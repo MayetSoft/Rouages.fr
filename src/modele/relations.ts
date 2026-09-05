@@ -52,6 +52,26 @@ export function famille(a: Pick<Arete, 'type' | 'nature'>): Famille {
   return PAR_TYPE[a.type];
 }
 
+/**
+ * Quand deux nœuds sont reliés de plusieurs façons, on n'en dessine qu'une :
+ * la plus informative. « Vous » est acteur d'une étape *et* titulaire d'un
+ * levier sur le même processus — dire « intervient dans » plutôt que « peut
+ * agir sur » perdrait précisément ce que le site est fait pour montrer.
+ */
+const PRIORITE: TypeArete[] = [
+  'peut-agir',
+  'detient',
+  'partage',
+  'flux',
+  'exerce',
+  'produit',
+  'intervient',
+];
+
+export function parPriorite<T extends { type: TypeArete }>(aretes: T[]): T[] {
+  return [...aretes].sort((a, b) => PRIORITE.indexOf(a.type) - PRIORITE.indexOf(b.type));
+}
+
 /** Les familles qui portent une flèche : celles où le sens change le sens. */
 export const FLECHEE: Record<Famille, boolean> = {
   pouvoir: false,

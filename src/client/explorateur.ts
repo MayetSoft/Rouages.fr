@@ -26,6 +26,7 @@ import {
   LIBELLE_INVERSE,
   LIBELLE_LIEN,
   LIBELLE_TYPE_NOEUD,
+  parPriorite,
   type Famille,
 } from '../modele/relations.ts';
 import { decalageTexte, formeNoeud } from '../vues/formes.ts';
@@ -57,7 +58,7 @@ function demarrer(reseau: Reseau) {
   const resultats = document.getElementById('resultats');
   const retour = document.getElementById('retour-carte');
   const aide = document.getElementById('aide');
-  const aideParDefaut = aide?.textContent ?? '';
+  const aideFamille = document.getElementById('aide-famille');
   if (!toileEventuelle || !panneauEventuel) return;
   // Réaffectés après le garde : les fonctions déclarées plus bas ne bénéficient
   // pas du rétrécissement de type appliqué au-dessus.
@@ -201,7 +202,10 @@ function demarrer(reseau: Reseau) {
     if (!etat.visibles.has(fam)) return;
     toile.setAttribute('data-accent', fam);
     const f = FAMILLES.find((x) => x.id === fam);
-    if (aide && f) aide.textContent = `${f.libelle} — ${f.aide}`;
+    if (aide && aideFamille && f) {
+      aideFamille.textContent = `${f.libelle} — ${f.aide}`;
+      aide.classList.add('aide--famille');
+    }
     const touches = new Set<string>();
     for (const a of toile.querySelectorAll<SVGPathElement>(`.a[data-famille="${fam}"]`)) {
       if (a.dataset.de) touches.add(a.dataset.de);
@@ -214,7 +218,10 @@ function demarrer(reseau: Reseau) {
 
   function rallumer() {
     toile.removeAttribute('data-accent');
-    if (aide) aide.textContent = aideParDefaut;
+    if (aide && aideFamille) {
+      aideFamille.textContent = '';
+      aide.classList.remove('aide--famille');
+    }
     for (const e of toile.querySelectorAll('.eteint, .vif')) e.classList.remove('eteint', 'vif');
   }
 
@@ -337,7 +344,7 @@ function demarrer(reseau: Reseau) {
 
     const voisins: { noeud: Noeud; label: string; type: TypeArete; fam: Famille; sortante: boolean }[] = [];
     const vus = new Set<string>([id]);
-    for (const a of reseau.aretes) {
+    for (const a of parPriorite(reseau.aretes)) {
       const autre = a.de === id ? a.vers : a.vers === id ? a.de : null;
       if (!autre || vus.has(autre)) continue;
       const n = index.get(autre);
@@ -456,6 +463,27 @@ function demarrer(reseau: Reseau) {
       chiffres.append(d);
     }
     panneau.append(chiffres);
+
+    // Les procédures ne sont pas sur la carte, qui ne montre que des acteurs :
+    // sans cette liste, le contenu le plus utile du site serait invisible.
+    const procedures = reseau.noeuds
+      .filter((n) => n.type === 'processus')
+      .sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
+    if (procedures.length > 0) {
+      panneau.append(ligne('h3', 'p-titre-section', 'Où vous pouvez agir'));
+      const ul = document.createElement('ul');
+      ul.className = 'p-procedures';
+      for (const n of procedures) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = n.nom;
+        b.addEventListener('click', () => ouvrir(n.id));
+        const li = document.createElement('li');
+        li.append(b, ligne('span', 'v-nature', n.resume));
+        ul.append(li);
+      }
+      panneau.append(ul);
+    }
 
     // Légende des formes : le type d'un nœud ne passe pas par la couleur.
     panneau.append(ligne('h3', 'p-titre-section', 'La forme dit le type'));

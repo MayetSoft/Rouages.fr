@@ -253,3 +253,74 @@ competences:
     liens: [wp-cada, cada]
     verifie_le: 2026-09-05
     confiance: etabli
+
+  # --- Ajouts phase 2 -----------------------------------------------------
+  - id: communication-documents
+    nom: "Communiquer les documents administratifs"
+    nom_court: "Communiquer les documents"
+    acteur: cada
+    resume: "Toute administration doit communiquer ses documents ; la CADA arbitre quand elle refuse."
+    partagee_avec: [commune, epci, departement, region, etat, delegataire-eau]
+    liens: [crpa, cada, sp-documents-administratifs]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: participation-public
+    nom: "Organiser la participation du public"
+    nom_court: "Participation du public"
+    acteur: prefet
+    resume: "Enquêtes publiques et concertations préalables aux projets ayant un impact sur l'environnement."
+    partagee_avec: [commune, epci, commissaire-enqueteur, etat]
+    liens: [code-environnement, vp-enquete-publique, od-projets-environnement]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: controle-des-comptes
+    nom: "Contrôler les comptes et la gestion"
+    nom_court: "Contrôle des comptes"
+    acteur: chambre-regionale-comptes
+    resume: "Examine la régularité des comptes et l'efficacité de la gestion, et publie des rapports d'observations."
+    partagee_avec: [prefet, commune, epci, departement, region]
+    liens: [code-juridictions-financieres, ccomptes, od-comptes-crc]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: vote-du-budget
+    nom: "Voter le budget"
+    nom_court: "Vote du budget"
+    acteur: conseil-municipal
+    resume: "Le conseil vote les recettes et les dépenses, et arrête ensuite les comptes de l'année écoulée."
+    partagee_avec: [maire, prefet, chambre-regionale-comptes]
+    liens: [cgct, vp-budget-local, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: aide-sociale-communale
+    nom: "Aide sociale de proximité"
+    nom_court: "Aide sociale communale"
+    acteur: ccas
+    resume: "Secours d'urgence, domiciliation, accompagnement : l'échelon communal de l'action sociale."
+    partagee_avec: [commune, departement]
+    liens: [wp-ccas, code-action-sociale, unccas]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: mediation-service-public
+    nom: "Médiation avec un service public"
+    nom_court: "Médiation"
+    acteur: defenseur-des-droits
+    resume: "Saisine gratuite en cas de litige avec une administration, avant ou à côté du recours contentieux."
+    partagee_avec: [etat, commune, departement]
+    liens: [defenseur-droits, wp-defenseur-droits]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: avis-vie-ecole
+    nom: "Donner un avis sur la vie de l'école"
+    nom_court: "Avis sur l'école"
+    acteur: conseil-ecole
+    resume: "Le conseil d'école est consulté, mais les moyens et la carte scolaire restent décidés par l'État."
+    partagee_avec: [commune, rectorat]
+    liens: [wp-conseil-ecole, code-education]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer

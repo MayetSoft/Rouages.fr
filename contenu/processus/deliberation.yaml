@@ -1,0 +1,101 @@
+# Contester une délibération du conseil municipal.
+# Le pendant « contrôle » du processus précédent : ce qu'on fait du document
+# une fois qu'on l'a obtenu.
+documents:
+  - id: deliberation
+    nom: "La délibération"
+    resume: "L'acte par lequel le conseil décide. Public, affiché, transmis au préfet."
+    ou_le_trouver: "Affichage en mairie, site de la commune, ou sur demande."
+    liens: [cgct, cada]
+  - id: proces-verbal
+    nom: "Le procès-verbal de séance"
+    resume: "Le compte rendu des débats, plus complet que la délibération elle-même."
+    ou_le_trouver: "Mairie, sur demande."
+    liens: [cgct, sp-documents-administratifs]
+
+processus:
+  - id: contester-deliberation
+    nom: "Contester une délibération"
+    famille: quotidien
+    resume: "Une décision du conseil municipal ou communautaire vous paraît illégale : qui la contrôle, dans quel délai, et comment s'y prendre."
+    declencheur: "Adoption d'une délibération par le conseil"
+    sortie: "Délibération maintenue, retirée, ou annulée par le juge"
+    decideur: tribunal-administratif
+    competences: [vote-du-budget, controle-legalite, acces-documents]
+    liens: [cgct, wp-recours-administratif, code-justice-administrative]
+    verifie_le: 2026-09-05
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: conseil-municipal
+        action: "Séance publique et vote de la délibération"
+        produit: [deliberation, proces-verbal]
+        note: "Les séances sont publiques : on peut y assister sans y être invité."
+        liens: [cgct]
+        confiance: etabli
+      - ordre: 2
+        acteur: maire
+        action: "Publication ou affichage, et transmission au préfet"
+        note: "C'est la publicité de l'acte qui le rend exécutoire, et qui fait courir les délais de recours."
+        liens: [cgct]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: prefet
+        action: "Contrôle de légalité"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Le préfet peut demander le retrait de l'acte, puis le déférer au tribunal administratif."
+        liens: [cgct, wp-prefet]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: citoyen
+        action: "Recours gracieux auprès de l'auteur de l'acte"
+        conditionnelle: true
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        liens: [wp-recours-administratif]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: tribunal-administratif
+        action: "Jugement du recours"
+        liens: [code-justice-administrative]
+        confiance: etabli
+
+    leviers:
+      - id: assister-a-la-seance
+        quoi: "Assister à la séance du conseil"
+        quand: "Avant le vote — l'ordre du jour est affiché à l'avance"
+        aupres_de: "Personne : la séance est publique de droit"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Assister ne donne pas la parole. Pour peser, il faut avoir écrit aux élus avant la séance."
+        liens: [cgct]
+        confiance: etabli
+      - id: demander-le-pv
+        quoi: "Demander le procès-verbal, plus complet que la délibération"
+        quand: "Après la séance"
+        aupres_de: "La mairie"
+        difficulte: faible
+        recours_si_refus: "Saisir la CADA"
+        ancre_etape: 2
+        piege: "La délibération dit ce qui a été décidé, pas ce qui a été dit. Les motifs utiles sont dans le procès-verbal."
+        liens: [cada, sp-documents-administratifs]
+        confiance: a_confirmer
+      - id: alerter-le-prefet
+        quoi: "Signaler l'illégalité supposée au préfet, au titre du contrôle de légalité"
+        quand: "Pendant les deux mois qui suivent la transmission"
+        aupres_de: "La préfecture"
+        difficulte: moyenne
+        ancre_etape: 3
+        piege: "Le préfet n'est jamais obligé de déférer. Ce signalement ne conserve pas votre propre délai de recours : il faut mener les deux en parallèle."
+        liens: [cgct, wp-prefet]
+        confiance: a_confirmer
+      - id: recours-deliberation
+        quoi: "Former un recours devant le tribunal administratif"
+        quand: "2 mois à compter de la publication ou de l'affichage"
+        aupres_de: "Le tribunal administratif du ressort"
+        difficulte: elevee
+        ancre_etape: 4
+        piege: "Il faut un intérêt à agir. Être contribuable de la commune en donne un dans certains cas, pas dans tous."
+        liens: [code-justice-administrative, wp-recours-administratif]
+        confiance: a_confirmer

@@ -268,3 +268,64 @@ acteurs:
     liens: [sp-permis, od-sitadel]
     verifie_le: 2026-09-05
     confiance: etabli
+
+  # --- Ajouts phase 2 -----------------------------------------------------
+  - id: cada
+    nom: "La CADA"
+    nom_court: "CADA"
+    type: service_administratif
+    echelon: etat
+    resume: "Autorité que l'on saisit gratuitement quand une administration refuse de communiquer un document ; elle rend un avis."
+    liens: [wp-cada, cada, crpa]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: commissaire-enqueteur
+    nom: "Le commissaire enquêteur"
+    nom_court: "Commissaire enquêteur"
+    type: personne
+    echelon: etat
+    resume: "Désigné pour conduire une enquête publique : il recueille les observations et rend un rapport avec un avis motivé."
+    liens: [wp-enquete-publique, code-environnement, vp-enquete-publique]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: ccas
+    nom: "Le CCAS"
+    nom_court: "CCAS"
+    type: service_administratif
+    echelon: commune
+    resume: "Centre communal d'action sociale : l'aide sociale de proximité, distincte de celle du département."
+    liens: [wp-ccas, code-action-sociale, unccas]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: chambre-regionale-comptes
+    nom: "La chambre régionale des comptes"
+    nom_court: "Chambre des comptes"
+    type: service_deconcentre
+    echelon: region
+    resume: "Contrôle les comptes et la gestion des collectivités, et publie des rapports d'observations publics."
+    liens: [wp-crc, code-juridictions-financieres, ccomptes]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: defenseur-des-droits
+    nom: "Le Défenseur des droits"
+    nom_court: "Défenseur des droits"
+    type: service_administratif
+    echelon: etat
+    resume: "Autorité indépendante que l'on saisit gratuitement en cas de litige avec un service public."
+    liens: [wp-defenseur-droits, defenseur-droits]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: conseil-ecole
+    nom: "Le conseil d'école"
+    nom_court: "Conseil d'école"
+    type: assemblee
+    echelon: commune
+    resume: "Réunit enseignants, parents élus et la commune ; il est consulté sur la vie de l'école mais ne décide pas des moyens."
+    liens: [wp-conseil-ecole, code-education]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer

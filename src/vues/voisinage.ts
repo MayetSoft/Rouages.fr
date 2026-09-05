@@ -14,6 +14,7 @@ import {
   FLECHEE,
   LIBELLE_ARETE,
   LIBELLE_INVERSE,
+  parPriorite,
   type Famille,
 } from '../modele/relations.ts';
 import { decalageTexte, formeNoeud } from './formes.ts';
@@ -31,7 +32,7 @@ export function voisinsDe(reseau: Reseau, id: string): Voisin[] {
   const index = new Map(reseau.noeuds.map((n) => [n.id, n]));
   const vus = new Set([id]);
   const voisins: Voisin[] = [];
-  for (const a of reseau.aretes) {
+  for (const a of parPriorite(reseau.aretes)) {
     const autre = a.de === id ? a.vers : a.vers === id ? a.de : null;
     if (!autre || vus.has(autre)) continue;
     const n = index.get(autre);

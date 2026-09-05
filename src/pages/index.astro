@@ -62,8 +62,11 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
       {/* Le geste n'est pas le même au doigt et à la souris : on le dit
           différemment plutôt que de parler de survol à qui ne survole pas. */}
       <p class="aide" id="aide">
-        <span class="si-survol">Survolez pour isoler une couche · cliquez un nœud pour l’ouvrir · Échap pour revenir</span>
-        <span class="si-tactile">Touchez une famille pour la masquer · un nœud pour l’ouvrir</span>
+        <span class="aide-defaut">
+          <span class="si-survol">Survolez pour isoler une couche · cliquez un nœud pour l’ouvrir · Échap pour revenir</span>
+          <span class="si-tactile">Touchez une famille pour la masquer · un nœud pour l’ouvrir</span>
+        </span>
+        <span id="aide-famille"></span>
       </p>
     </div>
     <aside id="panneau" aria-live="polite"></aside>

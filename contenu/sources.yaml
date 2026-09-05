@@ -72,3 +72,27 @@ sources:
   - { id: od-decp, type: donnees_ouvertes, titre: "Données essentielles de la commande publique", url: "https://www.data.gouv.fr/fr/datasets/donnees-essentielles-de-la-commande-publique-fichiers-consolides/", consulte_le: 2026-09-05 }
   - { id: od-datagouv, type: donnees_ouvertes, titre: "data.gouv.fr — la plateforme des données publiques", url: "https://www.data.gouv.fr/", consulte_le: 2026-09-05 }
   - { id: od-dvf, type: donnees_ouvertes, titre: "DVF — demandes de valeurs foncières (prix des ventes)", url: "https://app.dvf.etalab.gouv.fr/", consulte_le: 2026-09-05 }
+
+  # --- Ajouts phase 2 : information, contrôle, participation, budget --------
+  - { id: crpa, type: droit, titre: "Code des relations entre le public et l'administration", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000031366350/", consulte_le: 2026-09-05 }
+  - { id: code-justice-administrative, type: droit, titre: "Code de justice administrative", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070933/", consulte_le: 2026-09-05 }
+  - { id: code-juridictions-financieres, type: droit, titre: "Code des juridictions financières", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070249/", consulte_le: 2026-09-05 }
+
+  - { id: wp-enquete-publique, type: wikipedia, titre: "Enquête publique", url: "https://fr.wikipedia.org/wiki/Enqu%C3%AAte_publique", consulte_le: 2026-09-05 }
+  - { id: wp-ccas, type: wikipedia, titre: "Centre communal d'action sociale", url: "https://fr.wikipedia.org/wiki/Centre_communal_d%27action_sociale", consulte_le: 2026-09-05 }
+  - { id: wp-crc, type: wikipedia, titre: "Chambre régionale des comptes", url: "https://fr.wikipedia.org/wiki/Chambre_r%C3%A9gionale_des_comptes", consulte_le: 2026-09-05 }
+  - { id: wp-defenseur-droits, type: wikipedia, titre: "Défenseur des droits", url: "https://fr.wikipedia.org/wiki/D%C3%A9fenseur_des_droits", consulte_le: 2026-09-05 }
+  - { id: wp-conseil-ecole, type: wikipedia, titre: "Conseil d'école", url: "https://fr.wikipedia.org/wiki/Conseil_d%27%C3%A9cole", consulte_le: 2026-09-05 }
+  - { id: wp-recours-administratif, type: wikipedia, titre: "Recours administratif en France", url: "https://fr.wikipedia.org/wiki/Recours_administratif_en_France", consulte_le: 2026-09-05 }
+
+  - { id: sp-documents-administratifs, type: page_officielle, titre: "Accès aux documents administratifs — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/F2467", consulte_le: 2026-09-05 }
+  - { id: vp-enquete-publique, type: page_officielle, titre: "L'enquête publique — vie-publique.fr", url: "https://www.vie-publique.fr/fiches/20240-lenquete-publique", consulte_le: 2026-09-05 }
+  - { id: vp-budget-local, type: page_officielle, titre: "Le budget des collectivités territoriales — vie-publique.fr", url: "https://www.vie-publique.fr/fiches/20125-le-budget-des-collectivites-territoriales", consulte_le: 2026-09-05 }
+  - { id: ccomptes, type: page_officielle, titre: "Cour des comptes et chambres régionales des comptes", url: "https://www.ccomptes.fr/", consulte_le: 2026-09-05 }
+  - { id: defenseur-droits, type: page_officielle, titre: "Défenseur des droits", url: "https://www.defenseurdesdroits.fr/", consulte_le: 2026-09-05 }
+  - { id: unccas, type: page_officielle, titre: "Union nationale des CCAS", url: "https://www.unccas.org/", consulte_le: 2026-09-05 }
+  - { id: madada, type: page_officielle, titre: "Ma Dada — faire une demande de document administratif en ligne", url: "https://madada.fr/", consulte_le: 2026-09-05 }
+
+  - { id: od-projets-environnement, type: donnees_ouvertes, titre: "Projets soumis à évaluation environnementale et enquêtes publiques", url: "https://www.projets-environnement.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: od-comptes-crc, type: donnees_ouvertes, titre: "Rapports des chambres régionales des comptes", url: "https://www.ccomptes.fr/fr/publications", consulte_le: 2026-09-05 }
+  - { id: od-actes-budgetaires, type: donnees_ouvertes, titre: "Comptes individuels des collectivités (DGFiP)", url: "https://www.data.gouv.fr/fr/datasets/comptes-individuels-des-collectivites-fichier-global-a-compter-de-2000/", consulte_le: 2026-09-05 }

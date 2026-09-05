@@ -1,0 +1,80 @@
+# Demander un document administratif.
+# Le processus le plus utile du site : c'est la porte d'entrée de tous les
+# autres. Sans document, on ne conteste rien.
+processus:
+  - id: document-administratif
+    nom: "Demander un document administratif"
+    famille: quotidien
+    resume: "Délibérations, budgets, marchés, rapports : ce qui est communicable, à qui le demander, et que faire en cas de refus."
+    declencheur: "Demande écrite adressée à l'administration qui détient le document"
+    sortie: "Le document, ou un refus contestable devant la CADA puis le juge"
+    decideur: cada
+    competences: [communication-documents, acces-documents]
+    liens: [crpa, sp-documents-administratifs, cada]
+    verifie_le: 2026-09-05
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Demande écrite du document, en gardant une trace"
+        liens: [sp-documents-administratifs, madada]
+        confiance: etabli
+      - ordre: 2
+        acteur: commune
+        action: "Réponse de l'administration : communication, refus, ou silence"
+        delai: { valeur: 1, unite: mois, nature: maximum_legal }
+        note: "Le silence gardé pendant un mois vaut refus. C'est ce refus implicite qui ouvre la suite."
+        liens: [crpa, sp-documents-administratifs]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: citoyen
+        action: "Saisine de la CADA"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "À compter du refus, explicite ou implicite. Gratuit, par simple courrier ou formulaire."
+        liens: [cada, crpa]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: cada
+        action: "Instruction et avis de la CADA"
+        delai: { valeur: 1, unite: mois, nature: indicatif }
+        note: "L'avis n'est pas contraignant, mais l'administration le suit dans la plupart des cas."
+        liens: [cada]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: tribunal-administratif
+        action: "Recours contentieux si le refus persiste"
+        conditionnelle: true
+        note: "La saisine préalable de la CADA est un passage obligé avant le juge."
+        liens: [code-justice-administrative, cada]
+        confiance: a_confirmer
+
+    leviers:
+      - id: demander-par-ecrit
+        quoi: "Formuler la demande par écrit, en désignant le document précisément"
+        quand: "À tout moment"
+        aupres_de: "L'administration qui détient le document"
+        difficulte: faible
+        piege: "Une demande orale ne fait courir aucun délai. C'est l'écrit daté qui déclenche tout le reste."
+        liens: [sp-documents-administratifs, madada]
+        confiance: etabli
+      - id: laisser-courir-le-mois
+        quoi: "Attendre la fin du mois de silence plutôt que de relancer indéfiniment"
+        quand: "Un mois après la demande"
+        aupres_de: "Personne — le silence suffit"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Relancer ne repousse pas le délai, mais brouille la date de départ. Garder l'accusé d'envoi initial."
+        liens: [crpa]
+        confiance: a_confirmer
+      - id: saisir-la-cada
+        quoi: "Saisir la CADA, gratuitement"
+        quand: "Dans les 2 mois suivant le refus, explicite ou implicite"
+        aupres_de: "La CADA, par courrier ou en ligne"
+        difficulte: faible
+        recours_si_refus: "Le tribunal administratif, après l'avis"
+        ancre_etape: 3
+        piege: "Passé deux mois, la voie est fermée pour cette demande — il faut alors la reformuler entièrement."
+        liens: [cada, crpa]
+        confiance: a_confirmer

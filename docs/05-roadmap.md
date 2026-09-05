@@ -8,28 +8,41 @@ de nœuds.
 
 Vision, familles, modèle de données, vues, choix techniques.
 
-## Phase 1 — Le réseau local ✔ *(en place)*
+## Phase 1 — Le réseau local ✔
 
-26 acteurs, 26 compétences, 10 flux, un processus, ~50 pages de référence liées.
-Carte d'ensemble, focus, pages de nœud sans JavaScript, validation en
-intégration continue.
+Carte d'ensemble, focus, pages de nœud sans JavaScript, encodage visuel validé,
+validation du contenu en intégration continue.
 
-**Reste à faire avant de considérer la phase close** : faire relire les
-attributions de compétences par un praticien (les nœuds concernés portent
-`confiance: a_confirmer`).
+## Phase 2 — Densifier *(en cours)*
 
-## Phase 2 — Densifier
+Fait :
 
-- Les acteurs manquants de l'échelon local : SCoT, CCAS, chambres consulaires,
-  Enedis, opérateurs de transport, agence d'urbanisme.
-- Les compétences manquantes : voirie, énergie, culture, sport, funéraire,
-  numérique.
-- Les flux réellement chiffrés, branchés sur l'OFGL.
-- Deux ou trois processus de plus : contester une délibération, demander un
-  document administratif, une enquête publique.
+- **5 processus**, choisis pour couvrir les quatre prises réelles d'un
+  habitant : l'information (demander un document administratif), le contrôle
+  (contester une délibération), la participation (une enquête publique),
+  l'argent (le vote du budget communal), et l'urbanisme (le permis de
+  construire) ;
+- les acteurs qui manquaient à ces circuits : CADA, commissaire enquêteur,
+  chambre régionale des comptes, Défenseur des droits, CCAS, conseil d'école ;
+- 32 acteurs, 33 compétences, 183 relations, 71 pages de référence.
+
+Reste :
+
+- les acteurs de réseau : Enedis, opérateurs de transport, agence d'urbanisme,
+  SCoT, chambres consulaires ;
+- les compétences manquantes : énergie, culture, sport, funéraire, numérique ;
+- les flux réellement chiffrés, branchés sur l'OFGL ;
+- **la relecture par un praticien** des attributions marquées
+  `confiance: a_confirmer` — c'est le vrai reste à faire, pas le volume.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
+
+## Phase 2 bis — Mettre en ligne
+
+Déploiement, domaine, mentions légales, licence, sitemap. À faire dès que les
+attributions sont relues : rien n'est réel tant que personne d'extérieur n'a
+touché le site.
 
 ## Phase 3 — Élargir
 

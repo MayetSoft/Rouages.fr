@@ -1,0 +1,101 @@
+# Le budget communal.
+# Le seul document qui dit ce que la commune fait réellement, par opposition à
+# ce qu'elle annonce.
+documents:
+  - id: budget-primitif
+    nom: "Le budget primitif"
+    resume: "Les recettes et les dépenses prévues pour l'année, votées par le conseil."
+    ou_le_trouver: "Mairie, et données consolidées sur l'OFGL."
+    liens: [cgct, od-ofgl, od-actes-budgetaires]
+  - id: compte-administratif
+    nom: "Le compte administratif"
+    resume: "Ce qui a réellement été dépensé et encaissé. À comparer au budget voté."
+    ou_le_trouver: "Mairie, et données consolidées sur l'OFGL."
+    liens: [cgct, od-ofgl]
+
+processus:
+  - id: budget-communal
+    nom: "Le vote du budget communal"
+    famille: publics
+    resume: "Où passe l'argent de la commune : qui prépare, qui vote, qui contrôle, et à quels moments on peut regarder."
+    declencheur: "Débat d'orientation budgétaire, en amont du vote"
+    sortie: "Un budget voté, puis un compte administratif arrêté l'année suivante"
+    decideur: conseil-municipal
+    competences: [vote-du-budget, controle-des-comptes, controle-legalite]
+    liens: [cgct, vp-budget-local, od-ofgl]
+    verifie_le: 2026-09-05
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: maire
+        action: "Débat d'orientation budgétaire devant le conseil"
+        note: "Obligatoire au-delà d'un seuil de population. C'est là que les arbitrages se discutent, pas au vote."
+        liens: [cgct, vp-budget-local]
+        confiance: a_confirmer
+      - ordre: 2
+        acteur: conseil-municipal
+        action: "Vote du budget primitif"
+        produit: [budget-primitif]
+        delai: { valeur: 2, unite: mois, nature: indicatif }
+        note: "Le budget doit être voté avant une date limite fixée par la loi, en principe au printemps."
+        liens: [cgct]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: prefet
+        action: "Contrôle budgétaire et de légalité"
+        note: "En cas de budget déséquilibré ou voté hors délai, le préfet saisit la chambre régionale des comptes."
+        liens: [cgct, code-juridictions-financieres]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: conseil-municipal
+        action: "Arrêté du compte administratif de l'année écoulée"
+        produit: [compte-administratif]
+        liens: [cgct]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: chambre-regionale-comptes
+        action: "Contrôle des comptes et de la gestion"
+        conditionnelle: true
+        note: "Périodique, non systématique. Le rapport d'observations est public et souvent très lisible."
+        liens: [code-juridictions-financieres, ccomptes, od-comptes-crc]
+        confiance: a_confirmer
+
+    leviers:
+      - id: assister-au-dob
+        quoi: "Assister au débat d'orientation budgétaire"
+        quand: "En amont du vote, souvent deux mois avant"
+        aupres_de: "Personne : la séance est publique"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Au moment du vote, tout est arbitré. Le seul moment où les choix sont encore ouverts, c'est le débat d'orientation."
+        liens: [cgct, vp-budget-local]
+        confiance: a_confirmer
+      - id: comparer-sur-ofgl
+        quoi: "Comparer les finances de sa commune à celles de communes semblables"
+        quand: "À tout moment"
+        aupres_de: "L'Observatoire des finances et de la gestion publique locales"
+        difficulte: faible
+        piege: "Comparer par habitant et à strate de population équivalente, sinon les écarts ne veulent rien dire."
+        liens: [od-ofgl, od-actes-budgetaires]
+        confiance: etabli
+      - id: comparer-budget-compte
+        quoi: "Comparer le compte administratif au budget voté"
+        quand: "L'année suivant l'exercice"
+        aupres_de: "La mairie, ou l'OFGL"
+        difficulte: moyenne
+        recours_si_refus: "Saisir la CADA"
+        ancre_etape: 4
+        piege: "C'est l'écart entre les deux qui est intéressant, pas le budget seul : il dit ce qui a été annoncé et pas fait."
+        liens: [cgct, od-ofgl, cada]
+        confiance: a_confirmer
+      - id: lire-le-rapport-crc
+        quoi: "Lire le rapport d'observations de la chambre régionale des comptes"
+        quand: "À sa publication ; les rapports antérieurs restent en ligne"
+        aupres_de: "Le site des juridictions financières"
+        difficulte: faible
+        ancre_etape: 5
+        piege: "Le rapport doit être présenté au conseil et devient public ; c'est la source la plus solide sur la gestion d'une commune."
+        liens: [ccomptes, od-comptes-crc, code-juridictions-financieres]
+        confiance: a_confirmer
