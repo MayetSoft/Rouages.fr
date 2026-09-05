@@ -18,6 +18,7 @@ possibilité de tout reprendre ailleurs.
 | Validation | schémas **Zod** + contrôles maison en CI | la ligne éditoriale devient exécutable (`03-modele-de-donnees.md`) |
 | Schémas au build | SVG généré, code maison | lisible sans JS, indexable, imprimable, partageable |
 | Explorateur | SVG construit côté client, **sans bibliothèque** | la navigation *est* le produit ; d3-force a été écarté (voir plus bas) |
+| Couleurs | palette validée, 3 teintes porteuses d'identité | vérifiée au validateur, pas à l'œil — voir `04-graphiques.md` |
 | Recherche | **Pagefind** (index statique) | pas de serveur, suffisant jusqu'à plusieurs milliers de pages — *pas encore branché* |
 | Hébergement | Cloudflare Pages ou Netlify | statique, gratuit à cette échelle, déploiement sur push |
 | Analytique | Plausible ou Umami, sans cookie | cohérent avec le propos du site |

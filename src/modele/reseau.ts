@@ -65,7 +65,15 @@ export interface Reseau {
   noeuds: Noeud[];
   aretes: Arete[];
   /** Arêtes acteur↔acteur de la carte d'ensemble, déjà agrégées. */
-  carte: { aretes: Arete[]; largeur: number; hauteur: number; colonnes: { echelon: Echelon; libelle: string; x: number }[] };
+  carte: {
+    aretes: Arete[];
+    largeur: number;
+    hauteur: number;
+    /** Étendue verticale réellement occupée par des nœuds. */
+    hautNoeuds: number;
+    basNoeuds: number;
+    colonnes: { echelon: Echelon; libelle: string; x: number; largeur: number; haut: number; bas: number }[];
+  };
 }
 
 export const LIBELLE_ARETE: Record<TypeArete, string> = {
@@ -197,6 +205,8 @@ function disposerCarte(noeuds: Map<string, Noeud>, aretes: Arete[]): Reseau['car
   );
 
   const hauteurMax = Math.max(...contenus.map((c) => c.dedans.length)) * HAUTEUR_LIGNE;
+  let hautNoeuds = Infinity;
+  let basNoeuds = 0;
   let curseur = ECART_COLONNES;
   const colonnes = contenus.map((c, i) => {
     const x = Math.round(curseur + largeurs[i] / 2);
@@ -207,8 +217,17 @@ function disposerCarte(noeuds: Map<string, Noeud>, aretes: Arete[]): Reseau['car
     c.dedans.forEach((a, j) => {
       a.x = x;
       a.y = Math.round(decalage + j * HAUTEUR_LIGNE);
+      hautNoeuds = Math.min(hautNoeuds, a.y);
+      basNoeuds = Math.max(basNoeuds, a.y);
     });
-    return { echelon: c.echelon, libelle: LIBELLE_ECHELON[c.echelon], x };
+    return {
+      echelon: c.echelon,
+      libelle: LIBELLE_ECHELON[c.echelon],
+      x,
+      largeur: Math.round(largeurs[i]),
+      haut: Math.round(decalage),
+      bas: Math.round(decalage + (c.dedans.length - 1) * HAUTEUR_LIGNE),
+    };
   });
 
   const LARGEUR_CARTE = Math.round(curseur);
@@ -235,7 +254,14 @@ function disposerCarte(noeuds: Map<string, Noeud>, aretes: Arete[]): Reseau['car
     }
   }
 
-  return { aretes: [...paires.values()], largeur: LARGEUR_CARTE, hauteur: hauteur + 34, colonnes };
+  return {
+    aretes: [...paires.values()],
+    largeur: LARGEUR_CARTE,
+    hauteur: hauteur + 34,
+    hautNoeuds: hautNoeuds - 30,
+    basNoeuds: basNoeuds + 30,
+    colonnes,
+  };
 }
 
 /** Les relations d'un nœud, groupées par type — sert au focus et aux pages. */

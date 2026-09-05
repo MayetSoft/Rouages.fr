@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { construireReseau } from '../modele/reseau.ts';
 import { LIBELLE_ECHELON } from '../modele/schemas.ts';
+import { FAMILLES } from '../modele/relations.ts';
 
 const reseau = construireReseau();
 
@@ -25,8 +26,28 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
       <input id="recherche" type="search" placeholder="Chercher : eau, collège, préfet…" autocomplete="off" />
       <ul id="resultats"></ul>
     </div>
-    <label><input type="checkbox" id="filtre-flux" checked /> Flux d’argent</label>
-    <label><input type="checkbox" id="filtre-partage" checked /> Compétences partagées</label>
+
+    {/* La légende n'est pas décorative : elle commande l'affichage.
+        Survoler une clé éteint les autres familles, cliquer la retire. */}
+    <fieldset class="legende">
+      <legend>Relations</legend>
+      {FAMILLES.map((f) => (
+        <button type="button" class="cle" data-famille={f.id} aria-pressed="true" title={f.aide}>
+          <svg width="24" height="10" viewBox="0 0 24 10" aria-hidden="true">
+            <line
+              class={`cle-trait cle-trait--${f.id}`}
+              x1="1"
+              y1="5"
+              x2="23"
+              y2="5"
+              stroke-dasharray={f.tirets}
+            />
+          </svg>
+          {f.libelle}
+        </button>
+      ))}
+    </fieldset>
+
     <button type="button" class="plat" id="retour-carte" hidden>← Vue d’ensemble</button>
     <span class="zooms">
       <button type="button" class="plat rond" id="zoom-moins" aria-label="Dézoomer">−</button>
@@ -38,7 +59,12 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
   <div class="explorateur">
     <div class="scene">
       <svg id="toile" role="application" aria-label="Carte des acteurs publics et de leurs relations"></svg>
-      <p class="aide">Cliquez un nœud pour l’ouvrir · glissez pour vous déplacer · Échap pour revenir</p>
+      {/* Le geste n'est pas le même au doigt et à la souris : on le dit
+          différemment plutôt que de parler de survol à qui ne survole pas. */}
+      <p class="aide" id="aide">
+        <span class="si-survol">Survolez pour isoler une couche · cliquez un nœud pour l’ouvrir · Échap pour revenir</span>
+        <span class="si-tactile">Touchez une famille pour la masquer · un nœud pour l’ouvrir</span>
+      </p>
     </div>
     <aside id="panneau" aria-live="polite"></aside>
   </div>
@@ -52,7 +78,7 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
       </p>
       {parEchelon.map((c) => (
         <section>
-          <h2>{c.libelle}</h2>
+          <h2 class="badge">{c.libelle}</h2>
           <ul>{c.noeuds.map((n) => <li><a href={`/n/${n.id}`}>{n.nom}</a> — {n.resume}</li>)}</ul>
         </section>
       ))}

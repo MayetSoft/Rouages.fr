@@ -2,58 +2,41 @@
  * L'explorateur : la seule page du site, ou presque.
  *
  * Deux états. La **carte** montre tous les acteurs rangés par échelon et ce qui
- * circule entre eux. Le **focus** ouvre un nœud et déplie ses relations. On
- * passe de l'un à l'autre en cliquant ; rien n'est rédigé, tout renvoie vers
- * les pages qui font autorité.
+ * circule entre eux. Le **focus** ouvre un nœud et déplie ses relations.
  *
- * Pas de bibliothèque : le rendu est du SVG construit à la main, et les deux
- * dispositions sont déterministes — la même donnée donne toujours la même
- * image.
+ * Trois principes de lecture, dans l'ordre d'importance :
+ *
+ * 1. La couleur ne dit qu'une chose : la famille de relation. Le type d'un nœud
+ *    passe par sa forme, son échelon par sa colonne.
+ * 2. Survoler une famille éteint les autres. Sur un graphe dense, mettre en
+ *    retrait vaut mieux que masquer : la structure d'ensemble reste visible
+ *    pendant qu'on lit une couche.
+ * 3. Survoler un nœud ne garde que son voisinage. C'est la même idée appliquée
+ *    à un point du réseau plutôt qu'à une couche.
+ *
+ * Pas de bibliothèque, et deux dispositions calculées, non simulées : la même
+ * donnée donne toujours la même image, donc elle est citable et comparable.
  */
 import type { Reseau, Noeud, TypeArete } from '../modele/reseau.ts';
-
-const LIBELLE_ARETE: Record<TypeArete, string> = {
-  detient: 'détient',
-  partage: 'partage avec',
-  flux: 'verse à',
-  intervient: 'intervient dans',
-  'peut-agir': 'peut agir sur',
-  produit: 'produit',
-  exerce: 'met en œuvre',
-};
-
-const LIBELLE_INVERSE: Record<TypeArete, string> = {
-  detient: 'détenue par',
-  partage: 'partagée avec',
-  flux: 'reçoit de',
-  intervient: 'fait intervenir',
-  'peut-agir': 'ouvert à',
-  produit: 'produit par',
-  exerce: 'mise en œuvre par',
-};
-
-const LIBELLE_TYPE: Record<Noeud['type'], string> = {
-  acteur: 'Acteur',
-  competence: 'Compétence',
-  processus: 'Processus',
-  document: 'Document',
-};
-
-const LIBELLE_LIEN: Record<string, string> = {
-  wikipedia: 'Wikipédia',
-  droit: 'Le texte',
-  page_officielle: 'Page officielle',
-  donnees_ouvertes: 'Données ouvertes',
-  etude: 'Étude',
-  presse: 'Presse',
-};
+import {
+  famille,
+  FAMILLES,
+  FLECHEE,
+  LIBELLE_ARETE,
+  LIBELLE_INVERSE,
+  LIBELLE_LIEN,
+  LIBELLE_TYPE_NOEUD,
+  type Famille,
+} from '../modele/relations.ts';
+import { decalageTexte, formeNoeud } from '../vues/formes.ts';
 
 const NS = 'http://www.w3.org/2000/svg';
 
 interface Etat {
   mode: 'carte' | 'focus';
   focus: string | null;
-  filtres: { partage: boolean; flux: boolean };
+  /** Familles affichées. La légende est la commande. */
+  visibles: Set<Famille>;
 }
 
 interface Boite {
@@ -73,6 +56,8 @@ function demarrer(reseau: Reseau) {
   const recherche = document.getElementById('recherche') as HTMLInputElement | null;
   const resultats = document.getElementById('resultats');
   const retour = document.getElementById('retour-carte');
+  const aide = document.getElementById('aide');
+  const aideParDefaut = aide?.textContent ?? '';
   if (!toileEventuelle || !panneauEventuel) return;
   // Réaffectés après le garde : les fonctions déclarées plus bas ne bénéficient
   // pas du rétrécissement de type appliqué au-dessus.
@@ -80,7 +65,11 @@ function demarrer(reseau: Reseau) {
   const panneau = panneauEventuel;
 
   const index = new Map(reseau.noeuds.map((n) => [n.id, n]));
-  const etat: Etat = { mode: 'carte', focus: null, filtres: { partage: true, flux: true } };
+  const etat: Etat = {
+    mode: 'carte',
+    focus: null,
+    visibles: new Set(FAMILLES.map((f) => f.id)),
+  };
   let vue = { x: 0, y: 0, l: reseau.carte.largeur, h: reseau.carte.hauteur };
 
   /* ---------------------------------------------------------------- *
@@ -97,51 +86,169 @@ function demarrer(reseau: Reseau) {
   };
 
   /** Largeur approximative d'un libellé : suffisant pour dimensionner une boîte. */
-  const largeurTexte = (t: string, taille = 13) => t.length * taille * 0.58;
+  const largeurTexte = (t: string, taille = 13) => t.length * taille * 0.6;
 
   function dessinerNoeud(b: Boite, role: 'centre' | 'normal' = 'normal'): SVGGElement {
     const g = el('g', {
-      class: `n n--${b.noeud.type} ${role === 'centre' ? 'n--centre' : ''}`,
+      class: `n n--${b.noeud.type}${role === 'centre' ? ' n--centre' : ''}`,
       transform: `translate(${b.x - b.l / 2} ${b.y - b.h / 2})`,
       tabindex: 0,
       role: 'button',
-      'aria-label': `${LIBELLE_TYPE[b.noeud.type]} : ${b.noeud.nom}`,
-      'data-nom': b.noeud.nom,
+      'aria-label': `${LIBELLE_TYPE_NOEUD[b.noeud.type]} : ${b.noeud.nom}`,
       'data-id': b.noeud.id,
     });
-    g.append(el('rect', { class: 'n-fond', width: b.l, height: b.h, rx: b.h / 2 }));
-    const t = el('text', { class: 'n-nom', x: b.l / 2, y: b.h / 2 + 4, 'text-anchor': 'middle' });
+
+    for (const e of formeNoeud(b.noeud.type, b.l, b.h)) g.append(el(e.balise, e.attrs));
+
+    const taille = role === 'centre' ? 15.5 : 13;
+    const t = el('text', {
+      class: 'n-nom',
+      x: b.l / 2 + decalageTexte(b.noeud.type),
+      y: b.h / 2 + taille * 0.35,
+      'text-anchor': 'middle',
+    });
     t.textContent = b.noeud.court;
     g.append(t);
+
+    const titre = el('title');
+    titre.textContent = `${b.noeud.nom} — ${b.noeud.resume}`;
+    g.append(titre);
+
     g.addEventListener('click', () => ouvrir(b.noeud.id));
     g.addEventListener('keydown', (e) => {
-      if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+      const k = (e as KeyboardEvent).key;
+      if (k === 'Enter' || k === ' ') {
         e.preventDefault();
         ouvrir(b.noeud.id);
       }
     });
+    g.addEventListener('pointerenter', () => eclairerVoisinage(b.noeud.id));
+    g.addEventListener('focus', () => eclairerVoisinage(b.noeud.id));
+    g.addEventListener('pointerleave', rallumer);
+    g.addEventListener('blur', rallumer);
     return g;
   }
 
-  function defsFleche(): SVGDefsElement {
+  function defsFleches(): SVGDefsElement {
     const defs = el('defs');
-    const m = el('marker', {
-      id: 'fleche',
-      markerWidth: 9,
-      markerHeight: 9,
-      refX: 8,
-      refY: 3,
-      orient: 'auto',
-      markerUnits: 'userSpaceOnUse',
-    });
-    m.append(el('path', { class: 'a-pointe', d: 'M 0 0 L 8 3 L 0 6 z' }));
-    defs.append(m);
+    for (const f of FAMILLES) {
+      if (!FLECHEE[f.id]) continue;
+      const m = el('marker', {
+        id: `fleche-${f.id}`,
+        markerWidth: 9,
+        markerHeight: 9,
+        refX: 8,
+        refY: 3,
+        orient: 'auto',
+        markerUnits: 'userSpaceOnUse',
+      });
+      m.append(el('path', { class: `a-pointe--${f.id}`, d: 'M 0 0 L 8 3 L 0 6 z' }));
+      defs.append(m);
+    }
     return defs;
+  }
+
+  /**
+   * Le point où le trait rencontre le bord d'une pastille, dans la direction
+   * donnée. Approximation par rectangle : suffisante, et sans trigonométrie
+   * coûteuse à chaque rendu.
+   */
+  function bord(b: Boite, dx: number, dy: number): { x: number; y: number } {
+    const d = Math.hypot(dx, dy) || 1;
+    const ux = dx / d;
+    const uy = dy / d;
+    const t = 1 / Math.max(Math.abs(ux) / (b.l / 2), Math.abs(uy) / (b.h / 2));
+    return { x: b.x + ux * t, y: b.y + uy * t };
   }
 
   function courbe(x1: number, y1: number, x2: number, y2: number): string {
     const dx = Math.abs(x2 - x1) * 0.45;
     return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+  }
+
+  /** Une arête, avec sa famille, son tracé et son comportement au survol. */
+  function dessinerArete(
+    d: string,
+    fam: Famille,
+    infobulle: string,
+    options: { poids?: number; flechee?: boolean } = {},
+  ): SVGPathElement {
+    const chemin = el('path', {
+      class: `a a--f-${fam}${etat.visibles.has(fam) ? '' : ' masque'}`,
+      d,
+      'data-famille': fam,
+      ...(options.poids ? { 'stroke-width': Math.min(4.5, 1.4 + options.poids * 0.55) } : {}),
+      ...(options.flechee !== false && FLECHEE[fam] ? { 'marker-end': `url(#fleche-${fam})` } : {}),
+    });
+    const titre = el('title');
+    titre.textContent = infobulle;
+    chemin.append(titre);
+    chemin.addEventListener('pointerenter', () => accentuer(fam));
+    chemin.addEventListener('pointerleave', rallumer);
+    return chemin;
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Mise en retrait
+   * ---------------------------------------------------------------- */
+
+  /**
+   * Accentuer une famille : les autres passent en retrait, et les nœuds que
+   * cette famille ne touche pas aussi — sinon on éteint les traits mais on
+   * garde un mur de pastilles, et on n'a rien gagné en lisibilité.
+   */
+  function accentuer(fam: Famille) {
+    if (!etat.visibles.has(fam)) return;
+    toile.setAttribute('data-accent', fam);
+    const f = FAMILLES.find((x) => x.id === fam);
+    if (aide && f) aide.textContent = `${f.libelle} — ${f.aide}`;
+    const touches = new Set<string>();
+    for (const a of toile.querySelectorAll<SVGPathElement>(`.a[data-famille="${fam}"]`)) {
+      if (a.dataset.de) touches.add(a.dataset.de);
+      if (a.dataset.vers) touches.add(a.dataset.vers);
+    }
+    for (const n of toile.querySelectorAll<SVGGElement>('.couche-noeuds .n')) {
+      n.classList.toggle('vif', touches.has(n.dataset.id ?? ''));
+    }
+  }
+
+  function rallumer() {
+    toile.removeAttribute('data-accent');
+    if (aide) aide.textContent = aideParDefaut;
+    for (const e of toile.querySelectorAll('.eteint, .vif')) e.classList.remove('eteint', 'vif');
+  }
+
+  /** Survol d'un nœud : on ne garde que ce qui le touche. */
+  function eclairerVoisinage(id: string) {
+    toile.removeAttribute('data-accent');
+    const proches = new Set<string>([id]);
+    for (const a of reseau.aretes) {
+      if (a.de === id) proches.add(a.vers);
+      else if (a.vers === id) proches.add(a.de);
+    }
+    for (const a of reseau.carte.aretes) {
+      if (a.de === id) proches.add(a.vers);
+      else if (a.vers === id) proches.add(a.de);
+    }
+    for (const n of toile.querySelectorAll<SVGGElement>('.couche-noeuds .n')) {
+      const proche = proches.has(n.dataset.id ?? '');
+      n.classList.toggle('eteint', !proche);
+      n.classList.toggle('vif', n.dataset.id === id);
+    }
+    for (const a of toile.querySelectorAll<SVGPathElement>('.couche-aretes .a')) {
+      const touche = a.dataset.de === id || a.dataset.vers === id;
+      a.classList.toggle('eteint', !touche);
+      a.classList.toggle('vif', touche);
+    }
+    for (const l of toile.querySelectorAll<SVGTextElement>('.a-label')) {
+      l.classList.toggle('eteint', l.dataset.de !== id && l.dataset.vers !== id);
+    }
+  }
+
+  function appliquerVisibilite() {
+    for (const e of toile.querySelectorAll<SVGElement>('[data-famille]')) {
+      e.classList.toggle('masque', !etat.visibles.has(e.dataset.famille as Famille));
+    }
   }
 
   /* ---------------------------------------------------------------- *
@@ -150,59 +257,70 @@ function demarrer(reseau: Reseau) {
 
   function rendreCarte() {
     toile.textContent = '';
-    const { colonnes, aretes } = reseau.carte;
+    rallumer();
+    const { colonnes, aretes, hautNoeuds } = reseau.carte;
     cadrerCarte();
     appliquerVue();
 
-    toile.append(defsFleche());
+    toile.append(defsFleches());
+    const gBandes = el('g', { class: 'couche-bandes' });
     const gAretes = el('g', { class: 'couche-aretes' });
     const gNoeuds = el('g', { class: 'couche-noeuds' });
 
-    for (const col of colonnes) {
-      const t = el('text', { class: 'c-colonne', x: col.x, y: 26, 'text-anchor': 'middle' });
+    // Une bande une colonne sur deux : l'œil retrouve les échelons sans qu'on
+    // ait à tracer des séparateurs, qui seraient de l'encre pour rien.
+    colonnes.forEach((col, i) => {
+      // La bande épouse la pile de sa colonne, pas la hauteur de la carte :
+      // une colonne courte ne traîne pas un rectangle vide derrière elle.
+      if (i % 2 === 1) {
+        const l = col.largeur + 26;
+        gBandes.append(
+          el('rect', {
+            class: 'c-bande',
+            x: col.x - l / 2,
+            y: col.haut - 30,
+            width: l,
+            height: col.bas - col.haut + 60,
+            rx: 16,
+          }),
+        );
+      }
+      const t = el('text', { class: 'c-colonne', x: col.x, y: hautNoeuds - 12, 'text-anchor': 'middle' });
       t.textContent = col.libelle;
-      gAretes.append(t);
-    }
+      gBandes.append(t);
+    });
 
     const boites = new Map<string, Boite>();
     for (const n of reseau.noeuds) {
       if (n.type !== 'acteur' || n.x === undefined || n.y === undefined) continue;
-      const l = Math.max(96, largeurTexte(n.court) + 26);
-      const b: Boite = { noeud: n, x: n.x, y: n.y, l, h: 32 };
-      boites.set(n.id, b);
+      boites.set(n.id, { noeud: n, x: n.x, y: n.y, l: Math.max(96, largeurTexte(n.court) + 28), h: 34 });
     }
 
     for (const a of aretes) {
-      if (a.type === 'partage' && !etat.filtres.partage) continue;
-      if (a.type === 'flux' && !etat.filtres.flux) continue;
       const d = boites.get(a.de);
       const v = boites.get(a.vers);
       if (!d || !v) continue;
+      const fam = famille(a);
+
       // Le trait part toujours de l'émetteur, quelle que soit sa colonne : la
       // flèche indique alors le sens réel du versement, que la disposition en
       // colonnes ne dit pas.
       const versDroite = d.x <= v.x;
       const depart = versDroite ? d.x + d.l / 2 : d.x - d.l / 2;
       const arrivee = versDroite ? v.x - v.l / 2 : v.x + v.l / 2;
-      const chemin = el('path', {
-        class: `a a--${a.type}`,
-        d: courbe(depart, d.y, arrivee, v.y),
-        'stroke-width': Math.min(4, 0.8 + a.poids * 0.5),
-        'data-de': a.de,
-        'data-vers': a.vers,
-        ...(a.type === 'flux' ? { 'marker-end': 'url(#fleche)' } : {}),
-      });
-      const titre = el('title');
-      titre.textContent =
-        a.type === 'flux'
-          ? `${index.get(a.de)?.nom} verse à ${index.get(a.vers)?.nom}`
-          : `${index.get(a.de)?.nom} et ${index.get(a.vers)?.nom} partagent ${a.poids} compétence${a.poids > 1 ? 's' : ''}`;
-      chemin.append(titre);
+
+      const infobulle =
+        fam === 'partage'
+          ? `${d.noeud.nom} et ${v.noeud.nom} partagent ${a.poids} compétence${a.poids > 1 ? 's' : ''}`
+          : `${d.noeud.nom} → ${v.noeud.nom}`;
+      const chemin = dessinerArete(courbe(depart, d.y, arrivee, v.y), fam, infobulle, { poids: a.poids });
+      chemin.dataset.de = a.de;
+      chemin.dataset.vers = a.vers;
       gAretes.append(chemin);
     }
 
     for (const b of boites.values()) gNoeuds.append(dessinerNoeud(b));
-    toile.append(gAretes, gNoeuds);
+    toile.append(gBandes, gAretes, gNoeuds);
     retour?.setAttribute('hidden', '');
     ecrirePanneauAccueil();
   }
@@ -215,54 +333,76 @@ function demarrer(reseau: Reseau) {
     const centre = index.get(id);
     if (!centre) return;
     toile.textContent = '';
+    rallumer();
 
-    const voisins: { noeud: Noeud; label: string; type: TypeArete }[] = [];
+    const voisins: { noeud: Noeud; label: string; type: TypeArete; fam: Famille; sortante: boolean }[] = [];
     const vus = new Set<string>([id]);
-    const ajouter = (autre: string, label: string, type: TypeArete) => {
-      const n = index.get(autre);
-      if (!n || vus.has(autre)) return;
-      vus.add(autre);
-      voisins.push({ noeud: n, label, type });
-    };
     for (const a of reseau.aretes) {
-      if (a.de === id) ajouter(a.vers, LIBELLE_ARETE[a.type], a.type);
-      else if (a.vers === id) ajouter(a.de, LIBELLE_INVERSE[a.type], a.type);
+      const autre = a.de === id ? a.vers : a.vers === id ? a.de : null;
+      if (!autre || vus.has(autre)) continue;
+      const n = index.get(autre);
+      if (!n) continue;
+      vus.add(autre);
+      voisins.push({
+        noeud: n,
+        label: a.de === id ? LIBELLE_ARETE[a.type] : LIBELLE_INVERSE[a.type],
+        type: a.type,
+        fam: famille(a),
+        sortante: a.de === id,
+      });
     }
-    voisins.sort((a, b) => a.type.localeCompare(b.type) || a.noeud.nom.localeCompare(b.noeud.nom, 'fr'));
+    // Groupés par famille : les couches se lisent alors comme des secteurs.
+    const ordre = new Map(FAMILLES.map((f, i) => [f.id, i]));
+    voisins.sort(
+      (a, b) => ordre.get(a.fam)! - ordre.get(b.fam)! || a.noeud.nom.localeCompare(b.noeud.nom, 'fr'),
+    );
 
-    const L = 1000;
-    const rayon = Math.min(360, 150 + voisins.length * 11);
-    const H = rayon * 2 + 190;
+    const L = 1060;
+    const rayon = Math.min(370, 160 + voisins.length * 11);
+    const H = rayon * 2 + 170;
     vue = { x: -L / 2, y: -H / 2, l: L, h: H };
     appliquerVue();
 
+    toile.append(defsFleches());
     const gAretes = el('g', { class: 'couche-aretes' });
     const gNoeuds = el('g', { class: 'couche-noeuds' });
 
-    const lCentre = Math.max(150, largeurTexte(centre.court, 15) + 40);
-    const bCentre: Boite = { noeud: centre, x: 0, y: 0, l: lCentre, h: 44 };
+    const lCentre = Math.max(160, largeurTexte(centre.court, 15) + 44);
+    const bCentre: Boite = { noeud: centre, x: 0, y: 0, l: lCentre, h: 46 };
 
     voisins.forEach((v, i) => {
-      // Départ à midi, puis on tourne : l'ordre est stable d'une visite à l'autre.
+      // Départ à midi puis rotation : l'ordre est stable d'une visite à l'autre.
       const angle = (i / voisins.length) * Math.PI * 2 - Math.PI / 2;
-      const x = Math.cos(angle) * rayon * 1.28;
-      const y = Math.sin(angle) * rayon * 0.82;
-      const l = Math.max(104, Math.min(300, largeurTexte(v.noeud.court) + 26));
+      const x = Math.cos(angle) * rayon * 1.3;
+      const y = Math.sin(angle) * rayon * 0.86;
+      const l = Math.max(108, Math.min(300, largeurTexte(v.noeud.court) + 28));
       const b: Boite = { noeud: v.noeud, x, y, l, h: 32 };
 
-      const chemin = el('path', { class: `a a--${v.type}`, d: courbe(0, 0, x, y) });
-      const titre = el('title');
-      titre.textContent = `${centre.nom} — ${v.label} — ${v.noeud.nom}`;
-      chemin.append(titre);
+      // Le trait s'arrête au bord des deux pastilles, jamais en leur centre :
+      // sinon la flèche disparaît dessous. Et il va toujours de l'émetteur vers
+      // le destinataire, pour que ce soit le sens réel qui soit fléché.
+      const depart = bord(bCentre, x, y);
+      const arrivee = bord(b, -x, -y);
+      const chemin = dessinerArete(
+        v.sortante
+          ? courbe(depart.x, depart.y, arrivee.x, arrivee.y)
+          : courbe(arrivee.x, arrivee.y, depart.x, depart.y),
+        v.fam,
+        `${centre.nom} — ${v.label} — ${v.noeud.nom}`,
+      );
+      chemin.dataset.de = centre.id;
+      chemin.dataset.vers = v.noeud.id;
       gAretes.append(chemin);
 
-      // Le libellé de la relation, posé au tiers du trait, côté centre.
       const etiq = el('text', {
-        class: 'a-label',
-        x: x * 0.5,
-        y: y * 0.5 - 9,
+        class: `a-label a-label--f-${v.fam}${etat.visibles.has(v.fam) ? '' : ' masque'}`,
+        x: x * 0.6,
+        y: y * 0.6 - 9,
         'text-anchor': 'middle',
+        'data-famille': v.fam,
       });
+      etiq.dataset.de = centre.id;
+      etiq.dataset.vers = v.noeud.id;
       etiq.textContent = v.label;
       gAretes.append(etiq);
 
@@ -279,61 +419,134 @@ function demarrer(reseau: Reseau) {
    * Le panneau : c'est lui qui porte les liens sortants
    * ---------------------------------------------------------------- */
 
-  function ecrirePanneauAccueil() {
-    panneau.innerHTML = `
-      <p class="p-intro">
-        Chaque colonne est un échelon, chaque pastille un acteur. Les traits
-        pleins sont de l’argent qui circule&nbsp;; les traits pointillés, des
-        compétences que deux acteurs se partagent.
-      </p>
-      <p class="p-intro">Cliquez sur un acteur pour déplier ses rouages.</p>
-      <dl class="p-chiffres">
-        <div><dt>Acteurs</dt><dd>${reseau.noeuds.filter((n) => n.type === 'acteur').length}</dd></div>
-        <div><dt>Compétences</dt><dd>${reseau.noeuds.filter((n) => n.type === 'competence').length}</dd></div>
-        <div><dt>Relations</dt><dd>${reseau.aretes.length}</dd></div>
-        <div><dt>Pages liées</dt><dd>${new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).size}</dd></div>
-      </dl>`;
+  function vider(e: HTMLElement) {
+    while (e.firstChild) e.removeChild(e.firstChild);
   }
 
-  function ecrirePanneau(n: Noeud, voisins: { noeud: Noeud; label: string }[]) {
+  /** Les libellés viennent du contenu : on les insère en texte, jamais en HTML. */
+  function ligne(balise: string, classe: string, contenu: string): HTMLElement {
+    const e = document.createElement(balise);
+    e.className = classe;
+    e.textContent = contenu;
+    return e;
+  }
+
+  function ecrirePanneauAccueil() {
+    vider(panneau);
+    panneau.append(
+      ligne(
+        'p',
+        'p-intro',
+        'Chaque colonne est un échelon, chaque pastille un acteur. Survolez une famille de relations dans la légende pour ne garder qu’elle ; survolez un acteur pour ne garder que son voisinage.',
+      ),
+      ligne('p', 'p-intro', 'Cliquez sur un acteur pour déplier ses rouages.'),
+    );
+
+    const chiffres = document.createElement('dl');
+    chiffres.className = 'p-chiffres';
+    const compte: [string, number][] = [
+      ['Acteurs', reseau.noeuds.filter((n) => n.type === 'acteur').length],
+      ['Compétences', reseau.noeuds.filter((n) => n.type === 'competence').length],
+      ['Relations', reseau.aretes.length],
+      ['Pages liées', new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).size],
+    ];
+    for (const [nom, valeur] of compte) {
+      const d = document.createElement('div');
+      d.append(ligne('dt', '', nom), ligne('dd', '', String(valeur)));
+      chiffres.append(d);
+    }
+    panneau.append(chiffres);
+
+    // Légende des formes : le type d'un nœud ne passe pas par la couleur.
+    panneau.append(ligne('h3', 'p-titre-section', 'La forme dit le type'));
+    const formes = document.createElement('ul');
+    formes.className = 'p-formes';
+    for (const [type, texte] of [
+      ['acteur', 'Acteur — pastille'],
+      ['competence', 'Compétence — plaque'],
+      ['processus', 'Processus — barre de départ'],
+      ['document', 'Document — coin replié'],
+    ] as const) {
+      const li = document.createElement('li');
+      const s = el('svg', { width: 46, height: 20, viewBox: '0 0 46 20', 'aria-hidden': 'true' });
+      const g = el('g', { class: `n n--${type}` });
+      for (const e of formeNoeud(type, 44, 18)) g.append(el(e.balise, { ...e.attrs, transform: 'translate(1 1)' }));
+      s.append(g);
+      li.append(s, ligne('span', '', texte));
+      formes.append(li);
+    }
+    panneau.append(formes);
+  }
+
+  function ecrirePanneau(n: Noeud, voisins: { noeud: Noeud; label: string; fam: Famille }[]) {
+    vider(panneau);
+
+    const type = document.createElement('p');
+    type.className = 'p-type';
+    type.append(document.createTextNode(LIBELLE_TYPE_NOEUD[n.type]));
+    if (n.confiance !== 'etabli') {
+      type.append(
+        document.createTextNode(' · '),
+        ligne(
+          'span',
+          'p-confiance',
+          n.confiance === 'variable_selon_territoire' ? 'variable selon le territoire' : 'à confirmer',
+        ),
+      );
+    }
+    panneau.append(type, ligne('h2', 'p-nom', n.nom));
+    if (n.resume) panneau.append(ligne('p', 'p-resume', n.resume));
+
+    panneau.append(ligne('h3', 'p-titre-section', 'Pour en savoir plus'));
     const parType = new Map<string, typeof n.liens>();
     for (const l of n.liens) {
       if (!parType.has(l.type)) parType.set(l.type, []);
       parType.get(l.type)!.push(l);
     }
+    if (parType.size === 0) panneau.append(ligne('p', 'p-vide', 'Aucune page liée.'));
+    for (const [t, liste] of parType) {
+      const groupe = document.createElement('div');
+      groupe.className = 'p-groupe';
+      groupe.append(ligne('h3', '', LIBELLE_LIEN[t] ?? t));
+      const ul = document.createElement('ul');
+      for (const l of liste) {
+        const a = document.createElement('a');
+        a.href = l.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = l.titre;
+        const li = document.createElement('li');
+        li.append(a);
+        ul.append(li);
+      }
+      groupe.append(ul);
+      panneau.append(groupe);
+    }
 
-    const liens = [...parType.entries()]
-      .map(
-        ([type, liste]) => `
-        <div class="p-groupe">
-          <h3>${LIBELLE_LIEN[type] ?? type}</h3>
-          <ul>${liste
-            .map((l) => `<li><a href="${l.url}" target="_blank" rel="noopener">${echapper(l.titre)}</a></li>`)
-            .join('')}</ul>
-        </div>`,
-      )
-      .join('');
+    panneau.append(ligne('h3', 'p-titre-section', `${voisins.length} relations`));
+    const ul = document.createElement('ul');
+    ul.className = 'p-relations';
+    for (const v of voisins) {
+      const li = document.createElement('li');
+      li.append(ligne('span', `p-cle p-cle--${v.fam}`, ''));
+      const bloc = document.createElement('span');
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = v.noeud.nom;
+      b.addEventListener('click', () => ouvrir(v.noeud.id));
+      bloc.append(ligne('span', 'p-relation', v.label), b);
+      li.append(bloc);
+      ul.append(li);
+    }
+    panneau.append(ul);
 
-    const relations = voisins
-      .map(
-        (v) =>
-          `<li><span class="p-relation">${echapper(v.label)}</span> <button type="button" data-aller="${v.noeud.id}">${echapper(v.noeud.nom)}</button></li>`,
-      )
-      .join('');
-
-    panneau.innerHTML = `
-      <p class="p-type">${LIBELLE_TYPE[n.type]}${n.confiance !== 'etabli' ? ` · <span class="p-confiance">${n.confiance === 'variable_selon_territoire' ? 'variable selon le territoire' : 'à confirmer'}</span>` : ''}</p>
-      <h2 class="p-nom">${echapper(n.nom)}</h2>
-      ${n.resume ? `<p class="p-resume">${echapper(n.resume)}</p>` : ''}
-      <h3 class="p-titre-section">Pour en savoir plus</h3>
-      ${liens || '<p class="p-vide">Aucune page liée.</p>'}
-      <h3 class="p-titre-section">${voisins.length} relations</h3>
-      <ul class="p-relations">${relations}</ul>
-      <p class="p-permalien"><a href="/n/${n.id}">Page de ce nœud, sans JavaScript</a></p>`;
-
-    panneau.querySelectorAll<HTMLButtonElement>('[data-aller]').forEach((b) => {
-      b.addEventListener('click', () => ouvrir(b.dataset.aller!));
-    });
+    const permalien = document.createElement('p');
+    permalien.className = 'p-permalien';
+    const a = document.createElement('a');
+    a.href = `/n/${n.id}`;
+    a.textContent = 'Page de ce nœud, sans JavaScript';
+    permalien.append(a);
+    panneau.append(permalien);
   }
 
   /* ---------------------------------------------------------------- *
@@ -359,35 +572,45 @@ function demarrer(reseau: Reseau) {
     if (e.key === 'Escape' && etat.mode === 'focus') versCarte();
   });
 
-  for (const filtre of ['partage', 'flux'] as const) {
-    const c = document.getElementById(`filtre-${filtre}`) as HTMLInputElement | null;
-    c?.addEventListener('change', () => {
-      etat.filtres[filtre] = c.checked;
-      if (etat.mode === 'carte') rendreCarte();
+  /* --- la légende commande l'affichage ----------------------------- */
+  for (const cle of document.querySelectorAll<HTMLButtonElement>('.cle')) {
+    const fam = cle.dataset.famille as Famille;
+    cle.addEventListener('click', () => {
+      const affichee = etat.visibles.has(fam);
+      if (affichee) etat.visibles.delete(fam);
+      else etat.visibles.add(fam);
+      cle.setAttribute('aria-pressed', String(!affichee));
+      appliquerVisibilite();
     });
+    // Survoler une clé de légende éteint les autres familles : c'est la façon
+    // la moins destructive de lire une couche dans un graphe dense.
+    cle.addEventListener('pointerenter', () => accentuer(fam));
+    cle.addEventListener('focus', () => accentuer(fam));
+    cle.addEventListener('pointerleave', rallumer);
+    cle.addEventListener('blur', rallumer);
   }
 
   /* --- recherche : indispensable dès que la carte grossit ---------- */
   recherche?.addEventListener('input', () => {
     const q = recherche.value.trim().toLowerCase();
     if (!resultats) return;
-    if (q.length < 2) {
-      resultats.innerHTML = '';
-      return;
-    }
-    const trouves = reseau.noeuds
+    vider(resultats);
+    if (q.length < 2) return;
+    for (const n of reseau.noeuds
       .filter((n) => n.nom.toLowerCase().includes(q) || n.resume.toLowerCase().includes(q))
-      .slice(0, 8);
-    resultats.innerHTML = trouves
-      .map((n) => `<li><button type="button" data-aller="${n.id}">${echapper(n.nom)} <span>${LIBELLE_TYPE[n.type]}</span></button></li>`)
-      .join('');
-    resultats.querySelectorAll<HTMLButtonElement>('[data-aller]').forEach((b) => {
+      .slice(0, 8)) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.append(document.createTextNode(n.nom), ligne('span', '', LIBELLE_TYPE_NOEUD[n.type]));
       b.addEventListener('click', () => {
-        ouvrir(b.dataset.aller!);
+        ouvrir(n.id);
         recherche.value = '';
-        resultats.innerHTML = '';
+        vider(resultats);
       });
-    });
+      const li = document.createElement('li');
+      li.append(b);
+      resultats.append(li);
+    }
   });
 
   /* --- déplacement et zoom ----------------------------------------- */
@@ -404,8 +627,11 @@ function demarrer(reseau: Reseau) {
   function cadrerCarte() {
     const { largeur, hauteur, colonnes } = reseau.carte;
     const r = toile.getBoundingClientRect();
-    if (r.width >= 700 || r.width === 0) {
-      vue = { x: 0, y: 0, l: largeur, h: hauteur };
+    if (r.width >= 760 || r.width === 0) {
+      // Cadré sur ce qui est réellement dessiné : la hauteur nominale de la
+      // carte inclut des marges que personne n'a besoin de voir.
+      const haut = reseau.carte.hautNoeuds - 22;
+      vue = { x: 0, y: haut, l: largeur, h: reseau.carte.basNoeuds + 46 - haut };
       return;
     }
     const l = 620;
@@ -475,8 +701,4 @@ function demarrer(reseau: Reseau) {
   const ancre = location.hash.slice(1);
   if (ancre && index.has(ancre)) ouvrir(ancre);
   else rendreCarte();
-}
-
-function echapper(t: string): string {
-  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

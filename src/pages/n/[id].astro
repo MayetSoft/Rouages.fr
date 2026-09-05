@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { construireReseau } from '../../modele/reseau.ts';
 import { chargerGraphe, estPerime, formaterDate } from '../../modele/graphe.ts';
 import { schemaVoisinage, voisinsDe } from '../../vues/voisinage.ts';
+import { FAMILLES, LIBELLE_LIEN, LIBELLE_TYPE_NOEUD } from '../../modele/relations.ts';
 import { chronologie } from '../../vues/chronologie.ts';
 import { fenetresAction } from '../../vues/fenetres-action.ts';
 
@@ -25,15 +26,6 @@ const fenetres = processus ? fenetresAction(processus) : null;
 const source = g.acteurs.get(noeud.id) ?? g.competences.get(noeud.id) ?? g.processus.get(noeud.id);
 const perime = source && 'perime_apres_mois' in source ? estPerime(source) : false;
 
-const LIBELLE_TYPE = { acteur: 'Acteur', competence: 'Compétence', processus: 'Processus', document: 'Document' };
-const LIBELLE_LIEN: Record<string, string> = {
-  wikipedia: 'Wikipédia — la définition',
-  droit: 'Le texte applicable',
-  page_officielle: 'La page officielle',
-  donnees_ouvertes: 'Les données, vérifiables vous-même',
-  etude: 'Études',
-  presse: 'Presse',
-};
 const ORDRE_LIENS = ['wikipedia', 'droit', 'page_officielle', 'donnees_ouvertes', 'etude', 'presse'];
 const groupes = ORDRE_LIENS.map((type) => ({
   type,
@@ -44,7 +36,7 @@ const groupes = ORDRE_LIENS.map((type) => ({
 <Base titre={noeud.nom} description={noeud.resume || noeud.nom}>
   <div class="page">
     <p class="badge">
-      {LIBELLE_TYPE[noeud.type]}
+      {LIBELLE_TYPE_NOEUD[noeud.type]}
       {noeud.confiance !== 'etabli' && (
         <span class="badge--alerte">
           {' · '}
@@ -73,9 +65,23 @@ const groupes = ORDRE_LIENS.map((type) => ({
     <h2 class="badge">{voisins.length} relations</h2>
     <div class="cadre-schema" set:html={schema.svg} />
     <p class="indice-defilement">Le schéma défile horizontalement.</p>
+
+    {/* La légende accompagne toujours le schéma : la couleur seule ne dit rien. */}
+    <ul class="legende-fixe">
+      {FAMILLES.filter((f) => voisins.some((v) => v.fam === f.id)).map((f) => (
+        <li>
+          <svg width="24" height="10" viewBox="0 0 24 10" aria-hidden="true">
+            <line class={`cle-trait cle-trait--${f.id}`} x1="1" y1="5" x2="23" y2="5" stroke-dasharray={f.tirets} />
+          </svg>
+          <strong>{f.libelle}</strong> <span class="v-nature">{f.aide}</span>
+        </li>
+      ))}
+    </ul>
+
     <ul class="relations">
       {voisins.map((v) => (
         <li>
+          <span class={`p-cle p-cle--${v.fam}`}></span>
           <span class="quoi">{v.label}</span>
           <span><a href={`/n/${v.noeud.id}`}>{v.noeud.nom}</a> <span class="v-nature">{v.noeud.resume}</span></span>
         </li>

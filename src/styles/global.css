@@ -1,51 +1,70 @@
 /* ------------------------------------------------------------------ *
  * Rouages — feuille de style unique.
- * Le site est une visualisation : la typographie se fait discrète, les
- * schémas portent l'information.
+ *
+ * Le site est une visualisation. La couleur y est entièrement réservée
+ * aux relations : c'est l'information la plus difficile à lire autrement.
+ * Le type d'un nœud passe par sa forme, son échelon par sa colonne, et le
+ * texte reste toujours en encre — jamais en couleur de série.
  * ------------------------------------------------------------------ */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   --fond: #fbfaf8;
   --fond-carte: #ffffff;
   --fond-doux: #f2f0ec;
-  --encre: #1a1a1a;
+  --fond-bande: #f6f4f0;
+  --encre: #17171a;
   --encre-douce: #5f5c55;
+  --encre-tres-douce: #8c887f;
   --trait: #ddd8d0;
+  --trait-fort: #b9b2a7;
   --accent: #1e5f74;
   --accent-doux: #e4eef1;
   --alerte: #8a4b12;
   --alerte-doux: #fbf0e2;
 
-  /* Un ton par type de nœud — jamais la seule information portée. */
-  --acteur: #1e5f74;
-  --competence: #6b4d8f;
-  --processus: #8a4b12;
-  --document: #4a6741;
+  /* --- Familles de relations ------------------------------------- *
+   * Trois teintes seulement portent l'identité : c'est le seul triplet
+   * de la palette qui passe les seuils de séparation en vision normale
+   * et daltonienne, en clair comme en sombre, toutes paires simultanées
+   * — ce qui est le cas d'un graphe. Les deux autres familles n'ont pas
+   * de teinte : l'une s'efface (gris), l'autre domine (encre).           */
+  --rel-pouvoir: #2a78d6;
+  --rel-partage: #eb6834;
+  --rel-argent: #1baf7a;
+  --rel-information: #9a958c;
+  --rel-levier: #17171a;
 
   --mesure: 66ch;
-  --rayon: 8px;
+  --rayon: 10px;
   --sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --transition: 180ms cubic-bezier(0.2, 0, 0.2, 1);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+
     --fond: #15171a;
     --fond-carte: #1d2024;
     --fond-doux: #23272b;
-    --encre: #ecebe8;
+    --fond-bande: #191c1f;
+    --encre: #eeedea;
     --encre-douce: #a5a199;
+    --encre-tres-douce: #7d7972;
     --trait: #343a40;
+    --trait-fort: #4e555c;
     --accent: #7cc4d8;
     --accent-doux: #1d3238;
     --alerte: #e0a468;
     --alerte-doux: #2c2317;
 
-    --acteur: #7cc4d8;
-    --competence: #b79ad8;
-    --processus: #e0a468;
-    --document: #9dc48f;
+    --rel-pouvoir: #3987e5;
+    --rel-partage: #d95926;
+    --rel-argent: #199e70;
+    --rel-information: #6f6a62;
+    --rel-levier: #eeedea;
   }
 }
 
@@ -60,107 +79,245 @@ body {
 }
 
 a { color: var(--accent); text-underline-offset: 2px; }
-h1, h2, h3 { letter-spacing: -0.012em; }
+h1, h2, h3 { letter-spacing: -0.014em; }
 
-/* --- en-tête --- */
+.visuellement-cache {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ * Chrome
+ * ------------------------------------------------------------------ */
+
 .bandeau { border-bottom: 1px solid var(--trait); background: var(--fond-carte); }
 .bandeau-int { display: flex; align-items: center; gap: 1rem; padding: .7rem 1.1rem; flex-wrap: wrap; }
-.marque { font-weight: 650; text-decoration: none; color: var(--encre); }
+.marque { font-weight: 680; text-decoration: none; color: var(--encre); letter-spacing: -0.02em; }
 .baseline { color: var(--encre-douce); font-size: .82rem; }
 .bandeau nav { margin-left: auto; display: flex; gap: 1rem; font-size: .85rem; }
 
-/* --- outils de l'explorateur --- */
-.outils { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: .55rem 1.1rem; border-bottom: 1px solid var(--trait); font-size: .84rem; }
-.outils label { display: inline-flex; align-items: center; gap: .35rem; color: var(--encre-douce); cursor: pointer; }
+.outils {
+  display: flex; align-items: center; gap: .5rem 1.1rem; flex-wrap: wrap;
+  padding: .5rem 1.1rem; border-bottom: 1px solid var(--trait);
+  background: var(--fond-carte); font-size: .84rem;
+}
+
 .champ-recherche { position: relative; }
 .champ-recherche input {
-  font: inherit; padding: .3rem .6rem; width: 15rem; max-width: 46vw;
+  font: inherit; padding: .34rem .8rem; width: 15rem; max-width: 46vw;
   border: 1px solid var(--trait); border-radius: 999px;
   background: var(--fond); color: var(--encre);
 }
-#resultats { position: absolute; z-index: 5; top: 2.1rem; left: 0; width: 22rem; max-width: 80vw; margin: 0; padding: 0; list-style: none; background: var(--fond-carte); border: 1px solid var(--trait); border-radius: var(--rayon); box-shadow: 0 8px 24px rgb(0 0 0 / .12); }
+.champ-recherche input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+#resultats {
+  position: absolute; z-index: 5; top: 2.3rem; left: 0; width: 23rem; max-width: 84vw;
+  margin: 0; padding: .25rem; list-style: none; background: var(--fond-carte);
+  border: 1px solid var(--trait); border-radius: var(--rayon);
+  box-shadow: 0 10px 30px rgb(0 0 0 / .14);
+}
 #resultats:empty { display: none; }
-#resultats button { display: flex; justify-content: space-between; gap: 1rem; width: 100%; text-align: left; background: none; border: 0; font: inherit; color: inherit; padding: .45rem .7rem; cursor: pointer; }
-#resultats button:hover { background: var(--fond-doux); }
+#resultats button {
+  display: flex; justify-content: space-between; gap: 1rem; width: 100%; text-align: left;
+  background: none; border: 0; font: inherit; color: inherit; padding: .4rem .6rem;
+  border-radius: 6px; cursor: pointer;
+}
+#resultats button:hover, #resultats button:focus-visible { background: var(--fond-doux); }
 #resultats span { color: var(--encre-douce); font-size: .78rem; }
-button.plat { font: inherit; background: var(--fond-doux); border: 1px solid var(--trait); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; color: var(--encre); }
+
+button.plat {
+  font: inherit; background: var(--fond-doux); border: 1px solid var(--trait);
+  border-radius: 999px; padding: .26rem .8rem; cursor: pointer; color: var(--encre);
+  transition: background var(--transition);
+}
 button.plat:hover { background: var(--accent-doux); }
 .zooms { display: inline-flex; gap: .35rem; margin-left: auto; }
 button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3; }
 
-/* --- disposition de l'explorateur --- */
-.explorateur { display: grid; grid-template-columns: 1fr 22rem; height: calc(100vh - 6.6rem); min-height: 30rem; }
+/* ------------------------------------------------------------------ *
+ * La légende — c'est elle qui commande l'affichage
+ * ------------------------------------------------------------------ */
+
+.legende { display: flex; flex-wrap: wrap; gap: .3rem; margin: 0; padding: 0; border: 0; }
+.legende legend { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-douce); padding: 0 .4rem 0 0; float: left; line-height: 1.9; }
+
+.cle {
+  display: inline-flex; align-items: center; gap: .4rem;
+  border: 1px solid transparent; border-radius: 999px; padding: .2rem .6rem .2rem .4rem;
+  background: none; font: inherit; font-size: .82rem; color: var(--encre); cursor: pointer;
+  transition: background var(--transition), opacity var(--transition);
+}
+.cle:hover { background: var(--fond-doux); }
+.cle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* Éteinte : on la voit toujours, elle est seulement en retrait. */
+.cle[aria-pressed='false'] { opacity: .42; }
+.cle[aria-pressed='false'] .cle-trait { opacity: .35; }
+.cle svg { display: block; overflow: visible; }
+.cle-trait { stroke-width: 2.5; stroke-linecap: round; fill: none; }
+.cle-trait--pouvoir { stroke: var(--rel-pouvoir); }
+.cle-trait--partage { stroke: var(--rel-partage); }
+.cle-trait--argent { stroke: var(--rel-argent); }
+.cle-trait--information { stroke: var(--rel-information); }
+.cle-trait--levier { stroke: var(--rel-levier); }
+
+/* ------------------------------------------------------------------ *
+ * L'explorateur
+ * ------------------------------------------------------------------ */
+
+.explorateur { display: grid; grid-template-columns: 1fr 23rem; height: calc(100vh - 6.9rem); min-height: 32rem; }
 .scene { position: relative; overflow: hidden; background: var(--fond); }
 #toile { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 #toile.deplace { cursor: grabbing; }
-.aide { position: absolute; left: 1rem; bottom: .8rem; font-size: .75rem; color: var(--encre-douce); pointer-events: none; }
+.aide {
+  position: absolute; left: 1.1rem; right: 1.1rem; bottom: .8rem; margin: 0;
+  font-size: .75rem; color: var(--encre-tres-douce); pointer-events: none;
+}
+.si-survol { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .si-survol { display: inline; }
+  .si-tactile { display: none; }
+}
 
-/* --- panneau latéral --- */
-#panneau { border-left: 1px solid var(--trait); background: var(--fond-carte); padding: 1.1rem 1.2rem 3rem; overflow-y: auto; }
+/* --- bandes de colonnes : donnent sa structure à la carte --- */
+.c-bande { fill: var(--fond-bande); }
+.c-colonne { fill: var(--encre-douce); font-size: 11.5px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; }
+
+/* --- nœuds --- */
+.n { cursor: pointer; }
+.n .n-fond {
+  fill: var(--fond-carte); stroke: var(--trait-fort); stroke-width: 1.5;
+  transition: fill var(--transition), stroke var(--transition);
+}
+.n .n-marque { stroke: var(--trait-fort); stroke-width: 1.5; fill: none; }
+.n .n-nom { fill: var(--encre); font-size: 13px; font-weight: 500; }
+.n:hover .n-fond, .n:focus-visible .n-fond { fill: var(--fond-doux); stroke: var(--encre); }
+.n:focus { outline: none; }
+.n:focus-visible .n-fond { stroke-width: 2.5; }
+.n--centre .n-fond { fill: var(--accent-doux); stroke: var(--accent); stroke-width: 2.5; }
+.n--centre .n-marque { stroke: var(--accent); }
+.n--centre .n-nom { font-size: 15px; font-weight: 650; }
+
+/* --- arêtes : une teinte et un tracé par famille --- */
+.a { fill: none; stroke-linecap: round; stroke-width: 1.8; }
+.a--f-pouvoir { stroke: var(--rel-pouvoir); }
+.a--f-partage { stroke: var(--rel-partage); stroke-dasharray: 7 5; }
+.a--f-argent { stroke: var(--rel-argent); }
+.a--f-information { stroke: var(--rel-information); stroke-dasharray: 2 4; }
+.a--f-levier { stroke: var(--rel-levier); stroke-dasharray: 1 7; stroke-width: 2.6; }
+
+.a-pointe--pouvoir { fill: var(--rel-pouvoir); }
+.a-pointe--partage { fill: var(--rel-partage); }
+.a-pointe--argent { fill: var(--rel-argent); }
+.a-pointe--information { fill: var(--rel-information); }
+.a-pointe--levier { fill: var(--rel-levier); }
+
+/* Le libellé d'une relation porte un liseré de fond : il traverse des traits. */
+.a-label {
+  fill: var(--encre-douce); font-size: 10.5px; font-weight: 500;
+  paint-order: stroke; stroke: var(--fond); stroke-width: 3.5px; stroke-linejoin: round;
+}
+
+/* --- le fondu : survoler une famille éteint les autres --- *
+ * C'est le seul moyen de lire un graphe dense sans le vider : au lieu de
+ * masquer, on met en retrait, et la structure d'ensemble reste visible. */
+.couche-aretes .a,
+.couche-aretes .a-label,
+.couche-noeuds .n { transition: opacity var(--transition); }
+
+#toile[data-accent] .a,
+#toile[data-accent] .a-label { opacity: .07; }
+#toile[data-accent] .couche-noeuds .n { opacity: .2; }
+#toile[data-accent] .couche-noeuds .n.vif { opacity: 1; }
+
+#toile[data-accent='pouvoir'] .a--f-pouvoir,
+#toile[data-accent='partage'] .a--f-partage,
+#toile[data-accent='argent'] .a--f-argent,
+#toile[data-accent='information'] .a--f-information,
+#toile[data-accent='levier'] .a--f-levier,
+#toile[data-accent='pouvoir'] .a-label--f-pouvoir,
+#toile[data-accent='partage'] .a-label--f-partage,
+#toile[data-accent='argent'] .a-label--f-argent,
+#toile[data-accent='information'] .a-label--f-information,
+#toile[data-accent='levier'] .a-label--f-levier { opacity: 1; }
+
+/* Survoler un nœud : on garde son voisinage, on éteint le reste. */
+#toile .n.eteint, #toile .a.eteint, #toile .a-label.eteint { opacity: .07; }
+#toile .n.eteint { opacity: .22; }
+#toile .a.vif { stroke-width: 3; }
+#toile .n.vif .n-fond { stroke: var(--encre); }
+
+/* Famille masquée par la légende : retirée du dessin, pas mise en retrait. */
+#toile .a.masque, #toile .a-label.masque { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 1ms !important; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Le panneau
+ * ------------------------------------------------------------------ */
+
+#panneau { border-left: 1px solid var(--trait); background: var(--fond-carte); padding: 1.2rem 1.25rem 3rem; overflow-y: auto; }
 .p-type { margin: 0; font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-douce); }
 .p-confiance { color: var(--alerte); text-transform: none; letter-spacing: 0; }
-.p-nom { margin: .15rem 0 .5rem; font-size: 1.3rem; }
+.p-nom { margin: .15rem 0 .5rem; font-size: 1.35rem; line-height: 1.2; }
 .p-resume { margin: 0 0 1.2rem; color: var(--encre-douce); }
 .p-intro { color: var(--encre-douce); margin: 0 0 .9rem; }
-.p-titre-section { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-douce); margin: 1.5rem 0 .5rem; border-top: 1px solid var(--trait); padding-top: .8rem; }
-.p-groupe { margin-bottom: .7rem; }
-.p-groupe h3 { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-douce); margin: 0 0 .2rem; font-weight: 500; }
+.p-titre-section {
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-douce);
+  margin: 1.5rem 0 .6rem; border-top: 1px solid var(--trait); padding-top: .85rem;
+}
+.p-groupe { margin-bottom: .75rem; }
+.p-groupe h3 { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-tres-douce); margin: 0 0 .2rem; font-weight: 500; }
 .p-groupe ul, .p-relations { list-style: none; margin: 0; padding: 0; }
-.p-groupe li { margin-bottom: .2rem; font-size: .88rem; }
-.p-relations li { display: flex; gap: .4rem; align-items: baseline; margin-bottom: .28rem; font-size: .88rem; }
-.p-relation { color: var(--encre-douce); font-size: .76rem; min-width: 7.4rem; text-align: right; flex-shrink: 0; }
-.p-relations button { font: inherit; background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 2px; }
+.p-groupe li { margin-bottom: .22rem; font-size: .88rem; line-height: 1.45; }
+.p-relations li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .5rem; align-items: baseline; margin-bottom: .35rem; font-size: .89rem; }
+.p-cle { width: 16px; height: 2.5px; border-radius: 2px; display: inline-block; transform: translateY(-3px); }
+.p-cle--pouvoir { background: var(--rel-pouvoir); }
+.p-cle--partage { background: var(--rel-partage); }
+.p-cle--argent { background: var(--rel-argent); }
+.p-cle--information { background: var(--rel-information); }
+.p-cle--levier { background: var(--rel-levier); }
+.p-relation { display: block; color: var(--encre-tres-douce); font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; }
+.p-relations button {
+  font: inherit; background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer;
+  text-align: left; text-decoration: underline; text-underline-offset: 2px;
+}
 .p-permalien { margin-top: 1.6rem; font-size: .8rem; }
 .p-vide { color: var(--encre-douce); font-size: .88rem; }
-.p-chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: 1.4rem 0 0; }
-.p-chiffres div { background: var(--fond-doux); border-radius: var(--rayon); padding: .55rem .7rem; }
-.p-chiffres dt { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-douce); }
-.p-chiffres dd { margin: 0; font-size: 1.35rem; font-weight: 600; }
+.p-chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin: 1.4rem 0 0; }
+.p-chiffres div { background: var(--fond-doux); border-radius: var(--rayon); padding: .6rem .75rem; }
+.p-chiffres dt { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-douce); }
+.p-chiffres dd { margin: 0; font-size: 1.4rem; font-weight: 650; letter-spacing: -0.02em; }
+.p-formes { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .3rem; font-size: .82rem; color: var(--encre-douce); }
+.p-formes li { display: flex; align-items: center; gap: .5rem; }
+.p-formes svg { flex: 0 0 auto; }
 
-/* --- le réseau en SVG --- */
-.c-colonne { fill: var(--encre-douce); font-size: 12px; letter-spacing: .07em; text-transform: uppercase; }
-.n { cursor: pointer; }
-.n .n-fond { fill: var(--fond-carte); stroke: var(--acteur); stroke-width: 1.5; }
-.n .n-nom { fill: var(--encre); font-size: 13px; }
-.n--competence .n-fond { stroke: var(--competence); }
-.n--processus .n-fond { stroke: var(--processus); }
-.n--document .n-fond { stroke: var(--document); }
-.n:hover .n-fond, .n:focus .n-fond { fill: var(--accent-doux); }
-.n:focus { outline: none; }
-.n:focus .n-fond { stroke-width: 3; }
-.n--centre .n-fond { fill: var(--accent-doux); stroke-width: 2.5; }
-.n--centre .n-nom { font-size: 15px; font-weight: 600; }
+/* ------------------------------------------------------------------ *
+ * Pages de nœud — le repli sans JavaScript
+ * ------------------------------------------------------------------ */
 
-.a { fill: none; stroke: var(--trait); stroke-width: 1.4; }
-/* Le type de relation n'est pas porté par la seule couleur : chaque arête a
-   son libellé au survol, et son intitulé en toutes lettres dans le panneau. */
-.a--flux { stroke: var(--acteur); stroke-opacity: .75; }
-.a--partage { stroke: var(--competence); stroke-dasharray: 5 4; }
-.a--detient { stroke: var(--competence); }
-.a--intervient { stroke: var(--processus); }
-.a--peut-agir { stroke: var(--alerte); stroke-dasharray: 2 3; stroke-width: 2; }
-.a--produit, .a--exerce { stroke: var(--document); }
-.a-label { fill: var(--encre-douce); font-size: 10.5px; }
-.a-pointe { fill: var(--acteur); }
-
-/* --- pages de nœud (sans JavaScript, et pour les moteurs) --- */
-.page { max-width: 900px; margin: 0 auto; padding: 1.6rem 1.1rem 5rem; }
-.page h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); margin: .2rem 0 .4rem; }
-.resume { color: var(--encre-douce); max-width: var(--mesure); margin: 0 0 1.4rem; font-size: 1.05rem; }
+.page { max-width: 900px; margin: 0 auto; padding: 1.8rem 1.1rem 5rem; }
+.page h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: .2rem 0 .4rem; }
+.resume { color: var(--encre-douce); max-width: var(--mesure); margin: 0 0 1.6rem; font-size: 1.06rem; }
 .cadre-schema { background: var(--fond-carte); border: 1px solid var(--trait); border-radius: var(--rayon); padding: 1rem .75rem; overflow-x: auto; margin: 1rem 0; }
 .v-schema { width: 100%; height: auto; display: block; min-width: 680px; }
 .indice-defilement { display: none; }
 @media (max-width: 700px) { .indice-defilement { display: block; font-size: .78rem; color: var(--encre-douce); margin: .4rem 0 0; } }
 .grille-liens { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 1rem 0 2rem; }
-.grille-liens section { background: var(--fond-carte); border: 1px solid var(--trait); border-radius: var(--rayon); padding: .8rem 1rem; }
-.grille-liens h2 { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-douce); margin: 0 0 .4rem; font-weight: 500; }
+.grille-liens section { background: var(--fond-carte); border: 1px solid var(--trait); border-radius: var(--rayon); padding: .85rem 1rem; }
+.grille-liens h2 { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-tres-douce); margin: 0 0 .4rem; font-weight: 500; }
 .grille-liens ul { list-style: none; margin: 0; padding: 0; }
-.grille-liens li { margin-bottom: .3rem; font-size: .9rem; }
+.grille-liens li { margin-bottom: .32rem; font-size: .9rem; line-height: 1.45; }
+.legende-fixe { list-style: none; padding: 0; margin: .2rem 0 1.6rem; display: flex; flex-wrap: wrap; gap: .3rem 1.4rem; font-size: .84rem; }
+.legende-fixe li { display: flex; align-items: center; gap: .45rem; }
+.legende-fixe svg { flex: 0 0 auto; overflow: visible; }
+.legende-fixe strong { font-weight: 600; }
+
 .relations { list-style: none; padding: 0; margin: 0 0 2rem; }
-.relations li { display: flex; gap: .6rem; align-items: baseline; padding: .3rem 0; border-bottom: 1px solid var(--trait); }
-.relations .quoi { color: var(--encre-douce); font-size: .78rem; min-width: 9rem; text-align: right; flex-shrink: 0; }
-.badge { display: inline-block; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-douce); }
-.badge--alerte { color: var(--alerte); }
+.relations li { display: grid; grid-template-columns: 1.4rem 9rem 1fr; gap: .6rem; align-items: baseline; padding: .4rem 0; border-bottom: 1px solid var(--trait); }
+.relations .quoi { color: var(--encre-tres-douce); font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; }
+.badge { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--encre-douce); font-weight: 500; margin: 2rem 0 .5rem; }
+.badge--alerte { color: var(--alerte); display: inline; }
 .v-tableau { border-collapse: collapse; width: 100%; font-size: .86rem; }
 .v-tableau caption { text-align: left; color: var(--encre-douce); padding-bottom: .4rem; }
 .v-tableau th, .v-tableau td { border: 1px solid var(--trait); padding: .45rem .6rem; text-align: left; vertical-align: top; }
@@ -170,7 +327,7 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 footer { border-top: 1px solid var(--trait); margin-top: 3rem; padding: 1.2rem 1.1rem; color: var(--encre-douce); font-size: .82rem; }
 footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
 
-/* --- classes internes aux schémas générés au build --- */
+/* --- schémas générés au build (chronologie, fenêtres d'action) --- */
 .v-schema text { font-family: var(--sans); }
 .v-texte { fill: var(--encre); font-size: 13px; }
 .v-entete { fill: var(--encre-douce); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
@@ -179,7 +336,7 @@ footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
 .v-acteur, .v-jalon, .v-note, .v-delai { fill: var(--encre-douce); font-size: 12px; }
 .v-acteur { font-size: 13px; }
 .v-numero { fill: var(--fond-carte); font-size: 11px; font-weight: 700; }
-.v-etiquette { fill: var(--encre-douce); font-size: 11px; letter-spacing: .03em; text-transform: uppercase; }
+.v-etiquette { fill: var(--encre-tres-douce); font-size: 11px; letter-spacing: .03em; text-transform: uppercase; }
 .v-etiquette--piege { fill: var(--alerte); }
 .v-quand { fill: var(--encre); font-size: 13px; font-weight: 600; }
 .v-piege { fill: var(--encre-douce); font-size: 12px; }
@@ -189,20 +346,31 @@ footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
 .v-boite { fill: var(--fond-carte); stroke: var(--trait); stroke-width: 1; }
 .v-boite--conditionnelle { stroke-dasharray: 4 3; }
 .v-boite--sortie { fill: var(--accent-doux); stroke: var(--accent); }
-.v-boite--levier { stroke: var(--accent); }
+.v-boite--levier { stroke: var(--rel-levier); }
 .v-axe { stroke: var(--trait); stroke-width: 2; }
 .v-noeud { fill: var(--accent); }
-.v-barre--maximum_legal { fill: var(--accent); }
-.v-barre--indicatif { fill: var(--encre-douce); }
-.v-barre--observe { fill: var(--document); }
+.v-barre--maximum_legal { fill: var(--rel-pouvoir); }
+.v-barre--indicatif { fill: var(--encre-tres-douce); }
+.v-barre--observe { fill: var(--rel-argent); }
 
-@media (max-width: 860px) {
-  .explorateur { grid-template-columns: 1fr; height: auto; }
-  .scene { height: 62vh; border-bottom: 1px solid var(--trait); }
-  #panneau { border-left: 0; }
+@media (max-width: 620px) {
+  /* Sur téléphone la légende est la commande principale : on lui laisse la
+     place en retirant son intitulé, que les clés rendent évident. */
+  .legende legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .cle { padding: .28rem .6rem .28rem .4rem; }
 }
 
-.visuellement-cache {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+@media (max-width: 900px) {
+  .explorateur { grid-template-columns: 1fr; height: auto; }
+  .scene { height: 60vh; border-bottom: 1px solid var(--trait); }
+  #panneau { border-left: 0; }
+  .outils { gap: .45rem .7rem; }
+  .champ-recherche input { width: 100%; max-width: none; }
+  .champ-recherche { flex: 1 1 100%; }
+  .zooms { margin-left: 0; }
+}
+
+@media print {
+  .bandeau, .outils, footer, .aide { display: none; }
+  body { background: #fff; }
 }
