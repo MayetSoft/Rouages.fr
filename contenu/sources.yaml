@@ -96,3 +96,24 @@ sources:
   - { id: od-projets-environnement, type: donnees_ouvertes, titre: "Projets soumis à évaluation environnementale et enquêtes publiques", url: "https://www.projets-environnement.gouv.fr/", consulte_le: 2026-09-05 }
   - { id: od-comptes-crc, type: donnees_ouvertes, titre: "Rapports des chambres régionales des comptes", url: "https://www.ccomptes.fr/fr/publications", consulte_le: 2026-09-05 }
   - { id: od-actes-budgetaires, type: donnees_ouvertes, titre: "Comptes individuels des collectivités (DGFiP)", url: "https://www.data.gouv.fr/fr/datasets/comptes-individuels-des-collectivites-fichier-global-a-compter-de-2000/", consulte_le: 2026-09-05 }
+
+  # --- Ajouts réseaux : énergie, mobilité, planification -------------------
+  - { id: code-energie, type: droit, titre: "Code de l'énergie", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000023983208/", consulte_le: 2026-09-05 }
+  - { id: code-transports, type: droit, titre: "Code des transports", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000023086525/", consulte_le: 2026-09-05 }
+
+  - { id: wp-enedis, type: wikipedia, titre: "Enedis", url: "https://fr.wikipedia.org/wiki/Enedis", consulte_le: 2026-09-05 }
+  - { id: wp-scot, type: wikipedia, titre: "Schéma de cohérence territoriale", url: "https://fr.wikipedia.org/wiki/Sch%C3%A9ma_de_coh%C3%A9rence_territoriale", consulte_le: 2026-09-05 }
+  - { id: wp-agence-urbanisme, type: wikipedia, titre: "Agence d'urbanisme", url: "https://fr.wikipedia.org/wiki/Agence_d%27urbanisme", consulte_le: 2026-09-05 }
+  - { id: wp-aom, type: wikipedia, titre: "Autorité organisatrice de la mobilité", url: "https://fr.wikipedia.org/wiki/Autorit%C3%A9_organisatrice_de_la_mobilit%C3%A9", consulte_le: 2026-09-05 }
+  - { id: wp-versement-mobilite, type: wikipedia, titre: "Versement mobilité", url: "https://fr.wikipedia.org/wiki/Versement_mobilit%C3%A9", consulte_le: 2026-09-05 }
+  - { id: wp-concession-electricite, type: wikipedia, titre: "Distribution d'électricité en France", url: "https://fr.wikipedia.org/wiki/Distribution_d%27%C3%A9lectricit%C3%A9_en_France", consulte_le: 2026-09-05 }
+
+  - { id: enedis-fr, type: page_officielle, titre: "Enedis — gestionnaire du réseau de distribution", url: "https://www.enedis.fr/", consulte_le: 2026-09-05 }
+  - { id: fnau, type: page_officielle, titre: "Fédération nationale des agences d'urbanisme", url: "https://www.fnau.org/", consulte_le: 2026-09-05 }
+  - { id: fnccr, type: page_officielle, titre: "FNCCR — fédération des collectivités concédantes et régies", url: "https://www.fnccr.asso.fr/", consulte_le: 2026-09-05 }
+  - { id: vp-mobilite, type: page_officielle, titre: "L'organisation des transports — vie-publique.fr", url: "https://www.vie-publique.fr/fiches/20232-transports-quelle-repartition-des-competences", consulte_le: 2026-09-05 }
+
+  - { id: od-transport, type: donnees_ouvertes, titre: "transport.data.gouv.fr — l'offre de transport, réseau par réseau", url: "https://transport.data.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: od-enedis, type: donnees_ouvertes, titre: "Open data Enedis — consommation et réseau, commune par commune", url: "https://data.enedis.fr/", consulte_le: 2026-09-05 }
+  - { id: od-reseaux-energies, type: donnees_ouvertes, titre: "Open Data Réseaux Énergies", url: "https://opendata.reseaux-energies.fr/", consulte_le: 2026-09-05 }
+  - { id: od-ofgl-flux, type: donnees_ouvertes, titre: "OFGL — recettes et dépenses détaillées, par collectivité et par nature", url: "https://data.ofgl.fr/explore/", consulte_le: 2026-09-05 }

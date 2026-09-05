@@ -103,3 +103,87 @@ flux:
     liens: [cgct, cada]
     verifie_le: 2026-09-05
     confiance: etabli
+
+  # --- Réseaux et mobilité ------------------------------------------------
+  # Les ordres de grandeur restent qualitatifs : les chiffrer commune par
+  # commune demande d'ingérer l'OFGL, ce qui reste à faire (docs/05-roadmap.md).
+  - id: versement-mobilite
+    nom: "Versement mobilité"
+    nature: argent
+    de: employeur
+    vers: [aom]
+    resume: "Les employeurs au-delà d'un seuil d'effectif financent les transports du territoire, souvent pour plus que la recette des billets."
+    ordre_de_grandeur: "Première ressource des réseaux urbains, devant la billetterie."
+    liens: [wp-versement-mobilite, code-transports, od-ofgl-flux]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: billet-transport
+    nom: "Titres de transport"
+    nature: argent
+    de: citoyen
+    vers: [operateur-transport, aom]
+    resume: "Ce que paie l'usager ne couvre qu'une part minoritaire du coût réel du réseau."
+    liens: [code-transports, od-transport]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: subvention-transport
+    nom: "Compensation à l'exploitant"
+    nature: argent
+    de: aom
+    vers: [operateur-transport]
+    resume: "L'autorité organisatrice verse à l'exploitant la différence entre le coût du service et les recettes."
+    liens: [code-transports, od-decp]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: redevance-concession
+    nom: "Redevance de concession"
+    nature: argent
+    de: enedis
+    vers: [syndicat-energie, commune]
+    resume: "Le concessionnaire verse une redevance aux propriétaires du réseau, en contrepartie de son exploitation."
+    liens: [code-energie, fnccr, od-ofgl-flux]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: cotisation-scot
+    nom: "Cotisations au syndicat de SCoT"
+    nature: argent
+    de: epci
+    vers: [syndicat-scot]
+    resume: "Les intercommunalités financent la structure qui porte le schéma auquel leurs PLU devront se conformer."
+    liens: [code-urbanisme, od-ofgl-flux]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: financement-agence-urbanisme
+    nom: "Financement de l'agence d'urbanisme"
+    nature: argent
+    de: epci
+    vers: [agence-urbanisme]
+    resume: "Financée conjointement par les collectivités, l'État et la région : son indépendance tient à ce partage."
+    liens: [fnau, wp-agence-urbanisme]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: donnees-reseau
+    nom: "Données de réseau ouvertes"
+    nature: information
+    de: enedis
+    vers: [citoyen, commune, epci]
+    resume: "Consommation, production et raccordements sont publiés commune par commune, et réutilisables."
+    liens: [od-enedis, od-reseaux-energies]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: donnees-mobilite
+    nom: "Données de transport ouvertes"
+    nature: information
+    de: operateur-transport
+    vers: [citoyen, aom]
+    resume: "Horaires et arrêts sont publiés dans un format standard, ce qui les rend réutilisables par n'importe qui."
+    liens: [od-transport, code-transports]
+    verifie_le: 2026-09-05
+    confiance: etabli

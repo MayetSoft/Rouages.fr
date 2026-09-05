@@ -16,6 +16,7 @@
  */
 import { LIBELLE_ECHELON, ECHELONS, type Echelon } from './schemas.ts';
 import { chargerGraphe, type Graphe } from './graphe.ts';
+import { largeurPastille } from '../vues/formes.ts';
 
 export type TypeNoeud = 'acteur' | 'competence' | 'processus' | 'document';
 
@@ -89,7 +90,7 @@ export const LIBELLE_ARETE: Record<TypeArete, string> = {
 const HAUTEUR_LIGNE = 92;
 const MARGE_HAUT = 54;
 /** Vide entre deux colonnes, une fois les pastilles dimensionnées. */
-const ECART_COLONNES = 34;
+const ECART_COLONNES = 44;
 
 let cache: Reseau | undefined;
 
@@ -200,9 +201,7 @@ function disposerCarte(noeuds: Map<string, Noeud>, aretes: Arete[]): Reseau['car
       .filter((a) => a.echelon === echelon)
       .sort((a, b) => b.degre - a.degre || a.nom.localeCompare(b.nom, 'fr')),
   }));
-  const largeurs = contenus.map((c) =>
-    Math.max(104, ...c.dedans.map((a) => a.court.length * 7.6 + 26)),
-  );
+  const largeurs = contenus.map((c) => Math.max(104, ...c.dedans.map((a) => largeurPastille(a.court))));
 
   const hauteurMax = Math.max(...contenus.map((c) => c.dedans.length)) * HAUTEUR_LIGNE;
   let hautNoeuds = Infinity;

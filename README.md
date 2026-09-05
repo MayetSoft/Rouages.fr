@@ -9,9 +9,9 @@ définition, Légifrance pour la règle, l'open data pour les chiffres.
 
 Ce qui manque ailleurs, ce n'est pas l'information. Ce sont **les liens**.
 
-> État : **phase 2 en cours**. Le réseau de l'échelon local compte 32 acteurs,
-> 33 compétences, 10 flux d'argent, 5 processus et 183 relations, reliés à
-> 71 pages de référence.
+> État : **phase 2 en cours**. Le réseau de l'échelon local compte 39 acteurs,
+> 37 compétences, 18 flux, 5 processus et 215 relations, reliés à 86 pages de
+> référence.
 
 ## Comment ça marche
 

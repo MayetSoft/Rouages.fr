@@ -329,3 +329,74 @@ acteurs:
     liens: [wp-conseil-ecole, code-education]
     verifie_le: 2026-09-05
     confiance: a_confirmer
+
+  # --- Réseaux, mobilité, planification -----------------------------------
+  - id: syndicat-energie
+    nom: "Le syndicat d'énergie"
+    nom_court: "Syndicat d'énergie"
+    type: collectivite
+    echelon: epci
+    resume: "Propriétaire du réseau de distribution d'électricité et autorité concédante : c'est lui qui signe avec Enedis, pas la commune seule."
+    liens: [wp-concession-electricite, code-energie, fnccr]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: enedis
+    nom: "Enedis"
+    nom_court: "Enedis"
+    type: entreprise
+    echelon: prive
+    resume: "Exploite le réseau de distribution d'électricité sous concession, pour le compte des collectivités qui en sont propriétaires."
+    liens: [wp-enedis, enedis-fr, od-enedis, code-energie]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: aom
+    nom: "L'autorité organisatrice de la mobilité"
+    nom_court: "Autorité de mobilité"
+    type: collectivite
+    echelon: epci
+    resume: "Décide de l'offre de transport de son ressort : lignes, tarifs, fréquences. Intercommunalité le plus souvent, région à défaut."
+    liens: [wp-aom, code-transports, vp-mobilite, od-transport]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: operateur-transport
+    nom: "L'exploitant du réseau de transport"
+    nom_court: "Exploitant transport"
+    type: entreprise
+    echelon: prive
+    resume: "Fait rouler les bus et les trams, sous contrat avec l'autorité organisatrice, qui reste maîtresse de l'offre."
+    liens: [code-transports, od-transport, od-decp]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: syndicat-scot
+    nom: "Le syndicat de SCoT"
+    nom_court: "Syndicat de SCoT"
+    type: collectivite
+    echelon: epci
+    resume: "Porte le schéma de cohérence territoriale, cadre auquel les PLU doivent se conformer sur un bassin de vie entier."
+    liens: [wp-scot, code-urbanisme, od-gpu]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: agence-urbanisme
+    nom: "L'agence d'urbanisme"
+    nom_court: "Agence d'urbanisme"
+    type: association
+    echelon: epci
+    resume: "Ingénierie partagée entre collectivités et État : elle produit les études sur lesquelles s'appuient les décisions, sans en prendre aucune."
+    liens: [wp-agence-urbanisme, fnau, code-urbanisme]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: employeur
+    nom: "Les employeurs"
+    nom_court: "Employeurs"
+    type: entreprise
+    echelon: prive
+    resume: "Au-delà d'un seuil d'effectif, ils financent les transports du territoire par le versement mobilité."
+    liens: [wp-versement-mobilite, code-transports]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer

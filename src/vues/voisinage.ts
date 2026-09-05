@@ -17,7 +17,7 @@ import {
   parPriorite,
   type Famille,
 } from '../modele/relations.ts';
-import { decalageTexte, formeNoeud } from './formes.ts';
+import { decalageTexte, formeNoeud, largeurPastille } from './formes.ts';
 import { echapper, svg, couper } from './commun.ts';
 
 export interface Voisin {
@@ -63,8 +63,8 @@ export function schemaVoisinage(centre: Noeud, voisins: Voisin[], id = 'voisinag
   // La toile est dimensionnée d'après les libellés réellement présents : un
   // rayon fixe suffit tant que les noms sont courts, et se met à faire
   // chevaucher les pastilles dès qu'ils ne le sont plus.
-  const lCentre = Math.max(160, centre.court.length * 9 + 46);
-  const lVoisin = (n: Noeud) => Math.max(108, Math.min(290, n.court.length * 7.8 + 28));
+  const lCentre = largeurPastille(centre.court, 15, 160) + 16;
+  const lVoisin = (n: Noeud) => Math.min(290, largeurPastille(n.court, 13, 108));
   const lMax = Math.max(120, ...voisins.map((v) => lVoisin(v.noeud)));
 
   const rayonX = Math.max(230, Math.min(400, 190 + voisins.length * 8), lCentre / 2 + lMax / 2 + 56);

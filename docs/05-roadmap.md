@@ -24,19 +24,35 @@ Fait :
   construire) ;
 - les acteurs qui manquaient à ces circuits : CADA, commissaire enquêteur,
   chambre régionale des comptes, Défenseur des droits, CCAS, conseil d'école ;
-- 32 acteurs, 33 compétences, 183 relations, 71 pages de référence.
+- les réseaux : syndicat d'énergie et Enedis, autorité organisatrice de la
+  mobilité et son exploitant, syndicat de SCoT, agence d'urbanisme, employeurs ;
+- huit flux de plus — versement mobilité, redevance de concession, compensation
+  à l'exploitant, cotisations, données ouvertes de réseau ;
+- 39 acteurs, 37 compétences, 18 flux, 215 relations, 86 pages de référence.
 
 Reste :
 
-- les acteurs de réseau : Enedis, opérateurs de transport, agence d'urbanisme,
-  SCoT, chambres consulaires ;
-- les compétences manquantes : énergie, culture, sport, funéraire, numérique ;
-- les flux réellement chiffrés, branchés sur l'OFGL ;
+- les compétences manquantes : culture, sport, funéraire, numérique ;
+- **chiffrer les flux.** Ils sont structurellement en place et liés à l'OFGL,
+  mais leurs ordres de grandeur restent qualitatifs : les chiffrer commune par
+  commune demande d'ingérer les données, donc un environnement ayant accès au
+  réseau ouvert (voir plus bas) ;
 - **la relecture par un praticien** des attributions marquées
   `confiance: a_confirmer` — c'est le vrai reste à faire, pas le volume.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
+
+### Une contrainte d'outillage à lever
+
+Les sessions de développement passent par une politique réseau qui refuse les
+hôtes d'open data (`geo.api.gouv.fr`, `banatic`, `data.gouv.fr`, `data.ofgl.fr`,
+`services.eaufrance.fr`, `transport.data.gouv.fr`, `data.enedis.fr`). Tant
+qu'elle n'est pas ouverte, ou que les jeux de données ne sont pas déposés dans
+le dépôt, tout ce qui ingère de la donnée ne peut être écrit qu'à l'aveugle —
+et deviner des noms de champs produit du code qui casse au premier vrai appel.
+Le contrôle hebdomadaire des liens, lui, tourne dans l'intégration continue et
+n'est pas concerné.
 
 ## Phase 2 bis — Mettre en ligne
 

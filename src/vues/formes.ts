@@ -61,6 +61,17 @@ export function formeNoeud(type: TypeNoeud, l: number, h: number): Element[] {
   }
 }
 
+/**
+ * La largeur d'une pastille, calculée à un seul endroit.
+ *
+ * Elle sert deux fois : au build pour dimensionner les colonnes de la carte, et
+ * dans le navigateur pour dessiner les pastilles. Deux formules approchantes
+ * suffisent à faire se chevaucher les nœuds — c'est arrivé.
+ */
+export function largeurPastille(texte: string, taille = 13, minimum = 96): number {
+  return Math.max(minimum, texte.length * taille * 0.6 + 28);
+}
+
 /** Décalage du texte : le processus a une barre à gauche qui prend la place. */
 export function decalageTexte(type: TypeNoeud): number {
   return type === 'processus' ? 5 : 0;

@@ -29,7 +29,7 @@ import {
   parPriorite,
   type Famille,
 } from '../modele/relations.ts';
-import { decalageTexte, formeNoeud } from '../vues/formes.ts';
+import { decalageTexte, formeNoeud, largeurPastille } from '../vues/formes.ts';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -85,9 +85,6 @@ function demarrer(reseau: Reseau) {
     for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v));
     return e;
   };
-
-  /** Largeur approximative d'un libellé : suffisant pour dimensionner une boîte. */
-  const largeurTexte = (t: string, taille = 13) => t.length * taille * 0.6;
 
   function dessinerNoeud(b: Boite, role: 'centre' | 'normal' = 'normal'): SVGGElement {
     const g = el('g', {
@@ -300,7 +297,7 @@ function demarrer(reseau: Reseau) {
     const boites = new Map<string, Boite>();
     for (const n of reseau.noeuds) {
       if (n.type !== 'acteur' || n.x === undefined || n.y === undefined) continue;
-      boites.set(n.id, { noeud: n, x: n.x, y: n.y, l: Math.max(96, largeurTexte(n.court) + 28), h: 34 });
+      boites.set(n.id, { noeud: n, x: n.x, y: n.y, l: largeurPastille(n.court), h: 34 });
     }
 
     for (const a of aretes) {
@@ -374,7 +371,7 @@ function demarrer(reseau: Reseau) {
     const gAretes = el('g', { class: 'couche-aretes' });
     const gNoeuds = el('g', { class: 'couche-noeuds' });
 
-    const lCentre = Math.max(160, largeurTexte(centre.court, 15) + 44);
+    const lCentre = largeurPastille(centre.court, 15, 160) + 16;
     const bCentre: Boite = { noeud: centre, x: 0, y: 0, l: lCentre, h: 46 };
 
     voisins.forEach((v, i) => {
@@ -382,7 +379,7 @@ function demarrer(reseau: Reseau) {
       const angle = (i / voisins.length) * Math.PI * 2 - Math.PI / 2;
       const x = Math.cos(angle) * rayon * 1.3;
       const y = Math.sin(angle) * rayon * 0.86;
-      const l = Math.max(108, Math.min(300, largeurTexte(v.noeud.court) + 28));
+      const l = Math.min(300, largeurPastille(v.noeud.court, 13, 108));
       const b: Boite = { noeud: v.noeud, x, y, l, h: 32 };
 
       // Le trait s'arrête au bord des deux pastilles, jamais en leur centre :

@@ -324,3 +324,44 @@ competences:
     liens: [wp-conseil-ecole, code-education]
     verifie_le: 2026-09-05
     confiance: a_confirmer
+
+  # --- Réseaux, mobilité, planification -----------------------------------
+  - id: distribution-electricite
+    nom: "Distribution de l'électricité"
+    nom_court: "Distribution d'électricité"
+    acteur: syndicat-energie
+    resume: "Le réseau appartient aux collectivités, qui en concèdent l'exploitation. La commune n'est donc pas seule maîtresse de ses poteaux."
+    partagee_avec: [enedis, commune, etat]
+    liens: [code-energie, wp-concession-electricite, fnccr, od-reseaux-energies]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: organisation-mobilite
+    nom: "Organisation de la mobilité"
+    nom_court: "Mobilité"
+    acteur: aom
+    resume: "Lignes, horaires, tarifs, vélo et transport à la demande sur un ressort donné, la région prenant le relais là où personne ne s'en saisit."
+    partagee_avec: [region, epci, commune, operateur-transport]
+    liens: [code-transports, wp-aom, vp-mobilite, od-transport]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: planification-scot
+    nom: "Planification à l'échelle du bassin de vie"
+    nom_court: "SCoT"
+    acteur: syndicat-scot
+    resume: "Le SCoT fixe le cadre auquel les PLU doivent se conformer : la règle communale n'est jamais écrite seule."
+    partagee_avec: [epci, commune, region, etat]
+    liens: [wp-scot, code-urbanisme, od-gpu, vp-competences]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: ingenierie-territoriale
+    nom: "Ingénierie et études territoriales"
+    nom_court: "Ingénierie territoriale"
+    acteur: agence-urbanisme
+    resume: "Les études qui préparent les décisions. Sans elles, une petite collectivité décide à l'aveugle ou s'en remet à un bureau d'études privé."
+    partagee_avec: [epci, commune, etat, region]
+    liens: [wp-agence-urbanisme, fnau, code-urbanisme]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
