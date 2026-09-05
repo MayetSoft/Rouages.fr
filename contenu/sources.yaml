@@ -1,0 +1,74 @@
+# Les pages vers lesquelles le site renvoie.
+#
+# C'est ici que se trouve le contenu de Rouages : nous ne réécrivons pas ce que
+# Wikipédia, Légifrance ou l'open data disent déjà mieux. Chaque nœud du réseau
+# pointe vers au moins une de ces pages.
+sources:
+  # --- Wikipédia : la définition et l'histoire ---------------------------
+  - { id: wp-commune, type: wikipedia, titre: "Commune (France)", url: "https://fr.wikipedia.org/wiki/Commune_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-conseil-municipal, type: wikipedia, titre: "Conseil municipal (France)", url: "https://fr.wikipedia.org/wiki/Conseil_municipal_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-maire, type: wikipedia, titre: "Maire (France)", url: "https://fr.wikipedia.org/wiki/Maire_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-epci, type: wikipedia, titre: "Établissement public de coopération intercommunale", url: "https://fr.wikipedia.org/wiki/%C3%89tablissement_public_de_coop%C3%A9ration_intercommunale", consulte_le: 2026-09-05 }
+  - { id: wp-intercommunalite, type: wikipedia, titre: "Intercommunalité en France", url: "https://fr.wikipedia.org/wiki/Intercommunalit%C3%A9_en_France", consulte_le: 2026-09-05 }
+  - { id: wp-departement, type: wikipedia, titre: "Département français", url: "https://fr.wikipedia.org/wiki/D%C3%A9partement_fran%C3%A7ais", consulte_le: 2026-09-05 }
+  - { id: wp-conseil-departemental, type: wikipedia, titre: "Conseil départemental (France)", url: "https://fr.wikipedia.org/wiki/Conseil_d%C3%A9partemental_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-region, type: wikipedia, titre: "Région française", url: "https://fr.wikipedia.org/wiki/R%C3%A9gion_fran%C3%A7aise", consulte_le: 2026-09-05 }
+  - { id: wp-conseil-regional, type: wikipedia, titre: "Conseil régional (France)", url: "https://fr.wikipedia.org/wiki/Conseil_r%C3%A9gional_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-prefet, type: wikipedia, titre: "Préfet (France)", url: "https://fr.wikipedia.org/wiki/Pr%C3%A9fet_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-rectorat, type: wikipedia, titre: "Rectorat d'académie", url: "https://fr.wikipedia.org/wiki/Rectorat_d%27acad%C3%A9mie", consulte_le: 2026-09-05 }
+  - { id: wp-ars, type: wikipedia, titre: "Agence régionale de santé", url: "https://fr.wikipedia.org/wiki/Agence_r%C3%A9gionale_de_sant%C3%A9", consulte_le: 2026-09-05 }
+  - { id: wp-caf, type: wikipedia, titre: "Caisse d'allocations familiales", url: "https://fr.wikipedia.org/wiki/Caisse_d%27allocations_familiales", consulte_le: 2026-09-05 }
+  - { id: wp-sdis, type: wikipedia, titre: "Service départemental d'incendie et de secours", url: "https://fr.wikipedia.org/wiki/Service_d%C3%A9partemental_d%27incendie_et_de_secours", consulte_le: 2026-09-05 }
+  - { id: wp-agence-eau, type: wikipedia, titre: "Agence de l'eau (France)", url: "https://fr.wikipedia.org/wiki/Agence_de_l%27eau_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-plu, type: wikipedia, titre: "Plan local d'urbanisme", url: "https://fr.wikipedia.org/wiki/Plan_local_d%27urbanisme", consulte_le: 2026-09-05 }
+  - { id: wp-abf, type: wikipedia, titre: "Architecte des Bâtiments de France", url: "https://fr.wikipedia.org/wiki/Architecte_des_B%C3%A2timents_de_France", consulte_le: 2026-09-05 }
+  - { id: wp-tribunal-administratif, type: wikipedia, titre: "Tribunal administratif (France)", url: "https://fr.wikipedia.org/wiki/Tribunal_administratif_(France)", consulte_le: 2026-09-05 }
+  - { id: wp-dgf, type: wikipedia, titre: "Dotation globale de fonctionnement", url: "https://fr.wikipedia.org/wiki/Dotation_globale_de_fonctionnement", consulte_le: 2026-09-05 }
+  - { id: wp-taxe-fonciere, type: wikipedia, titre: "Taxe foncière", url: "https://fr.wikipedia.org/wiki/Taxe_fonci%C3%A8re", consulte_le: 2026-09-05 }
+  - { id: wp-teom, type: wikipedia, titre: "Taxe d'enlèvement des ordures ménagères", url: "https://fr.wikipedia.org/wiki/Taxe_d%27enl%C3%A8vement_des_ordures_m%C3%A9nag%C3%A8res", consulte_le: 2026-09-05 }
+  - { id: wp-hlm, type: wikipedia, titre: "Logement social en France", url: "https://fr.wikipedia.org/wiki/Logement_social_en_France", consulte_le: 2026-09-05 }
+  - { id: wp-union-europeenne, type: wikipedia, titre: "Union européenne", url: "https://fr.wikipedia.org/wiki/Union_europ%C3%A9enne", consulte_le: 2026-09-05 }
+  - { id: wp-loi-notre, type: wikipedia, titre: "Loi NOTRe", url: "https://fr.wikipedia.org/wiki/Loi_NOTRe", consulte_le: 2026-09-05 }
+  - { id: wp-cada, type: wikipedia, titre: "Commission d'accès aux documents administratifs", url: "https://fr.wikipedia.org/wiki/Commission_d%27acc%C3%A8s_aux_documents_administratifs", consulte_le: 2026-09-05 }
+
+  # --- Droit : la règle applicable --------------------------------------
+  - { id: cgct, type: droit, titre: "Code général des collectivités territoriales", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070633/", consulte_le: 2026-09-05 }
+  - { id: code-urbanisme, type: droit, titre: "Code de l'urbanisme", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006074075/", consulte_le: 2026-09-05 }
+  - { id: code-education, type: droit, titre: "Code de l'éducation", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006071191/", consulte_le: 2026-09-05 }
+  - { id: code-action-sociale, type: droit, titre: "Code de l'action sociale et des familles", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006074069/", consulte_le: 2026-09-05 }
+  - { id: code-environnement, type: droit, titre: "Code de l'environnement", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006074220/", consulte_le: 2026-09-05 }
+  - { id: code-securite-interieure, type: droit, titre: "Code de la sécurité intérieure", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000025503132/", consulte_le: 2026-09-05 }
+  - { id: code-patrimoine, type: droit, titre: "Code du patrimoine", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006074236/", consulte_le: 2026-09-05 }
+  - { id: cu-l422-1, type: droit, titre: "Code de l'urbanisme, art. L422-1 — autorité compétente", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006815714", consulte_le: 2026-09-05 }
+  - { id: cu-r423-19, type: droit, titre: "Code de l'urbanisme, art. R423-19 et s. — délais d'instruction", url: "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074075/LEGISCTA000006188432/", consulte_le: 2026-09-05 }
+  - { id: cu-l424-2, type: droit, titre: "Code de l'urbanisme, art. L424-2 — décision tacite", url: "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074075/", consulte_le: 2026-09-05 }
+  - { id: cu-a424-15, type: droit, titre: "Code de l'urbanisme, art. A424-15 et s. — affichage sur le terrain", url: "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074075/", consulte_le: 2026-09-05 }
+  - { id: cu-r600, type: droit, titre: "Code de l'urbanisme, art. R600-1 et R600-2 — recours des tiers", url: "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074075/", consulte_le: 2026-09-05 }
+
+  # --- Pages officielles : la synthèse faisant foi -----------------------
+  - { id: vp-competences, type: page_officielle, titre: "Qui fait quoi ? La répartition des compétences — vie-publique.fr", url: "https://www.vie-publique.fr/fiches/qui-fait-quoi-collectivites-territoriales", consulte_le: 2026-09-05 }
+  - { id: cl-gouv, type: page_officielle, titre: "Portail des collectivités locales — collectivites-locales.gouv.fr", url: "https://www.collectivites-locales.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: sp-permis, type: page_officielle, titre: "Permis de construire — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/N319", consulte_le: 2026-09-05 }
+  - { id: sp-recours-urbanisme, type: page_officielle, titre: "Contester une autorisation d'urbanisme — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/F19811", consulte_le: 2026-09-05 }
+  - { id: sp-taxe-amenagement, type: page_officielle, titre: "Taxe d'aménagement — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/F23263", consulte_le: 2026-09-05 }
+  - { id: sp-taxe-fonciere, type: page_officielle, titre: "Taxe foncière sur les propriétés bâties — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/F59", consulte_le: 2026-09-05 }
+  - { id: cada, type: page_officielle, titre: "Commission d'accès aux documents administratifs", url: "https://www.cada.fr/", consulte_le: 2026-09-05 }
+  - { id: education-gouv, type: page_officielle, titre: "Ministère de l'Éducation nationale", url: "https://www.education.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: ars-gouv, type: page_officielle, titre: "Les agences régionales de santé", url: "https://www.ars.sante.fr/", consulte_le: 2026-09-05 }
+  - { id: caf-fr, type: page_officielle, titre: "caf.fr", url: "https://www.caf.fr/", consulte_le: 2026-09-05 }
+  - { id: prefectures, type: page_officielle, titre: "Les services de l'État en région et département", url: "https://www.prefectures-regions.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: eaufrance, type: page_officielle, titre: "Eaufrance — le service public d'information sur l'eau", url: "https://www.eaufrance.fr/", consulte_le: 2026-09-05 }
+  - { id: europa, type: page_officielle, titre: "Union européenne — europa.eu", url: "https://european-union.europa.eu/index_fr", consulte_le: 2026-09-05 }
+  - { id: anct-hlm, type: page_officielle, titre: "Demande de logement social", url: "https://www.demande-logement-social.gouv.fr/", consulte_le: 2026-09-05 }
+
+  # --- Open data : les chiffres, vérifiables soi-même --------------------
+  - { id: od-ofgl, type: donnees_ouvertes, titre: "OFGL — finances des collectivités locales, commune par commune", url: "https://data.ofgl.fr/", consulte_le: 2026-09-05 }
+  - { id: od-banatic, type: donnees_ouvertes, titre: "BANATIC — intercommunalités et répartition de leurs compétences", url: "https://www.banatic.interieur.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: od-rne, type: donnees_ouvertes, titre: "Répertoire national des élus", url: "https://www.data.gouv.fr/fr/datasets/repertoire-national-des-elus-1/", consulte_le: 2026-09-05 }
+  - { id: od-gpu, type: donnees_ouvertes, titre: "Géoportail de l'urbanisme — documents d'urbanisme opposables", url: "https://www.geoportail-urbanisme.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: od-sitadel, type: donnees_ouvertes, titre: "Sitadel — permis de construire délivrés", url: "https://www.statistiques.developpement-durable.gouv.fr/donnees-sitadel", consulte_le: 2026-09-05 }
+  - { id: od-sispea, type: donnees_ouvertes, titre: "SISPEA — prix et performance des services d'eau, commune par commune", url: "https://services.eaufrance.fr/", consulte_le: 2026-09-05 }
+  - { id: od-sinoe, type: donnees_ouvertes, titre: "SINOE — données sur les déchets ménagers (ADEME)", url: "https://www.sinoe.org/", consulte_le: 2026-09-05 }
+  - { id: od-decp, type: donnees_ouvertes, titre: "Données essentielles de la commande publique", url: "https://www.data.gouv.fr/fr/datasets/donnees-essentielles-de-la-commande-publique-fichiers-consolides/", consulte_le: 2026-09-05 }
+  - { id: od-datagouv, type: donnees_ouvertes, titre: "data.gouv.fr — la plateforme des données publiques", url: "https://www.data.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: od-dvf, type: donnees_ouvertes, titre: "DVF — demandes de valeurs foncières (prix des ventes)", url: "https://app.dvf.etalab.gouv.fr/", consulte_le: 2026-09-05 }

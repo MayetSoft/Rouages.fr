@@ -1,0 +1,270 @@
+# Les nœuds du réseau : qui agit.
+# Une phrase par acteur, pas davantage — le détail est sur les pages liées.
+acteurs:
+  # --- Vous -------------------------------------------------------------
+  - id: citoyen
+    nom: "Vous"
+    nom_court: "Vous"
+    type: personne
+    echelon: citoyen
+    resume: "Habitant, contribuable, électeur, usager, riverain : selon le rouage, vous n'avez pas les mêmes prises."
+    liens: [vp-competences, od-datagouv]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  # --- Commune ----------------------------------------------------------
+  - id: commune
+    nom: "La commune"
+    nom_court: "Commune"
+    type: collectivite
+    echelon: commune
+    resume: "L'échelon de base, environ 35 000 en France, aux compétences très inégales selon ce qui a été transféré à l'intercommunalité."
+    liens: [wp-commune, cgct, cl-gouv, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: conseil-municipal
+    nom: "Le conseil municipal"
+    nom_court: "Conseil municipal"
+    type: assemblee
+    echelon: commune
+    resume: "Vote le budget, les délibérations et le PLU. Ses séances sont publiques et ses délibérations communicables."
+    liens: [wp-conseil-municipal, cgct, od-rne]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: maire
+    nom: "Le maire"
+    nom_court: "Maire"
+    type: mandat_electif
+    echelon: commune
+    resume: "Exécutif de la commune et, pour certaines missions, agent de l'État : deux casquettes qui changent qui est responsable."
+    liens: [wp-maire, cgct, od-rne]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: service-instructeur
+    nom: "Le service urbanisme"
+    nom_court: "Service urbanisme"
+    type: service_administratif
+    echelon: commune
+    resume: "Instruit les demandes d'autorisation. Municipal, mutualisé à l'intercommunalité, ou assuré par l'État selon la taille de la commune."
+    liens: [cu-r423-19, od-banatic]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: police-municipale
+    nom: "La police municipale"
+    nom_court: "Police municipale"
+    type: service_administratif
+    echelon: commune
+    resume: "Placée sous l'autorité du maire, aux pouvoirs distincts de ceux de la police nationale ou de la gendarmerie."
+    liens: [code-securite-interieure, cgct]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  # --- Intercommunalité -------------------------------------------------
+  - id: epci
+    nom: "L'intercommunalité"
+    nom_court: "Intercommunalité"
+    type: collectivite
+    echelon: epci
+    resume: "Communauté de communes, d'agglomération, urbaine ou métropole : exerce les compétences que les communes lui ont transférées."
+    liens: [wp-epci, wp-intercommunalite, od-banatic, cgct]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: conseil-communautaire
+    nom: "Le conseil communautaire"
+    nom_court: "Conseil communautaire"
+    type: assemblee
+    echelon: epci
+    resume: "Composé d'élus municipaux, il décide sur les compétences transférées — souvent celles qui pèsent le plus sur la facture."
+    liens: [wp-intercommunalite, cgct, od-rne]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: syndicat-eau
+    nom: "Le syndicat des eaux"
+    nom_court: "Syndicat des eaux"
+    type: collectivite
+    echelon: epci
+    resume: "Structure intercommunale spécialisée qui capte, traite et distribue l'eau, parfois via un délégataire privé."
+    liens: [od-sispea, eaufrance, cgct]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  # --- Département ------------------------------------------------------
+  - id: departement
+    nom: "Le département"
+    nom_court: "Département"
+    type: collectivite
+    echelon: departement
+    resume: "Chef de file de l'action sociale : RSA, personnes âgées, protection de l'enfance. Gère aussi les collèges et les routes départementales."
+    liens: [wp-departement, cgct, vp-competences, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: conseil-departemental
+    nom: "Le conseil départemental"
+    nom_court: "Conseil dép."
+    type: assemblee
+    echelon: departement
+    resume: "Assemblée élue par canton, qui vote un budget dont l'action sociale représente la plus grosse part."
+    liens: [wp-conseil-departemental, od-rne, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: sdis
+    nom: "Les pompiers (SDIS)"
+    nom_court: "Pompiers"
+    type: service_administratif
+    echelon: departement
+    resume: "Établissement public financé par le département et les communes, mais dirigé opérationnellement par le préfet."
+    liens: [wp-sdis, code-securite-interieure]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  # --- Région -----------------------------------------------------------
+  - id: region
+    nom: "La région"
+    nom_court: "Région"
+    type: collectivite
+    echelon: region
+    resume: "Lycées, formation professionnelle, transports régionaux, développement économique et aménagement du territoire."
+    liens: [wp-region, cgct, vp-competences, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: conseil-regional
+    nom: "Le conseil régional"
+    nom_court: "Conseil régional"
+    type: assemblee
+    echelon: region
+    resume: "Assemblée élue au scrutin de liste régional, qui adopte notamment le schéma d'aménagement du territoire."
+    liens: [wp-conseil-regional, od-rne]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: ars
+    nom: "L'agence régionale de santé"
+    nom_court: "Agence de santé (ARS)"
+    type: service_deconcentre
+    echelon: region
+    resume: "Pilote l'offre de soins dans la région : autorisations d'activité, hôpitaux, prévention."
+    liens: [wp-ars, ars-gouv]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  # --- État -------------------------------------------------------------
+  - id: etat
+    nom: "L'État"
+    nom_court: "État"
+    type: collectivite
+    echelon: etat
+    resume: "Fixe la règle, finance une large part des budgets locaux par dotations, et conserve les compétences régaliennes."
+    liens: [cgct, vp-competences, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: prefet
+    nom: "Le préfet"
+    nom_court: "Préfet"
+    type: mandat_electif
+    echelon: etat
+    resume: "Représentant de l'État dans le département : ordre public, gestion de crise, et contrôle de légalité des actes des collectivités."
+    liens: [wp-prefet, cgct, prefectures]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: rectorat
+    nom: "Le rectorat et la DSDEN"
+    nom_court: "Rectorat"
+    type: service_deconcentre
+    echelon: etat
+    resume: "Services de l'Éducation nationale : enseignants, programmes, ouvertures et fermetures de classes."
+    liens: [wp-rectorat, code-education, education-gouv]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: abf
+    nom: "L'architecte des Bâtiments de France"
+    nom_court: "Bâtiments de France"
+    type: service_deconcentre
+    echelon: etat
+    resume: "Rend un avis, parfois conforme, sur les projets situés en périmètre de protection du patrimoine."
+    liens: [wp-abf, code-patrimoine]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: caf
+    nom: "La CAF"
+    nom_court: "CAF"
+    type: service_administratif
+    echelon: etat
+    resume: "Verse les prestations familiales et sociales, dont le RSA financé par le département."
+    liens: [wp-caf, caf-fr, code-action-sociale]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: agence-eau
+    nom: "L'agence de l'eau"
+    nom_court: "Agence de l'eau"
+    type: service_administratif
+    echelon: etat
+    resume: "Établissement de bassin qui perçoit des redevances sur l'eau et subventionne les travaux des collectivités."
+    liens: [wp-agence-eau, code-environnement, eaufrance]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: tribunal-administratif
+    nom: "Le tribunal administratif"
+    nom_court: "Tribunal admin."
+    type: service_deconcentre
+    echelon: etat
+    resume: "Juge les litiges entre les particuliers et l'administration, dont les recours contre les autorisations d'urbanisme."
+    liens: [wp-tribunal-administratif, sp-recours-urbanisme]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  # --- Union européenne -------------------------------------------------
+  - id: union-europeenne
+    nom: "L'Union européenne"
+    nom_court: "Union européenne"
+    type: collectivite
+    echelon: union_europeenne
+    resume: "Fixe une partie des normes appliquées localement — eau, déchets, air — et cofinance des projets régionaux."
+    liens: [wp-union-europeenne, europa, code-environnement]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  # --- Acteurs privés ---------------------------------------------------
+  - id: delegataire-eau
+    nom: "Le délégataire (eau, déchets)"
+    nom_court: "Délégataire"
+    type: entreprise
+    echelon: prive
+    resume: "Entreprise à qui une collectivité confie l'exploitation d'un service public, par contrat de délégation."
+    liens: [od-decp, od-sispea, cgct]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: bailleur-social
+    nom: "Le bailleur social"
+    nom_court: "Bailleur social"
+    type: entreprise
+    echelon: prive
+    resume: "Organisme qui construit et gère les logements sociaux, sur des terrains et avec des financements largement publics."
+    liens: [wp-hlm, anct-hlm]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: petitionnaire
+    nom: "Le demandeur d'un permis"
+    nom_court: "Demandeur"
+    type: personne
+    echelon: prive
+    resume: "Particulier, entreprise ou collectivité qui dépose une demande d'autorisation d'urbanisme."
+    liens: [sp-permis, od-sitadel]
+    verifie_le: 2026-09-05
+    confiance: etabli

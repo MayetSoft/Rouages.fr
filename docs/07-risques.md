@@ -8,10 +8,15 @@ Le droit et les compétences changent en permanence (transferts commune/EPCI,
 réformes, jurisprudence). Un site d'explication institutionnelle non entretenu
 devient **activement nuisible** : il fait rater des délais.
 
-**Garde-fous** : `verifie_le` et `perime_apres` obligatoires ; bandeau
-automatique passé la date ; contrôle « fraîcheur » en intégration continue ;
-plafond volontaire du nombre de fiches en fonction de la capacité réelle de
-relecture. Vingt fiches à jour valent mieux que deux cents fiches douteuses.
+**Garde-fous** : `verifie_le` et `perime_apres_mois` obligatoires ; mention
+automatique passé la date ; contrôle « fraîcheur » et vérification des liens une
+fois par semaine en intégration continue ; plafond volontaire du nombre de nœuds
+selon la capacité réelle de relecture.
+
+Le format graphe atténue ce risque plus qu'un format d'articles : un nœud porte
+une phrase et des liens, pas trois écrans de développements à réviser. Ce qui
+périme vraiment, ce sont les **attributions de compétences** — et elles sont
+concentrées dans un seul fichier.
 
 ## 2. Exactitude juridique
 
@@ -20,8 +25,11 @@ a des conséquences concrètes pour un usager.
 
 **Garde-fous** : ne jamais formuler de conseil personnalisé ; toujours renvoyer
 au texte et à l'interlocuteur compétent ; afficher le niveau de `confiance` ;
-mention explicite « information d'orientation, sans valeur juridique » ; pour
-les procédures à enjeu, faire relire par un praticien avant publication.
+pour les procédures à enjeu, faire relire par un praticien avant publication.
+
+Le parti pris « on ne rédige pas » est aussi une protection : moins nous
+affirmons, moins nous pouvons nous tromper. Le lien vers Légifrance ne périme
+pas de la même façon qu'un paragraphe d'explication.
 
 ## 3. Neutralité perçue et famille « influence »
 

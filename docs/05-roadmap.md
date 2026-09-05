@@ -1,99 +1,54 @@
 # 05 — Feuille de route
 
-> Statut : proposition. Le principe directeur : **une tranche verticale complète
-> avant toute extension horizontale.**
+Principe : **densifier le réseau avant de l'élargir.** Un graphe clairsemé ne
+montre rien ; c'est la densité des relations qui fait la valeur, pas le nombre
+de nœuds.
 
-Le risque principal de ce projet n'est pas technique, c'est la dispersion : trois
-produits différents (encyclopédie visuelle, média de prebunking, plateforme
-d'outils) sous une même bannière. La roadmap ci-dessous les sépare dans le temps
-et pose une condition de sortie explicite à chaque phase.
+## Phase 0 — Cadrage ✔
 
----
+Vision, familles, modèle de données, vues, choix techniques.
 
-## Phase 0 — Cadrage *(en cours, ce dépôt)*
+## Phase 1 — Le réseau local ✔ *(en place)*
 
-Vision, familles, modèle de données, vues graphiques, choix techniques.
+26 acteurs, 26 compétences, 10 flux, un processus, ~50 pages de référence liées.
+Carte d'ensemble, focus, pages de nœud sans JavaScript, validation en
+intégration continue.
 
-**Fini quand** : le modèle de données est validé et une fiche exemple prouve
-qu'il tient debout. *(Fait : `exemples/permis-de-construire.yaml`.)*
+**Reste à faire avant de considérer la phase close** : faire relire les
+attributions de compétences par un praticien (les nœuds concernés portent
+`confiance: a_confirmer`).
 
----
+## Phase 2 — Densifier
 
-## Phase 1 — La tranche verticale
+- Les acteurs manquants de l'échelon local : SCoT, CCAS, chambres consulaires,
+  Enedis, opérateurs de transport, agence d'urbanisme.
+- Les compétences manquantes : voirie, énergie, culture, sport, funéraire,
+  numérique.
+- Les flux réellement chiffrés, branchés sur l'OFGL.
+- Deux ou trois processus de plus : contester une délibération, demander un
+  document administratif, une enquête publique.
 
-**Objectif : une seule fiche, complète, publiée, de bout en bout.**
+**Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
+n'importe quel autre en trois clics, sans passer par une impasse.
 
-Recommandation : **« Le permis de construire »** (famille B). Raisons : usage
-réel et fréquent, délais critiques donc valeur immédiate, mobilise les quatre
-vues, met en jeu commune / EPCI / État donc oblige à modéliser proprement le
-partage de compétences, et prépare directement la phase 3 (PLU).
+## Phase 3 — Élargir
 
-Livrables :
-- squelette du site, un seul gabarit de fiche ;
-- validation du schéma en intégration continue ;
-- génération des vues V1, V2 et V4 depuis le YAML ;
-- déploiement en ligne, nom de domaine, mentions légales, licence.
-
-**Fini quand** : un inconnu à qui l'on envoie l'URL trouve seul qui décide et
-jusqu'à quand il peut contester. À tester sur cinq personnes réelles, pas entre
-nous.
-
----
-
-## Phase 2 — Le socle local (10 à 15 fiches)
-
-Famille A (commune, EPCI, département, préfet, budget local, école, eau,
-déchets) + 3 à 4 fiches de famille B qui s'y raccrochent.
-
-Ajouts : recherche plein texte, entrée par situation (« que se passe-t-il si… »),
-page de licence et d'export des données, processus de contribution.
-
-**Fini quand** : le graphe est assez dense pour que les fiches se lient
-naturellement entre elles, et qu'un contributeur externe puisse en ajouter une
-sans nous.
-
----
-
-## Phase 3 — Élargissement (familles C puis D)
-
-D'abord la famille C (rouages économiques) : elle élargit l'audience sans
-engager la neutralité perçue.
-
-Puis, **et seulement si le site a acquis une réputation de neutralité**, la
-famille D (prebunking), sous la règle « mécanismes, jamais de personnes ».
-
-**Fini quand** : la famille D ne provoque pas de rejet des familles A à C.
-Signal à surveiller : les retours des enseignants et des collectivités.
-
----
+- **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,
+  autres nœuds.
+- **Rouages de l'influence** (prebunking), une fois la neutralité installée, et
+  sous la règle absolue : des mécanismes, jamais des personnes.
 
 ## Phase 4 — Les outils communautaires
 
-Produit distinct, adossé au graphe. Ordre recommandé, du moins risqué au plus
-risqué :
+Recherche dans les délibérations · lecture assistée du PLU · recherche de la
+procédure applicable. Adossés au graphe, jamais construits isolément. Voir
+`07-risques.md` avant la première ligne de code.
 
-1. **Recherche dans les délibérations** d'un territoire pilote — collecte,
-   OCR, indexation, recherche. Techniquement connu, juridiquement clair
-   (documents publics), utilité immédiate pour la presse locale et les élus
-   d'opposition. Point de vigilance RGPD : les noms de personnes physiques dans
-   les délibérations.
-2. **Recherche de la procédure applicable** dans les documents officiels —
-   recherche augmentée qui *cite* et ne *conclut jamais*.
-3. **Lecture assistée du PLU** — le plus demandé, le plus risqué. Doit
-   restituer l'article applicable et son texte, jamais un verdict de
-   constructibilité. Voir `07-risques.md`.
+## Ce qu'on ne fait pas
 
-**Ne pas commencer la phase 4 avant la phase 2.** Ces outils n'ont d'intérêt que
-rattachés à un graphe qui explique ce qu'on est en train de lire ; construits
-isolément, ce sont trois moteurs de recherche de plus.
-
----
-
-## Ce qu'on ne fait pas (pour l'instant)
-
+- Pas d'articles. Jamais. Le plafond de 280 signes sur les résumés est là pour
+  ça, et il est appliqué par le schéma.
 - Pas de comptes utilisateurs avant la phase 4.
-- Pas de commentaires ni de forum : coût de modération sans rapport avec la
-  valeur ajoutée.
-- Pas de couverture nationale exhaustive : mieux vaut vingt fiches justes que
-  deux cents approximatives.
-- Pas d'application mobile : le site responsive suffit.
+- Pas de commentaires : coût de modération sans rapport avec la valeur.
+- Pas de couverture nationale exhaustive : mieux vaut un réseau dense et juste
+  qu'un annuaire creux.

@@ -37,17 +37,17 @@ for (const a of g.anomalies) {
 // Une source déclarée mais citée par personne est du bruit : on la signale.
 const citees = new Set<string>();
 const recolter = (s: string[]) => s.forEach((id) => citees.add(id));
-for (const a of g.acteurs.values()) recolter(a.sources);
-for (const c of g.competences.values()) recolter(c.sources);
-for (const d of g.documents.values()) recolter(d.sources);
-for (const f of g.flux.values()) recolter(f.sources);
+for (const a of g.acteurs.values()) recolter(a.liens);
+for (const c of g.competences.values()) recolter(c.liens);
+for (const d of g.documents.values()) recolter(d.liens);
+for (const f of g.flux.values()) recolter(f.liens);
 for (const p of g.processus.values()) {
-  recolter(p.sources);
-  p.etapes.forEach((e) => recolter(e.sources));
-  p.leviers.forEach((l) => recolter(l.sources));
+  recolter(p.liens);
+  p.etapes.forEach((e) => recolter(e.liens));
+  p.leviers.forEach((l) => recolter(l.liens));
 }
 for (const id of g.sources.keys()) {
-  if (!citees.has(id)) avertissements.push(`source « ${id} » déclarée mais citée par aucune entité`);
+  if (!citees.has(id)) avertissements.push(`page de référence « ${id} » déclarée mais liée depuis aucun nœud`);
 }
 
 // Famille « influence » : mécanismes, jamais de personnes. Contrôle grossier

@@ -1,0 +1,255 @@
+# Les arêtes du réseau : qui détient quel pouvoir, et avec qui il le partage.
+# Le partage est l'information principale : c'est lui qui rend le circuit
+# illisible de l'extérieur.
+competences:
+  # --- Commune ----------------------------------------------------------
+  - id: etat-civil
+    nom: "État civil"
+    acteur: commune
+    resume: "Naissances, mariages, décès, cartes d'identité et passeports : la commune agit ici au nom de l'État."
+    partagee_avec: [etat]
+    liens: [cgct, cl-gouv]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: ecoles-primaires
+    nom: "Écoles maternelles et élémentaires"
+    nom_court: "Écoles primaires"
+    acteur: commune
+    resume: "La commune possède et entretient les bâtiments et paie les agents ; l'État recrute et paie les enseignants."
+    partagee_avec: [rectorat]
+    liens: [code-education, vp-competences]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: carte-scolaire
+    nom: "Ouverture et fermeture de classes"
+    nom_court: "Ouverture de classes"
+    acteur: rectorat
+    resume: "Décidée par les services de l'État, pas par le maire — même quand la commune est propriétaire de l'école."
+    partagee_avec: [commune]
+    liens: [code-education, education-gouv]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: police-tranquillite
+    nom: "Tranquillité et salubrité publiques"
+    nom_court: "Tranquillité publique"
+    acteur: maire
+    resume: "Pouvoir de police du maire : bruit, animaux, occupation du domaine public, arrêtés municipaux."
+    partagee_avec: [prefet]
+    liens: [cgct, code-securite-interieure]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: voirie-communale
+    nom: "Voirie communale"
+    acteur: commune
+    resume: "Rues et chemins communaux. Les routes départementales et nationales relèvent d'autres gestionnaires, même en traversée de bourg."
+    partagee_avec: [departement]
+    liens: [cgct, cl-gouv]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: redaction-plu
+    nom: "Écrire la règle d'urbanisme (PLU)"
+    nom_court: "Règle d'urbanisme (PLU)"
+    acteur: commune
+    resume: "Le document qui dit ce qui est constructible. De plus en plus souvent transféré à l'intercommunalité sous forme de PLUi."
+    partagee_avec: [epci]
+    liens: [wp-plu, code-urbanisme, od-gpu, od-banatic]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: delivrance-autorisation-urbanisme
+    nom: "Délivrer les permis de construire"
+    nom_court: "Permis de construire"
+    acteur: maire
+    resume: "Le maire signe, au nom de la commune si elle a un document d'urbanisme, au nom de l'État sinon."
+    partagee_avec: [abf, prefet]
+    liens: [cu-l422-1, code-patrimoine, sp-permis]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  # --- Intercommunalité -------------------------------------------------
+  - id: dechets-menagers
+    nom: "Collecte et traitement des déchets"
+    nom_court: "Déchets ménagers"
+    acteur: epci
+    resume: "Compétence intercommunale dans la quasi-totalité des territoires, financée par la taxe ou la redevance d'enlèvement."
+    partagee_avec: [commune]
+    liens: [cgct, od-sinoe, od-banatic]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: eau-potable
+    nom: "Eau potable"
+    acteur: epci
+    resume: "Captage, traitement, distribution. Exercée en régie ou déléguée à une entreprise ; le prix au mètre cube varie fortement d'un territoire à l'autre."
+    partagee_avec: [commune, syndicat-eau, delegataire-eau]
+    liens: [cgct, od-sispea, eaufrance, od-banatic]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: assainissement
+    nom: "Assainissement"
+    acteur: epci
+    resume: "Collecte et traitement des eaux usées, facturés sur la facture d'eau."
+    partagee_avec: [syndicat-eau, delegataire-eau]
+    liens: [cgct, od-sispea, code-environnement]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: developpement-economique
+    nom: "Développement économique local"
+    nom_court: "Développement éco."
+    acteur: epci
+    resume: "Zones d'activité et immobilier d'entreprise pour l'intercommunalité ; la stratégie et les aides relèvent de la région."
+    partagee_avec: [region]
+    liens: [cgct, vp-competences, wp-loi-notre]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: logement-social
+    nom: "Logement social"
+    acteur: epci
+    resume: "Programmation et attribution partagées entre l'intercommunalité, la commune, l'État et les bailleurs."
+    partagee_avec: [commune, etat, bailleur-social]
+    liens: [wp-hlm, anct-hlm, cgct]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  # --- Département ------------------------------------------------------
+  - id: colleges
+    nom: "Collèges"
+    acteur: departement
+    resume: "Bâtiments, personnels techniques et restauration au département ; enseignants et programmes à l'État."
+    partagee_avec: [rectorat]
+    liens: [code-education, vp-competences]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: action-sociale
+    nom: "Action sociale et RSA"
+    nom_court: "Action sociale, RSA"
+    acteur: departement
+    resume: "Le département finance et pilote ; la CAF verse. Premier poste de dépense des budgets départementaux."
+    partagee_avec: [caf, etat]
+    liens: [code-action-sociale, od-ofgl, caf-fr]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: protection-enfance
+    nom: "Protection de l'enfance et PMI"
+    nom_court: "Protection de l’enfance"
+    acteur: departement
+    resume: "Aide sociale à l'enfance, protection maternelle et infantile, sous contrôle du juge des enfants."
+    partagee_avec: [etat]
+    liens: [code-action-sociale, vp-competences]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: routes-departementales
+    nom: "Routes départementales"
+    nom_court: "Routes départementales"
+    acteur: departement
+    resume: "Le plus gros réseau routier français, y compris quand il traverse un village."
+    partagee_avec: [commune]
+    liens: [cgct, cl-gouv]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: secours-incendie
+    nom: "Secours et incendie"
+    acteur: sdis
+    resume: "Financé par le département et les communes, mais placé sous l'autorité opérationnelle du préfet."
+    partagee_avec: [departement, commune, prefet]
+    liens: [wp-sdis, code-securite-interieure]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  # --- Région -----------------------------------------------------------
+  - id: lycees
+    nom: "Lycées"
+    acteur: region
+    resume: "Même partage que pour les collèges : les murs à la région, les enseignants à l'État."
+    partagee_avec: [rectorat]
+    liens: [code-education, vp-competences]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: formation-professionnelle
+    nom: "Formation professionnelle et apprentissage"
+    nom_court: "Formation pro."
+    acteur: region
+    resume: "Compétence régionale, dont le partage avec l'État a été plusieurs fois redéfini."
+    partagee_avec: [etat]
+    liens: [vp-competences, wp-loi-notre]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: transports-regionaux
+    nom: "Transports régionaux"
+    acteur: region
+    resume: "Trains régionaux, cars interurbains et transport scolaire hors périmètre urbain."
+    partagee_avec: [epci, departement]
+    liens: [vp-competences, cgct]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: amenagement-territoire
+    nom: "Aménagement du territoire"
+    acteur: region
+    resume: "Le schéma régional s'impose aux documents d'urbanisme locaux : la règle communale n'est pas écrite seule."
+    partagee_avec: [etat, epci]
+    liens: [code-urbanisme, vp-competences]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  # --- État et Europe ---------------------------------------------------
+  - id: controle-legalite
+    nom: "Contrôle de légalité"
+    acteur: prefet
+    resume: "Le préfet peut déférer au tribunal administratif une délibération qu'il estime illégale."
+    partagee_avec: [tribunal-administratif]
+    liens: [cgct, wp-prefet]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: securite-publique
+    nom: "Sécurité publique"
+    acteur: prefet
+    resume: "Police nationale et gendarmerie relèvent de l'État ; la police municipale a des pouvoirs distincts et plus étroits."
+    partagee_avec: [maire, police-municipale]
+    liens: [code-securite-interieure, wp-prefet]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: offre-de-soins
+    nom: "Organisation des soins"
+    acteur: ars
+    resume: "Autorisations d'activité, hôpitaux, maternités : ni le maire ni le département n'y ont la main."
+    partagee_avec: [etat]
+    liens: [wp-ars, ars-gouv]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: normes-environnementales
+    nom: "Normes environnementales"
+    nom_court: "Normes environnement"
+    acteur: union-europeenne
+    resume: "Qualité de l'eau, de l'air, traitement des déchets : les seuils appliqués localement viennent largement de directives européennes."
+    partagee_avec: [etat, agence-eau]
+    liens: [europa, code-environnement, eaufrance]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: acces-documents
+    nom: "Accès aux documents administratifs"
+    nom_court: "Accès aux documents"
+    acteur: citoyen
+    resume: "Délibérations, budgets, marchés, permis : communicables sur demande, avec recours possible devant la CADA."
+    partagee_avec: [commune, epci, departement, region, etat]
+    liens: [wp-cada, cada]
+    verifie_le: 2026-09-05
+    confiance: etabli

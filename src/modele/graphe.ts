@@ -20,7 +20,7 @@ import {
 } from './schemas.ts';
 
 export const RACINE = new URL('../../', import.meta.url).pathname;
-const DOSSIERS = ['contenu/communs', 'contenu/rouages'];
+const DOSSIER_CONTENU = 'contenu';
 
 export interface Anomalie {
   fichier: string;
@@ -39,14 +39,14 @@ export interface Graphe {
   anomalies: Anomalie[];
 }
 
-function fichiersYaml(): string[] {
+/** Tout le YAML de `contenu/`, à n'importe quelle profondeur. */
+function fichiersYaml(dossier = join(RACINE, DOSSIER_CONTENU)): string[] {
+  if (!existsSync(dossier)) return [];
   const trouves: string[] = [];
-  for (const dossier of DOSSIERS) {
-    const chemin = join(RACINE, dossier);
-    if (!existsSync(chemin)) continue;
-    for (const nom of readdirSync(chemin).sort()) {
-      if (nom.endsWith('.yaml') || nom.endsWith('.yml')) trouves.push(join(chemin, nom));
-    }
+  for (const entree of readdirSync(dossier, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const chemin = join(dossier, entree.name);
+    if (entree.isDirectory()) trouves.push(...fichiersYaml(chemin));
+    else if (entree.name.endsWith('.yaml') || entree.name.endsWith('.yml')) trouves.push(chemin);
   }
   return trouves;
 }
@@ -144,29 +144,30 @@ function verifierReferences(g: Graphe): void {
     }
   };
 
-  const exigeSources = (sources: string[], chemin: string) => {
-    for (const s of sources) exige(s, g.sources, 'source', `${chemin}.sources`);
+  const exigeLiens = (liens: string[], chemin: string) => {
+    for (const s of liens) exige(s, g.sources, 'page de référence', `${chemin}.liens`);
   };
 
-  for (const a of g.acteurs.values()) exigeSources(a.sources, `acteur ${a.id}`);
+  for (const a of g.acteurs.values()) exigeLiens(a.liens, `acteur ${a.id}`);
 
   for (const c of g.competences.values()) {
-    exigeSources(c.sources, `competence ${c.id}`);
+    exigeLiens(c.liens, `competence ${c.id}`);
     exige(c.acteur, g.acteurs, 'acteur', `competence ${c.id}.acteur`);
     for (const p of c.partagee_avec) exige(p, g.acteurs, 'acteur', `competence ${c.id}.partagee_avec`);
   }
 
-  for (const d of g.documents.values()) exigeSources(d.sources, `document ${d.id}`);
+  for (const d of g.documents.values()) exigeLiens(d.liens, `document ${d.id}`);
 
   for (const f of g.flux.values()) {
-    exigeSources(f.sources, `flux ${f.id}`);
+    exigeLiens(f.liens, `flux ${f.id}`);
     exige(f.de, g.acteurs, 'acteur', `flux ${f.id}.de`);
     for (const v of f.vers) exige(v, g.acteurs, 'acteur', `flux ${f.id}.vers`);
   }
 
   for (const p of g.processus.values()) {
-    exigeSources(p.sources, `processus ${p.id}`);
+    exigeLiens(p.liens, `processus ${p.id}`);
     exige(p.decideur, g.acteurs, 'acteur', `processus ${p.id}.decideur`);
+    for (const c of p.competences) exige(c, g.competences, 'compétence', `processus ${p.id}.competences`);
     const ordres = new Set<number>();
     for (const e of p.etapes) {
       if (ordres.has(e.ordre)) {
@@ -179,11 +180,12 @@ function verifierReferences(g: Graphe): void {
       }
       ordres.add(e.ordre);
       exige(e.acteur, g.acteurs, 'acteur', `processus ${p.id}.etape ${e.ordre}.acteur`);
-      exigeSources(e.sources, `processus ${p.id}.etape ${e.ordre}`);
+      exigeLiens(e.liens, `processus ${p.id}.etape ${e.ordre}`);
       for (const d of e.produit) exige(d, g.documents, 'document', `processus ${p.id}.etape ${e.ordre}.produit`);
     }
     for (const l of p.leviers) {
-      exigeSources(l.sources, `levier ${l.id}`);
+      exigeLiens(l.liens, `levier ${l.id}`);
+      exige(l.acteur, g.acteurs, 'acteur', `levier ${l.id}.acteur`);
       if (l.ancre_etape !== undefined && !ordres.has(l.ancre_etape)) {
         g.anomalies.push({
           fichier: 'contenu',

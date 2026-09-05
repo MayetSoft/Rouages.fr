@@ -1,75 +1,55 @@
-# 04 — Les vues graphiques
+# 04 — Les vues
 
-> Statut : proposition.
+Le site est une visualisation. Il n'a que quatre rendus, et trois suffisent la
+plupart du temps.
 
-Quatre vues canoniques, **générées depuis le graphe**, réutilisables sur toutes
-les familles. Pas de schéma dessiné à la main : un schéma manuel diverge du
-texte dès la première mise à jour, et n'est pas réutilisable.
+## V1 — La carte d'ensemble
 
-## V1 — Carte des pouvoirs : « qui décide quoi »
+Tous les acteurs, en colonnes par échelon : Union européenne, État, région,
+département, intercommunalité, commune, acteurs privés, vous.
 
-Acteurs et compétences. Répond à la question 1.
+Deux types d'arêtes seulement : **l'argent qui circule** (trait plein, fléché) et
+**les compétences partagées** (pointillé, épaisseur = nombre de compétences en
+commun).
 
-Forme : arbre ou matrice acteurs × compétences, avec le partage de compétences
-rendu explicite (une compétence peut avoir plusieurs détenteurs, c'est le cas
-le plus fréquent et le plus mal compris).
+L'agrégation est le choix qui rend la carte lisible : sans elle, cinquante nœuds
+et deux cents arêtes ne montrent rien. Les compétences se déplient au clic.
 
-Exemple : « L'eau : qui capte, qui distribue, qui fixe le prix, qui contrôle. »
+## V2 — Le focus
 
-## V2 — Chronologie de procédure : « quand, et combien de temps »
+Un nœud au centre, ses relations autour, chacune **nommée en toutes lettres**
+(« détient », « partage avec », « reçoit de », « peut agir sur »). On clique un
+voisin, il devient le centre. C'est la navigation principale du site.
 
-Le processus en étapes, avec les délais à l'échelle et les acteurs en couloirs.
-Répond à la question 3.
+Le panneau qui l'accompagne porte les liens sortants, groupés par nature :
+Wikipédia pour la définition, le texte pour la règle, l'open data pour les
+chiffres.
 
-C'est la vue la plus utile du site, parce que les délais sont invisibles dans
-les sources textuelles et déterminants pour l'usager. Elle doit distinguer
-visuellement le délai *légal maximum*, le délai *observé*, et le délai
-*indicatif*.
+## V3 — La chronologie *(processus uniquement)*
 
-## V3 — Flux : « d'où vient l'argent »
+Un graphe ne sait pas montrer le temps. Un processus a donc une frise verticale :
+étapes, acteurs, délais à l'échelle, et la **nature** de chaque délai — maximum
+légal, indicatif, ou constaté. La confusion entre les trois est la première
+cause de mauvaise décision.
 
-Diagramme de flux (type Sankey) argent / information / autorisation. Répond à
-la question 2. Sert aussi bien un budget communal qu'une chaîne de valeur
-(famille C) ou un financement d'influence (famille D).
+## V4 — Les fenêtres d'action *(processus uniquement)*
 
-## V4 — Fenêtres d'action : « où puis-je agir »
+Ce que vous pouvez faire, jusqu'à quand, auprès de qui, et le piège de forme sur
+lequel on perd. C'est la vue signature : elle rend visibles les arêtes qui
+partent du nœud « Vous ».
 
-**La vue signature.** Une frise du processus sur laquelle sont posées les
-fenêtres d'intervention citoyenne : ce qui est ouvert, jusqu'à quand, auprès de
-qui, avec quelle difficulté. Répond à la question 5.
+## Règles
 
-C'est la seule des quatre qu'aucun site institutionnel ne propose. Si une seule
-vue doit être excellente, c'est celle-là.
+**Accessibilité.** Chaque schéma généré au build est doublé d'un tableau
+équivalent dans le DOM, porte un `title` et une `desc`, et n'encode jamais une
+information par la seule couleur : chaque relation est aussi écrite.
 
-## Règles de conception
+**Lisibilité avant compacité.** Sous 700 px, un schéma garde sa taille naturelle
+et défile ; le réduire le rendrait illisible, ce qui est pire.
 
-**Accessibilité — non négociable.** Tout schéma doit :
-- exister en **version tableau** équivalente (repliée, mais dans le DOM) ;
-- ne pas coder d'information uniquement par la couleur ;
-- rester lisible en 320 px de large — beaucoup d'usagers arrivent sur mobile,
-  souvent en situation d'urgence.
+**Déterminisme.** Les deux dispositions sont calculées, pas simulées. Aucune
+force, aucun aléa : la même donnée donne toujours la même image, donc on peut la
+citer et la comparer d'une version à l'autre.
 
-**Un schéma doit se comprendre sorti de sa page.** Il sera capturé et partagé.
-Il porte donc son titre, sa date de vérification et l'URL de la fiche.
-
-**Le schéma est un point d'entrée, pas une illustration.** Chaque nœud est
-cliquable et mène à la fiche de l'acteur, de l'étape ou du levier.
-
-**Densité maîtrisée.** Au-delà d'une dizaine de nœuds visibles, on découpe la
-fiche. Un schéma illisible est pire qu'un paragraphe.
-
-## Mise en œuvre technique
-
-| Vue | Rendu | Remarque |
-|---|---|---|
-| V1 | SVG généré (D3 ou code maison) | statique, pas d'interaction complexe |
-| V2 | SVG généré, échelle temporelle | attention au responsive : basculer en liste verticale sur mobile |
-| V3 | Sankey (d3-sankey) | fallback tableau obligatoire |
-| V4 | SVG généré maison | c'est notre différenciateur : ne pas déléguer à une bibliothèque générique |
-
-Mermaid reste utile pour la **documentation interne** (comme ici) et les
-brouillons éditoriaux, mais pas pour le rendu final : trop peu de contrôle sur
-la typographie, l'accessibilité et le responsive.
-
-Rendu **au build**, pas dans le navigateur : les schémas doivent être visibles
-sans JavaScript, indexables, et instantanés.
+**Le nœud est cliquable partout.** Sur la carte, dans le focus, dans les schémas
+générés au build.

@@ -1,0 +1,105 @@
+# Ce qui circule : l'argent, surtout. Les ordres de grandeur sont indicatifs et
+# se vérifient territoire par territoire dans l'open data lié.
+flux:
+  - id: dgf
+    nom: "Dotation globale de fonctionnement"
+    nature: argent
+    de: etat
+    vers: [commune, epci, departement]
+    resume: "La dotation globale de fonctionnement : le principal versement de l'État aux collectivités, calculé par formule."
+    ordre_de_grandeur: "Plusieurs dizaines de milliards d'euros par an, tous échelons confondus."
+    liens: [wp-dgf, od-ofgl, cl-gouv]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: taxe-fonciere
+    nom: "Taxe foncière"
+    nature: argent
+    de: citoyen
+    vers: [commune, epci]
+    resume: "Payée par les propriétaires, c'est la principale ressource fiscale directe du bloc communal."
+    ordre_de_grandeur: "Le taux est voté chaque année par le conseil municipal et le conseil communautaire."
+    liens: [wp-taxe-fonciere, sp-taxe-fonciere, od-ofgl, od-dvf]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: teom
+    nom: "Taxe d'enlèvement des ordures ménagères"
+    nature: argent
+    de: citoyen
+    vers: [epci]
+    resume: "La taxe d'enlèvement des ordures ménagères, adossée à la taxe foncière et affectée au service des déchets."
+    liens: [wp-teom, od-sinoe]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: facture-eau
+    nom: "Facture d'eau"
+    nature: argent
+    de: citoyen
+    vers: [epci, syndicat-eau, delegataire-eau, agence-eau]
+    resume: "La facture d'eau finance à la fois le service, l'assainissement et les redevances de l'agence de l'eau."
+    ordre_de_grandeur: "Le prix au mètre cube de chaque commune est public et comparable."
+    liens: [od-sispea, eaufrance, wp-agence-eau]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: taxe-amenagement
+    nom: "Taxe d'aménagement"
+    nature: argent
+    de: petitionnaire
+    vers: [commune, departement]
+    resume: "Due à raison d'une autorisation d'urbanisme, et partagée entre la commune et le département."
+    liens: [sp-taxe-amenagement, code-urbanisme]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: contribution-sdis
+    nom: "Contribution au SDIS"
+    nature: argent
+    de: departement
+    vers: [sdis]
+    resume: "Le département et les communes financent les pompiers, que le préfet dirige en opération."
+    liens: [wp-sdis, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: fonds-europeens
+    nom: "Fonds européens"
+    nature: argent
+    de: union-europeenne
+    vers: [region]
+    resume: "Les fonds structurels européens sont pour l'essentiel gérés par les régions."
+    liens: [europa, wp-region]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: rsa-verse
+    nom: "RSA"
+    nature: argent
+    de: departement
+    vers: [citoyen]
+    resume: "Le RSA est financé par le département et versé par la CAF : deux acteurs différents pour un même euro."
+    liens: [code-action-sociale, caf-fr, od-ofgl]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: subvention-agence-eau
+    nom: "Aides de l'agence de l'eau"
+    nature: argent
+    de: agence-eau
+    vers: [epci, syndicat-eau]
+    resume: "Les redevances perçues sur les factures d'eau reviennent aux collectivités sous forme d'aides aux travaux."
+    liens: [wp-agence-eau, eaufrance]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: deliberations
+    nom: "Délibérations publiées"
+    nature: information
+    de: conseil-municipal
+    vers: [citoyen, prefet]
+    resume: "Les délibérations sont publiques et transmises au préfet au titre du contrôle de légalité."
+    liens: [cgct, cada]
+    verifie_le: 2026-09-05
+    confiance: etabli

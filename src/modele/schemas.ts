@@ -1,15 +1,45 @@
 /**
  * Le modèle de données de Rouages, rendu exécutable.
  *
- * Ces schémas ne sont pas de la plomberie : ils sont la ligne éditoriale
- * appliquée mécaniquement. Une fiche sans source, sans date de vérification ou
- * sans levier d'action ne peut pas être publiée parce que le build échoue.
+ * Le site n'a pas d'articles : il a un graphe. Une entité n'existe donc que si
+ * elle est reliée à d'autres et si elle renvoie vers au moins une page de
+ * référence — Wikipédia pour la définition, Légifrance pour la règle,
+ * l'open data pour les chiffres. Nous ne réécrivons rien de ce que ces sites
+ * disent déjà mieux ; nous montrons ce qu'ils ne montrent pas : les liens.
+ *
+ * Ces schémas sont donc la ligne éditoriale appliquée mécaniquement : sans lien
+ * sortant, sans date de vérification, ou avec une référence cassée, le build
+ * échoue.
  *
  * Référence : docs/03-modele-de-donnees.md
  */
 import { z } from 'zod';
 
 /** Identifiant stable, en minuscules. Jamais réutilisé pour autre chose. */
+/** Les colonnes de la carte d'ensemble, du plus lointain au plus proche. */
+export const ECHELONS = [
+  'union_europeenne',
+  'etat',
+  'region',
+  'departement',
+  'epci',
+  'commune',
+  'prive',
+  'citoyen',
+] as const;
+export type Echelon = (typeof ECHELONS)[number];
+
+export const LIBELLE_ECHELON: Record<Echelon, string> = {
+  union_europeenne: 'Union européenne',
+  etat: 'État',
+  region: 'Région',
+  departement: 'Département',
+  epci: 'Intercommunalité',
+  commune: 'Commune',
+  prive: 'Acteurs privés',
+  citoyen: 'Vous',
+};
+
 export const Id = z
   .string()
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'un id est en minuscules, mots séparés par des tirets');
@@ -27,18 +57,22 @@ const dateSimple = z.coerce.date();
 
 /** Champs de traçabilité communs à toute entité sauf les sources elles-mêmes. */
 const tracable = {
-  sources: z.array(Id).min(1, 'toute entité porte au moins une source'),
+  /**
+   * Les pages de référence vers lesquelles ce nœud renvoie. C'est le contenu
+   * du site : on relie, on ne rédige pas.
+   */
+  liens: z.array(Id).min(1, 'toute entité renvoie vers au moins une page de référence'),
   verifie_le: dateSimple,
   verifie_par: z.string().optional(),
   /** Mois avant que la fiche ne se signale comme potentiellement périmée. */
   perime_apres_mois: z.number().int().positive().default(12),
   confiance: Confiance,
-  wikipedia: z.string().url().optional(),
 };
 
+/** Une page de référence. Jamais recopiée, seulement citée et liée. */
 export const Source = z.object({
   id: Id,
-  type: z.enum(['droit', 'donnees_ouvertes', 'page_officielle', 'etude', 'presse']),
+  type: z.enum(['wikipedia', 'droit', 'donnees_ouvertes', 'page_officielle', 'etude', 'presse']),
   titre: z.string().min(3),
   url: z.string().url(),
   consulte_le: dateSimple,
@@ -47,6 +81,8 @@ export const Source = z.object({
 export const Acteur = z.object({
   id: Id,
   nom: z.string().min(2),
+  /** Étiquette portée sur les schémas, où la place manque. */
+  nom_court: z.string().min(2).max(24).optional(),
   type: z.enum([
     'personne',
     'mandat_electif',
@@ -58,18 +94,19 @@ export const Acteur = z.object({
     'association',
     'metier',
   ]),
-  echelon: z
-    .enum(['commune', 'epci', 'departement', 'region', 'etat', 'union_europeenne', 'prive'])
-    .optional(),
-  resume: z.string().min(10, 'le résumé doit être lisible seul'),
+  /** Détermine la colonne du nœud sur la carte d'ensemble. */
+  echelon: z.enum(ECHELONS),
+  /** Une phrase, pas un paragraphe : le détail est sur les pages liées. */
+  resume: z.string().min(10).max(280, 'une phrase suffit — le reste est sur les pages liées'),
   ...tracable,
 });
 
 export const Competence = z.object({
   id: Id,
   nom: z.string().min(3),
+  nom_court: z.string().min(3).max(28).optional(),
   acteur: Id,
-  resume: z.string().min(10),
+  resume: z.string().min(10).max(280, 'une phrase suffit — le reste est sur les pages liées'),
   partagee_avec: z.array(Id).default([]),
   ...tracable,
 });
@@ -77,9 +114,9 @@ export const Competence = z.object({
 export const Document = z.object({
   id: Id,
   nom: z.string().min(3),
-  resume: z.string().optional(),
+  resume: z.string().max(280).optional(),
   ou_le_trouver: z.string().optional(),
-  sources: z.array(Id).min(1),
+  liens: z.array(Id).min(1),
 });
 
 /**
@@ -100,7 +137,7 @@ export const Etape = z.object({
   produit: z.array(Id).default([]),
   note: z.string().optional(),
   conditionnelle: z.boolean().default(false),
-  sources: z.array(Id).min(1),
+  liens: z.array(Id).min(1),
   confiance: Confiance,
 });
 
@@ -111,6 +148,8 @@ export const Etape = z.object({
  */
 export const Levier = z.object({
   id: Id,
+  /** Qui peut agir. Par défaut vous. */
+  acteur: Id.default('citoyen'),
   quoi: z.string().min(5),
   quand: z.string().min(3),
   aupres_de: z.string().min(3),
@@ -120,7 +159,7 @@ export const Levier = z.object({
   recours_si_refus: z.string().optional(),
   /** Position sur la frise des fenêtres d'action, en n° d'étape du processus. */
   ancre_etape: z.number().int().positive().optional(),
-  sources: z.array(Id).min(1),
+  liens: z.array(Id).min(1),
   confiance: Confiance,
 });
 
@@ -128,11 +167,13 @@ export const Processus = z.object({
   id: Id,
   nom: z.string().min(3),
   famille: z.enum(['publics', 'quotidien', 'economiques', 'influence']),
-  resume: z.string().min(10),
+  resume: z.string().min(10).max(280),
   declencheur: z.string().min(5),
   sortie: z.string().min(5),
   /** Qui signe, au bout du compte. La réponse à la question 1, en un id. */
   decideur: Id,
+  /** Les compétences que ce processus met en œuvre — relie le temps au réseau. */
+  competences: z.array(Id).default([]),
   etapes: z.array(Etape).min(1, 'un processus a au moins une étape'),
   leviers: z
     .array(Levier)
@@ -142,10 +183,12 @@ export const Processus = z.object({
 
 export const Flux = z.object({
   id: Id,
+  /** Le libellé porté par l'arête sur le schéma. */
+  nom: z.string().min(3).max(60),
   nature: z.enum(['argent', 'information', 'autorisation', 'obligation', 'attention']),
   de: Id,
   vers: z.array(Id).min(1),
-  resume: z.string().min(10),
+  resume: z.string().min(10).max(280),
   ordre_de_grandeur: z.string().optional(),
   ...tracable,
 });

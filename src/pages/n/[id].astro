@@ -1,0 +1,106 @@
+---
+import Base from '../../layouts/Base.astro';
+import { construireReseau } from '../../modele/reseau.ts';
+import { chargerGraphe, estPerime, formaterDate } from '../../modele/graphe.ts';
+import { schemaVoisinage, voisinsDe } from '../../vues/voisinage.ts';
+import { chronologie } from '../../vues/chronologie.ts';
+import { fenetresAction } from '../../vues/fenetres-action.ts';
+
+export function getStaticPaths() {
+  return construireReseau().noeuds.map((n) => ({ params: { id: n.id }, props: { noeud: n } }));
+}
+
+const { noeud } = Astro.props;
+const reseau = construireReseau();
+const g = chargerGraphe();
+
+const voisins = voisinsDe(reseau, noeud.id);
+const schema = schemaVoisinage(noeud, voisins);
+
+// Un processus est la seule chose qu'un graphe ne sait pas montrer : le temps.
+const processus = g.processus.get(noeud.id);
+const frise = processus ? chronologie(g, processus) : null;
+const fenetres = processus ? fenetresAction(processus) : null;
+
+const source = g.acteurs.get(noeud.id) ?? g.competences.get(noeud.id) ?? g.processus.get(noeud.id);
+const perime = source && 'perime_apres_mois' in source ? estPerime(source) : false;
+
+const LIBELLE_TYPE = { acteur: 'Acteur', competence: 'Compétence', processus: 'Processus', document: 'Document' };
+const LIBELLE_LIEN: Record<string, string> = {
+  wikipedia: 'Wikipédia — la définition',
+  droit: 'Le texte applicable',
+  page_officielle: 'La page officielle',
+  donnees_ouvertes: 'Les données, vérifiables vous-même',
+  etude: 'Études',
+  presse: 'Presse',
+};
+const ORDRE_LIENS = ['wikipedia', 'droit', 'page_officielle', 'donnees_ouvertes', 'etude', 'presse'];
+const groupes = ORDRE_LIENS.map((type) => ({
+  type,
+  liste: noeud.liens.filter((l) => l.type === type),
+})).filter((gr) => gr.liste.length > 0);
+---
+
+<Base titre={noeud.nom} description={noeud.resume || noeud.nom}>
+  <div class="page">
+    <p class="badge">
+      {LIBELLE_TYPE[noeud.type]}
+      {noeud.confiance !== 'etabli' && (
+        <span class="badge--alerte">
+          {' · '}
+          {noeud.confiance === 'variable_selon_territoire' ? 'varie selon le territoire' : 'à confirmer'}
+        </span>
+      )}
+      {perime && <span class="badge--alerte">{' · '}à revérifier</span>}
+    </p>
+    <h1>{noeud.nom}</h1>
+    {noeud.resume && <p class="resume">{noeud.resume}</p>}
+
+    <h2 class="badge">Pour en savoir plus</h2>
+    <div class="grille-liens">
+      {groupes.map((gr) => (
+        <section>
+          <h2>{LIBELLE_LIEN[gr.type]}</h2>
+          <ul>
+            {gr.liste.map((l) => (
+              <li><a href={l.url} rel="noopener nofollow" target="_blank">{l.titre}</a></li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    <h2 class="badge">{voisins.length} relations</h2>
+    <div class="cadre-schema" set:html={schema.svg} />
+    <p class="indice-defilement">Le schéma défile horizontalement.</p>
+    <ul class="relations">
+      {voisins.map((v) => (
+        <li>
+          <span class="quoi">{v.label}</span>
+          <span><a href={`/n/${v.noeud.id}`}>{v.noeud.nom}</a> <span class="v-nature">{v.noeud.resume}</span></span>
+        </li>
+      ))}
+    </ul>
+
+    {fenetres && (
+      <section>
+        <h2 class="badge">{fenetres.titre}</h2>
+        <div class="cadre-schema" set:html={fenetres.svg} />
+        <details class="equivalent"><summary>Le même en tableau</summary><div set:html={fenetres.tableau} /></details>
+      </section>
+    )}
+
+    {frise && (
+      <section>
+        <h2 class="badge">{frise.titre}</h2>
+        <div class="cadre-schema" set:html={frise.svg} />
+        <details class="equivalent"><summary>Le même en tableau</summary><div set:html={frise.tableau} /></details>
+      </section>
+    )}
+
+    {source && 'verifie_le' in source && (
+      <p class="v-nature">Vérifié le {formaterDate(source.verifie_le)}.</p>
+    )}
+    <p><a href={`/#${noeud.id}`}>Voir ce nœud dans la carte</a></p>
+  </div>
+</Base>

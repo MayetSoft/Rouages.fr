@@ -4,8 +4,10 @@ import '../styles/global.css';
 interface Props {
   titre: string;
   description: string;
+  /** L'explorateur occupe tout l'écran ; les pages de nœud sont des pages. */
+  plein?: boolean;
 }
-const { titre, description } = Astro.props;
+const { titre, description, plein = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -18,27 +20,34 @@ const { titre, description } = Astro.props;
     <meta property="og:title" content={titre} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content="fr_FR" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%231e5f74' stroke-width='2.5'%3E%3Ccircle cx='11' cy='12' r='6'/%3E%3Ccircle cx='22' cy='21' r='5'/%3E%3Cpath d='M15 16l3 2'/%3E%3C/g%3E%3C/svg%3E"
+    />
   </head>
   <body>
     <header class="bandeau">
-      <div class="page">
+      <div class="bandeau-int">
         <a class="marque" href="/">Rouages</a>
-        <span class="baseline">comment ça marche, et où l’on peut agir</span>
-        <a class="lien-methode" href="/a-propos">La méthode</a>
+        <span class="baseline">qui fait quoi, et avec qui</span>
+        <nav>
+          <a href="/">La carte</a>
+          <a href="/methode">La méthode</a>
+        </nav>
       </div>
     </header>
 
-    <main class="page">
-      <slot />
-    </main>
+    <slot />
 
-    <footer class="page">
-      <p>
-        Rouages décrit des mécanismes et oriente vers les sources qui font
-        autorité. Ce n’est ni une source de droit, ni un conseil juridique
-        personnalisé&nbsp;: vérifiez toujours auprès du service compétent.
-      </p>
-      <p>Contenu sous licence CC BY-SA 4.0. Chaque affirmation porte sa source et sa date de vérification.</p>
-    </footer>
+    {!plein && (
+      <footer>
+        <p>
+          Rouages ne réécrit pas ce que Wikipédia, Légifrance ou l’open data
+          disent déjà&nbsp;: il montre les liens entre eux. Ce site n’est ni une
+          source de droit, ni un conseil juridique.
+        </p>
+        <p>Contenu sous licence CC BY-SA 4.0. Chaque nœud porte sa date de vérification.</p>
+      </footer>
+    )}
   </body>
 </html>

@@ -85,9 +85,10 @@ export function svg(
   titre: string,
   description: string,
   contenu: string,
+  largeur: number = LARGEUR,
 ): string {
   return [
-    `<svg class="v-schema" viewBox="0 0 ${LARGEUR} ${Math.ceil(hauteur)}"`,
+    `<svg class="v-schema" viewBox="0 0 ${largeur} ${Math.ceil(hauteur)}"`,
     ` role="img" aria-labelledby="${id}-t ${id}-d"`,
     ` xmlns="http://www.w3.org/2000/svg">`,
     `<title id="${id}-t">${echapper(titre)}</title>`,

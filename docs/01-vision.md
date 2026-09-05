@@ -1,102 +1,74 @@
 # 01 — Vision et positionnement
 
-> Statut : proposition de cadrage, à valider. Dernière révision : 2026-09-05.
+> Statut : cadrage validé après recentrage. Dernière révision : 2026-09-05.
 
 ## Le problème
 
-Les informations sur le fonctionnement des institutions, des procédures et des
-organisations existent déjà, en abondance : Légifrance, service-public.fr,
-vie-publique.fr, data.gouv.fr, Wikipédia, les sites des collectivités.
+L'information sur le fonctionnement des institutions ne manque pas : Légifrance,
+service-public.fr, vie-publique.fr, data.gouv.fr, Wikipédia en produisent
+énormément, et mieux que nous ne le ferions.
 
-Ce qui manque n'est pas l'information. C'est **le schéma**. Personne ne sait
-répondre en trente secondes à :
+Ce qui manque, ce sont **les liens**. Chacune de ces sources décrit une entité à
+la fois : une institution, un texte, une démarche. Aucune ne montre le réseau —
+qui décide avec qui, qui paie qui, quelle compétence est partagée entre trois
+échelons dont personne ne connaît la frontière.
 
-- Qui décide de la fermeture de ma classe ? Le maire ? Le recteur ? Le préfet ?
-- Mon voisin construit un mur : qui a délivré l'autorisation, et jusqu'à quand
-  puis-je la contester ?
-- L'eau de ma commune est gérée par qui, sous quel contrat, révisable quand ?
-- Dans mon entreprise, entre le devis et la livraison, quels métiers touchent le
-  dossier, et où ça bloque réellement ?
+## Ce que Rouages fait
 
-Les sources publiques répondent *par institution* ou *par texte*. Le citoyen
-arrive *par une situation*. Le rôle de Rouages est de faire la jointure entre
-les deux, visuellement.
+**Rouages est une carte, pas une encyclopédie.**
 
-## La promesse
+Le site est un graphe navigable d'acteurs, de compétences, de flux et de
+processus. On y entre par un nœud, on suit ses relations, et à chaque nœud on
+trouve les liens vers les pages qui font autorité.
 
-**Rouages montre comment les choses fonctionnent — et où l'on peut agir.**
+Deux règles en découlent, et elles sont structurantes :
 
-Chaque fiche (« un rouage ») doit répondre à cinq questions, dans cet ordre :
+1. **On ne rédige pas.** Une phrase par nœud, le temps de comprendre de quoi il
+   s'agit. Tout le reste est un lien sortant vers Wikipédia, Légifrance,
+   service-public.fr ou un jeu de données ouvert.
+2. **Le contenu, c'est la relation.** Un nœud n'a d'intérêt que par ce à quoi il
+   est relié. Un nœud isolé ne mérite pas d'exister.
 
-1. **Qui décide ?** — l'acteur, son mandat, sa légitimité.
-2. **Avec quel argent ?** — d'où vient le financement, quel ordre de grandeur.
-3. **Selon quelle procédure et quel calendrier ?** — les étapes, les délais.
-4. **Où est-ce écrit ?** — la source de droit, le texte, la donnée ouverte.
-5. **Comment puis-je intervenir ?** — la fenêtre d'action, le délai de recours,
-   le document à demander, l'instance à saisir.
+## Ce que Rouages n'est pas
 
-La question 5 est la signature du projet. **Une fiche qui ne sait pas y répondre
-n'est pas une fiche Rouages** — c'est un article d'encyclopédie, et Wikipédia le
-fait mieux que nous.
-
-## Ce que Rouages est / n'est pas
-
-| Rouages **est** | Rouages **n'est pas** |
+| Rouages | Pas Rouages |
 |---|---|
-| Une carte des mécanismes : acteurs, pouvoirs, flux, délais | Une encyclopédie (→ lien Wikipédia) |
-| Un point d'entrée vers les sources faisant autorité | Une source de droit (→ lien Légifrance) |
-| Un outil d'orientation : « à qui m'adresser, avant quelle date » | Un service de conseil juridique personnalisé |
-| Descriptif et sourcé | Une tribune d'opinion ou un média d'actualité |
-| Réutilisable (données ouvertes, licence libre) | Un silo propriétaire |
+| Une carte des acteurs et de leurs relations | Une encyclopédie (→ Wikipédia) |
+| Un point d'entrée vers les sources | Une source de droit (→ Légifrance) |
+| Une phrase par nœud | Des articles d'explication (→ vie-publique) |
+| Des schémas | Des pages de texte |
+| Des liens vers l'open data | Une reproduction des données |
 
-## Positionnement par rapport à l'existant
+## Positionnement
 
-Rouages ne concurrence pas ces sites, il les **relie** :
-
-- **service-public.fr** : « comment faire ma démarche » → nous : « qui décide et
-  pourquoi c'est comme ça ».
-- **vie-publique.fr** : pédagogie institutionnelle nationale, format texte → nous :
-  le schéma, et l'échelon local, largement délaissé.
-- **data.gouv.fr / open data** : la donnée brute → nous : la donnée mise en
-  contexte dans un mécanisme.
-- **Wikipédia** : la définition et l'histoire → nous : le fonctionnement et le
-  levier d'action. Nous lions systématiquement vers eux, jamais l'inverse.
-- **Regards Citoyens / NosDéputés / Ma Dada** : outils de transparence ciblés,
-  surtout nationaux → nous : la vue d'ensemble qui explique *quand* utiliser
-  ces outils.
+Nous ne concurrençons aucune de ces sources : **nous sommes la couche qui les
+relie**. Une page Wikipédia sur le département ne dit pas avec qui le
+département partage l'action sociale ; une page service-public sur le permis de
+construire ne dit pas que le maire agit tantôt au nom de la commune, tantôt au
+nom de l'État. C'est exactement ce que montre un graphe, et rien d'autre ne le
+montre.
 
 **L'angle mort que nous occupons : l'échelon local et intercommunal.** C'est là
-que la densité de décisions touchant le quotidien est la plus forte, et là que
-l'opacité perçue est la plus grande. C'est aussi là que les futurs outils
-communautaires (délibérations, PLU) ont le plus de valeur.
+que la densité de décisions est la plus forte, que le partage de compétences est
+le plus illisible, et que l'open data est le plus riche et le moins exploité.
 
-## Publics visés
+## Publics
 
-Par ordre de priorité :
+1. **Le citoyen qui cherche à qui s'adresser** — il entre par « l'eau », « le
+   collège », « le permis », et remonte le réseau.
+2. **Le nouvel élu, l'agent, l'étudiant** — ils ont besoin de la carte, pas d'un
+   cours.
+3. **Le journaliste local** — il réutilise les schémas et les liens open data.
 
-1. **Le citoyen concerné** — il arrive par une situation précise, souvent avec
-   un délai qui court. C'est lui qui définit le format des fiches.
-2. **Le nouvel élu ou l'agent** — un conseiller municipal élu depuis trois mois
-   ne connaît pas la répartition commune / EPCI / département. Public réel et
-   demandeur.
-3. **Le journaliste local, l'étudiant, l'enseignant** — réutilisent nos schémas.
-4. **Le curieux** — arrive par la recherche ou le partage social.
+## Ligne éditoriale
 
-## Ligne éditoriale (non négociable)
+- **Des mécanismes, pas des opinions.** On décrit qui peut quoi.
+- **Chaque nœud renvoie ailleurs.** Sans lien sortant, pas de nœud.
+- **Tout est daté.** Un nœud non revérifié depuis trop longtemps se signale seul.
+- **L'incertitude est affichée.** « Variable selon le territoire » est une
+  réponse juste, et souvent la seule vraie.
 
-- **Mécanismes, pas opinions.** On décrit comment ça marche, pas si c'est bien.
-- **Tout est sourcé.** Chaque affirmation porte au moins une source vérifiable.
-- **Tout est daté.** Le droit change ; une fiche affiche sa date de dernière
-  vérification et se signale comme potentiellement périmée passé un délai.
-- **On ne masque pas l'incertitude.** « Compétence partagée, répartition variable
-  selon les conventions locales » est une réponse acceptable et honnête.
-- **Réutilisable.** Contenu sous licence libre compatible Wikipédia
-  (proposition : CC BY-SA 4.0), données ouvertes exportables.
+## Critère de succès
 
-## Critères de succès (à 12 mois)
-
-- Un visiteur trouve, en moins de deux minutes et sans lire un paragraphe
-  entier, **qui décide** et **jusqu'à quand il peut agir** sur sa situation.
-- Nos schémas sont réutilisés ailleurs (presse locale, cours, associations).
-- Le corpus de données est assez structuré pour qu'un outil tiers (ou notre
-  phase 3) puisse s'appuyer dessus sans réécrire le modèle.
+Un visiteur qui arrive sur « l'eau » comprend en trente secondes, sans lire un
+paragraphe, qui capte, qui distribue, qui fixe le prix et où vérifier le sien.

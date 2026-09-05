@@ -2,9 +2,10 @@
 
 > Statut : proposition, à valider. C'est le premier arbitrage à rendre.
 
-Quatre familles, plus une famille d'outils. **Elles partagent le même modèle de
-données** (voir `03-modele-de-donnees.md`) : ce n'est pas quatre sites, c'est
-quatre entrées dans un même graphe.
+Quatre familles, plus une famille d'outils. Ce ne sont pas quatre rubriques :
+**ce sont quatre zones d'un même graphe**, partageant le même modèle de données
+(voir `03-modele-de-donnees.md`). Rien ne les sépare techniquement ; elles disent
+seulement dans quel ordre on peuple le réseau.
 
 ```mermaid
 flowchart TB
@@ -30,7 +31,7 @@ déconcentré (préfet, rectorat, ARS), État central, Union européenne. Plus l
 organismes que personne ne situe : SDIS, syndicat des eaux, bailleur social,
 agence de l'eau, CAF, chambres consulaires.
 
-**Exemples de fiches.** « Le conseil municipal », « La communauté de communes »,
+**Exemples de nœuds.** « Le conseil municipal », « La communauté de communes »,
 « Qui gère l'eau potable ? », « Le préfet », « Le budget d'une commune : d'où
 vient l'argent », « Qui décide de la carte scolaire ».
 
@@ -46,21 +47,22 @@ riches et stables, et c'est le socle dont dépendent les familles B et E.
 ## B. Rouages du quotidien — « quelle procédure, quel délai »
 
 **Définition.** L'entrée par la situation vécue, pas par l'institution. Chaque
-fiche est un **processus** avec un déclencheur, des étapes datées, un résultat
+nœud de cette famille est un **processus** : un déclencheur, des étapes datées, un résultat
 et des voies de recours.
 
 **Domaines.** Urbanisme et voisinage · École · Santé et grand âge · Logement ·
 Justice du quotidien · Mobilité et voirie · Déchets, eau, énergie ·
 Environnement et nuisances · Aides sociales.
 
-**Exemples de fiches.** « Un permis de construire, du dépôt au recours »,
+**Exemples de nœuds.** « Un permis de construire, du dépôt au recours »,
 « Une école ferme : le calendrier réel de la décision », « Contester une
 délibération municipale », « Demander un document administratif (et que faire
 si on refuse) », « Un projet éolien s'installe : les 6 fenêtres où l'on peut
 s'exprimer ».
 
-**Pourquoi c'est le cœur du trafic.** C'est ce que les gens cherchent
-réellement. La famille A explique, la famille B est utilisée.
+**Pourquoi.** Un processus est la seule chose qu'un graphe ne sait pas montrer :
+le temps. C'est pourquoi il a ses propres vues (frise, fenêtres d'action) en plus
+de sa place dans le réseau.
 
 ---
 
@@ -76,7 +78,7 @@ décision, où se trouvent les points de friction.
 - *La filière* : comment un produit arrive dans le rayon, comment un logement se
   construit, comment un train circule, comment un médicament est remboursé.
 
-**Exemples de fiches.** « De la commande à la facture : le circuit dans une
+**Exemples de nœuds.** « De la commande à la facture : le circuit dans une
 PME », « Qui gagne quoi sur une baguette », « Un chantier de logement : les 14
 intervenants », « Comment une commune achète (marchés publics) ».
 
@@ -95,11 +97,11 @@ opinion : lobbying, astroturfing, capture réglementaire, économie de
 l'attention, conflits d'intérêts, rhétorique manipulatoire.
 
 **Règle absolue : on décrit des mécanismes, jamais des personnes.**
-« Comment fonctionne un faux mouvement citoyen » est une fiche Rouages.
-« Untel a monté un faux mouvement citoyen » ne l'est pas. Cette règle est ce
+« Comment fonctionne un faux mouvement citoyen » est un nœud Rouages.
+« Untel a monté un faux mouvement citoyen » ne l’est pas. Cette règle est ce
 qui protège juridiquement le site et préserve sa crédibilité acquise sur A/B/C.
 
-**Exemples de fiches.** « Le cycle de vie d'une rumeur locale », « Comment un
+**Exemples de nœuds.** « Le cycle de vie d'une rumeur locale », « Comment un
 amendement apparaît sans auteur apparent », « Astroturfing : les signaux
 observables », « À qui appartient mon journal local ».
 
@@ -115,31 +117,32 @@ Recherche plein texte dans les délibérations de conseils municipaux et
 communautaires · assistance à la lecture d'un PLU · recherche de la procédure
 applicable dans les documents officiels.
 
-Ce ne sont pas des fiches, ce sont des **applications** adossées au graphe.
+Ce ne sont pas des nœuds, ce sont des **applications** adossées au graphe.
 Elles ont un coût technique, juridique et d'exploitation d'un autre ordre. Voir
 `05-roadmap.md` et `07-risques.md`.
 
 ---
 
-## Critère d'admission d'une fiche
+## Critère d'admission d'un nœud
 
-Une fiche est publiable si, et seulement si :
+Un nœud est publiable si, et seulement si :
 
-- [ ] elle répond aux **cinq questions** de la vision (dont « comment
-      intervenir ») ;
-- [ ] chaque affirmation structurante porte **au moins une source** (texte de
-      droit, jeu de données, page officielle) ;
-- [ ] elle porte une **date de vérification** et un responsable ;
-- [ ] elle produit **au moins un schéma** exploitable seul ;
-- [ ] elle renvoie vers **Wikipédia** pour le contexte historique et vers la
-      **source faisant autorité** pour l'application.
+- [ ] il est **relié** à au moins un autre nœud — un nœud isolé n'apporte rien ;
+- [ ] il porte **au moins un lien sortant** vers une page de référence ;
+- [ ] il tient en **une phrase** (280 signes, contrôlés par le schéma) ;
+- [ ] il porte une **date de vérification** ;
+- [ ] son niveau de `confiance` est honnête, y compris
+      « variable selon le territoire ».
 
 ## Granularité
 
-Une fiche = **un mécanisme décidable**, pas un thème. « L'urbanisme » n'est pas
-une fiche. « Le permis de construire en commune dotée d'un PLU » en est une.
-En cas de doute : si la fiche ne peut pas nommer un acteur qui décide et un
-délai, elle est trop large.
+Un nœud = **une chose qu'on peut relier**, pas un thème. « L'urbanisme » n'est
+pas un nœud : ce n'est ni un acteur, ni une compétence attribuable, ni un
+processus. « Écrire la règle d'urbanisme (PLU) » en est un, parce qu'on peut
+nommer qui la détient et avec qui il la partage.
+
+Test simple : si on ne peut pas tracer une arête depuis le nœud, il est mal
+découpé.
 
 ## Ordre de traitement proposé
 

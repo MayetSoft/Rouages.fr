@@ -1,0 +1,125 @@
+# Un processus : la même matière que le reste du réseau, mais ordonnée dans le
+# temps. C'est la seule chose qu'un graphe ne sait pas montrer.
+documents:
+  - id: dossier-demande
+    nom: "Dossier de demande"
+    ou_le_trouver: "Déposé en mairie ou par téléprocédure ; consultable par le public."
+    liens: [sp-permis]
+  - id: plu
+    nom: "Plan local d'urbanisme"
+    ou_le_trouver: "Mairie, ou Géoportail de l'urbanisme."
+    liens: [wp-plu, od-gpu]
+  - id: arrete-permis
+    nom: "Arrêté de permis"
+    ou_le_trouver: "Affiché en mairie ; communicable sur demande."
+    liens: [sp-permis, cada]
+  - id: panneau-affichage
+    nom: "Panneau d'affichage sur le terrain"
+    resume: "C'est lui, et non l'arrêté, qui fait courir le délai de recours des tiers."
+    liens: [cu-a424-15, cu-r600]
+
+processus:
+  - id: permis-de-construire
+    nom: "Le permis de construire"
+    famille: quotidien
+    resume: "Du dépôt à la fin du délai de recours : qui instruit, qui signe, et quand un voisin peut encore intervenir."
+    declencheur: "Dépôt d'une demande en mairie ou par téléprocédure"
+    sortie: "Un arrêté de permis, un refus, ou une décision tacite"
+    decideur: maire
+    competences: [delivrance-autorisation-urbanisme, redaction-plu]
+    liens: [sp-permis, cu-l422-1, od-sitadel]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+    etapes:
+      - { ordre: 1, acteur: petitionnaire, action: "Dépôt du dossier", produit: [dossier-demande], liens: [sp-permis], confiance: etabli }
+      - ordre: 2
+        acteur: service-instructeur
+        action: "Vérification de la complétude"
+        delai: { valeur: 1, unite: mois, nature: maximum_legal }
+        note: "Une demande de pièces manquantes suspend l'instruction et fait repartir le compte à rebours."
+        liens: [cu-r423-19]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: service-instructeur
+        action: "Instruction et consultation des services"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Deux mois pour une maison individuelle, trois pour les autres constructions ; majoré en secteur protégé."
+        liens: [cu-r423-19]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: abf
+        action: "Avis de l'architecte des Bâtiments de France"
+        conditionnelle: true
+        delai: { valeur: 1, unite: mois, nature: indicatif }
+        note: "Uniquement en périmètre de protection du patrimoine. L'avis est alors souvent conforme."
+        liens: [code-patrimoine]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: maire
+        action: "Signature de l'arrêté"
+        produit: [arrete-permis]
+        note: "L'absence de réponse dans le délai vaut en principe permis tacite."
+        liens: [cu-l424-2]
+        confiance: a_confirmer
+      - ordre: 6
+        acteur: petitionnaire
+        action: "Affichage sur le terrain"
+        produit: [panneau-affichage]
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Doit rester continu pendant tout le délai de recours des tiers."
+        liens: [cu-a424-15, cu-r600]
+        confiance: a_confirmer
+
+    leviers:
+      - id: lire-le-plu
+        acteur: citoyen
+        quoi: "Lire le PLU applicable à la parcelle"
+        quand: "À tout moment — document public et opposable"
+        aupres_de: "Mairie ou Géoportail de l'urbanisme"
+        difficulte: faible
+        piege: "La version en ligne n'est pas toujours la dernière version opposable."
+        liens: [od-gpu, wp-plu]
+        confiance: etabli
+      - id: consulter-le-dossier
+        acteur: citoyen
+        quoi: "Consulter le dossier déposé"
+        quand: "Dès le dépôt, et après la décision"
+        aupres_de: "Service urbanisme de la mairie"
+        difficulte: faible
+        recours_si_refus: "Saisir la CADA"
+        ancre_etape: 1
+        piege: "Demander par écrit : le délai de saisine de la CADA court à compter du refus."
+        liens: [cada, sp-permis]
+        confiance: a_confirmer
+      - id: verifier-affichage
+        acteur: citoyen
+        quoi: "Photographier le panneau et sa date"
+        quand: "Dès que le panneau apparaît"
+        aupres_de: "Personne — précaution à prendre soi-même"
+        difficulte: faible
+        ancre_etape: 6
+        piege: "Un affichage absent ou incomplet ne fait pas courir le délai. La preuve se constitue avant, pas après."
+        liens: [cu-a424-15, cu-r600]
+        confiance: a_confirmer
+      - id: recours-gracieux
+        acteur: citoyen
+        quoi: "Recours gracieux auprès du maire"
+        quand: "2 mois à compter du premier jour d'affichage"
+        aupres_de: "Le maire, en recommandé"
+        difficulte: moyenne
+        recours_si_refus: "Tribunal administratif, 2 mois après le rejet"
+        ancre_etape: 6
+        piege: "Le recours doit être notifié au bénéficiaire du permis dans les 15 jours, sous peine d'irrecevabilité."
+        liens: [cu-r600, sp-recours-urbanisme]
+        confiance: a_confirmer
+      - id: recours-contentieux
+        acteur: citoyen
+        quoi: "Saisir le tribunal administratif"
+        quand: "2 mois après l'affichage, ou après le rejet du recours gracieux"
+        aupres_de: "Tribunal administratif du ressort"
+        difficulte: elevee
+        ancre_etape: 6
+        piege: "Il faut justifier d'un intérêt à agir : être voisin ne suffit pas toujours."
+        liens: [cu-r600, sp-recours-urbanisme, wp-tribunal-administratif]
+        confiance: a_confirmer

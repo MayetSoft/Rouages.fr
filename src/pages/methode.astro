@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import { construireReseau } from '../modele/reseau.ts';
+const reseau = construireReseau();
+const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).size;
+---
+
+<Base titre="La méthode" description="Rouages ne rédige pas : il relie. Comment le réseau est construit et vérifié.">
+  <div class="page">
+    <h1>La méthode</h1>
+    <p class="resume">
+      Rouages ne réécrit rien. Les explications existent déjà, et sont meilleures
+      là où elles sont. Ce qui manque, c’est la carte : qui décide, avec qui, et
+      avec quel argent. Le site est ce réseau, et {pages} liens vers les pages qui
+      font autorité.
+    </p>
+
+    <h2 class="badge">Ce qu’est un nœud</h2>
+    <ul>
+      <li><strong>Un acteur</strong> — une institution, un mandat, un service, une entreprise.</li>
+      <li><strong>Une compétence</strong> — un pouvoir de décision, attribué et souvent partagé.</li>
+      <li><strong>Un processus</strong> — une suite d’étapes datées : la seule chose qu’un graphe ne sait pas montrer.</li>
+      <li><strong>Un document</strong> — ce qui est produit ou requis, et où le trouver.</li>
+    </ul>
+
+    <h2 class="badge">Les règles, vérifiées à chaque publication</h2>
+    <ul>
+      <li>Un nœud sans lien sortant n’existe pas. C’est le lien qui est le contenu.</li>
+      <li>Une phrase par nœud, jamais un paragraphe : le reste est sur les pages liées.</li>
+      <li>Toute relation citée existe des deux côtés — le réseau ne peut pas mentir sur ses liens.</li>
+      <li>Chaque nœud porte sa date de vérification, et se signale seul quand elle est trop ancienne.</li>
+      <li>Quand la règle varie selon le territoire, le nœud le dit au lieu d’inventer une réponse unique.</li>
+      <li>Les schémas sont générés depuis les mêmes données que le reste : ils ne peuvent pas diverger.</li>
+    </ul>
+
+    <h2 class="badge">Ce que le site ne fait pas</h2>
+    <ul>
+      <li>Répondre à une situation personnelle. Il indique l’interlocuteur.</li>
+      <li>Trancher une question de droit. Il cite le texte et son lien.</li>
+      <li>Remplacer Wikipédia, service-public.fr ou Légifrance. Il y conduit.</li>
+    </ul>
+  </div>
+</Base>

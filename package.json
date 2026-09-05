@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Rouages.fr — comprendre comment les choses fonctionnent, et où l'on peut agir.",
+  "description": "Rouages.fr — la carte des acteurs publics, de leurs compétences et de ce qui circule entre eux.",
   "scripts": {
     "dev": "astro dev",
     "build": "npm run valider && astro build",
