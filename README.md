@@ -6,8 +6,9 @@ Rouages explique les mécanismes : qui décide, avec quel argent, selon quelle
 procédure, sur quelle base légale, et à quel moment un citoyen peut intervenir.
 Pas une encyclopédie de plus : une carte des rouages, avec les points d'entrée.
 
-> État du projet : **phase 0 — cadrage**. Ce dépôt ne contient pour l'instant que
-> des documents de conception. Rien n'est encore engagé techniquement.
+> État du projet : **phase 1 — première tranche verticale**. Un rouage complet
+> (le permis de construire) est modélisé, validé et rendu, pour éprouver le
+> format avant de l'étendre.
 
 ## La règle des cinq questions
 
@@ -46,13 +47,31 @@ structurant du projet.
 | [`docs/05-roadmap.md`](docs/05-roadmap.md) | Phases et conditions de sortie |
 | [`docs/06-stack-technique.md`](docs/06-stack-technique.md) | Choix techniques proposés et alternatives écartées |
 | [`docs/07-risques.md`](docs/07-risques.md) | Péremption, exactitude, neutralité, RGPD, soutenabilité |
-| [`exemples/permis-de-construire.yaml`](exemples/permis-de-construire.yaml) | Le modèle éprouvé sur un cas réel |
+| [`contenu/rouages/permis-de-construire.yaml`](contenu/rouages/permis-de-construire.yaml) | Le modèle éprouvé sur un cas réel |
+
+## Faire tourner le site
+
+```sh
+npm install
+npm run dev        # http://localhost:4321
+npm run valider    # contrôle du contenu : sources, références, règles éditoriales
+npm run build      # valide puis génère le site statique
+```
+
+Le contenu vit dans `contenu/` : un fichier YAML par rouage, les entités
+partagées dans `contenu/communs/`, la prose dans `contenu/fiches/`. Les schémas
+sont **générés** depuis ces données au moment du build — ils ne peuvent donc pas
+diverger du texte.
+
+`npm run valider` refuse de laisser passer une fiche sans source, sans date de
+vérification, sans fenêtre d'action, ou avec une référence cassée. C'est la
+ligne éditoriale, appliquée mécaniquement plutôt que par vigilance.
 
 ## Prochaine étape
 
-Valider le modèle de données et la fiche pilote, puis construire la première
-tranche verticale complète (voir [`docs/05-roadmap.md`](docs/05-roadmap.md),
-phase 1).
+Faire relire la fiche pilote par un praticien, puis construire le socle local :
+commune, intercommunalité, préfet, budget, école, eau (voir
+[`docs/05-roadmap.md`](docs/05-roadmap.md), phase 2).
 
 ## Licence (proposition, à confirmer)
 

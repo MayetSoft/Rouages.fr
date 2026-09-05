@@ -1,0 +1,44 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  titre: string;
+  description: string;
+}
+const { titre, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titre} — Rouages</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={titre} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="fr_FR" />
+  </head>
+  <body>
+    <header class="bandeau">
+      <div class="page">
+        <a class="marque" href="/">Rouages</a>
+        <span class="baseline">comment ça marche, et où l’on peut agir</span>
+        <a class="lien-methode" href="/a-propos">La méthode</a>
+      </div>
+    </header>
+
+    <main class="page">
+      <slot />
+    </main>
+
+    <footer class="page">
+      <p>
+        Rouages décrit des mécanismes et oriente vers les sources qui font
+        autorité. Ce n’est ni une source de droit, ni un conseil juridique
+        personnalisé&nbsp;: vérifiez toujours auprès du service compétent.
+      </p>
+      <p>Contenu sous licence CC BY-SA 4.0. Chaque affirmation porte sa source et sa date de vérification.</p>
+    </footer>
+  </body>
+</html>

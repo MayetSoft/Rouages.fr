@@ -1,0 +1,97 @@
+# Acteurs de l'échelon local, réutilisés par plusieurs rouages.
+# Un acteur est décrit une seule fois, même s'il intervient dans dix procédures.
+acteurs:
+  - id: commune
+    nom: "La commune"
+    type: collectivite
+    echelon: commune
+    resume: >
+      Collectivité de base. Détient les compétences que la loi ne confie pas à
+      un autre échelon et que l'intercommunalité ne s'est pas vu transférer.
+    sources: [cgct-collectivites]
+    wikipedia: https://fr.wikipedia.org/wiki/Commune_(France)
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: departement
+    nom: "Le département"
+    type: collectivite
+    echelon: departement
+    resume: >
+      Collectivité compétente notamment en matière d'action sociale, de collèges
+      et de routes départementales. Perçoit une part de la taxe d'aménagement.
+    sources: [cgct-collectivites]
+    wikipedia: https://fr.wikipedia.org/wiki/D%C3%A9partement_fran%C3%A7ais
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: maire
+    nom: "Le maire"
+    type: mandat_electif
+    echelon: commune
+    resume: >
+      Signe l'autorisation d'urbanisme. Il agit au nom de la commune lorsque
+      celle-ci dispose d'un document d'urbanisme, au nom de l'État sinon — ce
+      qui change qui est responsable en cas de contentieux.
+    sources: [cu-l422-1]
+    wikipedia: https://fr.wikipedia.org/wiki/Maire_(France)
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: service-instructeur
+    nom: "Le service instructeur"
+    type: service_administratif
+    echelon: commune
+    resume: >
+      Instruit techniquement le dossier et prépare la décision. Selon la taille
+      de la commune : service urbanisme municipal, service mutualisé de
+      l'intercommunalité, ou direction départementale des territoires.
+    sources: [banatic, cu-r423-19]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: abf
+    nom: "L'architecte des Bâtiments de France"
+    type: service_deconcentre
+    echelon: etat
+    resume: >
+      Consulté lorsque le projet se trouve dans un périmètre de protection du
+      patrimoine. Dans plusieurs de ces cas son avis est conforme : le maire ne
+      peut pas passer outre.
+    sources: [patrimoine-abf]
+    wikipedia: https://fr.wikipedia.org/wiki/Architecte_des_B%C3%A2timents_de_France
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: petitionnaire
+    nom: "Le demandeur"
+    type: personne
+    echelon: prive
+    resume: >
+      Celui qui dépose la demande : particulier, entreprise ou collectivité.
+      C'est lui qui porte la charge de l'affichage sur le terrain.
+    sources: [sp-permis]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: voisin
+    nom: "Le voisin ou le tiers intéressé"
+    type: personne
+    echelon: prive
+    resume: >
+      Toute personne dont les conditions d'occupation ou de jouissance de son
+      bien sont directement affectées par le projet. C'est le titulaire des
+      fenêtres d'action de cette procédure.
+    sources: [sp-recours-urbanisme]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+  - id: tribunal-administratif
+    nom: "Le tribunal administratif"
+    type: service_deconcentre
+    echelon: etat
+    resume: "Juge du contentieux des autorisations d'urbanisme."
+    sources: [sp-recours-urbanisme]
+    wikipedia: https://fr.wikipedia.org/wiki/Tribunal_administratif_(France)
+    verifie_le: 2026-09-05
+    confiance: etabli

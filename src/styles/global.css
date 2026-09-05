@@ -1,0 +1,192 @@
+/* ------------------------------------------------------------------ *
+ * Rouages — feuille de style unique.
+ * Sobre par choix : le contenu et les schémas portent l'information.
+ * ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light dark;
+
+  --fond: #fbfaf8;
+  --fond-carte: #ffffff;
+  --fond-doux: #f2f0ec;
+  --encre: #1a1a1a;
+  --encre-douce: #5a5750;
+  --trait: #ddd8d0;
+  --accent: #1e5f74;
+  --accent-doux: #e4eef1;
+  --alerte: #8a4b12;
+  --alerte-doux: #fbf0e2;
+  --legal: #1e5f74;
+  --indicatif: #7a7269;
+  --observe: #55707a;
+
+  --mesure: 68ch;
+  --rayon: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #16181a;
+    --fond-carte: #1e2124;
+    --fond-doux: #24282c;
+    --encre: #ecebe8;
+    --encre-douce: #a8a49c;
+    --trait: #363b40;
+    --accent: #7cc4d8;
+    --accent-doux: #1d3238;
+    --alerte: #e0a468;
+    --alerte-doux: #2e2417;
+    --legal: #7cc4d8;
+    --indicatif: #8d867c;
+    --observe: #8fb0ba;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre);
+  font: 400 17px/1.65 ui-serif, Georgia, 'Iowan Old Style', serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, .entete, .v-tableau, nav, footer, .meta, .etiquettes {
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+h1 { font-size: clamp(1.7rem, 5vw, 2.4rem); line-height: 1.15; margin: 0 0 .4em; letter-spacing: -0.015em; }
+h2 { font-size: 1.35rem; margin: 2.6rem 0 .8rem; letter-spacing: -0.01em; }
+h3 { font-size: 1.05rem; margin: 1.8rem 0 .4rem; }
+p { margin: 0 0 1em; }
+a { color: var(--accent); text-underline-offset: 2px; }
+
+.page { max-width: 860px; margin: 0 auto; padding: 0 20px 6rem; }
+.mesure { max-width: var(--mesure); }
+
+/* --- en-tête et pied --- */
+.bandeau { border-bottom: 1px solid var(--trait); margin-bottom: 2.5rem; }
+.bandeau .page { display: flex; align-items: baseline; gap: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
+.marque { font-weight: 650; font-size: 1.05rem; text-decoration: none; color: var(--encre); letter-spacing: -0.01em; }
+.baseline { color: var(--encre-douce); font-size: .84rem; }
+.lien-methode { margin-left: auto; font-size: .84rem; font-family: ui-sans-serif, system-ui, sans-serif; }
+footer { border-top: 1px solid var(--trait); margin-top: 4rem; padding-top: 1.4rem; color: var(--encre-douce); font-size: .85rem; }
+
+/* --- chapô et méta --- */
+.chapo { font-size: 1.18rem; line-height: 1.55; color: var(--encre-douce); max-width: var(--mesure); }
+.meta { font-size: .82rem; color: var(--encre-douce); display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
+
+.avertissement {
+  background: var(--alerte-doux);
+  border-left: 3px solid var(--alerte);
+  padding: .85rem 1rem;
+  border-radius: 0 var(--rayon) var(--rayon) 0;
+  font-size: .92rem;
+  margin: 1.6rem 0;
+  max-width: var(--mesure);
+}
+.avertissement strong { color: var(--alerte); }
+
+/* --- les cinq questions --- */
+.questions { list-style: none; margin: 2rem 0; padding: 0; display: grid; gap: .5rem; }
+.questions li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem; align-items: baseline; font-size: .95rem; }
+.questions .n { color: var(--accent); font-weight: 650; font-family: ui-sans-serif, system-ui, sans-serif; }
+
+/* --- blocs de schéma --- */
+.vue { margin: 2.4rem 0 3rem; }
+.vue > h2 { margin-top: 0; }
+.cadre-schema {
+  background: var(--fond-carte);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+  padding: 1rem .75rem;
+  overflow-x: auto;
+}
+.v-schema { width: 100%; height: auto; display: block; min-width: 680px; }
+
+/* Sous 700 px, le schéma garde sa taille naturelle et défile : le réduire
+   rendrait le texte illisible, ce qui est pire que de faire défiler. */
+.indice-defilement { display: none; }
+@media (max-width: 700px) {
+  .indice-defilement {
+    display: block;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: .78rem;
+    color: var(--encre-douce);
+    margin: .4rem 0 0;
+  }
+}
+
+.equivalent { margin-top: .6rem; }
+.equivalent summary { cursor: pointer; font-size: .85rem; color: var(--encre-douce); font-family: ui-sans-serif, system-ui, sans-serif; }
+.equivalent[open] summary { margin-bottom: .6rem; }
+
+.v-tableau { border-collapse: collapse; width: 100%; font-size: .86rem; }
+.v-tableau caption { text-align: left; color: var(--encre-douce); padding-bottom: .4rem; }
+.v-tableau th, .v-tableau td { border: 1px solid var(--trait); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+.v-tableau thead th { background: var(--fond-doux); font-weight: 600; }
+.v-tableau tbody th { font-weight: 600; }
+.v-nature { color: var(--encre-douce); font-size: .8rem; }
+
+/* --- classes internes aux schémas SVG --- */
+.v-schema text { font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif; }
+.v-texte { fill: var(--encre); font-size: 13px; }
+.v-entete { fill: var(--encre-douce); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.v-titre-boite { fill: var(--encre); font-size: 14px; font-weight: 600; }
+.v-titre-levier { fill: var(--encre); font-size: 15px; font-weight: 650; }
+.v-acteur { fill: var(--encre-douce); font-size: 13px; }
+.v-jalon { fill: var(--encre-douce); font-size: 12px; }
+.v-note { fill: var(--encre-douce); font-size: 12px; }
+.v-delai { fill: var(--encre-douce); font-size: 12px; }
+.v-numero { fill: var(--fond-carte); font-size: 11px; font-weight: 700; }
+.v-etiquette { fill: var(--encre-douce); font-size: 11px; letter-spacing: .03em; text-transform: uppercase; }
+.v-etiquette--piege { fill: var(--alerte); }
+.v-quand { fill: var(--encre); font-size: 13px; font-weight: 600; }
+.v-piege { fill: var(--encre-douce); font-size: 12px; }
+.v-piege-fond { fill: var(--alerte-doux); }
+.v-confiance { fill: var(--alerte); font-size: 12px; }
+.v-conditionnelle { fill: var(--encre-douce); font-size: 11px; font-style: italic; }
+
+.v-boite { fill: var(--fond-carte); stroke: var(--trait); stroke-width: 1; }
+.v-boite--acteur { fill: var(--fond-doux); }
+.v-boite--competence { fill: var(--accent-doux); stroke: var(--accent); }
+.v-boite--partage { fill: var(--fond-doux); stroke-dasharray: 4 3; }
+.v-boite--etape { fill: var(--fond-carte); }
+.v-boite--conditionnelle { fill: var(--fond-carte); stroke-dasharray: 4 3; }
+.v-boite--sortie { fill: var(--accent-doux); stroke: var(--accent); }
+.v-boite--levier { fill: var(--fond-carte); stroke: var(--accent); }
+
+.v-axe { stroke: var(--trait); stroke-width: 2; }
+.v-noeud { fill: var(--accent); }
+.v-noeud--levier { fill: var(--accent); }
+.v-lien { fill: none; stroke: var(--trait); stroke-width: 1.5; }
+.v-lien--partage { stroke-dasharray: 4 3; }
+.v-pointe { fill: var(--trait); }
+
+/* La nature du délai n'est jamais codée par la seule couleur :
+   elle est écrite en toutes lettres à côté de la barre. */
+.v-barre--maximum_legal { fill: var(--legal); }
+.v-barre--indicatif { fill: var(--indicatif); }
+.v-barre--observe { fill: var(--observe); }
+
+/* --- sources --- */
+.sources { font-size: .88rem; }
+.sources ol { padding-left: 1.2rem; }
+.sources li { margin-bottom: .35rem; }
+.type-source { color: var(--encre-douce); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; margin-right: .4rem; }
+
+/* --- accueil --- */
+.liste-rouages { list-style: none; padding: 0; display: grid; gap: 1rem; margin: 2rem 0; }
+.carte-rouage { border: 1px solid var(--trait); border-radius: var(--rayon); background: var(--fond-carte); }
+.carte-rouage a { display: block; padding: 1.1rem 1.2rem; text-decoration: none; color: inherit; }
+.carte-rouage a:hover { background: var(--fond-doux); }
+.carte-rouage h2 { margin: 0 0 .3rem; font-size: 1.15rem; color: var(--accent); }
+.carte-rouage p { margin: 0; font-size: .92rem; color: var(--encre-douce); }
+.chantier { border: 1px dashed var(--trait); border-radius: var(--rayon); padding: 1rem 1.2rem; color: var(--encre-douce); font-size: .9rem; }
+
+@media print {
+  .bandeau, footer, .equivalent summary { display: none; }
+  .equivalent[open] { display: block; }
+  body { background: #fff; color: #000; }
+}

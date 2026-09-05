@@ -61,11 +61,11 @@ modélise. C'est elle qui transforme une encyclopédie en outil.
 | `sources` | liste d'`id` de sources — **obligatoire, non vide** |
 | `verifie_le` | date de dernière vérification humaine |
 | `verifie_par` | qui |
-| `perime_apres` | durée avant alerte automatique (défaut : 12 mois) |
+| `perime_apres_mois` | mois avant alerte automatique (défaut : 12) |
 | `confiance` | `etabli` / `variable_selon_territoire` / `a_confirmer` |
 | `wikipedia` | URL de l'article correspondant, si pertinent |
 
-Le couple `verifie_le` / `perime_apres` est ce qui empêche le site de pourrir :
+Le couple `verifie_le` / `perime_apres_mois` est ce qui empêche le site de pourrir :
 une fiche périmée s'affiche comme telle, automatiquement, sans intervention.
 
 `confiance: variable_selon_territoire` est essentiel en France : la répartition
@@ -74,12 +74,13 @@ faux ; le dire est utile.
 
 ## Exemple concret
 
-Voir `exemples/permis-de-construire.yaml` pour un processus complet modélisé.
+Voir `contenu/rouages/permis-de-construire.yaml` pour un processus complet modélisé,
+et `src/modele/schemas.ts` pour le modèle sous sa forme exécutable.
 Extrait :
 
 ```yaml
 processus:
-  id: permis-construire-plu
+  id: permis-de-construire
   nom: "Permis de construire en commune dotée d'un PLU"
   declencheur: "Dépôt d'une demande par le pétitionnaire"
   etapes:
@@ -125,5 +126,7 @@ second site.
    fait échouer un contrôle « fraîcheur » (avertissement, pas blocage).
 6. Aucun nom de personne physique dans la famille D.
 
-Ces règles sont la ligne éditoriale rendue exécutable. Elles doivent tourner
-en intégration continue dès la première fiche.
+Ces règles sont la ligne éditoriale rendue exécutable. **Elles tournent en
+intégration continue depuis la première fiche** : `npm run valider` les applique,
+et `npm run build` refuse de produire le site si l'une d'elles échoue. Le contrôle
+de fraîcheur et la vérification des liens tournent en plus une fois par semaine.

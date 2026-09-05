@@ -1,0 +1,186 @@
+---
+import Base from '../../layouts/Base.astro';
+import { chargerGraphe, estPerime, formaterDate } from '../../modele/graphe.ts';
+import { carteDesPouvoirs } from '../../vues/carte-pouvoirs.ts';
+import { chronologie } from '../../vues/chronologie.ts';
+import { fenetresAction } from '../../vues/fenetres-action.ts';
+import { CONFIANCE } from '../../vues/commun.ts';
+
+export async function getStaticPaths() {
+  const g = chargerGraphe();
+  const proses = import.meta.glob('../../../contenu/fiches/*.md', { eager: true }) as Record<
+    string,
+    { frontmatter: { rouage: string; chapo: string }; compiledContent: () => string }
+  >;
+
+  return [...g.processus.values()].map((p) => {
+    const entree = Object.values(proses).find((m) => m.frontmatter?.rouage === p.id);
+    return {
+      params: { id: p.id },
+      props: {
+        chapo: entree?.frontmatter.chapo ?? p.resume,
+        prose: entree ? entree.compiledContent() : '',
+      },
+    };
+  });
+}
+
+const { id } = Astro.params;
+const { chapo, prose } = Astro.props;
+
+const g = chargerGraphe();
+const p = g.processus.get(id!)!;
+const decideur = g.acteurs.get(p.decideur);
+
+/** Pour citer une phrase à l'intérieur d'une autre, sans ponctuation orpheline. */
+const citer = (t: string) => t.trim().replace(/\.$/, '').toLowerCase();
+
+// Les compétences de la fiche : celles portées par les acteurs qui y interviennent.
+const acteursImpliques = new Set(p.etapes.map((e) => e.acteur));
+const competences = [...g.competences.values()].filter(
+  (c) => acteursImpliques.has(c.acteur) || c.partagee_avec.some((a) => acteursImpliques.has(a)),
+);
+
+const v1 = carteDesPouvoirs(g, competences);
+const v2 = chronologie(g, p);
+const v4 = fenetresAction(p);
+
+const fluxLies = [...g.flux.values()].filter(
+  (f) => acteursImpliques.has(f.de) || f.vers.some((v) => acteursImpliques.has(v)),
+);
+const documents = [...new Set(p.etapes.flatMap((e) => e.produit))]
+  .map((d) => g.documents.get(d))
+  .filter(Boolean);
+
+// Une fiche ne cite que les sources qu'elle utilise réellement.
+const idsSources = new Set<string>([
+  ...p.sources,
+  ...p.etapes.flatMap((e) => e.sources),
+  ...p.leviers.flatMap((l) => l.sources),
+  ...competences.flatMap((c) => c.sources),
+  ...documents.flatMap((d) => d!.sources),
+]);
+const sources = [...idsSources].map((s) => g.sources.get(s)!).filter(Boolean);
+
+const perime = estPerime(p);
+const TYPE_SOURCE: Record<string, string> = {
+  droit: 'Texte',
+  donnees_ouvertes: 'Données ouvertes',
+  page_officielle: 'Officiel',
+  etude: 'Étude',
+  presse: 'Presse',
+};
+---
+
+<Base titre={p.nom} description={p.resume}>
+  <h1>{p.nom}</h1>
+  <p class="chapo">{chapo}</p>
+
+  <ul class="meta">
+    <li>Vérifié le {formaterDate(p.verifie_le)}</li>
+    <li>Fiabilité : {CONFIANCE[p.confiance]}</li>
+    <li>{p.leviers.length} fenêtres d’action recensées</li>
+  </ul>
+
+  {perime && (
+    <p class="avertissement">
+      <strong>Fiche à revérifier.</strong> Sa dernière vérification remonte à plus
+      de {p.perime_apres_mois} mois. Le droit a pu changer depuis : recoupez avec
+      les sources citées en bas de page.
+    </p>
+  )}
+
+  {p.confiance !== 'etabli' && (
+    <p class="avertissement">
+      <strong>Lecture d’orientation.</strong> Plusieurs délais et articles de cette
+      fiche n’ont pas encore été relus par un praticien. Ils décrivent le régime de
+      droit commun&nbsp;; votre situation peut relever d’un régime particulier.
+      Les sources font foi, pas cette page.
+    </p>
+  )}
+
+  <h2>L’essentiel en cinq questions</h2>
+  <ol class="questions">
+    <li><span class="n">1</span><span><strong>Qui décide&nbsp;?</strong> {decideur?.nom} — {decideur?.resume}</span></li>
+    <li><span class="n">2</span><span><strong>Avec quel argent&nbsp;?</strong> {fluxLies[0]?.resume ?? 'Sans flux financier direct pour le demandeur.'}</span></li>
+    <li><span class="n">3</span><span><strong>Quelle procédure&nbsp;?</strong> {p.etapes.length} étapes, de «&nbsp;{citer(p.declencheur)}&nbsp;» à «&nbsp;{citer(p.sortie)}&nbsp;».</span></li>
+    <li><span class="n">4</span><span><strong>Où est-ce écrit&nbsp;?</strong> {sources.length} sources citées, dont {sources.filter((s) => s.type === 'droit').length} textes de droit.</span></li>
+    <li><span class="n">5</span><span><strong>Comment intervenir&nbsp;?</strong> {p.leviers.length} fenêtres d’action, détaillées plus bas.</span></li>
+  </ol>
+
+  <section class="vue">
+    <h2>{v4.titre}</h2>
+    <p class="mesure">
+      Les moments où un tiers peut effectivement peser, et jusqu’à quand. C’est
+      la partie que les sources officielles ne décrivent pas.
+    </p>
+    <div class="cadre-schema" set:html={v4.svg} />
+    <p class="indice-defilement">Le schéma défile horizontalement, ou consultez le tableau ci-dessous.</p>
+    <details class="equivalent">
+      <summary>Voir sous forme de tableau</summary>
+      <div set:html={v4.tableau} />
+    </details>
+  </section>
+
+  <section class="vue">
+    <h2>{v2.titre}</h2>
+    <p class="mesure">
+      La longueur des barres est proportionnelle aux délais. Un délai maximum
+      prévu par les textes et un délai constaté ne s’anticipent pas de la même
+      façon&nbsp;: la nature est indiquée à côté de chaque barre.
+    </p>
+    <div class="cadre-schema" set:html={v2.svg} />
+    <p class="indice-defilement">Le schéma défile horizontalement, ou consultez le tableau ci-dessous.</p>
+    <details class="equivalent">
+      <summary>Voir sous forme de tableau</summary>
+      <div set:html={v2.tableau} />
+    </details>
+  </section>
+
+  <section class="vue">
+    <h2>{v1.titre}</h2>
+    <p class="mesure">
+      Une compétence a rarement un seul détenteur. Le partage est ce qui rend
+      le circuit illisible de l’extérieur&nbsp;; il est donc explicite ici.
+    </p>
+    <div class="cadre-schema" set:html={v1.svg} />
+    <p class="indice-defilement">Le schéma défile horizontalement, ou consultez le tableau ci-dessous.</p>
+    <details class="equivalent">
+      <summary>Voir sous forme de tableau</summary>
+      <div set:html={v1.tableau} />
+    </details>
+  </section>
+
+  {prose && <div class="mesure" set:html={prose} />}
+
+  {documents.length > 0 && (
+    <section>
+      <h2>Les documents en jeu</h2>
+      <ul class="mesure">
+        {documents.map((d) => (
+          <li>
+            <strong>{d!.nom}</strong>{d!.resume ? ` — ${d!.resume}` : ''}
+            {d!.ou_le_trouver && <><br /><span class="v-nature">Où le trouver : {d!.ou_le_trouver}</span></>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section class="sources">
+    <h2>Sources</h2>
+    <p class="mesure">
+      Chaque affirmation de cette fiche renvoie à l’une de ces sources. En cas de
+      divergence, c’est la source qui fait foi.
+    </p>
+    <ol>
+      {sources.map((s) => (
+        <li>
+          <span class="type-source">{TYPE_SOURCE[s.type]}</span>
+          <a href={s.url} rel="nofollow noopener" target="_blank">{s.titre}</a>
+          <span class="v-nature"> — consultée le {formaterDate(s.consulte_le)}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+</Base>

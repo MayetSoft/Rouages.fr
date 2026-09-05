@@ -1,0 +1,10 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strictNullChecks": true
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "scripts/**/*", "astro.config.mjs"],
+  "exclude": ["dist"]
+}

@@ -1,6 +1,7 @@
 # 06 — Choix techniques
 
-> Statut : recommandations à confirmer. Aucune n'est encore engagée.
+> Statut : **engagé** pour la phase 1. Les points listés en fin de document
+> restent à trancher.
 
 ## Principe
 
@@ -10,13 +11,13 @@ possibilité de tout reprendre ailleurs.
 
 ## Recommandation
 
-| Besoin | Choix proposé | Pourquoi |
+| Besoin | Choix retenu | Pourquoi |
 |---|---|---|
 | Site | **Astro**, sortie statique | contenu en fichiers, validation de schéma intégrée (collections + Zod), zéro JS par défaut, excellent référencement |
 | Contenu | **YAML** (données) + **Markdown** (prose) dans le dépôt | relisible, diffable, contribuable par pull request, exportable |
 | Validation | schémas **Zod** + contrôles maison en CI | la ligne éditoriale devient exécutable (`03-modele-de-donnees.md`) |
 | Schémas | SVG généré **au build** (D3 côté serveur ou code maison) | lisible sans JS, indexable, imprimable, partageable |
-| Recherche | **Pagefind** (index statique) | pas de serveur, suffisant jusqu'à plusieurs milliers de pages |
+| Recherche | **Pagefind** (index statique) | pas de serveur, suffisant jusqu'à plusieurs milliers de pages — *pas encore branché* |
 | Hébergement | Cloudflare Pages ou Netlify | statique, gratuit à cette échelle, déploiement sur push |
 | Analytique | Plausible ou Umami, sans cookie | cohérent avec le propos du site |
 | Phase 4 | **Supabase** (Postgres + pgvector + stockage) | seul moment où un backend devient nécessaire |
@@ -47,18 +48,31 @@ possibilité de tout reprendre ailleurs.
 4. **Nom des URL.** Stables et lisibles : `/rouages/permis-de-construire`. Une
    URL publiée ne change jamais (redirection sinon).
 
-## Structure de dépôt visée
+## Structure du dépôt
 
 ```
 contenu/
-  acteurs/          *.yaml
-  processus/        *.yaml
-  sources/          *.yaml
-  fiches/           *.md      (prose, référence les entités par id)
+  communs/       *.yaml   entités partagées entre plusieurs rouages
+  rouages/       *.yaml   un fichier par rouage : ses entités propres
+  fiches/        *.md     la prose, rattachée à un processus par son id
 src/
-  schemas/                    (Zod : le modèle de données, exécutable)
-  vues/                       (V1 à V4, génération SVG)
-  pages/
-docs/                         (ce dossier : décisions et cadrage)
-exemples/                     (jeux d'essai du modèle)
+  modele/                 schemas.ts (Zod) + graphe.ts (chargement, intégrité)
+  vues/                   V1, V2, V4 — génération SVG au build
+  pages/ layouts/ styles/
+scripts/valider.ts        la ligne éditoriale, exécutable
+docs/                     décisions et cadrage
 ```
+
+Un fichier par rouage plutôt qu'un dossier par type d'entité : on édite une
+fiche entière d'un seul tenant, et les entités réellement partagées (le maire,
+un article de loi) vivent dans `communs/`, déclarées une seule fois.
+
+## Commandes
+
+| Commande | Effet |
+|---|---|
+| `npm run dev` | serveur local |
+| `npm run valider` | structure, références, règles éditoriales |
+| `npm run valider -- --liens` | vérifie en plus que les URL des sources répondent |
+| `npm run fraicheur` | échoue si une fiche a dépassé sa date de revérification |
+| `npm run build` | valide puis génère le site statique |

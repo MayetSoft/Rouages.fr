@@ -1,0 +1,242 @@
+# Rouage pilote — le permis de construire en commune dotée d'un PLU.
+#
+# Statut : les délais et articles cités sont conformes au régime de droit commun
+# mais n'ont pas encore été relus par un praticien. Les points incertains portent
+# `confiance: a_confirmer` et s'affichent comme tels sur le site.
+# Voir docs/07-risques.md.
+
+competences:
+  - id: delivrance-autorisation-urbanisme
+    nom: "Délivrer les autorisations d'urbanisme"
+    acteur: maire
+    resume: >
+      Décider d'accorder, de refuser ou d'assortir de prescriptions une demande
+      de permis, au regard du document d'urbanisme applicable.
+    partagee_avec: [abf]
+    sources: [cu-l422-1, patrimoine-abf]
+    verifie_le: 2026-09-05
+    confiance: etabli
+
+  - id: instruction-technique
+    nom: "Instruire techniquement la demande"
+    acteur: service-instructeur
+    resume: >
+      Vérifier la complétude du dossier, consulter les services concernés et
+      proposer une décision au maire. La compétence peut être mutualisée.
+    partagee_avec: []
+    sources: [cu-r423-19, banatic]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: redaction-plu
+    nom: "Écrire la règle applicable (PLU)"
+    acteur: commune
+    resume: >
+      Définir, dans le plan local d'urbanisme, ce qui est constructible et
+      comment. Compétence fréquemment transférée à l'intercommunalité (PLUi).
+    partagee_avec: []
+    sources: [gpu, cgct-collectivites]
+    verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+documents:
+  - id: dossier-demande
+    nom: "Le dossier de demande de permis"
+    resume: "Formulaire Cerfa, plans, notice, insertion paysagère."
+    ou_le_trouver: "Déposé en mairie ou par téléprocédure ; consultable par le public."
+    sources: [sp-permis]
+
+  - id: plu
+    nom: "Le plan local d'urbanisme (PLU)"
+    resume: "Le règlement qui dit ce qui est constructible sur votre parcelle, et comment."
+    ou_le_trouver: "Mairie, ou Géoportail de l'urbanisme."
+    sources: [gpu]
+
+  - id: arrete-permis
+    nom: "L'arrêté de permis"
+    resume: "La décision signée : accord, accord avec prescriptions, ou refus."
+    ou_le_trouver: "Affiché en mairie ; communicable sur demande."
+    sources: [sp-permis, cada]
+
+  - id: panneau-affichage
+    nom: "Le panneau d'affichage sur le terrain"
+    resume: >
+      Panneau réglementaire posé par le bénéficiaire, visible depuis la voie
+      publique. C'est lui qui fait courir le délai de recours des tiers.
+    ou_le_trouver: "Sur le terrain concerné."
+    sources: [cu-a424-15]
+
+flux:
+  - id: taxe-amenagement
+    nature: argent
+    de: petitionnaire
+    vers: [commune, departement]
+    resume: >
+      Taxe due du fait de l'autorisation délivrée, liquidée après la décision et
+      répartie entre la commune et le département.
+    ordre_de_grandeur: "Quelques milliers d'euros pour une maison individuelle."
+    sources: [sp-taxe-amenagement]
+    verifie_le: 2026-09-05
+    confiance: a_confirmer
+
+processus:
+  - id: permis-de-construire
+    nom: "Le permis de construire"
+    famille: quotidien
+    resume: >
+      Du dépôt de la demande à la fin du délai de recours : qui instruit, qui
+      signe, combien de temps cela prend, et à quels moments un voisin peut
+      intervenir.
+    declencheur: "Dépôt d'une demande de permis en mairie ou par téléprocédure."
+    sortie: "Un arrêté de permis, un refus, ou une décision tacite faute de réponse."
+    decideur: maire
+    sources: [sp-permis, cu-l422-1, sitadel]
+    verifie_le: 2026-09-05
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: petitionnaire
+        action: "Dépôt du dossier de demande"
+        produit: [dossier-demande]
+        sources: [sp-permis]
+        confiance: etabli
+
+      - ordre: 2
+        acteur: service-instructeur
+        action: "Vérification de la complétude du dossier"
+        delai: { valeur: 1, unite: mois, nature: maximum_legal }
+        note: >
+          Une demande de pièces manquantes dans ce délai suspend l'instruction :
+          le compte à rebours repart à la réception des pièces. C'est la première
+          cause d'allongement réel d'un dossier.
+        sources: [cu-r423-38]
+        confiance: a_confirmer
+
+      - ordre: 3
+        acteur: service-instructeur
+        action: "Instruction technique et consultation des services concernés"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: >
+          Deux mois pour une maison individuelle et ses annexes, trois mois pour
+          les autres constructions. Ce délai peut être majoré dans les cas
+          prévus par les textes, notamment en secteur protégé.
+        sources: [cu-r423-23]
+        confiance: a_confirmer
+
+      - ordre: 4
+        acteur: abf
+        action: "Avis de l'architecte des Bâtiments de France"
+        conditionnelle: true
+        delai: { valeur: 1, unite: mois, nature: indicatif }
+        note: >
+          Uniquement si le projet est situé en périmètre de protection du
+          patrimoine. L'avis est alors souvent conforme : le maire ne peut pas
+          délivrer contre lui.
+        sources: [patrimoine-abf]
+        confiance: a_confirmer
+
+      - ordre: 5
+        acteur: maire
+        action: "Signature de l'arrêté : accord, prescriptions, ou refus"
+        produit: [arrete-permis]
+        note: >
+          L'absence de réponse à l'expiration du délai vaut en principe permis
+          tacite — sauf exceptions, fréquentes en secteur protégé.
+        sources: [cu-l424-2]
+        confiance: a_confirmer
+
+      - ordre: 6
+        acteur: petitionnaire
+        action: "Affichage du permis sur le terrain"
+        produit: [panneau-affichage]
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: >
+          L'affichage doit être continu pendant toute la durée du délai de
+          recours des tiers. C'est cet affichage, et non la date de l'arrêté,
+          qui déclenche le compte à rebours pour les voisins.
+        sources: [cu-a424-15, cu-r600-2]
+        confiance: a_confirmer
+
+    leviers:
+      - id: lire-le-plu
+        quoi: "Lire le PLU avant tout, y compris avant d'acheter un terrain"
+        quand: "À tout moment — c'est un document public et opposable"
+        aupres_de: "La mairie, ou le Géoportail de l'urbanisme"
+        difficulte: faible
+        piege: >
+          Le PLU consultable en ligne n'est pas toujours la dernière version
+          opposable. Demander en mairie la version en vigueur et sa date
+          d'approbation.
+        sources: [gpu]
+        confiance: etabli
+
+      - id: consulter-le-dossier
+        quoi: "Demander à consulter le dossier de permis déposé"
+        quand: "Dès le dépôt, et après la décision"
+        aupres_de: "Le service urbanisme de la mairie"
+        difficulte: faible
+        recours_si_refus: "Saisir la CADA, puis le tribunal administratif"
+        ancre_etape: 1
+        piege: >
+          Formuler la demande par écrit et en garder une trace : le délai de
+          saisine de la CADA court à compter du refus, explicite ou implicite.
+        sources: [cada, sp-permis]
+        confiance: a_confirmer
+
+      - id: signaler-au-service
+        quoi: "Signaler par écrit une difficulté au service instructeur pendant l'instruction"
+        quand: "Pendant l'instruction, avant la signature de l'arrêté"
+        aupres_de: "Le service instructeur et le maire"
+        difficulte: faible
+        ancre_etape: 3
+        piege: >
+          Aucune obligation de réponse à ce stade, et cela n'interrompt aucun
+          délai. Utile pour éclairer l'instruction, jamais suffisant pour
+          préserver ses droits : le vrai levier reste le recours.
+        sources: [sp-recours-urbanisme]
+        confiance: a_confirmer
+
+      - id: recours-gracieux
+        quoi: "Former un recours gracieux auprès du maire"
+        quand: "Dans les 2 mois suivant le premier jour d'affichage sur le terrain"
+        aupres_de: "Le maire, par lettre recommandée avec accusé de réception"
+        difficulte: moyenne
+        ancre_etape: 6
+        recours_si_refus: "Le tribunal administratif, dans les 2 mois du rejet"
+        piege: >
+          Le recours doit être notifié au bénéficiaire du permis dans les 15
+          jours de son envoi, faute de quoi il est irrecevable. C'est l'erreur
+          qui fait perdre la majorité des recours de voisinage.
+        sources: [cu-r600-1, cu-r600-2, sp-recours-urbanisme]
+        confiance: a_confirmer
+
+      - id: recours-contentieux
+        quoi: "Saisir le tribunal administratif"
+        quand: >
+          Dans les 2 mois de l'affichage, ou dans les 2 mois du rejet du recours
+          gracieux si celui-ci a été formé dans le délai
+        aupres_de: "Le tribunal administratif du ressort"
+        difficulte: elevee
+        ancre_etape: 6
+        piege: >
+          Il faut justifier d'un intérêt à agir — être affecté directement dans
+          les conditions d'occupation ou de jouissance de son bien. La simple
+          qualité de voisin ne suffit pas toujours.
+        sources: [cu-r600-1, cu-r600-2, sp-recours-urbanisme]
+        confiance: a_confirmer
+
+      - id: verifier-affichage
+        quoi: "Photographier le panneau d'affichage et sa date"
+        quand: "Dès que le panneau apparaît sur le terrain"
+        aupres_de: "Personne — c'est une précaution à prendre soi-même"
+        difficulte: faible
+        ancre_etape: 6
+        piege: >
+          Un affichage absent, illisible ou incomplet ne fait pas courir le
+          délai de recours. C'est souvent le seul angle qui reste quand on
+          découvre le chantier trop tard : la preuve se constitue avant, pas
+          après.
+        sources: [cu-a424-15, cu-r600-2]
+        confiance: a_confirmer

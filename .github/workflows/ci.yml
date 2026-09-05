@@ -1,0 +1,42 @@
+name: Contrôle du contenu et build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  schedule:
+    # Une fois par semaine : signale les fiches qui ont dépassé leur date de
+    # revérification, et les liens de sources devenus morts.
+    - cron: '0 6 * * 1'
+
+jobs:
+  controler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Structure, références et règles éditoriales
+        run: npm run valider
+      - name: Types
+        run: npm run verifier-types
+      - name: Build
+        run: npx astro build
+
+  fraicheur:
+    # Contrôle non bloquant sur les branches : une fiche périmée n'empêche pas
+    # de travailler, mais on veut le savoir chaque semaine.
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Fiches à revérifier et liens morts
+        run: npm run fraicheur -- --liens

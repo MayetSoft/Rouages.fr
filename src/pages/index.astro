@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import { chargerGraphe } from '../modele/graphe.ts';
+
+const g = chargerGraphe();
+const rouages = [...g.processus.values()].sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
+---
+
+<Base
+  titre="Comment ça marche, et où l’on peut agir"
+  description="Rouages explique qui décide, avec quel argent, selon quelle procédure — et à quel moment vous pouvez intervenir."
+>
+  <h1>Comprendre comment les choses fonctionnent</h1>
+
+  <p class="chapo">
+    Qui décide de ce qui se construit à côté de chez vous&nbsp;? Avec quel
+    argent&nbsp;? Selon quelle procédure&nbsp;? Et surtout&nbsp;: jusqu’à quand
+    pouvez-vous encore intervenir&nbsp;?
+  </p>
+
+  <p class="mesure">
+    Les informations existent déjà — Légifrance, service-public.fr, les données
+    ouvertes. Ce qui manque, c’est le schéma. Rouages relie les sources
+    officielles en montrant le mécanisme, et le point d’entrée.
+  </p>
+
+  <h2>Les rouages publiés</h2>
+  <ul class="liste-rouages">
+    {rouages.map((p) => (
+      <li class="carte-rouage">
+        <a href={`/rouages/${p.id}`}>
+          <h2>{p.nom}</h2>
+          <p>{p.resume}</p>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <h2>Ce qui arrive</h2>
+  <div class="chantier">
+    <p>
+      Le site en est à sa première tranche&nbsp;: un rouage complet, pour
+      éprouver le format avant de l’étendre. Viennent ensuite le socle local —
+      commune, intercommunalité, préfet, budget, école, eau — puis les rouages
+      des entreprises et des métiers.
+    </p>
+    <p style="margin:0">
+      La méthode, les familles et le modèle de données sont documentés
+      publiquement dans le dépôt du projet.
+    </p>
+  </div>
+</Base>
