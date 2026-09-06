@@ -123,6 +123,17 @@ jour n'existe que sous forme d'archive 7z contenant un classeur .xls, ce qui
 impose deux dépendances de plus au script de rafraîchissement. On a préféré la
 complexité au chiffre commode et faux.
 
+### La veille ✔
+
+Trois demandes distinctes — être alerté qu'une source change, réagir quand une
+donnée plus fraîche paraît, se voir proposer de nouveaux jeux — sont le même
+mécanisme avec trois déclencheurs. Elles ont été traitées ensemble.
+
+Le point de bascule est celui-ci : la donnée sur le prix de l'eau avait déjà
+deux ans avant qu'on s'en aperçoive, et on ne s'en est aperçu qu'en la
+recoupant à la main. Un projet dont les sources se dégradent en silence ne
+tombe pas en panne, il devient faux. Voir `06-stack-technique.md`.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

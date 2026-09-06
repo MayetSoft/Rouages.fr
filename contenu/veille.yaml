@@ -1,0 +1,63 @@
+# Veille sur les sources de données.
+#
+# Ce projet se périme par ses sources, pas par son code. En une seule journée de
+# travail, trois ruptures ont été rencontrées : l'interface Hub'Eau figée à 2018,
+# BANATIC qui a refait son site et perdu son ancienne adresse de téléchargement,
+# et l'export SISPEA dont l'URL change de forme selon le millésime. Aucune n'a
+# produit d'alerte : elles ont été découvertes à la main, par hasard.
+#
+# Chaque source déclare donc ici le signal le moins coûteux qui soit réellement
+# actionnable — pas un ping qui répond « 200 » pendant que la donnée dort depuis
+# huit ans.
+surveillances:
+  - id: banatic-referentiel
+    nom: "BANATIC — référentiel des compétences"
+    alimente: "les compétences transférées à l'intercommunalité"
+    type: banatic-competences
+    url: "https://www.banatic.interieur.gouv.fr/consultation/api/referentiel/competence/all"
+    lien: od-banatic
+
+  - id: banatic-export
+    nom: "BANATIC — export national des groupements"
+    alimente: "le rattachement de chaque commune à ses groupements"
+    type: disponibilite
+    url: "https://www.banatic.interieur.gouv.fr/consultation/api/export/pregenere/telecharger/France"
+    lien: od-banatic
+
+  - id: ofgl-communes
+    nom: "OFGL — comptes consolidés des communes"
+    alimente: "les repères financiers"
+    type: ofgl-millesime
+    url: "https://data.ofgl.fr/api/explore/v2.1/catalog/datasets/ofgl-base-communes-consolidee"
+    lien: od-ofgl
+
+  - id: sispea-eau-potable
+    nom: "SISPEA — services publics d'eau potable"
+    alimente: "le prix de l'eau"
+    type: sispea-millesime
+    url: "https://data.ofb.fr/catalogue/srv/api/records/7d6a3010-cf19-42c3-8a38-9823074185ce"
+    lien: od-sispea
+
+  - id: decoupage-etalab
+    nom: "Découpage administratif"
+    alimente: "communes, départements, régions"
+    type: paquet-npm
+    url: "@etalab/decoupage-administratif"
+    lien: od-datagouv
+
+# Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
+# autres sont proposés, à nous de juger s'ils méritent un nœud.
+decouverte:
+  mots_cles:
+    - "intercommunalité compétences"
+    - "prix de l'eau assainissement"
+    - "finances locales communes"
+    - "annuaire éducation établissements"
+    - "établissements de santé FINESS"
+    - "France Services"
+    - "casernes services d'incendie et de secours"
+    - "subventions associations collectivités"
+    - "délibérations conseils municipaux"
+    - "plan local d'urbanisme"
+  # Publiées après cette date seulement : inutile de reproposer l'existant.
+  depuis: 2026-01-01

@@ -164,11 +164,13 @@ const total =
   g.flux.size +
   g.sources.size +
   g.sigles.size +
-  g.reperes.size;
+  g.reperes.size +
+  g.surveillances.size;
 console.log(
   `${GRIS}${total} entités : ${g.acteurs.size} acteurs, ${g.competences.size} compétences, ` +
     `${g.processus.size} processus, ${g.documents.size} documents, ${g.flux.size} flux, ` +
-    `${g.sources.size} sources, ${g.sigles.size} sigles, ${g.reperes.size} repères.${RAZ}`,
+    `${g.sources.size} sources, ${g.sigles.size} sigles, ${g.reperes.size} repères, ` +
+    `${g.surveillances.size} surveillances.${RAZ}`,
 );
 
 for (const a of avertissements) console.log(`${JAUNE}avertissement${RAZ} ${a}`);

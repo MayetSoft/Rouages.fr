@@ -1,0 +1,78 @@
+name: Veille des sources
+
+# Le projet ne se périme pas par son code mais par ses sources : un millésime
+# qui sort, une URL d'export qui change de forme, une interface figée depuis
+# huit ans. Rien de tout cela ne casse le build — d'où ce contrôle séparé, qui
+# tient une issue à jour plutôt que de faire échouer une branche.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  veiller:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Contrôler les sources et chercher les nouveautés
+        id: veille
+        # Le script sort en 2 dès qu'il y a quelque chose à regarder : ce n'est
+        # pas un échec, c'est le signal. Tout autre code non nul est une panne
+        # du script, et doit faire échouer le job au lieu d'ouvrir une issue.
+        run: |
+          set +e
+          npm run --silent veille -- --decouvrir
+          code=$?
+          set -e
+          case "$code" in
+            0) echo "actionnable=non" >> "$GITHUB_OUTPUT" ;;
+            2) echo "actionnable=oui" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::la veille elle-même a échoué (code $code)"; exit "$code" ;;
+          esac
+
+      - name: Ouvrir ou mettre à jour l'issue de veille
+        if: steps.veille.outputs.actionnable == 'oui'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create veille --color FBCA04 --description "Sources de données" --force
+          numero=$(gh issue list --label veille --state open --limit 1 --json number --jq '.[0].number')
+          if [ -n "$numero" ]; then
+            gh issue edit "$numero" --body-file veille/rapport.md
+            echo "Issue #$numero mise à jour."
+          else
+            gh issue create --label veille \
+              --title "Veille des sources — $(date -u +%Y-%m-%d)" \
+              --body-file veille/rapport.md
+          fi
+
+      - name: Refermer l'issue si tout est revenu au vert
+        if: steps.veille.outputs.actionnable == 'non'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          numero=$(gh issue list --label veille --state open --limit 1 --json number --jq '.[0].number')
+          if [ -n "$numero" ]; then
+            gh issue close "$numero" --comment "Toutes les sources sont à jour et joignables."
+          fi
+
+      - name: Retenir l'état, pour savoir la prochaine fois ce qui a bougé
+        run: |
+          if [ -n "$(git status --porcelain veille/etat.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add veille/etat.json
+            git commit -m "veille : état du $(date -u +%Y-%m-%d)"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

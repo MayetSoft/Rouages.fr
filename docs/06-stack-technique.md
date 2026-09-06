@@ -116,3 +116,49 @@ Le site lui-même n'a aucune de ces dépendances : il lit des fichiers versionn�
 | `npm run valider -- --liens` | vérifie en plus que les URL des sources répondent |
 | `npm run fraicheur` | échoue si une fiche a dépassé sa date de revérification |
 | `npm run build` | valide puis génère le site statique |
+| `npm run veille` | contrôle que chaque source est vivante et à jour |
+| `npm run veille -- --decouvrir` | cherche en plus ce qui est apparu en open data |
+
+## La veille
+
+Le site ne se périme pas par son code mais par ses sources. En une journée de
+travail, trois ruptures ont été rencontrées : Hub'Eau figée à 2018, BANATIC qui
+refait son site et perd son adresse de téléchargement, l'export SISPEA dont
+l'URL change de forme selon le millésime. Aucune n'a produit d'alerte — toutes
+ont été découvertes à la main, par hasard.
+
+Chaque source déclare donc, dans `contenu/veille.yaml`, **le signal le moins
+coûteux qui soit réellement actionnable**. Un ping qui répond « 200 » pendant
+que la donnée dort depuis huit ans ne surveille rien : c'est le millésime qu'on
+interroge, pas le serveur.
+
+| Signal | Ce qu'il détecte |
+|---|---|
+| `banatic-competences` | un code de compétence dont le contenu dépend a disparu du référentiel |
+| `ofgl-millesime` | un exercice plus récent est publié, ou un agrégat que l'ingestion utilise a disparu |
+| `sispea-millesime` | une extraction annuelle plus récente est parue |
+| `paquet-npm` | le découpage administratif a bougé (fusions de communes) |
+| `disponibilite` | le minimum, quand la source n'expose rien de mieux |
+
+`veille/etat.json` est versionné : c'est lui qui permet de dire « ça a changé
+depuis la dernière fois » plutôt que de tout redécouvrir. Pour les sources qui
+n'exposent aucun millésime, une empreinte du contenu joue ce rôle.
+
+**La découverte** (`--decouvrir`) interroge data.gouv.fr sur les mots-clés
+déclarés. Le tri y est le vrai travail : data.gouv est très majoritairement
+alimenté par des collectivités qui publient leur propre territoire, et sur
+« délibérations » les premiers résultats sont une commune après l'autre. Trois
+marqueurs permettent d'écarter le local — les zones déclarées, l'emprise
+géographique (un jeu départemental tient dans 1,6° de longitude là où la
+métropole en fait 14,8), et le badge du producteur. Aucun ne permet de conclure
+« national » à coup sûr, et le badge ment parfois : la Région Île-de-France est
+badgée `public-service` quand la Région des Pays de la Loire est badgée
+`local-authority`. Ce qui reste indécidable est donc annoncé comme tel plutôt
+que maquillé en certitude — la même règle à trois états que pour les
+compétences territoriales.
+
+Le workflow `veille.yml` passe une fois par semaine, tient **une seule issue**
+à jour tant qu'il y a quelque chose à regarder, et la referme d'elle-même quand
+tout est revenu au vert. Le script sort en `2` dans ce cas et en `1` s'il tombe
+en panne lui-même : sans cette distinction, un script cassé ouvrirait une issue
+rassurante.

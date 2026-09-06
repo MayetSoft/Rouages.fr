@@ -16,8 +16,10 @@ import {
   type Document,
   type Flux,
   type Processus,
+  type Decouverte,
   type Repere,
   type Sigle,
+  type Surveillance,
   type Source,
 } from './schemas.ts';
 
@@ -40,6 +42,8 @@ export interface Graphe {
   sources: Map<string, Source>;
   sigles: Map<string, Sigle>;
   reperes: Map<string, Repere>;
+  surveillances: Map<string, Surveillance>;
+  decouverte?: Decouverte;
   anomalies: Anomalie[];
 }
 
@@ -69,6 +73,7 @@ export function chargerGraphe(): Graphe {
     sources: new Map(),
     sigles: new Map(),
     reperes: new Map(),
+    surveillances: new Map(),
     anomalies: [],
   };
 
@@ -124,6 +129,8 @@ export function chargerGraphe(): Graphe {
     ranger(contenu.flux, g.flux, 'flux');
     ranger(contenu.sigles, g.sigles, 'sigles');
     ranger(contenu.reperes, g.reperes, 'reperes');
+    ranger(contenu.surveillances, g.surveillances, 'surveillances');
+    if (contenu.decouverte) g.decouverte = contenu.decouverte;
   }
 
   verifierReferences(g);
@@ -170,6 +177,10 @@ function verifierReferences(g: Graphe): void {
     exigeLiens(f.liens, `flux ${f.id}`);
     exige(f.de, g.acteurs, 'acteur', `flux ${f.id}.de`);
     for (const v of f.vers) exige(v, g.acteurs, 'acteur', `flux ${f.id}.vers`);
+  }
+
+  for (const s of g.surveillances.values()) {
+    if (s.lien) exige(s.lien, g.sources, 'page de référence', `surveillance ${s.id}.lien`);
   }
 
   for (const r of g.reperes.values()) {

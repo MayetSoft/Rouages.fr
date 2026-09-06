@@ -244,6 +244,36 @@ export const Repere = z.object({
   liens: z.array(Id).min(1),
 });
 
+/**
+ * Une source de données surveillée.
+ *
+ * Le projet se périme par ses sources, pas par son code. Chaque source déclare
+ * le signal le moins coûteux qui soit réellement actionnable — un ping qui
+ * répond « 200 » pendant que la donnée dort depuis huit ans n'en est pas un.
+ */
+export const Surveillance = z.object({
+  id: Id,
+  nom: z.string().min(3),
+  /** Ce que cette source alimente sur le site, pour savoir ce qui casse. */
+  alimente: z.string().min(5).max(160),
+  type: z.enum([
+    'disponibilite',
+    'banatic-competences',
+    'ofgl-millesime',
+    'sispea-millesime',
+    'paquet-npm',
+  ]),
+  url: z.string().min(3),
+  /** La page de référence correspondante, si elle est déjà au contenu. */
+  lien: Id.optional(),
+});
+
+/** Ce qu'on cherche à voir apparaître en open data. */
+export const Decouverte = z.object({
+  mots_cles: z.array(z.string().min(3)).min(1),
+  depuis: z.coerce.date(),
+});
+
 /** Un fichier de contenu : toutes les entités d'un même rouage. */
 export const FichierContenu = z.object({
   acteurs: z.array(Acteur).default([]),
@@ -254,9 +284,13 @@ export const FichierContenu = z.object({
   sources: z.array(Source).default([]),
   sigles: z.array(Sigle).default([]),
   reperes: z.array(Repere).default([]),
+  surveillances: z.array(Surveillance).default([]),
+  decouverte: Decouverte.optional(),
 });
 
+export type Decouverte = z.infer<typeof Decouverte>;
 export type Repere = z.infer<typeof Repere>;
+export type Surveillance = z.infer<typeof Surveillance>;
 export type Sigle = z.infer<typeof Sigle>;
 export type Source = z.infer<typeof Source>;
 export type Acteur = z.infer<typeof Acteur>;

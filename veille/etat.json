@@ -1,0 +1,27 @@
+{
+  "dernier_controle": "2026-09-06",
+  "constats": {
+    "banatic-referentiel": {
+      "empreinte": "a9d1b65dfa4eea62",
+      "gravite": "ok"
+    },
+    "banatic-export": {
+      "gravite": "ok"
+    },
+    "ofgl-communes": {
+      "millesime": 2025,
+      "gravite": "ok"
+    },
+    "sispea-eau-potable": {
+      "millesime": 2024,
+      "gravite": "ok"
+    },
+    "decoupage-etalab": {
+      "millesime": "6.0.0",
+      "gravite": "ok"
+    }
+  },
+  "decouvertes_vues": [
+    "69d724a20930a0418dd06588"
+  ]
+}
