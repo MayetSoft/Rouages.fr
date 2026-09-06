@@ -138,6 +138,8 @@ interroge, pas le serveur.
 | `ofgl-millesime` | un exercice plus récent est publié, ou un agrégat que l'ingestion utilise a disparu |
 | `sispea-millesime` | une extraction annuelle plus récente est parue |
 | `paquet-npm` | le découpage administratif a bougé (fusions de communes) |
+| `opendatasoft-total` | un référentiel a perdu ses lignes, ou changé d'identifiant |
+| `datagouv-ressource` | une nouvelle version d'un fichier épinglé par URL datée est parue |
 | `disponibilite` | le minimum, quand la source n'expose rien de mieux |
 
 `veille/etat.json` est versionné : c'est lui qui permet de dire « ça a changé
@@ -225,3 +227,49 @@ un département de 24,8 ko à 8,1 ko.
 Il ne force **ni HTTPS ni le domaine canonique** : Cloudflare est devant et
 s'en charge. Le faire aussi à l'origine crée une boucle de redirection dès que
 Cloudflare passe en mode SSL « flexible ».
+
+## La localisation des services publics
+
+Trois référentiels nationaux, parce qu'aucun ne couvre l'ensemble : l'Annuaire
+de l'administration (France services, CCAS, SDIS), l'Annuaire de l'éducation
+(écoles, collèges, lycées) et le référentiel FINESS (établissements de santé,
+et ceux qui ont un service d'urgences). 83 719 implantations dans 22 958
+communes, écrites par département à côté des données d'eau et de finances : le
+client ne télécharge que la sienne — 29 ko compressés pour le département le
+plus dense.
+
+Le reste du panneau dit **qui décide** ; ce bloc dit **où l'on va**. Ce sont
+deux questions différentes, et la seconde est souvent la première qu'on se
+pose.
+
+### Trois pièges, et ce qu'on en fait
+
+**Les casernes de pompiers n'existent pas en open data national.** L'annuaire
+ne connaît que les 98 états-majors départementaux ; les centres de secours ne
+sont publiés que par quelques SDIS pour leur propre territoire — Marseille,
+l'Hérault. On nomme donc le SDIS compétent, ce qui est vrai et utile, en disant
+qu'on ne situe pas la caserne la plus proche. C'est exactement le genre de jeu
+départemental que le tri de la découverte écarte par ailleurs.
+
+**Paris, Lyon et Marseille n'existent pas dans ces référentiels.** Une école
+parisienne est déposée sous le code de son arrondissement (75112), jamais sous
+celui de la commune (75056). Sans repli, les trois plus grandes villes de
+France apparaissaient dépourvues d'école et d'hôpital — c'est ce qu'elles
+faisaient au premier passage. Le rattachement vient du découpage administratif
+lui-même, qui publie la commune de chaque arrondissement, plutôt que de plages
+de codes écrites à la main : 2 790 implantations récupérées.
+
+**Une France services ne déclare pas son ressort.** Le champ qui pourrait le
+dire ne contient que la commune d'implantation. Pour une commune qui n'en
+accueille pas, on regarde donc son intercommunalité — un rattachement réel, que
+le site résout déjà, là où une distance à vol d'oiseau ne dirait que la
+géométrie. Le raccourci ne tient que pour une intercommunalité de taille
+humaine : la Métropole du Grand Paris en compte 131 communes, et y énumérer
+quatre-vingts France services n'aidait personne. Au-delà de trois communes, on
+donne le nombre sans la liste.
+
+Enfin Le Mans compte 87 écoles : les nommer toutes dans un panneau latéral,
+c'est n'en montrer aucune. Au-delà d'une poignée, la liste se replie derrière
+son décompte — un `details` natif, qui marche sans script et que les lecteurs
+d'écran annoncent déjà. Les urgences, elles, remontent toujours en tête de leur
+famille : c'est l'établissement qu'on cherche quand on cherche vite.

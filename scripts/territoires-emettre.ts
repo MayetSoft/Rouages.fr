@@ -18,6 +18,12 @@ import { join } from 'node:path';
 import type { chargerGraphe } from '../src/modele/graphe.ts';
 import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
+import {
+  ecrireServices,
+  replierArrondissements,
+  FAMILLES_SERVICE,
+  type Services,
+} from './services-emettre.ts';
 
 interface Groupement {
   siren: string;
@@ -41,6 +47,8 @@ interface CommuneEtalab {
   region?: string;
   codesPostaux?: string[];
   population?: number;
+  /** Renseigné pour un arrondissement municipal : la commune dont il relève. */
+  commune?: string;
 }
 
 export function emettre(o: {
@@ -55,13 +63,14 @@ export function emettre(o: {
     statutParticulier: Map<string, string>;
   } | null;
   eau: Eau | null;
+  services: Services | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
   RAZ: string;
   GRIS: string;
 }) {
-  const { groupements, codesSuivis, dateExport, natures, finances, eau, sortie, dire, VERT, RAZ, GRIS } = o;
+  const { groupements, codesSuivis, dateExport, natures, finances, eau, services, sortie, dire, VERT, RAZ, GRIS } = o;
   const reperes = [...o.graphe.reperes.values()];
 
   // Le découpage administratif vient d'un paquet npm plutôt que d'une API :
@@ -71,9 +80,32 @@ export function emettre(o: {
     JSON.parse(
       readFileSync(createRequire(import.meta.url).resolve(`@etalab/decoupage-administratif/data/${f}`), 'utf8'),
     ) as T;
-  const communes = lire<CommuneEtalab[]>('communes.json').filter(
+  const toutesLesEntrees = lire<CommuneEtalab[]>('communes.json');
+  const communes = toutesLesEntrees.filter(
     (c) => c.type === 'commune-actuelle' && c.siren && c.departement,
   );
+
+  // Paris, Lyon et Marseille n'existent pas dans les référentiels de services :
+  // une école parisienne est déposée sous le code de son arrondissement (75112),
+  // jamais sous celui de la commune (75056). Sans ce repli, les trois plus
+  // grandes villes de France apparaîtraient dépourvues d'école et d'hôpital.
+  // Le rattachement vient du découpage lui-même, pas de plages de codes écrites
+  // à la main.
+  const communeDeArrondissement = new Map<string, string>();
+  for (const c of toutesLesEntrees) {
+    if (c.type === 'arrondissement-municipal' && c.commune) {
+      communeDeArrondissement.set(c.code, c.commune);
+    }
+  }
+  if (services) {
+    const replies = replierArrondissements(services, communeDeArrondissement);
+    if (replies > 0) {
+      dire(
+        `${GRIS}${replies.toLocaleString('fr-FR')} services d'arrondissement rattachés ` +
+          `à Paris, Lyon et Marseille.${RAZ}`,
+      );
+    }
+  }
   // Le nom du département, pas son numéro : « Sarthe » se reconnaît, « 72 » non.
   // Plus d'une commune sur dix porte un nom qu'une autre porte aussi.
   const nomsDep = new Map(lire<DepartementEtalab[]>('departements.json').map((d) => [d.code, d.nom]));
@@ -154,6 +186,30 @@ export function emettre(o: {
   const codesEau = compEau ? (codesDeComp.get(compEau) ?? []) : [];
   let servicesEau = 0;
 
+  // Une France services ne déclare pas le territoire qu'elle dessert. Mais la
+  // commune qui n'en accueille pas appartient à une intercommunalité, et celle
+  // d'à côté en a peut-être une : c'est un rattachement réel, que le site
+  // résout déjà, là où une distance à vol d'oiseau ne dirait que la géométrie.
+  const A_FISCALITE_PROPRE = new Set(['CC', 'CA', 'CU', 'METRO', 'MET69', 'EPT', 'SAN']);
+  const epciDe = new Map<string, string>();
+  for (const c of communes) {
+    const epci = closure(c.siren!).find((s) => A_FISCALITE_PROPRE.has(groupements.get(s)?.nature ?? ''));
+    if (epci) epciDe.set(c.code, epci);
+  }
+  const fsParEpci = new Map<string, { nom: string; commune: string; code: string }[]>();
+  if (services) {
+    for (const c of communes) {
+      const epci = epciDe.get(c.code);
+      if (!epci) continue;
+      for (const s of services.parCommune.get(c.code) ?? []) {
+        if (s.famille !== 'france-services') continue;
+        if (!fsParEpci.has(epci)) fsParEpci.set(epci, []);
+        fsParEpci.get(epci)!.push({ nom: s.nom, commune: c.nom, code: c.code });
+      }
+    }
+  }
+  let servicesEcrits = 0;
+
   let couvertes = 0;
   let sansRattachement = 0;
   for (const [dep, liste] of parDep) {
@@ -197,16 +253,16 @@ export function emettre(o: {
     });
 
     if (eau && codesEau.length > 0) {
-      const services = new Map<string, ServiceEau>();
+      const eauxCommunes = new Map<string, ServiceEau>();
       for (const c of liste) {
         const competents = closure(c.siren!).filter((s) =>
           [...(groupements.get(s)?.codes ?? [])].some((code) => codesEau.includes(code)),
         );
         const s = serviceDe(eau, c.siren!, c.code, competents);
-        if (s) services.set(c.code, s);
+        if (s) eauxCommunes.set(c.code, s);
       }
-      servicesEau += services.size;
-      ecrireEau(sortie, dep, eau, services);
+      servicesEau += eauxCommunes.size;
+      ecrireEau(sortie, dep, eau, eauxCommunes);
     }
 
     if (finances) {
@@ -217,6 +273,19 @@ export function emettre(o: {
         liste.map((c) => c.code),
         finances.parCommune,
       );
+    }
+
+    if (services) {
+      const voisines = new Map<string, { nom: string; commune: string }[]>();
+      for (const c of liste) {
+        const epci = epciDe.get(c.code);
+        if (!epci) continue;
+        const autres = (fsParEpci.get(epci) ?? []).filter((f) => f.code !== c.code);
+        if (autres.length > 0) {
+          voisines.set(c.code, autres.map((f) => ({ nom: f.nom, commune: f.commune })));
+        }
+      }
+      servicesEcrits += ecrireServices(sortie, dep, liste.map((c) => c.code), services, voisines);
     }
   }
 
@@ -232,6 +301,21 @@ export function emettre(o: {
     couverture: Object.fromEntries(
       [...couvertureNationale].map(([k, v]) => [k, Math.round((v / totalCommunes) * 100) / 100]),
     ),
+    ...(services
+      ? {
+          services: {
+            maj: services.maj,
+            // L'ordre fait foi : les fichiers départementaux désignent une
+            // famille par son index dans cette liste.
+            familles: [...FAMILLES_SERVICE],
+            totaux: services.totaux,
+            // Les casernes n'existent pas en open data national : l'annuaire ne
+            // publie que les états-majors départementaux. On nomme le SDIS
+            // compétent plutôt que de situer une caserne qu'on ne connaît pas.
+            sdis: Object.fromEntries(services.sdis),
+          },
+        }
+      : {}),
     ...(eau
       ? {
           eau: {
@@ -270,6 +354,13 @@ export function emettre(o: {
     dire(
       `${GRIS}Prix de l'eau rattaché à ${servicesEau.toLocaleString('fr-FR')} communes ` +
         `sur ${communes.length.toLocaleString('fr-FR')}.${RAZ}`,
+    );
+  }
+  if (services) {
+    const communesServies = [...services.parCommune.keys()].length;
+    dire(
+      `${GRIS}Services publics : ${servicesEcrits.toLocaleString('fr-FR')} implantations ` +
+        `dans ${communesServies.toLocaleString('fr-FR')} communes.${RAZ}`,
     );
   }
   dire(

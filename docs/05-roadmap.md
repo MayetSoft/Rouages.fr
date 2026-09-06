@@ -161,6 +161,17 @@ administratif et la chambre régionale des comptes étaient typés
 `service_deconcentre`, c'est-à-dire rangés parmi les bras de l'exécutif. Voir
 `02-familles.md`.
 
+### Où sont les services publics ✔
+
+Écoles, collèges, lycées, France services, CCAS et établissements de santé —
+83 719 implantations dans 22 958 communes, affichées sous le nom de la commune
+choisie. Le reste du panneau dit qui décide ; ce bloc dit où l'on va.
+
+Les casernes de pompiers manquent, et manqueront : elles ne sont pas publiées
+en open data national, seuls les 98 états-majors départementaux le sont. On
+nomme le SDIS compétent et on dit qu'on ne situe pas la caserne — plutôt que
+d'inventer une proximité. Voir `06-stack-technique.md`.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

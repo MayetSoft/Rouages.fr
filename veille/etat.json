@@ -19,6 +19,18 @@
     "decoupage-etalab": {
       "millesime": "6.0.0",
       "gravite": "ok"
+    },
+    "annuaire-education": {
+      "millesime": 68939,
+      "gravite": "ok"
+    },
+    "annuaire-administration": {
+      "millesime": 93784,
+      "gravite": "ok"
+    },
+    "finess-referentiel": {
+      "empreinte": "0b463da3a172c9f8",
+      "gravite": "ok"
     }
   },
   "decouvertes_vues": [

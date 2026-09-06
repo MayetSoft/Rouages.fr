@@ -81,6 +81,67 @@ async function telecharger(url: string, vers: string): Promise<void> {
   });
 }
 
+/**
+ * Lit un CSV distant ligne à ligne : le référentiel FINESS pèse 244 Mo, et
+ * `JSON.parse` d'un fichier entier tiendrait sans doute, mais le flux évite de
+ * poser la question à chaque nouveau millésime.
+ *
+ * Analyse les guillemets plutôt que de découper sur la virgule : plusieurs
+ * raisons sociales en contiennent une.
+ */
+async function* lignesCsv(url: string): AsyncIterable<Record<string, string>> {
+  const r = await obstine(url);
+  if (!r.body) throw new Error(`${url} : réponse sans corps`);
+  let reste = '';
+  let entetes: string[] | null = null;
+  const decoder = new TextDecoder('utf-8');
+  for await (const morceau of r.body as unknown as AsyncIterable<Uint8Array>) {
+    reste += decoder.decode(morceau, { stream: true });
+    let coupe: number;
+    while ((coupe = prochaineFinDeLigne(reste)) !== -1) {
+      const ligne = reste.slice(0, coupe).replace(/\r$/, '');
+      reste = reste.slice(coupe + 1);
+      const champs = decouper(ligne);
+      if (!entetes) entetes = champs;
+      else if (champs.length > 1) yield Object.fromEntries(entetes.map((h, i) => [h, champs[i] ?? '']));
+    }
+  }
+  if (reste.trim() !== '' && entetes) {
+    const champs = decouper(reste);
+    if (champs.length > 1) yield Object.fromEntries(entetes.map((h, i) => [h, champs[i] ?? '']));
+  }
+}
+
+/** Une fin de ligne hors guillemets : un champ peut contenir un saut de ligne. */
+function prochaineFinDeLigne(s: string): number {
+  let dansGuillemets = false;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '"') dansGuillemets = !dansGuillemets;
+    else if (s[i] === '\n' && !dansGuillemets) return i;
+  }
+  return -1;
+}
+
+function decouper(ligne: string): string[] {
+  const champs: string[] = [];
+  let courant = '';
+  let dansGuillemets = false;
+  for (let i = 0; i < ligne.length; i++) {
+    const c = ligne[i];
+    if (c === '"') {
+      if (dansGuillemets && ligne[i + 1] === '"') {
+        courant += '"';
+        i++;
+      } else dansGuillemets = !dansGuillemets;
+    } else if (c === ',' && !dansGuillemets) {
+      champs.push(courant);
+      courant = '';
+    } else courant += c;
+  }
+  champs.push(courant);
+  return champs;
+}
+
 /** Colonne Excel (A, B, …, AA) vers son index, et retour. */
 function indiceColonne(ref: string): number {
   let n = 0;
@@ -162,7 +223,15 @@ async function principal() {
   const { collecterEau } = await import('./eau-emettre.ts');
   const eau = await collecterEau(telecharger, CACHE, (m) => dire(`${GRIS}${m}${RAZ}`));
 
-  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances, eau);
+  // Où sont les services publics : écoles, France services, CCAS, santé.
+  const { collecterServices } = await import('./services-emettre.ts');
+  const services = await collecterServices(
+    async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+    lignesCsv,
+    (m) => dire(`${GRIS}${m}${RAZ}`),
+  );
+
+  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances, eau, services);
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */
@@ -267,6 +336,7 @@ async function ecrire(
     statutParticulier: Map<string, string>;
   } | null,
   eau: Awaited<ReturnType<typeof import('./eau-emettre.ts')['collecterEau']>>,
+  services: Awaited<ReturnType<typeof import('./services-emettre.ts')['collecterServices']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -277,6 +347,7 @@ async function ecrire(
     natures,
     finances,
     eau,
+    services,
     sortie: SORTIE,
     dire,
     VERT,

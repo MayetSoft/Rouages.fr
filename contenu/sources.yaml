@@ -154,3 +154,9 @@ sources:
   - { id: od-annuaire-administration, type: donnees_ouvertes, titre: "Annuaire de l'administration — toutes les implantations de services publics", url: "https://www.data.gouv.fr/datasets/service-public-gouv-fr-annuaire-de-ladministration-base-de-donnees-locales/", consulte_le: 2026-09-06 }
   - { id: od-nosdeputes, type: donnees_ouvertes, titre: "Données ouvertes de l'Assemblée nationale", url: "https://data.assemblee-nationale.fr/", consulte_le: 2026-09-06 }
   - { id: od-senat, type: donnees_ouvertes, titre: "Données ouvertes du Sénat", url: "https://data.senat.fr/", consulte_le: 2026-09-06 }
+
+  # --- Localisation des services publics ------------------------------------
+  - { id: od-annuaire-education, type: donnees_ouvertes, titre: "Annuaire de l'éducation — écoles, collèges et lycées, commune par commune", url: "https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/", consulte_le: 2026-09-06 }
+  - { id: od-finess, type: donnees_ouvertes, titre: "Référentiel FINESS — les établissements de santé et leurs autorisations", url: "https://www.data.gouv.fr/datasets/referentiel-finess-t-finess", consulte_le: 2026-09-06 }
+  - { id: france-services-gouv, type: page_officielle, titre: "France services — trouver la structure la plus proche", url: "https://www.france-services.gouv.fr/", consulte_le: 2026-09-06 }
+  - { id: wp-france-services, type: wikipedia, titre: "France Services", url: "https://fr.wikipedia.org/wiki/France_Services", consulte_le: 2026-09-06 }

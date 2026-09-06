@@ -299,9 +299,23 @@ export const Surveillance = z.object({
     'banatic-competences',
     'ofgl-millesime',
     'sispea-millesime',
+    'opendatasoft-total',
+    'datagouv-ressource',
     'paquet-npm',
   ]),
   url: z.string().min(3),
+  /**
+   * Pour `datagouv-ressource` : le motif que doit porter le nom de la
+   * ressource suivie. Un jeu de données en publie souvent plusieurs, dont des
+   * notices PDF ; sans motif, on comparerait n'importe quoi.
+   */
+  ressource: z.string().min(1).optional(),
+  /**
+   * Pour `opendatasoft-total` : le nombre d'enregistrements au dernier relevé
+   * connu. Une chute brutale est le signal — un référentiel ne perd pas la
+   * moitié de ses lignes sans raison.
+   */
+  attendu: z.number().int().positive().optional(),
   /** La page de référence correspondante, si elle est déjà au contenu. */
   lien: Id.optional(),
 });

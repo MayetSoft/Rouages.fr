@@ -87,6 +87,36 @@ export interface ServiceEau {
   competence: string;
 }
 
+/** Une implantation de service public dans la commune. */
+export interface ServicePublic {
+  famille: string;
+  nom: string;
+  /** École ou établissement de santé privé. */
+  prive: boolean;
+  /** Établissement de santé doté d'un service d'urgences. */
+  urgences: boolean;
+}
+
+export interface Services {
+  /** Ce qui est dans la commune, groupé par famille et dans l'ordre déclaré. */
+  parFamille: Map<string, ServicePublic[]>;
+  /**
+   * Les communes du reste de l'intercommunalité qui accueillent une France
+   * services. Elles ne déclarent pas leur ressort : c'est le rattachement
+   * intercommunal qui les rend pertinentes, pas une distance à vol d'oiseau.
+   *
+   * `communes` est vide quand elles sont trop nombreuses pour être nommées
+   * utilement — seul `nombre` est alors renseigné.
+   */
+  franceServicesVoisines: { nombre: number; communes: string[] };
+  /**
+   * Le service d'incendie compétent. Les casernes n'existent pas en open data
+   * national : l'annuaire ne publie que les états-majors départementaux.
+   */
+  sdis: string | null;
+  maj: string;
+}
+
 export interface Territoire {
   commune: CommuneBreve;
   population: number;
@@ -99,6 +129,8 @@ export interface Territoire {
   finances: Finances | null;
   /** Le service d'eau qui la dessert, et son prix. */
   eau: ServiceEau | null;
+  /** Les services publics implantés sur son territoire. */
+  services: Services | null;
   maj: string;
 }
 
@@ -136,6 +168,12 @@ let meta: {
   couverture: Record<string, number>;
   finances?: MetaFinances;
   eau?: { annee: number; indicateur: string; competence: string; prixMedian: number | null };
+  services?: {
+    maj: string;
+    familles: string[];
+    totaux: Record<string, number>;
+    sdis: Record<string, string>;
+  };
   maj: string;
 } | null = null;
 const departements = new Map<string, unknown>();
@@ -144,6 +182,13 @@ const eauDep = new Map<
   string,
   { annee: number; c: Record<string, [number | null, string, string, string]> } | null
 >();
+type ServicesDep = {
+  maj: string;
+  c: Record<string, [number, string, number][]>;
+  sdis?: string;
+  fs?: Record<string, { n: number; l: string[] }>;
+};
+const servicesDep = new Map<string, ServicesDep | null>();
 
 /** Les strates de population, dans le même ordre qu'à l'ingestion. */
 const BORNES = [500, 2000, 10000, 50000, Infinity];
@@ -267,7 +312,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau] = await Promise.all([
+    const [structure, argent, eau, servs] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; c: Record<string, (number | null)[]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -275,10 +320,12 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<{ annee: number; c: Record<string, [number | null, string, string, string]> }>(
         `${BASE}/dep/${commune.dep}-eau.json`,
       ).catch(() => null),
+      json<ServicesDep>(`${BASE}/dep/${commune.dep}-services.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
     eauDep.set(commune.dep, eau);
+    servicesDep.set(commune.dep, servs);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -328,11 +375,47 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     verdict,
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
+    services: assemblerServices(commune),
     maj: dep.maj,
   };
 }
 
 /** Le service d'eau qui dessert la commune, avec son prix et son mode de gestion. */
+export function assemblerServices(commune: CommuneBreve): Services | null {
+  const m = meta?.services;
+  const dep = servicesDep.get(commune.dep);
+  if (!m || !dep) return null;
+  const parFamille = new Map<string, ServicePublic[]>();
+  // L'ordre des familles est celui des métadonnées : le fichier départemental
+  // ne transporte qu'un index, ce qui évite de répéter 80 000 fois « ecole ».
+  for (const [i, nom, drapeau] of dep.c[commune.code] ?? []) {
+    const famille = m.familles[i];
+    if (!famille) continue;
+    if (!parFamille.has(famille)) parFamille.set(famille, []);
+    parFamille.get(famille)!.push({
+      famille,
+      nom,
+      prive: famille === 'sante' ? false : drapeau === 1,
+      urgences: famille === 'sante' && drapeau === 1,
+    });
+  }
+  // Les urgences en tête : c'est l'établissement qu'on cherche quand on
+  // cherche vite, et il ne doit pas dépendre de l'ordre alphabétique.
+  for (const l of parFamille.values()) {
+    l.sort((a, b) => Number(b.urgences) - Number(a.urgences) || a.nom.localeCompare(b.nom, 'fr'));
+  }
+  const brut = dep.fs?.[commune.code];
+  const voisines = { nombre: brut?.n ?? 0, communes: brut?.l ?? [] };
+  const services: Services = {
+    parFamille,
+    franceServicesVoisines: voisines,
+    sdis: dep.sdis ?? m.sdis?.[commune.dep] ?? null,
+    maj: dep.maj,
+  };
+  const vide = parFamille.size === 0 && voisines.nombre === 0 && services.sdis === null;
+  return vide ? null : services;
+}
+
 function assemblerEau(commune: CommuneBreve): ServiceEau | null {
   const m = meta?.eau;
   const dep = eauDep.get(commune.dep);

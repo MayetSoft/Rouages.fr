@@ -152,7 +152,7 @@ acteurs:
     type: service_deconcentre
     echelon: region
     resume: "Pilote l'offre de soins dans la région : autorisations d'activité, hôpitaux, prévention."
-    liens: [wp-ars, ars-gouv]
+    liens: [wp-ars, ars-gouv, od-finess]
     verifie_le: 2026-09-05
     confiance: etabli
 
@@ -395,6 +395,17 @@ acteurs:
     pouvoirs: [independant]
     resume: "Contrôle l'usage des données personnelles, y compris par les administrations et les collectivités, et peut être saisie par toute personne concernée."
     liens: [wp-cnil, cnil-fr, loi-aai, wp-aai]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  # --- Le guichet de proximité ---------------------------------------------
+  - id: france-services
+    nom: "France services"
+    nom_court: "France services"
+    type: service_administratif
+    echelon: commune
+    resume: "Guichet unique où l'on est accompagné pour les démarches de plusieurs administrations à la fois : impôts, retraite, allocations, permis."
+    liens: [wp-france-services, france-services-gouv, od-annuaire-administration]
     verifie_le: 2026-09-06
     confiance: etabli
 

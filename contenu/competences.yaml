@@ -19,7 +19,7 @@ competences:
     resume: "La commune possède et entretient les bâtiments et paie les agents ; l'État recrute et paie les enseignants."
     partagee_avec: [rectorat]
     banatic: ["5010"]
-    liens: [code-education, vp-competences]
+    liens: [code-education, vp-competences, od-annuaire-education]
     verifie_le: 2026-09-05
     confiance: etabli
 
@@ -147,7 +147,7 @@ competences:
     acteur: departement
     resume: "Bâtiments, personnels techniques et restauration au département ; enseignants et programmes à l'État."
     partagee_avec: [rectorat]
-    liens: [code-education, vp-competences]
+    liens: [code-education, vp-competences, od-annuaire-education]
     verifie_le: 2026-09-05
     confiance: etabli
 
@@ -197,7 +197,7 @@ competences:
     acteur: region
     resume: "Même partage que pour les collèges : les murs à la région, les enseignants à l'État."
     partagee_avec: [rectorat]
-    liens: [code-education, vp-competences]
+    liens: [code-education, vp-competences, od-annuaire-education]
     verifie_le: 2026-09-05
     confiance: etabli
 
@@ -564,5 +564,16 @@ competences:
     resume: "L'assemblée vote le budget et les schémas qui s'imposent ensuite aux documents d'urbanisme locaux."
     partagee_avec: [region, prefet, chambre-regionale-comptes]
     liens: [cgct, od-ofgl, vp-budget-local]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
+
+  # --- L'accueil du public --------------------------------------------------
+  - id: accueil-demarches
+    nom: "Accompagnement aux démarches administratives"
+    nom_court: "Accueil des démarches"
+    acteur: france-services
+    resume: "Un seul lieu pour des démarches relevant d'administrations différentes : c'est le partage entre opérateurs qui fait tout l'intérêt, et toute la complexité."
+    partagee_avec: [citoyen, caf, commune, epci, etat]
+    liens: [france-services-gouv, wp-france-services, od-annuaire-administration]
     verifie_le: 2026-09-06
     confiance: a_confirmer

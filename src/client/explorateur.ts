@@ -61,6 +61,22 @@ interface Boite {
 const donnees = document.getElementById('donnees-reseau');
 if (donnees) demarrer(JSON.parse(donnees.textContent ?? '{}') as Reseau);
 
+/**
+ * L'ordre d'affichage, et le pluriel. Un libellé qui compte évite d'écrire
+ * « Écoles (1) » — la parenthèse est un aveu de gabarit.
+ */
+const LIBELLE_FAMILLE: [string, (n: number) => string][] = [
+  ['ecole', (n) => (n > 1 ? `${n} écoles` : 'Une école')],
+  ['college', (n) => (n > 1 ? `${n} collèges` : 'Un collège')],
+  ['lycee', (n) => (n > 1 ? `${n} lycées` : 'Un lycée')],
+  ['france-services', (n) => (n > 1 ? `${n} France services` : 'Une France services')],
+  ['ccas', () => 'Action sociale'],
+  ['sante', (n) => (n > 1 ? `${n} établissements de santé` : 'Un établissement de santé')],
+];
+
+/** Au-delà, la liste d'une famille se replie derrière son décompte. */
+const SEUIL_REPLI = 6;
+
 function demarrer(reseau: Reseau) {
   const toileEventuelle = document.getElementById('toile') as SVGSVGElement | null;
   const panneauEventuel = document.getElementById('panneau');
@@ -567,6 +583,8 @@ function demarrer(reseau: Reseau) {
     bloc.append(dl);
     const argent = blocFinances();
     if (argent) bloc.append(argent);
+    const equipements = blocServices();
+    if (equipements) bloc.append(equipements);
 
     bloc.append(
       ligne(
@@ -574,6 +592,97 @@ function demarrer(reseau: Reseau) {
         'p-source-territoire',
         `D'après les transferts de compétences déclarés à BANATIC (${territoire.maj}). ` +
           `Une compétence exercée sans transfert déclaré — par convention, par exemple — n'y figure pas.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * Où sont les services publics.
+   *
+   * Le reste du panneau dit qui décide ; celui-ci dit où l'on va. Ce sont deux
+   * questions différentes, et la seconde est souvent la première qu'on se pose.
+   */
+  function blocServices(): HTMLElement | null {
+    const s = territoire?.services;
+    if (!s) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-services';
+    bloc.append(ligne('h4', 'p-titre-bloc', 'Les services publics sur place'));
+
+    for (const [famille, libelle] of LIBELLE_FAMILLE) {
+      const liste = s.parFamille.get(famille);
+      if (!liste || liste.length === 0) continue;
+
+      const ul = document.createElement('ul');
+      for (const e of liste) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-service-nom', e.nom));
+        // Deux nuances qui changent la démarche : une école privée ne relève
+        // pas de la carte scolaire, un hôpital sans urgences ne se présente
+        // pas de la même façon un dimanche soir.
+        if (e.prive) li.append(ligne('span', 'p-service-note', 'privé'));
+        if (e.urgences) li.append(ligne('span', 'p-service-note p-service-note--fort', 'urgences'));
+        ul.append(li);
+      }
+
+      // Le Mans compte 87 écoles : les nommer toutes dans un panneau latéral,
+      // c'est n'en montrer aucune. Au-delà d'une poignée, la liste se replie
+      // derrière son décompte — un `details` natif, qui marche sans script et
+      // que les lecteurs d'écran annoncent déjà.
+      if (liste.length > SEUIL_REPLI) {
+        const d = document.createElement('details');
+        d.className = 'p-service-groupe';
+        const resume = document.createElement('summary');
+        resume.className = 'p-service-famille';
+        resume.textContent = libelle(liste.length);
+        d.append(resume, ul);
+        bloc.append(d);
+      } else {
+        const d = document.createElement('div');
+        d.className = 'p-service-groupe';
+        d.append(ligne('span', 'p-service-famille', libelle(liste.length)));
+        d.append(ul);
+        bloc.append(d);
+      }
+    }
+
+    const voisines = s.franceServicesVoisines;
+    if (!s.parFamille.has('france-services') && voisines.nombre > 0) {
+      const p = document.createElement('p');
+      p.className = 'p-service-voisin';
+      // Le nom de commune est présenté après un deux-points plutôt qu'après une
+      // préposition : « à Le Lude » n'existe pas en français, et contracter
+      // correctement demanderait de connaître le genre et l'article de 34 875
+      // noms de communes.
+      const ou =
+        voisines.communes.length > 0
+          ? `Dans votre intercommunalité : ${voisines.communes.join(', ')}.`
+          : `${voisines.nombre} communes de votre intercommunalité en accueillent une.`;
+      p.append(
+        ligne('span', 'p-service-famille', 'France services'),
+        ligne('span', '', `aucune dans la commune. ${ou}`),
+      );
+      bloc.append(p);
+    }
+
+    if (s.sdis) {
+      bloc.append(
+        ligne(
+          'p',
+          'p-source-territoire',
+          `Secours : ${s.sdis}. Les centres de secours ne sont pas publiés en open data ` +
+            `national — seuls les états-majors départementaux le sont, nous ne situons donc ` +
+            `pas la caserne la plus proche.`,
+        ),
+      );
+    }
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après l'Annuaire de l'administration, l'Annuaire de l'éducation et le répertoire ` +
+          `FINESS (${s.maj}).`,
       ),
     );
     return bloc;

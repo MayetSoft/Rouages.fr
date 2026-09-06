@@ -29,6 +29,12 @@ sigles:
     noeud: redaction-plu
     liens: [wp-plu, od-gpu]
 
+  - id: sigle-finess
+    sigle: FINESS
+    developpe: "Fichier national des établissements sanitaires et sociaux"
+    definition: "Le répertoire officiel des hôpitaux, cliniques et établissements médico-sociaux, avec les soins que chacun est autorisé à pratiquer."
+    liens: [od-finess]
+
   - id: sigle-plui
     sigle: PLUi
     developpe: "Plan local d'urbanisme intercommunal"

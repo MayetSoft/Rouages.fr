@@ -45,6 +45,34 @@ surveillances:
     url: "@etalab/decoupage-administratif"
     lien: od-datagouv
 
+  - id: annuaire-education
+    nom: "Annuaire de l'éducation"
+    alimente: "les écoles, collèges et lycées de chaque commune"
+    type: opendatasoft-total
+    url: "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education"
+    attendu: 68939
+    lien: od-annuaire-education
+
+  - id: annuaire-administration
+    nom: "Annuaire de l'administration"
+    alimente: "les France services, les CCAS et les SDIS"
+    type: opendatasoft-total
+    url: "https://api-lannuaire.service-public.fr/api/explore/v2.1/catalog/datasets/api-lannuaire-administration"
+    # Relevé, pas estimé : la première valeur écrite ici était de mémoire, et la
+    # veille l'a rejetée au premier passage.
+    attendu: 93784
+    lien: od-annuaire-administration
+
+  - id: finess-referentiel
+    nom: "FINESS — établissements de santé"
+    alimente: "les hôpitaux et les services d'urgences"
+    # L'ingestion épingle une URL datée : sans surveillance, une nouvelle
+    # publication ne changerait rien tant que personne ne la remarque.
+    type: datagouv-ressource
+    url: "referentiel-finess-t-finess"
+    ressource: "t-finess.csv"
+    lien: od-finess
+
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
 decouverte:

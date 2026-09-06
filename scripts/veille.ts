@@ -182,6 +182,65 @@ const controles: Record<
     return { gravite: 'ok', message: `à jour (extraction ${embarque})`, millesime: dernier };
   },
 
+  /**
+   * Un référentiel servi par Opendatasoft : on lui demande son nombre de
+   * lignes. Il ne dit pas si la donnée est fraîche, mais il dit tout de suite
+   * si elle a disparu — un référentiel qui perd la moitié de ses lignes, ou
+   * change d'identifiant, casse l'ingestion en silence.
+   */
+  async 'opendatasoft-total'(s) {
+    const r = (await (await obstine(`${s.url}/records?limit=1`)).json()) as {
+      total_count?: number;
+    };
+    const n = r.total_count ?? 0;
+    if (n === 0) {
+      return { gravite: 'alerte', message: 'le jeu de données ne renvoie plus aucune ligne' };
+    }
+    const attendu = s.attendu ?? n;
+    const ecart = Math.abs(n - attendu) / attendu;
+    if (ecart > 0.1) {
+      return {
+        gravite: n < attendu ? 'alerte' : 'a-regarder',
+        message:
+          `${n.toLocaleString('fr-FR')} lignes, contre ${attendu.toLocaleString('fr-FR')} attendues ` +
+          `(${n < attendu ? '−' : '+'}${Math.round(ecart * 100)} %) — mettre à jour « attendu » si c'est normal`,
+        millesime: n,
+      };
+    }
+    return { gravite: 'ok', message: `${n.toLocaleString('fr-FR')} lignes`, millesime: n };
+  },
+
+  /**
+   * Une ressource data.gouv épinglée par son URL datée. C'est le cas le plus
+   * fragile du site : l'ingestion pointe une version précise du fichier, donc
+   * une nouvelle publication ne change rien tant que personne ne la voit.
+   */
+  async 'datagouv-ressource'(s) {
+    const d = (await (await obstine(`https://www.data.gouv.fr/api/1/datasets/${s.url}/`)).json()) as {
+      resources?: { title?: string; url?: string; last_modified?: string; created_at?: string }[];
+    };
+    const motif = (s.ressource ?? '').toLowerCase();
+    const candidates = (d.resources ?? []).filter((r) =>
+      (r.title ?? r.url ?? '').toLowerCase().includes(motif),
+    );
+    if (candidates.length === 0) {
+      return {
+        gravite: 'alerte',
+        message: `aucune ressource ne correspond à « ${s.ressource} » : le jeu a changé de forme`,
+      };
+    }
+    // La plus récente, quel que soit l'ordre de publication.
+    const recente = candidates.sort((a, b) =>
+      (b.last_modified ?? b.created_at ?? '').localeCompare(a.last_modified ?? a.created_at ?? ''),
+    )[0];
+    const empreinte = empreinteDe(recente.url ?? '');
+    return {
+      gravite: 'ok',
+      message: `dernière ressource : ${(recente.last_modified ?? recente.created_at ?? '').slice(0, 10)}`,
+      empreinte,
+    };
+  },
+
   /** Le découpage administratif bouge à chaque fusion de communes. */
   async 'paquet-npm'(s) {
     const r = (await (await obstine(`https://registry.npmjs.org/${s.url}/latest`)).json()) as {
