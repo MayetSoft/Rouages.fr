@@ -4,6 +4,8 @@ import { construireReseau } from '../../modele/reseau.ts';
 import { chargerGraphe, estPerime, formaterDate } from '../../modele/graphe.ts';
 import { schemaVoisinage, voisinsDe } from '../../vues/voisinage.ts';
 import { FAMILLES, LIBELLE_LIEN, LIBELLE_TYPE_NOEUD } from '../../modele/relations.ts';
+import { construireGlossaire } from '../../modele/glossaire.ts';
+import Glose from '../../composants/Glose.astro';
 import { chronologie } from '../../vues/chronologie.ts';
 import { fenetresAction } from '../../vues/fenetres-action.ts';
 
@@ -15,8 +17,15 @@ const { noeud } = Astro.props;
 const reseau = construireReseau();
 const g = chargerGraphe();
 
+const glossaire = construireGlossaire([...g.sigles.values()]);
 const voisins = voisinsDe(reseau, noeud.id);
-const schema = schemaVoisinage(noeud, voisins);
+const schema = schemaVoisinage(noeud, voisins, 'voisinage', glossaire);
+
+// Les sigles employés sur cette page, rappelés en clair sous le schéma : le
+// survol ne sert à rien à l'impression, ni sur un écran tactile.
+const siglesEmployes = glossaire.employes(
+  [noeud.nom, noeud.resume, ...voisins.map((v) => `${v.noeud.nom} ${v.noeud.resume}`)].join(' '),
+);
 
 // Un processus est la seule chose qu'un graphe ne sait pas montrer : le temps.
 const processus = g.processus.get(noeud.id);
@@ -45,8 +54,8 @@ const groupes = ORDRE_LIENS.map((type) => ({
       )}
       {perime && <span class="badge--alerte">{' · '}à revérifier</span>}
     </p>
-    <h1>{noeud.nom}</h1>
-    {noeud.resume && <p class="resume">{noeud.resume}</p>}
+    <h1><Glose texte={noeud.nom} /></h1>
+    {noeud.resume && <p class="resume"><Glose texte={noeud.resume} /></p>}
 
     <h2 class="badge">Pour en savoir plus</h2>
     <div class="grille-liens">
@@ -78,12 +87,26 @@ const groupes = ORDRE_LIENS.map((type) => ({
       ))}
     </ul>
 
+    {siglesEmployes.length > 0 && (
+      <dl class="sigles">
+        {siglesEmployes.map((s) => (
+          <div>
+            <dt>{s.sigle}</dt>
+            <dd>{s.developpe}{s.definition ? ` — ${s.definition}` : ''}{s.noeud && s.noeud !== noeud.id ? <> · <a href={`/n/${s.noeud}`}>sa fiche</a></> : null}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
     <ul class="relations">
       {voisins.map((v) => (
         <li>
           <span class={`p-cle p-cle--${v.fam}`}></span>
           <span class="quoi">{v.label}</span>
-          <span><a href={`/n/${v.noeud.id}`}>{v.noeud.nom}</a> <span class="v-nature">{v.noeud.resume}</span></span>
+          <span>
+            <a href={`/n/${v.noeud.id}`}><Glose texte={v.noeud.nom} /></a>{' '}
+            <span class="v-nature"><Glose texte={v.noeud.resume} /></span>
+          </span>
         </li>
       ))}
     </ul>

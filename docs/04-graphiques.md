@@ -88,6 +88,13 @@ Un graphe dense ne se lit pas d'un bloc. Trois gestes le déplient :
 
 ## Règles
 
+**Les sigles sont expliqués au survol.** `<abbr title>` dans tout le texte —
+c'est la balise que les lecteurs d'écran annoncent, elle marche sans JavaScript,
+et le navigateur l'affiche déjà. Un SVG n'accepte pas `<abbr>` : le développé y
+est donc collé à l'infobulle du nœud. Et comme le survol n'existe ni à
+l'impression ni au doigt, chaque page de nœud rappelle en clair, sous son
+schéma, les sigles qu'elle emploie.
+
 **Accessibilité.** La légende est toujours présente. Chaque schéma généré au
 build porte un `title`, une `desc` et un tableau équivalent. Aucune information
 n'est portée par la seule couleur. Les animations respectent

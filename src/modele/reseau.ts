@@ -14,7 +14,7 @@
  * Les positions de la carte sont calculées ici, au build : le même graphe donne
  * toujours la même image, ce qui permet de la citer et de la comparer.
  */
-import { LIBELLE_ECHELON, ECHELONS, type Echelon } from './schemas.ts';
+import { LIBELLE_ECHELON, ECHELONS, type Echelon, type Sigle } from './schemas.ts';
 import { chargerGraphe, type Graphe } from './graphe.ts';
 import { largeurPastille } from '../vues/formes.ts';
 
@@ -65,6 +65,8 @@ export interface Arete {
 export interface Reseau {
   noeuds: Noeud[];
   aretes: Arete[];
+  /** Le glossaire voyage avec le réseau : le panneau en a besoin côté client. */
+  sigles: Sigle[];
   /** Arêtes acteur↔acteur de la carte d'ensemble, déjà agrégées. */
   carte: {
     aretes: Arete[];
@@ -181,7 +183,7 @@ export function construireReseau(g: Graphe = chargerGraphe()): Reseau {
   }
 
   const carte = disposerCarte(noeuds, aretes);
-  cache = { noeuds: [...noeuds.values()], aretes, carte };
+  cache = { noeuds: [...noeuds.values()], aretes, sigles: [...g.sigles.values()], carte };
   return cache;
 }
 

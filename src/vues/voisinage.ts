@@ -18,6 +18,7 @@ import {
   type Famille,
 } from '../modele/relations.ts';
 import { decalageTexte, formeNoeud, largeurPastille } from './formes.ts';
+import { expansions, type Glossaire } from '../modele/glossaire.ts';
 import { echapper, svg, couper } from './commun.ts';
 
 export interface Voisin {
@@ -59,7 +60,12 @@ interface Boite {
   h: number;
 }
 
-export function schemaVoisinage(centre: Noeud, voisins: Voisin[], id = 'voisinage') {
+export function schemaVoisinage(
+  centre: Noeud,
+  voisins: Voisin[],
+  id = 'voisinage',
+  glossaire?: Glossaire,
+) {
   // La toile est dimensionnée d'après les libellés réellement présents : un
   // rayon fixe suffit tant que les noms sont courts, et se met à faire
   // chevaucher les pastilles dès qu'ils ne le sont plus.
@@ -100,7 +106,7 @@ export function schemaVoisinage(centre: Noeud, voisins: Voisin[], id = 'voisinag
         v.label,
       )}</text>`,
     );
-    noeuds.push(pastille(v.noeud, b, 12.5));
+    noeuds.push(pastille(v.noeud, b, 12.5, false, glossaire));
   });
 
   const defs = FAMILLES.filter((f) => FLECHEE[f.id])
@@ -113,7 +119,7 @@ export function schemaVoisinage(centre: Noeud, voisins: Voisin[], id = 'voisinag
   const contenu =
     `<defs>${defs}</defs>` +
     `<g class="couche-aretes">${aretes.join('')}</g>` +
-    `<g class="couche-noeuds">${noeuds.join('')}${pastille(centre, bCentre, 15, true)}</g>`;
+    `<g class="couche-noeuds">${noeuds.join('')}${pastille(centre, bCentre, 15, true, glossaire)}</g>`;
 
   const description = `${centre.nom} : ${voisins.map((v) => `${v.label} ${v.noeud.nom}`).join(' ; ')}.`;
   return {
@@ -136,7 +142,16 @@ function courbe(x1: number, y1: number, x2: number, y2: number): string {
   return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
 }
 
-function pastille(n: Noeud, b: Boite, taille: number, centre = false): string {
+function pastille(
+  n: Noeud,
+  b: Boite,
+  taille: number,
+  centre = false,
+  glossaire?: Glossaire,
+): string {
+  // Un SVG n'accepte pas <abbr> : le développé des sigles est donc collé à
+  // l'infobulle du nœud, qui est de toute façon la seule chose lisible ici.
+  const glose = glossaire ? expansions(glossaire, n.nom, n.court, n.resume) : '';
   const texte = couper(n.court, b.l - 22, taille)[0];
   const formes = formeNoeud(n.type, b.l, b.h)
     .map(
@@ -150,7 +165,7 @@ function pastille(n: Noeud, b: Boite, taille: number, centre = false): string {
     `<a href="/n/${n.id}" class="n n--${n.type}${centre ? ' n--centre' : ''}" transform="translate(${b.x - b.l / 2} ${b.y - b.h / 2})">` +
     formes +
     `<text class="n-nom" x="${b.l / 2 + decalageTexte(n.type)}" y="${b.h / 2 + taille * 0.35}" text-anchor="middle" style="font-size:${taille}px${centre ? ';font-weight:650' : ''}">${echapper(texte)}</text>` +
-    `<title>${echapper(n.resume || n.nom)}</title>` +
+    `<title>${echapper([n.resume || n.nom, glose].filter(Boolean).join(' '))}</title>` +
     `</a>`
   );
 }

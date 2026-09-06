@@ -62,6 +62,10 @@ vigilance — c'est ce qui permettra d'accepter des contributions extérieures.
 | [`docs/06-stack-technique.md`](docs/06-stack-technique.md) | Choix techniques et alternatives écartées |
 | [`docs/07-risques.md`](docs/07-risques.md) | Péremption, exactitude, neutralité, RGPD |
 
+Le contenu vit dans `contenu/`&nbsp;: acteurs, compétences, flux, processus,
+sources et **glossaire**. Tout sigle employé doit y avoir son entrée, sans quoi
+le build échoue.
+
 ## Licence (proposition)
 
 Contenu : CC BY-SA 4.0, compatible avec la réutilisation depuis et vers

@@ -9,6 +9,7 @@
  * référence cassée ne peut pas être mise en ligne.
  */
 import { chargerGraphe, estPerime, formaterDate } from '../src/modele/graphe.ts';
+import { construireGlossaire } from '../src/modele/glossaire.ts';
 
 const args = new Set(process.argv.slice(2));
 const verifierLiens = args.has('--liens');
@@ -48,6 +49,38 @@ for (const p of g.processus.values()) {
 }
 for (const id of g.sources.keys()) {
   if (!citees.has(id)) avertissements.push(`page de référence « ${id} » déclarée mais liée depuis aucun nœud`);
+}
+
+// Tout sigle employé doit avoir son entrée au glossaire. C'est la règle qui
+// empêche le site de redevenir illisible pour qui n'est pas du métier — et elle
+// se renforce toute seule à mesure que le réseau grossit.
+const glossaire = construireGlossaire([...g.sigles.values()]);
+const textesVisibles: [string, string][] = [];
+const noter = (ou: string, ...textes: (string | undefined)[]) => {
+  for (const t of textes) if (t) textesVisibles.push([ou, t]);
+};
+for (const a of g.acteurs.values()) noter(`acteur ${a.id}`, a.nom, a.nom_court, a.resume);
+for (const c of g.competences.values()) noter(`compétence ${c.id}`, c.nom, c.nom_court, c.resume);
+for (const d of g.documents.values()) noter(`document ${d.id}`, d.nom, d.resume, d.ou_le_trouver);
+for (const f of g.flux.values()) noter(`flux ${f.id}`, f.nom, f.resume, f.ordre_de_grandeur);
+for (const s of g.sources.values()) noter(`source ${s.id}`, s.titre);
+for (const s of g.sigles.values()) noter(`sigle ${s.sigle}`, s.definition);
+for (const p of g.processus.values()) {
+  noter(`processus ${p.id}`, p.nom, p.resume, p.declencheur, p.sortie);
+  for (const e of p.etapes) noter(`processus ${p.id}, étape ${e.ordre}`, e.action, e.note);
+  for (const l of p.leviers) noter(`levier ${l.id}`, l.quoi, l.quand, l.aupres_de, l.piege, l.recours_si_refus);
+}
+
+const sigleManquant = new Map<string, string>();
+for (const [ou, texte] of textesVisibles) {
+  for (const inconnu of glossaire.inconnus(texte)) {
+    if (!sigleManquant.has(inconnu)) sigleManquant.set(inconnu, ou);
+  }
+}
+for (const [sigle, ou] of sigleManquant) {
+  erreurs.push(
+    `sigle « ${sigle} » employé dans ${ou} sans entrée au glossaire — ajoutez-le à contenu/glossaire.yaml`,
+  );
 }
 
 // Famille « influence » : mécanismes, jamais de personnes. Contrôle grossier
@@ -123,10 +156,17 @@ if (verifierLiens) {
  * ------------------------------------------------------------------ */
 
 const total =
-  g.acteurs.size + g.competences.size + g.documents.size + g.processus.size + g.flux.size + g.sources.size;
+  g.acteurs.size +
+  g.competences.size +
+  g.documents.size +
+  g.processus.size +
+  g.flux.size +
+  g.sources.size +
+  g.sigles.size;
 console.log(
   `${GRIS}${total} entités : ${g.acteurs.size} acteurs, ${g.competences.size} compétences, ` +
-    `${g.processus.size} processus, ${g.documents.size} documents, ${g.flux.size} flux, ${g.sources.size} sources.${RAZ}`,
+    `${g.processus.size} processus, ${g.documents.size} documents, ${g.flux.size} flux, ` +
+    `${g.sources.size} sources, ${g.sigles.size} sigles.${RAZ}`,
 );
 
 for (const a of avertissements) console.log(`${JAUNE}avertissement${RAZ} ${a}`);

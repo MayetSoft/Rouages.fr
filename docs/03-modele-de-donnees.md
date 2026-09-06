@@ -27,6 +27,7 @@ Conséquences :
 | **Flux** | Ce qui circule : argent, information | arête |
 | **Levier** | Là où vous pouvez agir, et jusqu'à quand | arête depuis « Vous » |
 | **Source** | Une page de référence — Wikipédia, Légifrance, open data | lien sortant |
+| **Sigle** | Un acronyme et son développé | `<abbr>` au survol, partout |
 
 **« Levier » est l'entité distinctive du projet.** Aucune source institutionnelle
 ne la modélise : elles décrivent la procédure du point de vue de
@@ -67,6 +68,12 @@ l'intégration continue :
 4. Tout délai porte sa nature : `maximum_legal`, `indicatif` ou `observe`.
 5. Aucun résumé ne dépasse une phrase.
 6. Aucun nom de personne physique dans la famille « influence ».
+7. **Tout sigle employé a son entrée au glossaire.** Toute suite d'au moins deux
+   majuscules apparaissant dans un texte visible doit être définie, sinon le
+   build échoue. L'administration française parle par sigles ; un sigle non
+   expliqué est une porte fermée pour exactement le lecteur à qui le site
+   s'adresse. La règle se renforce d'elle-même à mesure que le réseau grossit —
+   elle a attrapé DGFiP dès sa mise en place.
 7. Un nœud dépassant sa date de revérification déclenche un avertissement, et
    fait échouer le contrôle hebdomadaire de fraîcheur.
 

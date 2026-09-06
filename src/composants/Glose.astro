@@ -1,0 +1,28 @@
+---
+/**
+ * Rend un texte en explicitant ses sigles.
+ *
+ * `<abbr title>` plutôt qu'une infobulle maison : c'est la balise que les
+ * lecteurs d'écran annoncent, elle marche sans JavaScript, et le navigateur
+ * l'affiche déjà au survol. Une infobulle dessinée à la main coûterait du code
+ * pour faire moins bien.
+ */
+import { chargerGraphe } from '../modele/graphe.ts';
+import { construireGlossaire } from '../modele/glossaire.ts';
+
+interface Props {
+  texte: string;
+}
+const { texte } = Astro.props;
+const glossaire = construireGlossaire([...chargerGraphe().sigles.values()]);
+const segments = glossaire.decouper(texte);
+---
+{segments.map((s) =>
+  s.sigle ? (
+    <abbr title={s.sigle.definition ? `${s.sigle.developpe} — ${s.sigle.definition}` : s.sigle.developpe}>
+      {s.texte}
+    </abbr>
+  ) : (
+    s.texte
+  ),
+)}

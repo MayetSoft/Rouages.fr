@@ -30,6 +30,7 @@ import {
   type Famille,
 } from '../modele/relations.ts';
 import { decalageTexte, formeNoeud, largeurPastille } from '../vues/formes.ts';
+import { construireGlossaire, expansions } from '../modele/glossaire.ts';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -66,6 +67,7 @@ function demarrer(reseau: Reseau) {
   const panneau = panneauEventuel;
 
   const index = new Map(reseau.noeuds.map((n) => [n.id, n]));
+  const glossaire = construireGlossaire(reseau.sigles ?? []);
   const etat: Etat = {
     mode: 'carte',
     focus: null,
@@ -109,7 +111,8 @@ function demarrer(reseau: Reseau) {
     g.append(t);
 
     const titre = el('title');
-    titre.textContent = `${b.noeud.nom} — ${b.noeud.resume}`;
+    const dev = expansions(glossaire, b.noeud.nom, b.noeud.court, b.noeud.resume);
+    titre.textContent = [`${b.noeud.nom} — ${b.noeud.resume}`, dev].filter(Boolean).join(' ');
     g.append(titre);
 
     g.addEventListener('click', () => ouvrir(b.noeud.id));
@@ -435,6 +438,33 @@ function demarrer(reseau: Reseau) {
     return e;
   }
 
+  /**
+   * Comme `ligne`, mais les sigles y deviennent des <abbr> explicités au survol.
+   * Construit nœud par nœud, jamais par concaténation de HTML : le contenu est
+   * de la donnée, il ne doit pas pouvoir devenir du balisage.
+   */
+  function glose(balise: string, classe: string, contenu: string): HTMLElement {
+    const e = document.createElement(balise);
+    e.className = classe;
+    e.append(fragmentGlose(contenu));
+    return e;
+  }
+
+  function fragmentGlose(contenu: string): DocumentFragment {
+    const frag = document.createDocumentFragment();
+    for (const s of glossaire.decouper(contenu)) {
+      if (!s.sigle) {
+        frag.append(document.createTextNode(s.texte));
+        continue;
+      }
+      const abbr = document.createElement('abbr');
+      abbr.title = s.sigle.definition ? `${s.sigle.developpe} — ${s.sigle.definition}` : s.sigle.developpe;
+      abbr.textContent = s.texte;
+      frag.append(abbr);
+    }
+    return frag;
+  }
+
   function ecrirePanneauAccueil() {
     vider(panneau);
     panneau.append(
@@ -473,10 +503,10 @@ function demarrer(reseau: Reseau) {
       for (const n of procedures) {
         const b = document.createElement('button');
         b.type = 'button';
-        b.textContent = n.nom;
+        b.append(fragmentGlose(n.nom));
         b.addEventListener('click', () => ouvrir(n.id));
         const li = document.createElement('li');
-        li.append(b, ligne('span', 'v-nature', n.resume));
+        li.append(b, glose('span', 'v-nature', n.resume));
         ul.append(li);
       }
       panneau.append(ul);
@@ -519,8 +549,8 @@ function demarrer(reseau: Reseau) {
         ),
       );
     }
-    panneau.append(type, ligne('h2', 'p-nom', n.nom));
-    if (n.resume) panneau.append(ligne('p', 'p-resume', n.resume));
+    panneau.append(type, glose('h2', 'p-nom', n.nom));
+    if (n.resume) panneau.append(glose('p', 'p-resume', n.resume));
 
     panneau.append(ligne('h3', 'p-titre-section', 'Pour en savoir plus'));
     const parType = new Map<string, typeof n.liens>();
@@ -557,7 +587,7 @@ function demarrer(reseau: Reseau) {
       const bloc = document.createElement('span');
       const b = document.createElement('button');
       b.type = 'button';
-      b.textContent = v.noeud.nom;
+      b.append(fragmentGlose(v.noeud.nom));
       b.addEventListener('click', () => ouvrir(v.noeud.id));
       bloc.append(ligne('span', 'p-relation', v.label), b);
       li.append(bloc);

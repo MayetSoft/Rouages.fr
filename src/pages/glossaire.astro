@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { chargerGraphe } from '../modele/graphe.ts';
+import { construireGlossaire } from '../modele/glossaire.ts';
+
+const g = chargerGraphe();
+const glossaire = construireGlossaire([...g.sigles.values()]);
+---
+
+<Base
+  titre="Glossaire"
+  description="Les sigles employés sur Rouages, développés et expliqués en une phrase."
+>
+  <div class="page">
+    <h1>Glossaire</h1>
+    <p class="resume">
+      L’administration française parle par sigles. Ils sont expliqués au survol
+      partout sur le site&nbsp;; les voici tous, et rien n’est publié sans que
+      son sigle figure ici — la validation le refuse.
+    </p>
+
+    <dl class="glossaire">
+      {glossaire.entrees.map((s) => (
+        <div id={s.sigle.toLowerCase()}>
+          <dt>{s.sigle}</dt>
+          <dd>
+            <strong>{s.developpe}</strong>
+            {s.confiance !== 'etabli' && <span class="badge--alerte"> · à confirmer</span>}
+            {s.definition && <><br />{s.definition}</>}
+            <p class="glossaire-liens">
+              {s.noeud && <a href={`/n/${s.noeud}`}>Sa fiche</a>}
+              {/* Le nom de la source plutôt que sa nature : deux liens « données
+                  ouvertes » côte à côte ne disent pas lequel mène où. */}
+              {s.liens.map((id) => {
+                const l = g.sources.get(id);
+                return l ? (
+                  <a href={l.url} rel="noopener nofollow" target="_blank" title={l.titre}>
+                    {l.titre.split(' — ')[0]}
+                  </a>
+                ) : null;
+              })}
+            </p>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</Base>

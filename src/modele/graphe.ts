@@ -16,6 +16,7 @@ import {
   type Document,
   type Flux,
   type Processus,
+  type Sigle,
   type Source,
 } from './schemas.ts';
 
@@ -36,6 +37,7 @@ export interface Graphe {
   processus: Map<string, Processus>;
   flux: Map<string, Flux>;
   sources: Map<string, Source>;
+  sigles: Map<string, Sigle>;
   anomalies: Anomalie[];
 }
 
@@ -63,6 +65,7 @@ export function chargerGraphe(): Graphe {
     processus: new Map(),
     flux: new Map(),
     sources: new Map(),
+    sigles: new Map(),
     anomalies: [],
   };
 
@@ -116,6 +119,7 @@ export function chargerGraphe(): Graphe {
     ranger(contenu.documents, g.documents, 'documents');
     ranger(contenu.processus, g.processus, 'processus');
     ranger(contenu.flux, g.flux, 'flux');
+    ranger(contenu.sigles, g.sigles, 'sigles');
   }
 
   verifierReferences(g);
@@ -162,6 +166,22 @@ function verifierReferences(g: Graphe): void {
     exigeLiens(f.liens, `flux ${f.id}`);
     exige(f.de, g.acteurs, 'acteur', `flux ${f.id}.de`);
     for (const v of f.vers) exige(v, g.acteurs, 'acteur', `flux ${f.id}.vers`);
+  }
+
+  for (const s of g.sigles.values()) {
+    exigeLiens(s.liens, `sigle ${s.sigle}`);
+    if (s.noeud) {
+      const existe =
+        g.acteurs.has(s.noeud) || g.competences.has(s.noeud) || g.processus.has(s.noeud) || g.documents.has(s.noeud);
+      if (!existe) {
+        g.anomalies.push({
+          fichier: 'contenu',
+          chemin: `sigle ${s.sigle}.noeud`,
+          message: `renvoie vers un nœud inconnu « ${s.noeud} »`,
+          gravite: 'erreur',
+        });
+      }
+    }
   }
 
   for (const p of g.processus.values()) {

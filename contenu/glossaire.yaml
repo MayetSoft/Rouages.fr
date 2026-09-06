@@ -1,0 +1,140 @@
+# Le glossaire.
+#
+# Un sigle non expliqué est une porte fermée : le lecteur qui ne le connaît pas
+# décroche, et c'est précisément celui pour qui le site est fait. Toute suite de
+# majuscules apparaissant dans le contenu doit donc figurer ici, sans quoi la
+# validation échoue — la règle s'impose d'elle-même à mesure que le réseau
+# grossit.
+#
+# `noeud` relie le sigle à sa fiche quand elle existe.
+sigles:
+  - id: sigle-cada
+    sigle: CADA
+    developpe: "Commission d'accès aux documents administratifs"
+    definition: "On la saisit gratuitement quand une administration refuse de communiquer un document."
+    noeud: cada
+    liens: [cada, wp-cada]
+
+  - id: sigle-plu
+    sigle: PLU
+    developpe: "Plan local d'urbanisme"
+    definition: "Le règlement qui dit ce qui est constructible sur une parcelle, et comment."
+    noeud: redaction-plu
+    liens: [wp-plu, od-gpu]
+
+  - id: sigle-plui
+    sigle: PLUi
+    developpe: "Plan local d'urbanisme intercommunal"
+    definition: "Le même document, écrit à l'échelle de l'intercommunalité plutôt que de la commune."
+    liens: [wp-plu, od-banatic]
+
+  - id: sigle-scot
+    sigle: SCoT
+    developpe: "Schéma de cohérence territoriale"
+    definition: "Le cadre de planification d'un bassin de vie, auquel les PLU doivent se conformer."
+    noeud: planification-scot
+    liens: [wp-scot, code-urbanisme]
+
+  - id: sigle-ofgl
+    sigle: OFGL
+    developpe: "Observatoire des finances et de la gestion publique locales"
+    definition: "Publie les recettes et les dépenses de chaque collectivité, comparables entre elles."
+    liens: [od-ofgl, od-ofgl-flux]
+
+  - id: sigle-rsa
+    sigle: RSA
+    developpe: "Revenu de solidarité active"
+    definition: "Financé par le département, versé par la CAF."
+    noeud: action-sociale
+    liens: [code-action-sociale, caf-fr]
+
+  - id: sigle-caf
+    sigle: CAF
+    developpe: "Caisse d'allocations familiales"
+    definition: "Verse les prestations familiales et sociales, dont le RSA."
+    noeud: caf
+    liens: [wp-caf, caf-fr]
+
+  - id: sigle-ccas
+    sigle: CCAS
+    developpe: "Centre communal d'action sociale"
+    definition: "L'aide sociale de proximité, distincte de celle du département."
+    noeud: ccas
+    liens: [wp-ccas, unccas]
+
+  - id: sigle-sdis
+    sigle: SDIS
+    developpe: "Service départemental d'incendie et de secours"
+    definition: "Les pompiers : financés par le département et les communes, dirigés en opération par le préfet."
+    noeud: sdis
+    liens: [wp-sdis]
+
+  - id: sigle-ars
+    sigle: ARS
+    developpe: "Agence régionale de santé"
+    definition: "Pilote l'offre de soins d'une région : autorisations, hôpitaux, prévention."
+    noeud: ars
+    liens: [wp-ars, ars-gouv]
+
+  - id: sigle-pmi
+    sigle: PMI
+    developpe: "Protection maternelle et infantile"
+    definition: "Service départemental de suivi des jeunes enfants et des femmes enceintes."
+    noeud: protection-enfance
+    liens: [code-action-sociale]
+
+  - id: sigle-dsden
+    sigle: DSDEN
+    developpe: "Direction des services départementaux de l'Éducation nationale"
+    definition: "L'échelon départemental de l'Éducation nationale, qui décide des ouvertures et fermetures de classes."
+    noeud: rectorat
+    liens: [wp-rectorat, education-gouv]
+
+  - id: sigle-banatic
+    sigle: BANATIC
+    developpe: "Base nationale sur l'intercommunalité"
+    definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
+    liens: [od-banatic]
+
+  - id: sigle-sispea
+    sigle: SISPEA
+    developpe: "Système d'information sur les services publics d'eau et d'assainissement"
+    definition: "Le prix de l'eau et la performance du service, commune par commune."
+    liens: [od-sispea]
+
+  - id: sigle-ademe
+    sigle: ADEME
+    developpe: "Agence de la transition écologique"
+    definition: "Anciennement Agence de l'environnement et de la maîtrise de l'énergie ; l'acronyme est resté."
+    liens: [od-sinoe]
+
+  - id: sigle-sinoe
+    sigle: SINOE
+    developpe: "Système d'information et d'observation de l'environnement"
+    definition: "La base de l'ADEME sur les déchets ménagers, territoire par territoire."
+    liens: [od-sinoe]
+    confiance: a_confirmer
+
+  - id: sigle-dvf
+    sigle: DVF
+    developpe: "Demandes de valeurs foncières"
+    definition: "Le prix des ventes immobilières réellement conclues, parcelle par parcelle."
+    liens: [od-dvf]
+
+  - id: sigle-fnccr
+    sigle: FNCCR
+    developpe: "Fédération nationale des collectivités concédantes et régies"
+    definition: "Regroupe les collectivités qui possèdent les réseaux d'énergie, d'eau et de télécommunications."
+    liens: [fnccr]
+
+  - id: sigle-notre
+    sigle: NOTRe
+    developpe: "Nouvelle organisation territoriale de la République"
+    definition: "La loi de 2015 qui a redistribué une large part des compétences entre les échelons."
+    liens: [wp-loi-notre]
+
+  - id: sigle-dgfip
+    sigle: DGFiP
+    developpe: "Direction générale des Finances publiques"
+    definition: "Tient les comptes des collectivités et recouvre l'impôt local."
+    liens: [od-actes-budgetaires, od-ofgl]

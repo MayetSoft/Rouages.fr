@@ -193,6 +193,25 @@ export const Flux = z.object({
   ...tracable,
 });
 
+/**
+ * Un sigle et son développé.
+ *
+ * Un sigle non expliqué est une porte fermée pour exactement le lecteur à qui
+ * le site s'adresse. La validation refuse donc toute suite de majuscules qui
+ * n'a pas son entrée ici.
+ */
+export const Sigle = z.object({
+  id: Id,
+  /** Tel qu'il s'écrit dans le texte, casse comprise : SCoT, PLUi, NOTRe. */
+  sigle: z.string().min(2).max(12),
+  developpe: z.string().min(4).max(120),
+  definition: z.string().max(200).optional(),
+  /** La fiche correspondante, quand il y en a une. */
+  noeud: Id.optional(),
+  liens: z.array(Id).default([]),
+  confiance: Confiance,
+});
+
 /** Un fichier de contenu : toutes les entités d'un même rouage. */
 export const FichierContenu = z.object({
   acteurs: z.array(Acteur).default([]),
@@ -201,8 +220,10 @@ export const FichierContenu = z.object({
   processus: z.array(Processus).default([]),
   flux: z.array(Flux).default([]),
   sources: z.array(Source).default([]),
+  sigles: z.array(Sigle).default([]),
 });
 
+export type Sigle = z.infer<typeof Sigle>;
 export type Source = z.infer<typeof Source>;
 export type Acteur = z.infer<typeof Acteur>;
 export type Competence = z.infer<typeof Competence>;
