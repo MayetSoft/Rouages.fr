@@ -21,6 +21,8 @@ jobs:
       - run: npm ci
       - name: Structure, références et règles éditoriales
         run: npm run valider
+      - name: Classement de la recherche de communes
+        run: npm run verifier-recherche
       - name: Types
         run: npm run verifier-types
       - name: Build

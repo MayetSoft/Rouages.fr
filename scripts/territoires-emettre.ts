@@ -25,6 +25,11 @@ interface Groupement {
   membres: Set<string>;
 }
 
+interface DepartementEtalab {
+  code: string;
+  nom: string;
+}
+
 interface CommuneEtalab {
   code: string;
   nom: string;
@@ -53,12 +58,16 @@ export function emettre(o: {
   // Le découpage administratif vient d'un paquet npm plutôt que d'une API :
   // le registre est autrement plus fiable qu'un service web, et la version est
   // épinglée dans package.json — donc reproductible.
-  const chemin = createRequire(import.meta.url).resolve(
-    '@etalab/decoupage-administratif/data/communes.json',
-  );
-  const communes = (JSON.parse(readFileSync(chemin, 'utf8')) as CommuneEtalab[]).filter(
+  const lire = <T,>(f: string): T =>
+    JSON.parse(
+      readFileSync(createRequire(import.meta.url).resolve(`@etalab/decoupage-administratif/data/${f}`), 'utf8'),
+    ) as T;
+  const communes = lire<CommuneEtalab[]>('communes.json').filter(
     (c) => c.type === 'commune-actuelle' && c.siren && c.departement,
   );
+  // Le nom du département, pas son numéro : « Sarthe » se reconnaît, « 72 » non.
+  // Plus d'une commune sur dix porte un nom qu'une autre porte aussi.
+  const nomsDep = new Map(lire<DepartementEtalab[]>('departements.json').map((d) => [d.code, d.nom]));
   dire(`${GRIS}${communes.length.toLocaleString('fr-FR')} communes au découpage Etalab.${RAZ}`);
 
   // Qui est membre de quoi. Un membre peut être une commune ou un autre
@@ -90,8 +99,22 @@ export function emettre(o: {
     sirens.filter((s) => (groupements.get(s)?.codes.size ?? 0) > 0);
 
   // --- index de recherche ------------------------------------------------
-  const index = communes.map((c) => [c.code, c.nom, c.codesPostaux?.[0] ?? '', c.departement!]);
-  ecrireJson(join(sortie, 'index.json'), { maj: dateExport, c: index });
+  // La population accompagne chaque entrée : entre deux homonymes, la taille
+  // départage bien plus sûrement qu'un code postal que personne ne retient.
+  // Tous les codes postaux, pas seulement le premier : une commune un peu
+  // étendue en a plusieurs, et l'habitant ne connaît que le sien.
+  const index = communes.map((c) => [
+    c.code,
+    c.nom,
+    (c.codesPostaux ?? []).join(' '),
+    c.departement!,
+    c.population ?? 0,
+  ]);
+  ecrireJson(join(sortie, 'index.json'), {
+    maj: dateExport,
+    deps: Object.fromEntries(nomsDep),
+    c: index,
+  });
 
   // --- un fichier par département ---------------------------------------
   mkdirSync(join(sortie, 'dep'), { recursive: true });

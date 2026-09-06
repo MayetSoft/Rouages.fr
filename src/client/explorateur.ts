@@ -36,6 +36,7 @@ import {
   memorisee,
   memoriser,
   resoudre,
+  trouverParCode,
   type CommuneBreve,
   type Territoire,
 } from './territoire.ts';
@@ -790,7 +791,7 @@ function demarrer(reseau: Reseau) {
         return;
       }
       memoriser(c);
-      if (etiquetteCommune) etiquetteCommune.textContent = `${c.nom} (${c.dep})`;
+      if (etiquetteCommune) etiquetteCommune.textContent = `${c.nom} · ${c.depNom ?? c.dep}`;
       oublier?.removeAttribute('hidden');
       const u = new URL(location.href);
       u.searchParams.set('commune', c.code);
@@ -819,7 +820,20 @@ function demarrer(reseau: Reseau) {
       for (const c of trouves) {
         const b = document.createElement('button');
         b.type = 'button';
-        b.append(document.createTextNode(c.nom), ligne('span', '', `${c.cp} · ${c.dep}`));
+        const gauche = document.createElement('span');
+        gauche.className = 'commune-nom';
+        gauche.append(
+          document.createTextNode(c.nom),
+          ligne('span', 'commune-dep', `${c.depNom} · ${c.cp}`),
+        );
+        b.append(
+          gauche,
+          ligne(
+            'span',
+            'commune-pop',
+            `${c.population.toLocaleString('fr-FR')} hab.`,
+          ),
+        );
         b.addEventListener('click', () => void choisirCommune(c));
         const li = document.createElement('li');
         li.append(b);
@@ -944,12 +958,14 @@ function demarrer(reseau: Reseau) {
 
   // La commune vient de l'URL — une adresse partagée doit montrer le même
   // territoire — sinon du choix précédent, qu'on ne redemande pas à chaque fois.
+  // Toujours par code INSEE : un nom peut désigner plusieurs communes, un code
+  // non. Le choix mémorisé est réhydraté depuis l'index, pour qu'un
+  // enregistrement d'une version antérieure retrouve son département.
   const retenue = memorisee();
-  if (communeDemandee) {
-    void chercherCommune(communeDemandee, 1).then((r) => {
-      if (r[0]?.code === communeDemandee) void choisirCommune(r[0]);
+  const codeVoulu = communeDemandee ?? retenue?.code ?? null;
+  if (codeVoulu) {
+    void trouverParCode(codeVoulu).then((c) => {
+      if (c) void choisirCommune(c);
     });
-  } else if (retenue) {
-    void choisirCommune(retenue);
   }
 }

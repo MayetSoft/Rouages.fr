@@ -6,12 +6,13 @@
   "description": "Rouages.fr — la carte des acteurs publics, de leurs compétences et de ce qui circule entre eux.",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run valider && astro build",
+    "build": "npm run valider && npm run verifier-recherche && astro build",
     "preview": "astro preview",
     "valider": "tsx scripts/valider.ts",
     "fraicheur": "tsx scripts/valider.ts --fraicheur",
     "verifier-types": "astro check",
-    "territoires": "tsx scripts/ingerer-territoires.ts"
+    "territoires": "tsx scripts/ingerer-territoires.ts",
+    "verifier-recherche": "tsx scripts/verifier-recherche.ts"
   },
   "dependencies": {
     "astro": "^5.14.1",

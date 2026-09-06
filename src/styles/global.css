@@ -153,7 +153,10 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
   border-radius: 6px; cursor: pointer;
 }
 #resultats-commune button:hover, #resultats-commune button:focus-visible { background: var(--fond-doux); }
-#resultats-commune span { color: var(--encre-douce); font-size: .78rem; white-space: nowrap; }
+#resultats-commune button { align-items: baseline; }
+.commune-nom { display: grid; gap: .05rem; }
+.commune-dep { display: block; color: var(--encre-douce); font-size: .76rem; }
+.commune-pop { color: var(--encre-tres-douce); font-size: .74rem; white-space: nowrap; }
 .lien-plat {
   background: none; border: 0; padding: .4rem 0 0; font: inherit; font-size: .8rem;
   color: var(--encre-douce); text-decoration: underline; text-underline-offset: 2px; cursor: pointer;

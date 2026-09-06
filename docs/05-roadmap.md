@@ -83,6 +83,16 @@ est le pire défaut possible pour ce site. La couverture est donc mesurée par
 département et comparée à la moyenne nationale, et le site distingue trois
 états : transférée, communale, non renseignée.
 
+**Choisir sa commune est la première marche, et elle est piégeuse.** 1 481 noms
+de communes sont portés par plusieurs communes, soit 3 769 communes — plus d'une
+sur dix. « Mayet » n'est pas « Le Mayet-de-Montagne ». La recherche classe donc
+la correspondance exacte avant le préfixe, développe les abréviations — 3 885
+communes commencent par Saint, personne ne l'écrit en entier — fait passer le
+code postal devant le code INSEE, qui occupe le même espace de valeurs, et
+affiche le département en toutes lettres avec la population pour départager.
+`npm run verifier-recherche` fixe ces cas sur l'index réel : une régression de
+tri est invisible à l'œil et proposerait la mauvaise commune.
+
 Reste : brancher les chiffres (prix de l'eau via SISPEA, finances via l'OFGL)
 sur les mêmes structures.
 

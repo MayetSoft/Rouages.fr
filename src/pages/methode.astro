@@ -62,6 +62,17 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       transférée presque nulle part, n’est pas résolue ici.
     </p>
 
+    <h2 class="badge">Trouver sa commune</h2>
+    <p class="mesure">
+      Plus d’une commune sur dix porte un nom qu’une autre porte aussi —
+      1 481 noms pour 3 769 communes. La recherche affiche donc le département
+      en toutes lettres et la population, place la correspondance exacte avant
+      le préfixe, comprend «&nbsp;St&nbsp;» pour «&nbsp;Saint&nbsp;», et traite
+      cinq chiffres comme un code postal plutôt que comme un code
+      <abbr title="Institut national de la statistique et des études économiques">INSEE</abbr>,
+      qui occupe pourtant le même espace de valeurs.
+    </p>
+
     <h2 class="badge">Ce que le site ne fait pas</h2>
     <ul>
       <li>Répondre à une situation personnelle. Il indique l’interlocuteur.</li>
