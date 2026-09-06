@@ -57,10 +57,23 @@ export interface Repere {
   valeur: number | null;
   /** Médiane des communes de la même strate de population. */
   mediane: number | null;
+  /**
+   * La valeur de chaque exercice, du plus ancien au plus récent. Un chiffre
+   * isolé ne se discute pas ; une série dit ce qui a changé.
+   */
+  serie: (number | null)[];
+  /**
+   * Variation entre le premier et le dernier exercice renseignés, en pour
+   * cent. `null` quand la série est trop lacunaire pour conclure — ou quand
+   * elle part de zéro, où le pourcentage n'aurait pas de sens.
+   */
+  evolution: number | null;
 }
 
 export interface Finances {
   annee: number;
+  /** Les exercices de la série, du plus ancien au plus récent. */
+  annees: number[];
   /** Le libellé de la strate à laquelle la commune est comparée. */
   strate: string;
   /**
@@ -156,6 +169,8 @@ function formesDe(c: CommuneBreve): { nom: string; nu: string } {
 }
 interface MetaFinances {
   annee: number;
+  /** Les exercices de la série, du plus ancien au plus récent. */
+  annees?: number[];
   reperes: { id: string; nom: string; explication: string; flux?: string }[];
   strates: string[];
   medianes: (number | null)[][];
@@ -177,7 +192,10 @@ let meta: {
   maj: string;
 } | null = null;
 const departements = new Map<string, unknown>();
-const financesDep = new Map<string, { annee: number; c: Record<string, (number | null)[]> } | null>();
+const financesDep = new Map<
+  string,
+  { annee: number; annees: number[]; h: Record<string, (number | null)[][]> } | null
+>();
 const eauDep = new Map<
   string,
   { annee: number; c: Record<string, [number | null, string, string, string]> } | null
@@ -314,7 +332,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     // arrivent ensemble, plutôt que l'un après l'autre.
     const [structure, argent, eau, servs] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
-      json<{ annee: number; c: Record<string, (number | null)[]> }>(
+      json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
       ).catch(() => null),
       json<{ annee: number; c: Record<string, [number | null, string, string, string]> }>(
@@ -442,21 +460,46 @@ function assemblerFinances(commune: CommuneBreve, population: number): Finances 
   const m = meta?.finances;
   const dep = financesDep.get(commune.dep);
   if (!m || !dep) return null;
-  const valeurs = dep.c[commune.code];
-  if (!valeurs) return null;
+  const series = dep.h[commune.code];
+  if (!series) return null;
   const strate = BORNES.findIndex((b) => population < b);
   const particulier = m.statutParticulier?.[commune.code];
+  const annees = dep.annees ?? m.annees ?? [dep.annee];
   return {
     annee: dep.annee,
+    annees,
     strate: m.strates[strate] ?? '',
     statutParticulier: particulier,
-    reperes: m.reperes.map((r, i) => ({
-      ...r,
-      valeur: valeurs[i] ?? null,
-      // Pas de médiane quand la comparaison n'a pas de sens.
-      mediane: particulier ? null : (m.medianes[strate]?.[i] ?? null),
-    })),
+    reperes: m.reperes.map((r, i) => {
+      const serie = series[i] ?? [];
+      return {
+        ...r,
+        // Le dernier exercice est la dernière valeur de la série.
+        valeur: serie.length > 0 ? (serie[serie.length - 1] ?? null) : null,
+        // Pas de médiane quand la comparaison n'a pas de sens.
+        mediane: particulier ? null : (m.medianes[strate]?.[i] ?? null),
+        serie,
+        evolution: variation(serie),
+      };
+    }),
   };
+}
+
+/**
+ * L'écart entre le premier et le dernier exercice renseignés.
+ *
+ * On refuse de conclure sur moins de trois points : deux valeurs isolées à huit
+ * ans d'écart peuvent tenir à un investissement exceptionnel plutôt qu'à une
+ * tendance. Et une série qui part de zéro n'a pas de pourcentage — « +∞ % » ne
+ * veut rien dire.
+ */
+export function variation(serie: (number | null)[]): number | null {
+  const points = serie.filter((v): v is number => v !== null);
+  if (points.length < 3) return null;
+  const debut = points[0];
+  const fin = points[points.length - 1];
+  if (debut === 0) return null;
+  return Math.round(((fin - debut) / Math.abs(debut)) * 100);
 }
 
 /* --- mémoire du choix : on ne redemande pas sa commune à chaque visite --- */

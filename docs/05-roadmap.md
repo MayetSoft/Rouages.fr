@@ -172,6 +172,20 @@ en open data national, seuls les 98 états-majors départementaux le sont. On
 nomme le SDIS compétent et on dit qu'on ne situe pas la caserne — plutôt que
 d'inventer une proximité. Voir `06-stack-technique.md`.
 
+### Ce qui a changé ✔ (et ce qui ne se tracera pas)
+
+Les six repères financiers sont désormais suivis sur huit exercices, 2018-2025,
+avec une courbe et la variation depuis le début de la série. Un chiffre isolé
+ne se discute pas ; « +57 % depuis 2018 » appelle une question, et le site
+nomme déjà celui à qui la poser.
+
+Le traçage des **décisions** — pourquoi une classe ferme, pourquoi des lits
+disparaissent — ne se fera pas : ni les subventions de l'État aux communes, ni
+les effectifs par école année après année, ni a fortiori le motif d'une
+décision, n'existent en open data national exploitable. Le détail des
+vérifications est dans `06-stack-technique.md`. Mieux vaut le dire que le
+simuler.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

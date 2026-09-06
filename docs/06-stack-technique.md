@@ -273,3 +273,51 @@ c'est n'en montrer aucune. Au-delà d'une poignée, la liste se replie derrière
 son décompte — un `details` natif, qui marche sans script et que les lecteurs
 d'écran annoncent déjà. Les urgences, elles, remontent toujours en tête de leur
 famille : c'est l'établissement qu'on cherche quand on cherche vite.
+
+## Ce qui a changé : les comptes sur huit exercices
+
+Un chiffre isolé ne se discute pas. « 308 € de dotation par habitant » n'appelle
+aucune question ; « +57 % depuis 2018 » en appelle une, et c'est de là que part
+toute conversation avec un élu.
+
+Chaque repère financier est donc collecté sur toute la profondeur que publie
+l'OFGL — 2018 à 2025, huit exercices complets — et restitué en courbe minuscule
+sous le montant, avec la variation entre le premier et le dernier exercice
+renseignés. Un seul export par repère, tous exercices confondus : huit requêtes
+séparées ramèneraient les mêmes lignes en huit fois plus d'allers-retours.
+`annee_join` est un champ **texte** à l'OFGL, et une comparaison numérique y
+renvoie une erreur 400 — les exercices voulus sont donc énumérés.
+
+Trois précautions, qui sont la même que partout ailleurs sur ce site : ne pas
+conclure plus que la donnée ne permet.
+
+- **Moins de trois points, pas de pourcentage.** Deux valeurs isolées à huit ans
+  d'écart peuvent tenir à un investissement exceptionnel plutôt qu'à une
+  tendance.
+- **Une série qui part de zéro n'a pas de variation.** « +∞ % » ne veut rien
+  dire.
+- **Aucune couleur selon le sens.** Une dette qui baisse et un investissement
+  qui baisse ne se lisent pas de la même façon, et ce n'est pas au site d'en
+  juger. La courbe montre, elle ne commente pas.
+
+L'échelle de chaque courbe part de zéro plutôt que de cadrer sur les extrêmes :
+une dotation qui passe de 300 à 280 € doit se voir comme une inflexion, pas
+comme un effondrement.
+
+### Ce qu'on ne peut pas tracer, et pourquoi
+
+La demande initiale était un outil de traçage des **décisions** — pourquoi une
+classe ferme, pourquoi des lits d'hôpital disparaissent. Cette partie-là ne se
+fera pas, et il vaut mieux le dire que de la simuler.
+
+| Ce qu'on voulait | Ce qui existe en open data national |
+|---|---|
+| Subventions de l'État aux communes (DETR, DSIL) | rien — un jeu « équipements sportifs » de 2015, et le contrat d'une agglomération |
+| Subventions aux associations | rien de national : chaque commune publie les siennes, ou non |
+| Effectifs par école, année par année | le jeu national est marqué obsolète depuis 2016 ; seule Nantes publie les siens |
+| Le motif d'une décision | nulle part, par construction : il n'est consigné dans aucun registre ouvert |
+
+Ce que le site peut faire, et fait : montrer **ce qui a changé** dans les
+comptes, et nommer **qui décide** — c'est déjà de quoi savoir à qui poser la
+question. Le reste relèverait des délibérations, qui ne sont pas en données
+ouvertes exploitables : c'est la phase 4, et c'est un autre projet.

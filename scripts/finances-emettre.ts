@@ -8,6 +8,11 @@
  * les écarts ne veulent rien dire.
  *
  * Les comptes viennent de l'OFGL, qui les publie sous licence ouverte.
+ *
+ * Chaque repère est collecté sur toute la profondeur disponible, pas seulement
+ * sur le dernier exercice. Un chiffre isolé ne se discute pas ; une série dit
+ * ce qui a changé — et c'est de là que part toute question à un élu. L'OFGL
+ * couvre 2018 à 2025, huit exercices complets.
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -34,8 +39,16 @@ export function strateDe(population: number): number {
 interface LigneOfgl {
   com_code: string;
   categ: string;
+  annee_join: number | string;
   euros_par_habitant: number | null;
 }
+
+/**
+ * La série ne remonte pas plus loin que l'OFGL ne publie, et huit points
+ * suffisent largement à voir une tendance. Au-delà, on alourdirait chaque
+ * fichier départemental pour une précision que personne ne lit.
+ */
+export const PROFONDEUR = 8;
 
 export async function collecterFinances(
   reperes: Repere[],
@@ -43,6 +56,11 @@ export async function collecterFinances(
   dire: (m: string) => void,
 ): Promise<{
   annee: number;
+  /** Les exercices retenus, du plus ancien au plus récent. */
+  annees: number[];
+  /** Par commune : pour chaque repère, la valeur de chaque exercice. */
+  series: Map<string, (number | null)[][]>;
+  /** Le dernier exercice seul, pour tout ce qui n'a pas besoin de la série. */
   parCommune: Map<string, (number | null)[]>;
   /** Communes au statut particulier : leurs comptes ne se comparent pas. */
   statutParticulier: Map<string, string>;
@@ -54,13 +72,22 @@ export async function collecterFinances(
     dire("Aucun exercice exploitable à l'OFGL : les repères financiers sont ignorés.");
     return null;
   }
+  const annees: number[] = [];
+  for (let a = annee - PROFONDEUR + 1; a <= annee; a++) annees.push(a);
+  const rang = new Map(annees.map((a, i) => [a, i]));
 
-  const parCommune = new Map<string, (number | null)[]>();
+  const series = new Map<string, (number | null)[][]>();
   const statutParticulier = new Map<string, string>();
   for (const [i, r] of reperes.entries()) {
+    // Un seul export par repère, tous exercices confondus : huit requêtes
+    // séparées ramèneraient les mêmes lignes en huit fois plus d'allers-retours.
     const url =
-      `${OFGL}/exports/json?select=com_code,categ,euros_par_habitant` +
-      `&where=${encodeURIComponent(`annee_join=${annee} and agregat="${r.agregat}"`)}`;
+      `${OFGL}/exports/json?select=com_code,categ,annee_join,euros_par_habitant` +
+      // `annee_join` est un champ texte à l'OFGL : une comparaison numérique y
+      // renvoie une erreur 400. On énumère donc les exercices voulus.
+      `&where=${encodeURIComponent(
+        `agregat="${r.agregat}" and annee_join in (${annees.map((a) => `"${a}"`).join(',')})`,
+      )}`;
     const lignes = (await (await obstine(url)).json()) as LigneOfgl[];
     if (lignes.length === 0) {
       throw new Error(
@@ -68,28 +95,37 @@ export async function collecterFinances(
       );
     }
     for (const l of lignes) {
+      const j = rang.get(Number(l.annee_join));
+      if (j === undefined) continue;
       // Paris fusionne les fonctions communales et départementales : ses
       // comptes sont hors d'échelle par rapport aux autres communes, et sa
       // dotation communale est quasi nulle par construction. On garde les
       // chiffres, on retire la comparaison.
       if (l.categ && l.categ !== 'Commune') statutParticulier.set(l.com_code, l.categ);
-      let v = parCommune.get(l.com_code);
+      let v = series.get(l.com_code);
       if (!v) {
-        v = new Array(reperes.length).fill(null);
-        parCommune.set(l.com_code, v);
+        v = reperes.map(() => new Array<number | null>(annees.length).fill(null));
+        series.set(l.com_code, v);
       }
       // Arrondir à l'euro près écrirait « 0 € » là où la valeur est faible mais
       // non nulle — la dotation communale de Paris vaut 0,06 € par habitant, et
       // « 0 » se lirait « Paris ne reçoit rien », ce qui est faux.
       const brut = l.euros_par_habitant;
-      v[i] = brut === null ? null : Math.abs(brut) < 10 ? Math.round(brut * 10) / 10 : Math.round(brut);
+      v[i][j] = brut === null ? null : Math.abs(brut) < 10 ? Math.round(brut * 10) / 10 : Math.round(brut);
     }
-    dire(`  ${r.agregat} : ${lignes.length.toLocaleString('fr-FR')} communes`);
+    dire(`  ${r.agregat} : ${lignes.length.toLocaleString('fr-FR')} lignes sur ${annees.length} exercices`);
   }
+
+  // Le dernier exercice, extrait de la série : c'est lui que lisent les
+  // médianes et l'affichage principal.
+  const dernier = annees.length - 1;
+  const parCommune = new Map<string, (number | null)[]>();
+  for (const [code, v] of series) parCommune.set(code, v.map((r) => r[dernier]));
+
   if (statutParticulier.size > 0) {
     dire(`  ${statutParticulier.size} commune(s) au statut particulier, exclue(s) des médianes.`);
   }
-  return { annee, parCommune, statutParticulier };
+  return { annee, annees, series, parCommune, statutParticulier };
 }
 
 /** Le dernier exercice réellement renseigné : le plus récent est souvent partiel. */
@@ -143,18 +179,24 @@ export function ecrireFinances(
   sortie: string,
   dep: string,
   annee: number,
+  annees: number[],
   codes: string[],
-  parCommune: Map<string, (number | null)[]>,
+  series: Map<string, (number | null)[][]>,
 ): number {
-  const c: Record<string, (number | null)[]> = {};
+  // Seule la série est écrite : le dernier exercice en est la dernière colonne,
+  // et le stocker en double coûterait un huitième du fichier pour éviter une
+  // indexation de tableau.
+  const h: Record<string, (number | null)[][]> = {};
   let n = 0;
   for (const code of codes) {
-    const v = parCommune.get(code);
-    if (v) {
-      c[code] = v;
-      n++;
-    }
+    const v = series.get(code);
+    if (!v) continue;
+    h[code] = v;
+    n++;
   }
-  writeFileSync(join(sortie, 'dep', `${dep}-finances.json`), JSON.stringify({ dep, annee, c }));
+  writeFileSync(
+    join(sortie, 'dep', `${dep}-finances.json`),
+    JSON.stringify({ dep, annee, annees, h }),
+  );
   return n;
 }

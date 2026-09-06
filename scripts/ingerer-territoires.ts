@@ -330,11 +330,7 @@ async function ecrire(
   codesSuivis: Map<string, string[]>,
   dateExport: string,
   natures: Map<string, string>,
-  finances: {
-    annee: number;
-    parCommune: Map<string, (number | null)[]>;
-    statutParticulier: Map<string, string>;
-  } | null,
+  finances: Awaited<ReturnType<typeof import('./finances-emettre.ts')['collecterFinances']>>,
   eau: Awaited<ReturnType<typeof import('./eau-emettre.ts')['collecterEau']>>,
   services: Awaited<ReturnType<typeof import('./services-emettre.ts')['collecterServices']>>,
 ) {

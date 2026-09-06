@@ -760,6 +760,30 @@ function demarrer(reseau: Reseau) {
           ),
         );
       }
+      const courbe = tendance(r.serie, f.annees);
+      if (courbe) {
+        // Sur sa propre ligne : la première porte déjà le montant, la réglette
+        // et la médiane, et y ajouter la série la ferait déborder.
+        const rang = document.createElement('span');
+        rang.className = 'p-tendance-ligne';
+        rang.append(courbe);
+        if (r.evolution !== null) {
+          // Le signe compte plus que le chiffre : c'est lui qui fait poser la
+          // question. On ne colore pas pour autant en « bon » ou « mauvais » —
+          // une dette qui baisse et un investissement qui baisse ne se lisent
+          // pas de la même façon, et ce n'est pas au site d'en juger.
+          rang.append(
+            ligne(
+              'span',
+              'p-evolution',
+              // Un vrai signe moins (U+2212), pas le trait d'union du clavier :
+              // il s'aligne sur le plus et sur les chiffres.
+              `${r.evolution >= 0 ? '+' : '\u2212'}${Math.abs(r.evolution)} % depuis ${f.annees[0]}`,
+            ),
+          );
+        }
+        dd.append(rang);
+      }
       d.append(dt, dd);
       dl.append(d);
     }
@@ -784,6 +808,44 @@ function demarrer(reseau: Reseau) {
       el('line', { class: 'reglette-mediane', x1: L / 2, y1: 2, x2: L / 2, y2: H - 2 }),
       el('circle', { class: 'reglette-anneau', cx: x, cy: H / 2, r: 5.5 }),
       el('circle', { class: 'reglette-point', cx: x, cy: H / 2, r: 4 }),
+    );
+    return s;
+  }
+
+  /**
+   * La série d'un repère, en courbe minuscule.
+   *
+   * Un chiffre isolé ne se discute pas ; une série dit ce qui a changé, et
+   * c'est de là que part toute question à un élu. L'échelle est propre à chaque
+   * repère et part de zéro : une dotation qui passe de 300 à 280 € doit se voir
+   * comme une inflexion, pas comme un effondrement — ce qu'un cadrage sur les
+   * seuls extrêmes ferait croire.
+   */
+  function tendance(serie: (number | null)[], annees: number[]): SVGSVGElement | null {
+    const points = serie
+      .map((v, i) => ({ v, i }))
+      .filter((p): p is { v: number; i: number } => p.v !== null);
+    if (points.length < 3) return null;
+    const L = 108;
+    const H = 20;
+    const haut = Math.max(...points.map((p) => p.v), 0);
+    const bas = Math.min(...points.map((p) => p.v), 0);
+    const etendue = haut - bas || 1;
+    const x = (i: number) => 2 + (i / Math.max(1, serie.length - 1)) * (L - 4);
+    const y = (v: number) => H - 3 - ((v - bas) / etendue) * (H - 6);
+    const d = points.map((p, k) => `${k === 0 ? 'M' : 'L'} ${x(p.i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' ');
+
+    const s = el('svg', { class: 'tendance', width: L, height: H, viewBox: `0 0 ${L} ${H}` });
+    const titre = el('title');
+    const premier = points[0];
+    const dernier = points[points.length - 1];
+    titre.textContent =
+      `${annees[premier.i]} : ${premier.v.toLocaleString('fr-FR')} € · ` +
+      `${annees[dernier.i]} : ${dernier.v.toLocaleString('fr-FR')} €`;
+    s.append(
+      titre,
+      el('path', { class: 'tendance-trait', d }),
+      el('circle', { class: 'tendance-fin', cx: x(dernier.i), cy: y(dernier.v), r: 2.6 }),
     );
     return s;
   }

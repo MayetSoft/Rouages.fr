@@ -59,6 +59,8 @@ export function emettre(o: {
   natures: Map<string, string>;
   finances: {
     annee: number;
+    annees: number[];
+    series: Map<string, (number | null)[][]>;
     parCommune: Map<string, (number | null)[]>;
     statutParticulier: Map<string, string>;
   } | null;
@@ -270,8 +272,9 @@ export function emettre(o: {
         sortie,
         dep,
         finances.annee,
+        finances.annees,
         liste.map((c) => c.code),
-        finances.parCommune,
+        finances.series,
       );
     }
 
@@ -330,6 +333,8 @@ export function emettre(o: {
       ? {
           finances: {
             annee: finances.annee,
+            // Les exercices de la série, du plus ancien au plus récent.
+            annees: finances.annees,
             // L'ordre des repères est celui du contenu : les vecteurs de
             // valeurs y font référence par position.
             reperes: reperes.map((r) => ({ id: r.id, nom: r.nom, explication: r.explication, flux: r.flux })),

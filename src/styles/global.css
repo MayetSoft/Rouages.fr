@@ -386,6 +386,17 @@ details.p-service-groupe[open] > summary { margin-bottom: .2rem; }
   border-radius: 999px; padding: 0 .38rem; white-space: nowrap;
 }
 .p-service-note--fort { color: var(--alerte); border-color: var(--alerte); }
+/* La série d'un repère financier : ce qui a changé, en un coup d'œil.
+   Sur sa propre ligne — la première porte déjà le montant, la réglette et la
+   médiane. */
+.p-tendance-ligne { flex: 1 0 100%; display: flex; align-items: center; gap: .5rem; }
+.tendance { flex: 0 0 auto; overflow: visible; }
+.tendance-trait { fill: none; stroke: var(--encre-tres-douce); stroke-width: 1.4; stroke-linejoin: round; }
+.tendance-fin { fill: var(--accent); }
+/* Pas de couleur selon le sens : une dette qui baisse et un investissement qui
+   baisse ne se lisent pas pareil, et ce n'est pas au site d'en juger. */
+.p-evolution { font-size: .72rem; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
+
 .p-service-voisin { font-size: .84rem; margin: .2rem 0 .6rem; color: var(--encre-douce); line-height: 1.45; }
 .p-invite-commune {
   background: var(--accent-doux); border-radius: var(--rayon); padding: .6rem .75rem;
