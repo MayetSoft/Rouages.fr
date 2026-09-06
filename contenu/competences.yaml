@@ -18,6 +18,7 @@ competences:
     acteur: commune
     resume: "La commune possède et entretient les bâtiments et paie les agents ; l'État recrute et paie les enseignants."
     partagee_avec: [rectorat]
+    banatic: ["5010"]
     liens: [code-education, vp-competences]
     verifie_le: 2026-09-05
     confiance: etabli
@@ -47,6 +48,7 @@ competences:
     acteur: commune
     resume: "Rues et chemins communaux. Les routes départementales et nationales relèvent d'autres gestionnaires, même en traversée de bourg."
     partagee_avec: [departement]
+    banatic: ["6040"]
     liens: [cgct, cl-gouv]
     verifie_le: 2026-09-05
     confiance: etabli
@@ -57,8 +59,21 @@ competences:
     acteur: commune
     resume: "Le document qui dit ce qui est constructible. De plus en plus souvent transféré à l'intercommunalité sous forme de PLUi."
     partagee_avec: [epci]
+    banatic: ["5510"]
     liens: [wp-plu, code-urbanisme, od-gpu, od-banatic]
     verifie_le: 2026-09-05
+    confiance: variable_selon_territoire
+
+  - id: instruction-autorisations
+    nom: "Instruire les demandes d'autorisation d'urbanisme"
+    nom_court: "Instruction des permis"
+    acteur: service-instructeur
+    resume: >
+      Le travail technique qui précède la signature. Le plus souvent mutualisé
+      par convention, ce que le registre des compétences ne recense pas.
+    partagee_avec: [commune, epci, etat]
+    liens: [cu-r423-19, od-banatic, sp-permis]
+    verifie_le: 2026-09-06
     confiance: variable_selon_territoire
 
   - id: delivrance-autorisation-urbanisme
@@ -67,6 +82,7 @@ competences:
     acteur: maire
     resume: "Le maire signe, au nom de la commune si elle a un document d'urbanisme, au nom de l'État sinon."
     partagee_avec: [abf, prefet]
+    banatic: ["5530"]
     liens: [cu-l422-1, code-patrimoine, sp-permis]
     verifie_le: 2026-09-05
     confiance: etabli
@@ -78,6 +94,7 @@ competences:
     acteur: epci
     resume: "Compétence intercommunale dans la quasi-totalité des territoires, financée par la taxe ou la redevance d'enlèvement."
     partagee_avec: [commune]
+    banatic: ["2080", "2085"]
     liens: [cgct, od-sinoe, od-banatic]
     verifie_le: 2026-09-05
     confiance: variable_selon_territoire
@@ -87,6 +104,7 @@ competences:
     acteur: epci
     resume: "Captage, traitement, distribution. Exercée en régie ou déléguée à une entreprise ; le prix au mètre cube varie fortement d'un territoire à l'autre."
     partagee_avec: [commune, syndicat-eau, delegataire-eau]
+    banatic: ["1505"]
     liens: [cgct, od-sispea, eaufrance, od-banatic]
     verifie_le: 2026-09-05
     confiance: variable_selon_territoire
@@ -96,6 +114,7 @@ competences:
     acteur: epci
     resume: "Collecte et traitement des eaux usées, facturés sur la facture d'eau."
     partagee_avec: [syndicat-eau, delegataire-eau]
+    banatic: ["1510", "1515"]
     liens: [cgct, od-sispea, code-environnement]
     verifie_le: 2026-09-05
     confiance: variable_selon_territoire
@@ -106,6 +125,7 @@ competences:
     acteur: epci
     resume: "Zones d'activité et immobilier d'entreprise pour l'intercommunalité ; la stratégie et les aides relèvent de la région."
     partagee_avec: [region]
+    banatic: ["4000", "4005"]
     liens: [cgct, vp-competences, wp-loi-notre]
     verifie_le: 2026-09-05
     confiance: a_confirmer
@@ -115,6 +135,7 @@ competences:
     acteur: epci
     resume: "Programmation et attribution partagées entre l'intercommunalité, la commune, l'État et les bailleurs."
     partagee_avec: [commune, etat, bailleur-social]
+    banatic: ["6500", "6505"]
     liens: [wp-hlm, anct-hlm, cgct]
     verifie_le: 2026-09-05
     confiance: a_confirmer
@@ -164,6 +185,7 @@ competences:
     acteur: sdis
     resume: "Financé par le département et les communes, mais placé sous l'autorité opérationnelle du préfet."
     partagee_avec: [departement, commune, prefet]
+    banatic: ["7510"]
     liens: [wp-sdis, code-securite-interieure]
     verifie_le: 2026-09-05
     confiance: a_confirmer
@@ -301,6 +323,7 @@ competences:
     acteur: ccas
     resume: "Secours d'urgence, domiciliation, accompagnement : l'échelon communal de l'action sociale."
     partagee_avec: [commune, departement]
+    banatic: ["3025"]
     liens: [wp-ccas, code-action-sociale, unccas]
     verifie_le: 2026-09-05
     confiance: a_confirmer
@@ -332,6 +355,7 @@ competences:
     acteur: syndicat-energie
     resume: "Le réseau appartient aux collectivités, qui en concèdent l'exploitation. La commune n'est donc pas seule maîtresse de ses poteaux."
     partagee_avec: [enedis, commune, etat]
+    banatic: ["1005"]
     liens: [code-energie, wp-concession-electricite, fnccr, od-reseaux-energies]
     verifie_le: 2026-09-05
     confiance: a_confirmer
@@ -342,6 +366,7 @@ competences:
     acteur: aom
     resume: "Lignes, horaires, tarifs, vélo et transport à la demande sur un ressort donné, la région prenant le relais là où personne ne s'en saisit."
     partagee_avec: [region, epci, commune, operateur-transport]
+    banatic: ["6000"]
     liens: [code-transports, wp-aom, vp-mobilite, od-transport]
     verifie_le: 2026-09-05
     confiance: a_confirmer
@@ -352,6 +377,7 @@ competences:
     acteur: syndicat-scot
     resume: "Le SCoT fixe le cadre auquel les PLU doivent se conformer : la règle communale n'est jamais écrite seule."
     partagee_avec: [epci, commune, region, etat]
+    banatic: ["5500"]
     liens: [wp-scot, code-urbanisme, od-gpu, vp-competences]
     verifie_le: 2026-09-05
     confiance: a_confirmer

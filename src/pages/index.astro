@@ -30,6 +30,20 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
 
     {/* La légende n'est pas décorative : elle commande l'affichage.
         Survoler une clé éteint les autres familles, cliquer la retire. */}
+    {/* « Chez moi » : le site répond « variable selon le territoire » partout ;
+        ici il répond vraiment. L'index n'est chargé qu'à l'ouverture. */}
+    <div class="champ-commune">
+      <button type="button" class="plat" id="ouvrir-commune" aria-expanded="false">
+        <span id="etiquette-commune">Chez moi</span>
+      </button>
+      <div id="choix-commune" hidden>
+        <label for="recherche-commune">Votre commune, ou son code postal</label>
+        <input id="recherche-commune" type="search" placeholder="Mayet, 72360…" autocomplete="off" />
+        <ul id="resultats-commune"></ul>
+        <button type="button" class="lien-plat" id="oublier-commune" hidden>Oublier ma commune</button>
+      </div>
+    </div>
+
     <fieldset class="legende">
       <legend>Relations</legend>
       {FAMILLES.map((f) => (

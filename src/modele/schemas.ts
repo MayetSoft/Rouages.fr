@@ -105,6 +105,15 @@ export const Competence = z.object({
   id: Id,
   nom: z.string().min(3),
   nom_court: z.string().min(3).max(28).optional(),
+  /**
+   * Les codes du référentiel BANATIC qui permettent de dire, pour une commune
+   * donnée, qui exerce réellement cette compétence.
+   *
+   * C'est la compétence qui déclare comment elle se résout : la correspondance
+   * est une décision éditoriale, pas un détail d'implémentation, et elle se
+   * relit dans le contenu plutôt que dans un script.
+   */
+  banatic: z.array(z.string().regex(/^\d{3,5}$/)).default([]),
   acteur: Id,
   resume: z.string().min(10).max(280, 'une phrase suffit — le reste est sur les pages liées'),
   partagee_avec: z.array(Id).default([]),

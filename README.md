@@ -36,6 +36,21 @@ Ce qui manque ailleurs, ce n'est pas l'information. Ce sont **les liens**.
 
 Un seul modèle de données pour les quatre premières. C'est le pari structurant.
 
+## « Chez moi »
+
+Le site ne se contente plus de dire « variable selon le territoire » : indiquez
+votre commune et il nomme la structure qui exerce réellement chaque compétence —
+votre syndicat des eaux, votre intercommunalité, votre syndicat de SCoT.
+
+```sh
+npm run territoires          # refait la jointure BANATIC × découpage Etalab
+npm run territoires -- --cache   # réutilise l'export déjà téléchargé
+```
+
+Les fichiers produits sont **versionnés** dans `public/territoires` : le site
+n'appelle aucune interface à l'exécution, le build est reproductible hors ligne,
+et une évolution de la donnée se relit dans un diff.
+
 ## Faire tourner
 
 ```sh

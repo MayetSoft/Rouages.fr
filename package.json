@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "valider": "tsx scripts/valider.ts",
     "fraicheur": "tsx scripts/valider.ts --fraicheur",
-    "verifier-types": "astro check"
+    "verifier-types": "astro check",
+    "territoires": "tsx scripts/ingerer-territoires.ts"
   },
   "dependencies": {
     "astro": "^5.14.1",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@etalab/decoupage-administratif": "^6.0.0",
     "@types/node": "^26.4.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"

@@ -133,6 +133,35 @@ button.plat:hover { background: var(--accent-doux); }
 .zooms { display: inline-flex; gap: .35rem; margin-left: auto; }
 button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3; }
 
+/* --- « Chez moi » --------------------------------------------------- */
+.champ-commune { position: relative; }
+#ouvrir-commune::before { content: '◉'; margin-right: .35rem; color: var(--accent); }
+#choix-commune {
+  position: absolute; z-index: 6; top: 2.3rem; left: 0; width: 24rem; max-width: 86vw;
+  background: var(--fond-carte); border: 1px solid var(--trait); border-radius: var(--rayon);
+  box-shadow: 0 10px 30px rgb(0 0 0 / .16); padding: .8rem;
+}
+#choix-commune label { display: block; font-size: .78rem; color: var(--encre-douce); margin-bottom: .3rem; }
+#choix-commune input {
+  font: inherit; width: 100%; padding: .35rem .7rem; border: 1px solid var(--trait);
+  border-radius: 999px; background: var(--fond); color: var(--encre);
+}
+#resultats-commune { list-style: none; margin: .4rem 0 0; padding: 0; max-height: 15rem; overflow-y: auto; }
+#resultats-commune button {
+  display: flex; justify-content: space-between; gap: 1rem; width: 100%; text-align: left;
+  background: none; border: 0; font: inherit; color: inherit; padding: .35rem .5rem;
+  border-radius: 6px; cursor: pointer;
+}
+#resultats-commune button:hover, #resultats-commune button:focus-visible { background: var(--fond-doux); }
+#resultats-commune span { color: var(--encre-douce); font-size: .78rem; white-space: nowrap; }
+.lien-plat {
+  background: none; border: 0; padding: .4rem 0 0; font: inherit; font-size: .8rem;
+  color: var(--encre-douce); text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+}
+
+/* Une pastille pleine : cette compétence est résolue sur votre territoire. */
+.n-resolu { fill: var(--accent); }
+
 /* ------------------------------------------------------------------ *
  * La légende — c'est elle qui commande l'affichage
  * ------------------------------------------------------------------ */
@@ -289,6 +318,29 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 .p-chiffres div { background: var(--fond-doux); border-radius: var(--rayon); padding: .6rem .75rem; }
 .p-chiffres dt { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-douce); }
 .p-chiffres dd { margin: 0; font-size: 1.4rem; font-weight: 650; letter-spacing: -0.02em; }
+/* --- le bloc « chez vous » dans le panneau --- */
+.p-territoire { border-left: 3px solid var(--accent); padding-left: .85rem; margin: 1.2rem 0 0; }
+.p-territoire .p-titre-section { border-top: 0; padding-top: 0; margin-top: 0; color: var(--accent); }
+.p-structures { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.p-structures li { display: grid; gap: .05rem; font-size: .9rem; }
+.p-nature-jur { color: var(--encre-douce); font-size: .78rem; }
+.p-resolution { margin: 0; display: grid; gap: .45rem; }
+.p-resolution > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: .6rem; align-items: baseline; }
+.p-resolution dt button {
+  font: inherit; font-size: .82rem; background: none; border: 0; padding: 0; text-align: left;
+  color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.p-resolution dd { margin: 0; font-size: .86rem; }
+.p-commune-seule { color: var(--encre-douce); font-style: italic; }
+.p-incertain { color: var(--alerte); font-style: italic; }
+.p-verdict { font-size: .88rem; margin: 0; color: var(--encre-douce); }
+.p-verdict--incertain { color: var(--alerte); }
+.p-source-territoire { color: var(--encre-tres-douce); font-size: .75rem; margin: .9rem 0 0; }
+.p-invite-commune {
+  background: var(--accent-doux); border-radius: var(--rayon); padding: .6rem .75rem;
+  font-size: .86rem; margin: 1rem 0 0; color: var(--encre);
+}
+
 .p-procedures { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }
 .p-procedures li { display: grid; gap: .1rem; }
 .p-procedures button {

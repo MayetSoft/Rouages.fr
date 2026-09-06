@@ -38,6 +38,8 @@ export interface Noeud {
   liens: Lien[];
   /** Nombre de relations : donne sa taille au nœud sur la carte. */
   degre: number;
+  /** Codes BANATIC, quand la compétence se résout commune par commune. */
+  banatic?: string[];
   /** Position sur la carte d'ensemble (acteurs uniquement). */
   x?: number;
   y?: number;
@@ -130,6 +132,7 @@ export function construireReseau(g: Graphe = chargerGraphe()): Reseau {
       echelon: g.acteurs.get(c.acteur)?.echelon ?? 'etat',
       confiance: c.confiance,
       liens: liensDe(c.liens),
+      ...(c.banatic.length > 0 ? { banatic: c.banatic } : {}),
     });
   }
   for (const p of g.processus.values()) {

@@ -31,6 +31,14 @@ import {
 } from '../modele/relations.ts';
 import { decalageTexte, formeNoeud, largeurPastille } from '../vues/formes.ts';
 import { construireGlossaire, expansions } from '../modele/glossaire.ts';
+import {
+  chercher as chercherCommune,
+  memorisee,
+  memoriser,
+  resoudre,
+  type CommuneBreve,
+  type Territoire,
+} from './territoire.ts';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -68,6 +76,8 @@ function demarrer(reseau: Reseau) {
 
   const index = new Map(reseau.noeuds.map((n) => [n.id, n]));
   const glossaire = construireGlossaire(reseau.sigles ?? []);
+  /** La résolution territoriale, quand une commune a été choisie. */
+  let territoire: Territoire | null = null;
   const etat: Etat = {
     mode: 'carte',
     focus: null,
@@ -112,8 +122,22 @@ function demarrer(reseau: Reseau) {
 
     const titre = el('title');
     const dev = expansions(glossaire, b.noeud.nom, b.noeud.court, b.noeud.resume);
-    titre.textContent = [`${b.noeud.nom} — ${b.noeud.resume}`, dev].filter(Boolean).join(' ');
+    const local = exercantsLocaux(b.noeud.id);
+    titre.textContent = [
+      `${b.noeud.nom} — ${b.noeud.resume}`,
+      local.length > 0 ? `Chez vous : ${local.map((s) => s.nom).join(', ')}.` : '',
+      dev,
+    ]
+      .filter(Boolean)
+      .join(' ');
     g.append(titre);
+
+    // Une pastille pleine marque les compétences résolues sur votre territoire :
+    // c'est ce qui distingue « en général » de « chez vous ».
+    if (local.length > 0) {
+      g.classList.add('n--resolu');
+      g.append(el('circle', { class: 'n-resolu', cx: b.l - 11, cy: b.h / 2, r: 3.5 }));
+    }
 
     g.addEventListener('click', () => ouvrir(b.noeud.id));
     g.addEventListener('keydown', (e) => {
@@ -129,6 +153,12 @@ function demarrer(reseau: Reseau) {
     g.addEventListener('blur', rallumer);
     return g;
   }
+
+  /** Les structures qui exercent réellement cette compétence sur le territoire choisi. */
+  function exercantsLocaux(idNoeud: string) {
+    return territoire?.parCompetence.get(idNoeud) ?? [];
+  }
+  void exercantsLocaux;
 
   function defsFleches(): SVGDefsElement {
     const defs = el('defs');
@@ -465,6 +495,78 @@ function demarrer(reseau: Reseau) {
     return frag;
   }
 
+  /**
+   * Le bloc « chez vous ». C'est la réponse que le site ne savait pas donner :
+   * ailleurs il dit « variable selon le territoire », ici il nomme la structure.
+   */
+  function blocTerritoire(idCompetence?: string): HTMLElement | null {
+    if (!territoire) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-territoire';
+
+    if (idCompetence) {
+      const v = territoire.verdict(idCompetence);
+      bloc.append(ligne('h3', 'p-titre-section', `Chez vous, à ${territoire.commune.nom}`));
+      if (v.etat === 'transferee') {
+        const ul = document.createElement('ul');
+        ul.className = 'p-structures';
+        for (const s of v.structures) {
+          const li = document.createElement('li');
+          li.append(glose('strong', '', s.nom), ligne('span', 'p-nature-jur', s.natureLibelle));
+          ul.append(li);
+        }
+        bloc.append(ul);
+      } else if (v.etat === 'communale') {
+        bloc.append(
+          ligne('p', 'p-verdict', 'Aucun transfert enregistré : la compétence reste exercée par la commune.'),
+        );
+      } else {
+        bloc.append(
+          ligne(
+            'p',
+            'p-verdict p-verdict--incertain',
+            `Non renseigné pour ce département : ${Math.round(v.couvertureDep * 100)} % de ses communes ` +
+              `ont un exerçant identifié, contre ${Math.round(v.couvertureNationale * 100)} % en France. ` +
+              `Le registre est probablement incomplet ici — nous préférons ne pas conclure.`,
+          ),
+        );
+      }
+      return bloc;
+    }
+
+    // Vue d'ensemble : toutes les compétences que ce territoire déplace.
+    bloc.append(ligne('h3', 'p-titre-section', `Chez vous, à ${territoire.commune.nom}`));
+    const resolvables = reseau.noeuds.filter((n) => n.banatic && n.banatic.length > 0);
+    const dl = document.createElement('dl');
+    dl.className = 'p-resolution';
+    for (const n of resolvables.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))) {
+      const v = territoire.verdict(n.id);
+      const d = document.createElement('div');
+      const dt = document.createElement('dt');
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.append(fragmentGlose(n.court));
+      b.addEventListener('click', () => ouvrir(n.id));
+      dt.append(b);
+      const dd = document.createElement('dd');
+      if (v.etat === 'transferee') dd.append(fragmentGlose(v.structures.map((s) => s.nom).join(' · ')));
+      else if (v.etat === 'communale') dd.append(ligne('span', 'p-commune-seule', 'la commune'));
+      else dd.append(ligne('span', 'p-incertain', 'non renseigné ici'));
+      d.append(dt, dd);
+      dl.append(d);
+    }
+    bloc.append(dl);
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les transferts de compétences déclarés à BANATIC (${territoire.maj}). ` +
+          `Une compétence exercée sans transfert déclaré — par convention, par exemple — n'y figure pas.`,
+      ),
+    );
+    return bloc;
+  }
+
   function ecrirePanneauAccueil() {
     vider(panneau);
     panneau.append(
@@ -490,6 +592,9 @@ function demarrer(reseau: Reseau) {
       chiffres.append(d);
     }
     panneau.append(chiffres);
+
+    const chezVous = blocTerritoire();
+    if (chezVous) panneau.append(chezVous);
 
     // Les procédures ne sont pas sur la carte, qui ne montre que des acteurs :
     // sans cette liste, le contenu le plus utile du site serait invisible.
@@ -552,6 +657,12 @@ function demarrer(reseau: Reseau) {
     panneau.append(type, glose('h2', 'p-nom', n.nom));
     if (n.resume) panneau.append(glose('p', 'p-resume', n.resume));
 
+    if (n.banatic && n.banatic.length > 0) {
+      const chez = blocTerritoire(n.id);
+      if (chez) panneau.append(chez);
+      else panneau.append(ligne('p', 'p-invite-commune', 'Cette compétence varie selon le territoire — indiquez votre commune pour savoir qui l’exerce chez vous.'));
+    }
+
     panneau.append(ligne('h3', 'p-titre-section', 'Pour en savoir plus'));
     const parType = new Map<string, typeof n.liens>();
     for (const l of n.liens) {
@@ -611,14 +722,14 @@ function demarrer(reseau: Reseau) {
   function ouvrir(id: string) {
     etat.mode = 'focus';
     etat.focus = id;
-    history.replaceState(null, '', `#${id}`);
+    history.replaceState(null, '', `${location.pathname}${location.search}#${id}`);
     rendreFocus(id);
   }
 
   function versCarte() {
     etat.mode = 'carte';
     etat.focus = null;
-    history.replaceState(null, '', location.pathname);
+    history.replaceState(null, '', location.pathname + location.search);
     rendreCarte();
   }
 
@@ -644,6 +755,78 @@ function demarrer(reseau: Reseau) {
     cle.addEventListener('pointerleave', rallumer);
     cle.addEventListener('blur', rallumer);
   }
+
+  /* --- le choix de la commune ------------------------------------- */
+
+  const boutonCommune = document.getElementById('ouvrir-commune');
+  const zoneCommune = document.getElementById('choix-commune');
+  const champCommune = document.getElementById('recherche-commune') as HTMLInputElement | null;
+  const listeCommune = document.getElementById('resultats-commune');
+  const etiquetteCommune = document.getElementById('etiquette-commune');
+  const oublier = document.getElementById('oublier-commune');
+
+  function afficherChoixCommune(ouvert: boolean) {
+    if (!zoneCommune || !boutonCommune) return;
+    zoneCommune.hidden = !ouvert;
+    boutonCommune.setAttribute('aria-expanded', String(ouvert));
+    if (ouvert) champCommune?.focus();
+  }
+
+  async function choisirCommune(c: CommuneBreve | null) {
+    if (!c) {
+      territoire = null;
+      memoriser(null);
+      if (etiquetteCommune) etiquetteCommune.textContent = 'Chez moi';
+      oublier?.setAttribute('hidden', '');
+      history.replaceState(null, '', location.pathname + location.hash);
+    } else {
+      try {
+        territoire = await resoudre(c);
+      } catch {
+        // Département introuvable ou hors métropole : on ne prétend pas savoir.
+        territoire = null;
+        if (listeCommune) listeCommune.textContent = '';
+        if (etiquetteCommune) etiquetteCommune.textContent = 'Chez moi';
+        return;
+      }
+      memoriser(c);
+      if (etiquetteCommune) etiquetteCommune.textContent = `${c.nom} (${c.dep})`;
+      oublier?.removeAttribute('hidden');
+      const u = new URL(location.href);
+      u.searchParams.set('commune', c.code);
+      history.replaceState(null, '', u.toString());
+    }
+    afficherChoixCommune(false);
+    if (champCommune) champCommune.value = '';
+    if (listeCommune) listeCommune.textContent = '';
+    // Le territoire change ce qui est dessiné : on redessine.
+    if (etat.mode === 'focus' && etat.focus) rendreFocus(etat.focus);
+    else rendreCarte();
+  }
+
+  boutonCommune?.addEventListener('click', () => {
+    afficherChoixCommune(zoneCommune?.hidden !== false);
+  });
+  oublier?.addEventListener('click', () => void choisirCommune(null));
+
+  let rechercheEnCours = 0;
+  champCommune?.addEventListener('input', () => {
+    const mien = ++rechercheEnCours;
+    const q = champCommune.value;
+    void chercherCommune(q).then((trouves) => {
+      if (mien !== rechercheEnCours || !listeCommune) return;
+      vider(listeCommune);
+      for (const c of trouves) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.append(document.createTextNode(c.nom), ligne('span', '', `${c.cp} · ${c.dep}`));
+        b.addEventListener('click', () => void choisirCommune(c));
+        const li = document.createElement('li');
+        li.append(b);
+        listeCommune.append(li);
+      }
+    });
+  });
 
   /* --- recherche : indispensable dès que la carte grossit ---------- */
   recherche?.addEventListener('input', () => {
@@ -753,7 +936,20 @@ function demarrer(reseau: Reseau) {
   toile.addEventListener('pointercancel', relacher);
 
   /* --- démarrage ---------------------------------------------------- */
+  // Lu avant tout rendu : l'ouverture d'un nœud réécrit l'URL.
+  const communeDemandee = new URL(location.href).searchParams.get('commune');
   const ancre = location.hash.slice(1);
   if (ancre && index.has(ancre)) ouvrir(ancre);
   else rendreCarte();
+
+  // La commune vient de l'URL — une adresse partagée doit montrer le même
+  // territoire — sinon du choix précédent, qu'on ne redemande pas à chaque fois.
+  const retenue = memorisee();
+  if (communeDemandee) {
+    void chercherCommune(communeDemandee, 1).then((r) => {
+      if (r[0]?.code === communeDemandee) void choisirCommune(r[0]);
+    });
+  } else if (retenue) {
+    void choisirCommune(retenue);
+  }
 }

@@ -33,6 +33,35 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       <li>Les schémas sont générés depuis les mêmes données que le reste : ils ne peuvent pas diverger.</li>
     </ul>
 
+    <h2 class="badge">« Chez moi » : ce que la résolution territoriale dit, et ne dit pas</h2>
+    <p class="mesure">
+      Répondre « variable selon le territoire » est honnête, et c’est une
+      impasse. La réponse est pourtant calculable&nbsp;: <abbr title="Base nationale sur l’intercommunalité">BANATIC</abbr>
+      publie, groupement par groupement, les compétences que les communes leur
+      ont transférées. Nous faisons la jointure une fois, et le site lit des
+      fichiers versionnés — il n’appelle aucune interface au moment où vous le
+      consultez.
+    </p>
+    <ul>
+      <li><strong>Ce qui est affirmé</strong>&nbsp;: le registre déclare un
+        transfert, et nous nommons la structure.</li>
+      <li><strong>Ce qui est déduit</strong>&nbsp;: aucun transfert déclaré, et
+        le registre est bien renseigné dans ce département — la compétence reste
+        alors à la commune.</li>
+      <li><strong>Ce qui n’est pas conclu</strong>&nbsp;: aucun transfert
+        déclaré, mais le département décroche nettement de la moyenne nationale.
+        Le registre y est probablement incomplet, et nous le disons plutôt que
+        d’inventer une réponse. Dans la Sarthe, 15&nbsp;% des communes ont un
+        exerçant identifié pour la concession électrique, contre 94&nbsp;% en
+        France&nbsp;: conclure «&nbsp;la commune s’en charge&nbsp;» y serait faux.</li>
+    </ul>
+    <p class="mesure">
+      Une compétence exercée sans transfert déclaré — par convention entre
+      collectivités, par exemple — n’apparaît pas dans le registre. C’est
+      pourquoi l’instruction des permis, mutualisée presque partout mais
+      transférée presque nulle part, n’est pas résolue ici.
+    </p>
+
     <h2 class="badge">Ce que le site ne fait pas</h2>
     <ul>
       <li>Répondre à une situation personnelle. Il indique l’interlocuteur.</li>

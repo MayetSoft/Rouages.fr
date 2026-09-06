@@ -60,6 +60,32 @@ Déploiement, domaine, mentions légales, licence, sitemap. À faire dès que le
 attributions sont relues : rien n'est réel tant que personne d'extérieur n'a
 touché le site.
 
+## Phase 2 ter — « Chez moi » ✔ *(en place)*
+
+La résolution territoriale : pour une commune donnée, qui exerce réellement les
+compétences que le site décrit comme variables.
+
+- `npm run territoires` fait la jointure entre l'export national BANATIC et le
+  découpage administratif d'Etalab, puis écrit des fichiers versionnés dans
+  `public/territoires`. **Le site n'appelle aucune interface à l'exécution** :
+  la donnée vit dans le dépôt, le build est reproductible et hors ligne, et un
+  changement se relit dans un diff.
+- 34 875 communes, 9 290 groupements, 14 compétences résolues.
+- Chargement en deux temps : un index de recherche léger, puis le seul
+  département concerné — personne ne télécharge la France pour trouver sa
+  commune.
+
+**Le point le plus important n'est pas la jointure, c'est ce qu'on refuse de
+dire.** Le registre a des trous : dans la Sarthe, 15 % des communes ont un
+exerçant identifié pour la concession électrique, contre 94 % en France.
+Conclure « la commune s'en charge » y serait faux — et faux avec aplomb, ce qui
+est le pire défaut possible pour ce site. La couverture est donc mesurée par
+département et comparée à la moyenne nationale, et le site distingue trois
+états : transférée, communale, non renseignée.
+
+Reste : brancher les chiffres (prix de l'eau via SISPEA, finances via l'OFGL)
+sur les mêmes structures.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,
