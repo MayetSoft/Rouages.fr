@@ -65,6 +65,7 @@ for (const d of g.documents.values()) noter(`document ${d.id}`, d.nom, d.resume,
 for (const f of g.flux.values()) noter(`flux ${f.id}`, f.nom, f.resume, f.ordre_de_grandeur);
 for (const s of g.sources.values()) noter(`source ${s.id}`, s.titre);
 for (const s of g.sigles.values()) noter(`sigle ${s.sigle}`, s.definition);
+for (const r of g.reperes.values()) noter(`repère ${r.id}`, r.nom, r.explication);
 for (const p of g.processus.values()) {
   noter(`processus ${p.id}`, p.nom, p.resume, p.declencheur, p.sortie);
   for (const e of p.etapes) noter(`processus ${p.id}, étape ${e.ordre}`, e.action, e.note);
@@ -162,11 +163,12 @@ const total =
   g.processus.size +
   g.flux.size +
   g.sources.size +
-  g.sigles.size;
+  g.sigles.size +
+  g.reperes.size;
 console.log(
   `${GRIS}${total} entités : ${g.acteurs.size} acteurs, ${g.competences.size} compétences, ` +
     `${g.processus.size} processus, ${g.documents.size} documents, ${g.flux.size} flux, ` +
-    `${g.sources.size} sources, ${g.sigles.size} sigles.${RAZ}`,
+    `${g.sources.size} sources, ${g.sigles.size} sigles, ${g.reperes.size} repères.${RAZ}`,
 );
 
 for (const a of avertissements) console.log(`${JAUNE}avertissement${RAZ} ${a}`);

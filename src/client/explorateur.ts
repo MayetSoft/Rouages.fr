@@ -557,6 +557,9 @@ function demarrer(reseau: Reseau) {
       dl.append(d);
     }
     bloc.append(dl);
+    const argent = blocFinances();
+    if (argent) bloc.append(argent);
+
     bloc.append(
       ligne(
         'p',
@@ -566,6 +569,83 @@ function demarrer(reseau: Reseau) {
       ),
     );
     return bloc;
+  }
+
+  /**
+   * Les comptes de la commune. Un montant seul ne dit rien : chacun est posé
+   * sur une réglette dont le repère central est la médiane des communes de
+   * taille voisine. La position du point vaut mieux qu'un pourcentage, qui
+   * demande un calcul mental à chaque ligne.
+   */
+  function blocFinances(): HTMLElement | null {
+    const f = territoire?.finances;
+    if (!f) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-finances';
+    bloc.append(ligne('h3', 'p-titre-section', `Ses comptes, en ${f.annee}`));
+    bloc.append(
+      f.statutParticulier
+        ? ligne(
+            'p',
+            'p-strate p-strate--particulier',
+            `Statut particulier : cette commune exerce aussi des fonctions départementales. ` +
+              `Ses comptes ne se comparent à ceux d'aucune autre — les montants sont donnés seuls.`,
+          )
+        : ligne(
+            'p',
+            'p-strate',
+            `Par habitant — sinon rien n'est comparable — et rapportés aux communes ${f.strate}.`,
+          ),
+    );
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    for (const r of f.reperes) {
+      if (r.valeur === null) continue;
+      const d = document.createElement('div');
+      const dt = document.createElement('dt');
+      dt.textContent = r.nom;
+      dt.title = r.explication;
+      const dd = document.createElement('dd');
+      dd.append(
+        ligne('span', 'p-montant', `${r.valeur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} €`),
+      );
+      if (r.mediane !== null && r.mediane > 0) {
+        dd.append(reglette(r.valeur, r.mediane));
+        dd.append(
+          ligne(
+            'span',
+            'p-mediane',
+            `médiane ${r.mediane.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} €`,
+          ),
+        );
+      }
+      d.append(dt, dd);
+      dl.append(d);
+    }
+    bloc.append(dl);
+    return bloc;
+  }
+
+  /** Une réglette : le trait est la médiane, le point la commune. */
+  function reglette(valeur: number, mediane: number): SVGSVGElement {
+    const L = 108;
+    const H = 14;
+    // L'échelle va de 0 à deux fois la médiane : au-delà, on bute au bord et le
+    // point le montre plutôt que d'écraser toutes les autres lignes.
+    const x = Math.max(4, Math.min(L - 4, (valeur / (mediane * 2)) * L));
+    const s = el('svg', { class: 'reglette', width: L, height: H, viewBox: `0 0 ${L} ${H}` });
+    const titre = el('title');
+    const ecart = Math.round((valeur / mediane - 1) * 100);
+    titre.textContent = `${ecart >= 0 ? '+' : ''}${ecart} % par rapport à la médiane de la strate`;
+    s.append(
+      titre,
+      el('line', { class: 'reglette-axe', x1: 2, y1: H / 2, x2: L - 2, y2: H / 2 }),
+      el('line', { class: 'reglette-mediane', x1: L / 2, y1: 2, x2: L / 2, y2: H - 2 }),
+      el('circle', { class: 'reglette-anneau', cx: x, cy: H / 2, r: 5.5 }),
+      el('circle', { class: 'reglette-point', cx: x, cy: H / 2, r: 4 }),
+    );
+    return s;
   }
 
   function ecrirePanneauAccueil() {

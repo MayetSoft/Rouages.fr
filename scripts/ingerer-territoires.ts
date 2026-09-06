@@ -147,7 +147,13 @@ async function principal() {
   const { groupements, dateExport } = await lireExport(XLSX, libelleDeCode, codesSuivis);
   dire(`${GRIS}${groupements.size.toLocaleString('fr-FR')} groupements lus.${RAZ}`);
 
-  ecrire(graphe, groupements, codesSuivis, dateExport, natures);
+  // Les repères financiers : les comptes des communes, en euros par habitant.
+  const { collecterFinances } = await import('./finances-emettre.ts');
+  const reperes = [...graphe.reperes.values()];
+  dire(`${GRIS}Repères financiers (${reperes.length}) :${RAZ}`);
+  const finances = await collecterFinances(reperes, obstine, (m) => dire(`${GRIS}${m}${RAZ}`));
+
+  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances);
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */
@@ -246,9 +252,26 @@ async function ecrire(
   codesSuivis: Map<string, string[]>,
   dateExport: string,
   natures: Map<string, string>,
+  finances: {
+    annee: number;
+    parCommune: Map<string, (number | null)[]>;
+    statutParticulier: Map<string, string>;
+  } | null,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
-  emettre({ graphe, groupements, codesSuivis, dateExport, natures, sortie: SORTIE, dire, VERT, RAZ, GRIS });
+  emettre({
+    graphe,
+    groupements,
+    codesSuivis,
+    dateExport,
+    natures,
+    finances,
+    sortie: SORTIE,
+    dire,
+    VERT,
+    RAZ,
+    GRIS,
+  });
 }
 
 await principal();

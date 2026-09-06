@@ -221,6 +221,24 @@ export const Sigle = z.object({
   confiance: Confiance,
 });
 
+/**
+ * Un repère financier : un agrégat des comptes publics, rendu comparable.
+ *
+ * Un montant seul ne dit rien. Chaque repère est donc restitué en euros par
+ * habitant et confronté à la médiane des communes de taille voisine — ce que le
+ * site recommande par ailleurs de faire avant de conclure quoi que ce soit.
+ */
+export const Repere = z.object({
+  id: Id,
+  nom: z.string().min(3).max(60),
+  /** Libellé exact de l'agrégat OFGL : l'ingestion échoue s'il ne correspond pas. */
+  agregat: z.string().min(3),
+  /** Le flux du réseau que ce repère chiffre, quand la correspondance est exacte. */
+  flux: Id.optional(),
+  explication: z.string().min(10).max(280),
+  liens: z.array(Id).min(1),
+});
+
 /** Un fichier de contenu : toutes les entités d'un même rouage. */
 export const FichierContenu = z.object({
   acteurs: z.array(Acteur).default([]),
@@ -230,8 +248,10 @@ export const FichierContenu = z.object({
   flux: z.array(Flux).default([]),
   sources: z.array(Source).default([]),
   sigles: z.array(Sigle).default([]),
+  reperes: z.array(Repere).default([]),
 });
 
+export type Repere = z.infer<typeof Repere>;
 export type Sigle = z.infer<typeof Sigle>;
 export type Source = z.infer<typeof Source>;
 export type Acteur = z.infer<typeof Acteur>;

@@ -93,8 +93,22 @@ affiche le département en toutes lettres avec la population pour départager.
 `npm run verifier-recherche` fixe ces cas sur l'index réel : une régression de
 tri est invisible à l'œil et proposerait la mauvaise commune.
 
-Reste : brancher les chiffres (prix de l'eau via SISPEA, finances via l'OFGL)
-sur les mêmes structures.
+### Les chiffres ✔
+
+Six repères financiers par commune, tirés des comptes publiés par l'OFGL :
+dotation de l'État, impôts locaux, dépenses de fonctionnement, frais de
+personnel, dépenses d'équipement, encours de dette. En euros par habitant, et
+rapportés à la médiane des communes de taille voisine — c'est précisément ce
+que le site recommande par ailleurs de faire avant de conclure.
+
+Là encore, ce qu'on refuse de dire compte : Paris exerce aussi des fonctions
+départementales, ses comptes ne se comparent à ceux d'aucune autre commune, la
+médiane lui est donc retirée et il est écarté du calcul des médianes des autres.
+Et aucun montant faible n'est arrondi à zéro : la dotation communale de Paris
+vaut 0,1 € par habitant, « 0 » se lirait « Paris ne reçoit rien ».
+
+Reste : le prix de l'eau via SISPEA, rattaché au service qui la distribue
+réellement — la structure est désormais identifiée pour chaque commune.
 
 ## Phase 3 — Élargir
 

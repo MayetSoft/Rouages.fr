@@ -16,6 +16,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import type { chargerGraphe } from '../src/modele/graphe.ts';
+import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.ts';
 
 interface Groupement {
   siren: string;
@@ -47,13 +48,19 @@ export function emettre(o: {
   codesSuivis: Map<string, string[]>;
   dateExport: string;
   natures: Map<string, string>;
+  finances: {
+    annee: number;
+    parCommune: Map<string, (number | null)[]>;
+    statutParticulier: Map<string, string>;
+  } | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
   RAZ: string;
   GRIS: string;
 }) {
-  const { groupements, codesSuivis, dateExport, natures, sortie, dire, VERT, RAZ, GRIS } = o;
+  const { groupements, codesSuivis, dateExport, natures, finances, sortie, dire, VERT, RAZ, GRIS } = o;
+  const reperes = [...o.graphe.reperes.values()];
 
   // Le découpage administratif vient d'un paquet npm plutôt que d'une API :
   // le registre est autrement plus fiable qu'un service web, et la version est
@@ -180,6 +187,16 @@ export function emettre(o: {
       c: rows,
       couverture: couvertureDep,
     });
+
+    if (finances) {
+      ecrireFinances(
+        sortie,
+        dep,
+        finances.annee,
+        liste.map((c) => c.code),
+        finances.parCommune,
+      );
+    }
   }
 
   // --- métadonnées : la correspondance est aussi de la donnée ------------
@@ -194,6 +211,28 @@ export function emettre(o: {
     couverture: Object.fromEntries(
       [...couvertureNationale].map(([k, v]) => [k, Math.round((v / totalCommunes) * 100) / 100]),
     ),
+    ...(finances
+      ? {
+          finances: {
+            annee: finances.annee,
+            // L'ordre des repères est celui du contenu : les vecteurs de
+            // valeurs y font référence par position.
+            reperes: reperes.map((r) => ({ id: r.id, nom: r.nom, explication: r.explication, flux: r.flux })),
+            strates: STRATES.map((s) => s.libelle),
+            // Médiane par strate : la moyenne serait tirée par quelques
+            // communes atypiques, et c'est à la médiane qu'on se compare.
+            medianes: medianesParStrate(
+              reperes,
+              finances.parCommune,
+              new Map(communes.map((c) => [c.code, c.population ?? 0])),
+              finances.statutParticulier,
+            ),
+            // Rares — Paris seulement à ce jour — mais il faut le dire plutôt
+            // que de proposer une comparaison qui n'a pas de sens.
+            statutParticulier: Object.fromEntries(finances.statutParticulier),
+          },
+        }
+      : {}),
   });
 
   dire(

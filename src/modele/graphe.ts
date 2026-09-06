@@ -16,6 +16,7 @@ import {
   type Document,
   type Flux,
   type Processus,
+  type Repere,
   type Sigle,
   type Source,
 } from './schemas.ts';
@@ -38,6 +39,7 @@ export interface Graphe {
   flux: Map<string, Flux>;
   sources: Map<string, Source>;
   sigles: Map<string, Sigle>;
+  reperes: Map<string, Repere>;
   anomalies: Anomalie[];
 }
 
@@ -66,6 +68,7 @@ export function chargerGraphe(): Graphe {
     flux: new Map(),
     sources: new Map(),
     sigles: new Map(),
+    reperes: new Map(),
     anomalies: [],
   };
 
@@ -120,6 +123,7 @@ export function chargerGraphe(): Graphe {
     ranger(contenu.processus, g.processus, 'processus');
     ranger(contenu.flux, g.flux, 'flux');
     ranger(contenu.sigles, g.sigles, 'sigles');
+    ranger(contenu.reperes, g.reperes, 'reperes');
   }
 
   verifierReferences(g);
@@ -166,6 +170,11 @@ function verifierReferences(g: Graphe): void {
     exigeLiens(f.liens, `flux ${f.id}`);
     exige(f.de, g.acteurs, 'acteur', `flux ${f.id}.de`);
     for (const v of f.vers) exige(v, g.acteurs, 'acteur', `flux ${f.id}.vers`);
+  }
+
+  for (const r of g.reperes.values()) {
+    exigeLiens(r.liens, `repère ${r.id}`);
+    if (r.flux) exige(r.flux, g.flux, 'flux', `repère ${r.id}.flux`);
   }
 
   for (const s of g.sigles.values()) {

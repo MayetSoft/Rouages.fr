@@ -62,6 +62,23 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       transférée presque nulle part, n’est pas résolue ici.
     </p>
 
+    <h2 class="badge">Les chiffres</h2>
+    <p class="mesure">
+      Les comptes viennent de l’<abbr title="Observatoire des finances et de la gestion publique locales">OFGL</abbr>,
+      qui les publie sous licence ouverte. Ils sont donnés <strong>par habitant</strong>,
+      seule forme comparable, et rapportés à la <strong>médiane des communes de
+      taille voisine</strong> — comparer un village à une ville produirait un
+      écart spectaculaire et vide de sens. La médiane, et non la moyenne&nbsp;:
+      quelques communes atypiques suffisent à déplacer une moyenne.
+    </p>
+    <p class="mesure">
+      Quand une commune a un statut particulier — Paris, qui exerce aussi des
+      fonctions départementales — les montants sont affichés seuls, sans
+      comparaison. Et un montant faible n’est jamais arrondi à zéro&nbsp;: la
+      dotation communale de Paris vaut 0,1&nbsp;€ par habitant, «&nbsp;0&nbsp;»
+      se lirait «&nbsp;Paris ne reçoit rien&nbsp;».
+    </p>
+
     <h2 class="badge">Trouver sa commune</h2>
     <p class="mesure">
       Plus d’une commune sur dix porte un nom qu’une autre porte aussi —

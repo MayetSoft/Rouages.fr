@@ -1,0 +1,50 @@
+# Repères financiers.
+#
+# Ce que la commune encaisse et dépense réellement, en euros par habitant, tiré
+# des comptes publiés par l'OFGL. Un chiffre seul ne dit rien : chacun est donc
+# comparé à la médiane des communes de taille voisine, ce que le site
+# recommande par ailleurs de faire.
+#
+# `agregat` doit reprendre exactement le libellé de l'OFGL — l'ingestion échoue
+# sinon. `flux` n'est renseigné que lorsque le repère correspond exactement à un
+# flux du réseau : « Impôts locaux » est plus large que la taxe foncière, on ne
+# les confond donc pas.
+reperes:
+  - id: repere-dgf
+    nom: "Dotation de l'État"
+    agregat: "Dotation globale de fonctionnement"
+    flux: dgf
+    explication: "Ce que l'État verse à la commune, calculé par formule."
+    liens: [od-ofgl, wp-dgf]
+
+  - id: repere-impots-locaux
+    nom: "Impôts locaux"
+    agregat: "Impôts locaux"
+    explication: >
+      Ce que la commune perçoit directement des contribuables. Plus large que la
+      seule taxe foncière : la mesure inclut les autres impôts directs locaux.
+    liens: [od-ofgl, wp-taxe-fonciere]
+
+  - id: repere-fonctionnement
+    nom: "Dépenses de fonctionnement"
+    agregat: "Dépenses de fonctionnement"
+    explication: "Ce que coûte le fonctionnement courant : personnel, énergie, entretien, services."
+    liens: [od-ofgl, vp-budget-local]
+
+  - id: repere-personnel
+    nom: "Frais de personnel"
+    agregat: "Frais de personnel"
+    explication: "La part des dépenses de fonctionnement consacrée aux agents."
+    liens: [od-ofgl]
+
+  - id: repere-equipement
+    nom: "Dépenses d'équipement"
+    agregat: "Dépenses d'équipement"
+    explication: "L'investissement : ce qui se construit ou se rénove cette année-là. Très variable d'une année sur l'autre."
+    liens: [od-ofgl, vp-budget-local]
+
+  - id: repere-dette
+    nom: "Encours de dette"
+    agregat: "Encours de dette"
+    explication: "Ce qui reste à rembourser, tous emprunts confondus."
+    liens: [od-ofgl]

@@ -47,6 +47,31 @@ export type Verdict =
   | { etat: 'communale' }
   | { etat: 'non-renseigne'; couvertureDep: number; couvertureNationale: number };
 
+export interface Repere {
+  id: string;
+  nom: string;
+  explication: string;
+  /** Le flux du réseau que ce repère chiffre, quand la correspondance est exacte. */
+  flux?: string;
+  /** Euros par habitant pour cette commune, ou null si non renseigné. */
+  valeur: number | null;
+  /** Médiane des communes de la même strate de population. */
+  mediane: number | null;
+}
+
+export interface Finances {
+  annee: number;
+  /** Le libellé de la strate à laquelle la commune est comparée. */
+  strate: string;
+  /**
+   * Renseigné pour les communes dont le statut rend la comparaison trompeuse —
+   * Paris, qui fusionne les fonctions communales et départementales. Les
+   * chiffres restent affichés, la médiane est retirée.
+   */
+  statutParticulier?: string;
+  reperes: Repere[];
+}
+
 export interface Territoire {
   commune: CommuneBreve;
   population: number;
@@ -55,6 +80,8 @@ export interface Territoire {
   parCompetence: Map<string, Structure[]>;
   /** compétence Rouages -> ce qu'on peut honnêtement en dire ici. */
   verdict(competence: string): Verdict;
+  /** Les comptes de la commune, en euros par habitant. */
+  finances: Finances | null;
   maj: string;
 }
 
@@ -78,13 +105,26 @@ function formesDe(c: CommuneBreve): { nom: string; nu: string } {
   }
   return f;
 }
+interface MetaFinances {
+  annee: number;
+  reperes: { id: string; nom: string; explication: string; flux?: string }[];
+  strates: string[];
+  medianes: (number | null)[][];
+  statutParticulier: Record<string, string>;
+}
+
 let meta: {
   codes: Record<string, string[]>;
   natures: Record<string, string>;
   couverture: Record<string, number>;
+  finances?: MetaFinances;
   maj: string;
 } | null = null;
 const departements = new Map<string, unknown>();
+const financesDep = new Map<string, { annee: number; c: Record<string, (number | null)[]> } | null>();
+
+/** Les strates de population, dans le même ordre qu'à l'ingestion. */
+const BORNES = [500, 2000, 10000, 50000, Infinity];
 
 async function json<T>(url: string): Promise<T> {
   const r = await fetch(url);
@@ -203,7 +243,16 @@ export async function trouverParCode(code: string): Promise<CommuneBreve | null>
 export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   meta ??= await json(`${BASE}/meta.json`);
   if (!departements.has(commune.dep)) {
-    departements.set(commune.dep, await json(`${BASE}/dep/${commune.dep}.json`));
+    // Les deux fichiers en parallèle : ils concernent le même département et
+    // arrivent ensemble, plutôt que l'un après l'autre.
+    const [structure, argent] = await Promise.all([
+      json(`${BASE}/dep/${commune.dep}.json`),
+      json<{ annee: number; c: Record<string, (number | null)[]> }>(
+        `${BASE}/dep/${commune.dep}-finances.json`,
+      ).catch(() => null),
+    ]);
+    departements.set(commune.dep, structure);
+    financesDep.set(commune.dep, argent);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -245,7 +294,41 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     return { etat: 'communale' };
   };
 
-  return { commune, population: ligne[2], structures, parCompetence, verdict, maj: dep.maj };
+  return {
+    commune,
+    population: ligne[2],
+    structures,
+    parCompetence,
+    verdict,
+    finances: assemblerFinances(commune, ligne[2]),
+    maj: dep.maj,
+  };
+}
+
+/**
+ * Un montant brut ne dit rien : chaque repère est donc accompagné de la médiane
+ * des communes de taille voisine. Comparer un village à une ville produirait un
+ * écart spectaculaire et vide de sens.
+ */
+function assemblerFinances(commune: CommuneBreve, population: number): Finances | null {
+  const m = meta?.finances;
+  const dep = financesDep.get(commune.dep);
+  if (!m || !dep) return null;
+  const valeurs = dep.c[commune.code];
+  if (!valeurs) return null;
+  const strate = BORNES.findIndex((b) => population < b);
+  const particulier = m.statutParticulier?.[commune.code];
+  return {
+    annee: dep.annee,
+    strate: m.strates[strate] ?? '',
+    statutParticulier: particulier,
+    reperes: m.reperes.map((r, i) => ({
+      ...r,
+      valeur: valeurs[i] ?? null,
+      // Pas de médiane quand la comparaison n'a pas de sens.
+      mediane: particulier ? null : (m.medianes[strate]?.[i] ?? null),
+    })),
+  };
 }
 
 /* --- mémoire du choix : on ne redemande pas sa commune à chaque visite --- */
