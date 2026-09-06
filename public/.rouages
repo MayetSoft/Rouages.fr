@@ -1,0 +1,5 @@
+Marqueur de racine de site.
+
+Sa presence prouve au deploiement que le dossier vise est bien celui de
+Rouages avant de l autoriser a supprimer des fichiers distants.
+Voir .github/workflows/deployer.yml.

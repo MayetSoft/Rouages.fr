@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { construireReseau } from '../modele/reseau.ts';
+
+// Une page absente est presque toujours un nœud qui n'existe pas encore, ou
+// dont l'identifiant a changé. Plutôt qu'un cul-de-sac, on renvoie vers la
+// carte — c'est elle qui contient tout, et elle sait chercher.
+const reseau = construireReseau();
+const noeuds = reseau.noeuds.length;
+---
+
+<Base
+  titre="Page introuvable"
+  description="Cette adresse ne correspond à aucun nœud du réseau."
+>
+  <div class="page">
+    <h1>Cette adresse ne mène nulle part</h1>
+    <p class="resume">
+      Le nœud que vous cherchez n’existe pas, ou plus sous ce nom. La carte en
+      compte {noeuds} — elle est le meilleur endroit d’où repartir.
+    </p>
+    <ul>
+      <li><a href="/">La carte des acteurs</a></li>
+      <li><a href="/glossaire">Le glossaire des sigles</a></li>
+      <li><a href="/methode">Comment le réseau est construit</a></li>
+    </ul>
+  </div>
+</Base>

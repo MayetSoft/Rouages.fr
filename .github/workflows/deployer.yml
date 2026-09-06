@@ -1,0 +1,132 @@
+name: Déploiement
+
+# Le site est statique : déployer, c'est copier `dist/` à la racine du serveur.
+# Trois choses méritent d'être sues avant de lire le reste.
+#
+# 1. Cloudflare ne relaie que HTTP et HTTPS. Le FTP doit donc viser le serveur
+#    directement — le nom de machine o2switch, ou un enregistrement DNS laissé
+#    en « DNS only » (nuage gris). Viser le domaine proxifié ne marchera pas,
+#    et l'erreur ne dira pas pourquoi.
+# 2. FTPS explicite, jamais FTP simple : autrement le mot de passe du compte
+#    d'hébergement traverse le réseau en clair à chaque publication.
+# 3. Cloudflare met le HTML en cache. Sans purge, la mise en ligne est
+#    invisible pendant des heures. Les fichiers de `_astro/` portent une
+#    empreinte dans leur nom et n'ont, eux, jamais besoin d'être purgés.
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+    inputs:
+      simulation:
+        description: "Simuler sans rien écrire sur le serveur"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploiement
+  cancel-in-progress: false
+
+jobs:
+  deployer:
+    # Seule la branche par défaut est publiée, quel que soit son nom.
+    if: github.event_name == 'workflow_dispatch' || github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # `npm run build` valide le contenu avant de générer : un réseau
+      # incohérent ne peut pas être mis en ligne.
+      - name: Construire
+        run: npm run build
+
+      - name: Vérifier que le serveur est configuré
+        id: config
+        env:
+          HOTE: ${{ secrets.FTP_HOTE }}
+        run: |
+          if [ -z "$HOTE" ]; then
+            echo "::notice::FTP_HOTE n'est pas défini : rien à déployer. Voir docs/06-stack-technique.md."
+            echo "pret=non" >> "$GITHUB_OUTPUT"
+          else
+            echo "pret=oui" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Installer lftp
+        if: steps.config.outputs.pret == 'oui'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Publier
+        if: steps.config.outputs.pret == 'oui'
+        env:
+          HOTE: ${{ secrets.FTP_HOTE }}
+          UTILISATEUR: ${{ secrets.FTP_UTILISATEUR }}
+          MOTDEPASSE: ${{ secrets.FTP_MOTDEPASSE }}
+          RACINE: ${{ secrets.FTP_RACINE }}
+          SIMULATION: ${{ inputs.simulation }}
+        run: |
+          set -euo pipefail
+          : "${RACINE:=public_html}"
+
+          # Le chiffrement n'est pas négociable, et le certificat est vérifié :
+          # un FTPS qui accepte n'importe quel certificat ne protège de rien.
+          reglages="set ftp:ssl-force true;
+                    set ftp:ssl-protect-data true;
+                    set ssl:verify-certificate true;
+                    set net:max-retries 3;
+                    set net:timeout 30;"
+
+          # `--delete` est ce qui garde le serveur propre : sans lui, une page
+          # supprimée du réseau resterait en ligne indéfiniment. C'est aussi
+          # une commande destructrice si RACINE désigne le mauvais dossier.
+          # Le marqueur, déposé au premier envoi, prouve que le dossier visé
+          # est bien celui de ce site avant qu'on autorise la suppression.
+          if lftp -c "$reglages open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                      cd \"$RACINE\"; ls .rouages" >/dev/null 2>&1; then
+            effacer="--delete"
+          else
+            echo "::warning::marqueur .rouages absent de $RACINE — premier envoi, rien ne sera supprimé à distance."
+            effacer=""
+          fi
+
+          if [ "${SIMULATION:-false}" = "true" ]; then
+            echo "::notice::simulation — aucune écriture."
+            simuler="--dry-run"
+          else
+            simuler=""
+          fi
+
+          lftp -c "$reglages
+                   open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                   mirror --reverse --verbose=1 --parallel=4 \
+                          $effacer $simuler \
+                          dist/ \"$RACINE\""
+
+      # Sans purge, Cloudflare continue de servir l'ancien HTML. Les secrets
+      # sont facultatifs : sans eux, on le dit plutôt que d'échouer.
+      - name: Purger le cache Cloudflare
+        if: steps.config.outputs.pret == 'oui' && inputs.simulation != true
+        env:
+          ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+          JETON: ${{ secrets.CLOUDFLARE_JETON }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ZONE" ] || [ -z "$JETON" ]; then
+            echo "::warning::CLOUDFLARE_ZONE/CLOUDFLARE_JETON absents : le cache n'est pas purgé, la mise en ligne mettra du temps à être visible."
+            exit 0
+          fi
+          reponse=$(curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE/purge_cache" \
+            -H "Authorization: Bearer $JETON" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+          if [ "$(echo "$reponse" | jq -r '.success')" != "true" ]; then
+            echo "::error::purge refusée : $(echo "$reponse" | jq -c '.errors')"
+            exit 1
+          fi
+          echo "Cache purgé."

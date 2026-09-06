@@ -134,6 +134,13 @@ deux ans avant qu'on s'en aperçoive, et on ne s'en est aperçu qu'en la
 recoupant à la main. Un projet dont les sources se dégradent en silence ne
 tombe pas en panne, il devient faux. Voir `06-stack-technique.md`.
 
+### Le déploiement ✔
+
+Publication automatique sur o2switch en FTPS, avec purge du cache Cloudflare.
+Le piège n'était pas le FTP mais le DNS : Cloudflare ne relaie que HTTP et
+HTTPS, un enregistrement proxifié ne transporte rien d'autre. Voir
+`06-stack-technique.md`.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

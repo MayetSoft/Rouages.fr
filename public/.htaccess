@@ -1,0 +1,96 @@
+# Rouages.fr — configuration du serveur d'origine (o2switch, LiteSpeed/Apache).
+#
+# Ce fichier est copié tel quel dans dist/ par Astro et déposé à la racine du
+# site. Il fait trois choses : servir les URL sans extension, dire ce qui se
+# met en cache, et refuser ce qui n'a rien à faire là.
+
+# --- Les URL n'ont pas d'extension, les fichiers en ont une ----------------
+# Astro est configuré en `format: 'file'` : il écrit `n/abf.html` et pointe
+# vers `/n/abf`. C'est au serveur de faire le rapprochement. MultiViews ferait
+# le travail mais négocie aussi la langue et l'encodage, ce qui produit des
+# surprises ; une règle explicite est plus prévisible.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Une barre finale n'est jamais l'adresse canonique (`trailingSlash: never`),
+  # sauf pour la racine.
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+  # /n/abf  ->  /n/abf.html, sans redirection visible.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+)$ /$1.html [L]
+
+  # Une URL en .html reste valide mais n'est pas l'adresse canonique : on
+  # redirige une fois pour toutes, sinon chaque page existe à deux adresses.
+  # `THE_REQUEST` porte la ligne de requête d'origine, pas l'URL réécrite : la
+  # règle ci-dessus ne peut donc pas la redéclencher, et il n'y a pas de boucle.
+  RewriteCond %{THE_REQUEST} \s/index\.html[\s?] [NC]
+  RewriteRule ^ / [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/(.+?)\.html[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L]
+</IfModule>
+
+# On ne force ni HTTPS ni le domaine canonique ici : Cloudflare est devant et
+# s'en charge. Le faire aussi à l'origine crée une boucle de redirection dès
+# que Cloudflare est en mode SSL « flexible ».
+
+# --- Cache ------------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Les fichiers de _astro/ portent une empreinte dans leur nom : leur contenu
+  # ne peut pas changer sans que l'URL change. Ils sont donc immuables, et ce
+  # sont les seuls .css et .js produits par le build.
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Le HTML, lui, change à chaque publication sans changer d'adresse.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  # Les données territoriales changent une fois par millésime — soit une fois
+  # l'an. Une heure de cache navigateur, la revalidation fait le reste.
+  <FilesMatch "\.json$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --- Compression ------------------------------------------------------------
+# Les fichiers territoriaux sont du JSON très répétitif : c'est là que la
+# compression rapporte le plus.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType application/json .json
+  AddType image/svg+xml .svg
+</IfModule>
+
+# Le HTML déclare déjà son encodage dans une balise `meta`, mais l'en-tête HTTP
+# fait autorité sur elle : sans cette ligne, un serveur configuré autrement
+# afficherait les accents de travers.
+AddDefaultCharset utf-8
+
+ErrorDocument 404 /404.html
+
+# --- Ce qui n'a rien à faire sur un site statique ---------------------------
+Options -Indexes
+
+# `FilesMatch` ne voit que le nom du fichier, pas son chemin : les jetons de
+# `.well-known/acme-challenge/` n'ont pas de point initial et restent servis,
+# le renouvellement du certificat n'est pas cassé.
+<IfModule mod_authz_core.c>
+  <FilesMatch "^\.|\.(yaml|yml|ts|json5|map)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>

@@ -162,3 +162,66 @@ Le workflow `veille.yml` passe une fois par semaine, tient **une seule issue**
 tout est revenu au vert. Le script sort en `2` dans ce cas et en `1` s'il tombe
 en panne lui-même : sans cette distinction, un script cassé ouvrirait une issue
 rassurante.
+
+## Le déploiement
+
+Oui, le FTP vers o2switch fonctionne — à trois conditions, dont la première
+est celle qui fait perdre une soirée.
+
+**Cloudflare ne relaie que HTTP et HTTPS.** Un enregistrement proxifié (nuage
+orange) ne transporte pas de FTP : la connexion part vers Cloudflare, qui n'a
+rien à en faire. Le dépôt doit viser le serveur directement — le nom de machine
+o2switch, ou un enregistrement laissé en « DNS only » (nuage gris). L'échec ne
+dit pas pourquoi : il expire, simplement.
+
+**FTPS explicite, jamais FTP simple.** o2switch le propose, et sans lui le mot
+de passe du compte d'hébergement traverse le réseau en clair à chaque
+publication. Le certificat est vérifié : un FTPS qui accepte n'importe quel
+certificat ne protège de rien.
+
+**Le cache Cloudflare survit au dépôt.** Sans purge, la mise en ligne reste
+invisible pendant des heures. Les fichiers de `_astro/` portent une empreinte
+dans leur nom et n'ont, eux, jamais besoin d'être purgés — d'où leur
+`immutable` d'un an.
+
+### Le garde-fou
+
+`mirror --delete` est ce qui garde le serveur propre : sans lui, une page
+retirée du réseau resterait en ligne indéfiniment. C'est aussi une commande
+destructrice si la racine désigne le mauvais dossier — le répertoire personnel
+d'un compte cPanel contient le courrier et la configuration.
+
+Le déploiement ne supprime donc rien tant qu'il n'a pas trouvé le marqueur
+`.rouages` à la racine visée. Le premier envoi le dépose ; les suivants le
+trouvent et s'autorisent alors la suppression. Un chemin erroné ne peut ainsi
+détruire quoi que ce soit : il se contente d'ajouter.
+
+### Secrets attendus
+
+| Secret | Contenu |
+|---|---|
+| `FTP_HOTE` | le serveur **non proxifié** — sans lui, le job ne fait rien et le dit |
+| `FTP_UTILISATEUR` · `FTP_MOTDEPASSE` | le compte FTP |
+| `FTP_RACINE` | la racine du site, `public_html` par défaut |
+| `CLOUDFLARE_ZONE` · `CLOUDFLARE_JETON` | facultatifs : sans eux, le dépôt réussit mais avertit que le cache n'est pas purgé |
+
+`workflow_dispatch` accepte une entrée **simulation** qui exécute le miroir en
+`--dry-run` : de quoi vérifier ce qui serait écrit avant de l'écrire.
+
+### Ce que fait `.htaccess`
+
+Astro est configuré en `format: 'file'` : il écrit `n/abf.html` et pointe vers
+`/n/abf`. C'est au serveur d'origine de faire le rapprochement. Le fichier est
+dans `public/`, donc copié tel quel à la racine du site.
+
+Il a été vérifié sous Apache 2.4, page par page : URL sans extension servie
+directement, `.html` et barre finale redirigés en 301 vers l'adresse
+canonique, `/index.html` renvoyé vers `/`, adresse inconnue sur le 404 du
+site, fichiers cachés refusés. Les en-têtes de cache suivent la nature du
+fichier — un an et `immutable` pour `_astro/`, revalidation systématique pour
+le HTML, une heure pour les données territoriales — et la compression ramène
+un département de 24,8 ko à 8,1 ko.
+
+Il ne force **ni HTTPS ni le domaine canonique** : Cloudflare est devant et
+s'en charge. Le faire aussi à l'origine crée une boucle de redirection dès que
+Cloudflare passe en mode SSL « flexible ».
