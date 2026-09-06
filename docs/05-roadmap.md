@@ -107,8 +107,21 @@ médiane lui est donc retirée et il est écarté du calcul des médianes des au
 Et aucun montant faible n'est arrondi à zéro : la dotation communale de Paris
 vaut 0,1 € par habitant, « 0 » se lirait « Paris ne reçoit rien ».
 
-Reste : le prix de l'eau via SISPEA, rattaché au service qui la distribue
-réellement — la structure est désormais identifiée pour chaque commune.
+### Le prix de l'eau ✔
+
+Rattaché au service qui la distribue réellement, puisque la structure est
+identifiée pour chaque commune : prix TTC au m³, mode de gestion, et le nom du
+délégataire quand il y en a un. 32 469 communes sur 34 875 sont couvertes ;
+seules Mayotte, la Guadeloupe et le Territoire de Belfort décrochent, et
+l'absence y est silencieuse plutôt qu'approximative.
+
+**Le choix de source mérite d'être noté**, parce qu'il coûte cher. L'API
+Hub'Eau expose ces indicateurs en JSON propre — mais s'arrête à 2018. Pour le
+seul service de Mayet, le prix est passé de 2,11 € en 2018 à 2,73 € en 2024,
+soit +30 % : un chiffre de 2018 serait faux aujourd'hui, même daté. La source à
+jour n'existe que sous forme d'archive 7z contenant un classeur .xls, ce qui
+impose deux dépendances de plus au script de rafraîchissement. On a préféré la
+complexité au chiffre commode et faux.
 
 ## Phase 3 — Élargir
 

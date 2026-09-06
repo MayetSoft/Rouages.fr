@@ -88,6 +88,25 @@ docs/                     décisions et cadrage
 Un fichier par type d'entité : le réseau se lit et se relit par catégorie, et
 les processus, qui portent beaucoup plus de détail, restent isolés.
 
+## Dépendances du rafraîchissement des données
+
+`npm run territoires` — et lui seul — a besoin de&nbsp;:
+
+| Dépendance | Pourquoi |
+|---|---|
+| `unzip` (système) | l'export national BANATIC : 1,4 Go de XML, lu en flux |
+| `7zip-min` | l'extraction SISPEA n'existe qu'en archive 7z |
+| `xlsx` (SheetJS) | et cette archive ne contient qu'un classeur `.xls` |
+| `@etalab/decoupage-administratif` | le découpage communal, épinglé et reproductible |
+
+**SheetJS est installé depuis le dépôt de son éditeur**, pas depuis le registre
+npm public : le paquet `xlsx` qui s'y trouve est abandonné à la version 0.18.5 et
+porte des vulnérabilités de sévérité haute sans correctif. Une dépendance
+durablement vulnérable rendrait `npm audit` rouge en permanence, et un audit
+toujours rouge ne signale plus rien.
+
+Le site lui-même n'a aucune de ces dépendances : il lit des fichiers versionnés.
+
 ## Commandes
 
 | Commande | Effet |

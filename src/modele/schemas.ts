@@ -114,6 +114,11 @@ export const Competence = z.object({
    * relit dans le contenu plutôt que dans un script.
    */
   banatic: z.array(z.string().regex(/^\d{3,5}$/)).default([]),
+  /**
+   * L'indicateur SISPEA qui chiffre cette compétence sur le terrain, quand il
+   * en existe un : le prix du service, rattaché à la structure qui l'exerce.
+   */
+  sispea: z.string().regex(/^[A-Z]{1,3}\d{2,3}\.\d$/).optional(),
   acteur: Id,
   resume: z.string().min(10).max(280, 'une phrase suffit — le reste est sur les pages liées'),
   partagee_avec: z.array(Id).default([]),

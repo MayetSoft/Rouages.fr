@@ -517,6 +517,8 @@ function demarrer(reseau: Reseau) {
           ul.append(li);
         }
         bloc.append(ul);
+        const prix = blocPrixEau(idCompetence);
+        if (prix) bloc.append(prix);
       } else if (v.etat === 'communale') {
         bloc.append(
           ligne('p', 'p-verdict', 'Aucun transfert enregistré : la compétence reste exercée par la commune.'),
@@ -550,7 +552,13 @@ function demarrer(reseau: Reseau) {
       b.addEventListener('click', () => ouvrir(n.id));
       dt.append(b);
       const dd = document.createElement('dd');
-      if (v.etat === 'transferee') dd.append(fragmentGlose(v.structures.map((s) => s.nom).join(' · ')));
+      if (v.etat === 'transferee') {
+        dd.append(fragmentGlose(v.structures.map((s) => s.nom).join(' · ')));
+        const e = territoire.eau;
+        if (e && e.competence === n.id && e.prix !== null) {
+          dd.append(ligne('span', 'p-prix-incise', `${e.prix.toLocaleString('fr-FR')} €/m³`));
+        }
+      }
       else if (v.etat === 'communale') dd.append(ligne('span', 'p-commune-seule', 'la commune'));
       else dd.append(ligne('span', 'p-incertain', 'non renseigné ici'));
       d.append(dt, dd);
@@ -569,6 +577,29 @@ function demarrer(reseau: Reseau) {
       ),
     );
     return bloc;
+  }
+
+  /**
+   * Le prix de l'eau. Il n'a de sens qu'attaché au service qui la distribue —
+   * c'est le même mètre cube, mais ni le même exploitant ni le même tarif d'une
+   * commune à l'autre.
+   */
+  function blocPrixEau(idCompetence: string): HTMLElement | null {
+    const e = territoire?.eau;
+    if (!e || e.competence !== idCompetence || e.prix === null) return null;
+    const p = document.createElement('p');
+    p.className = 'p-prix-eau';
+    p.append(
+      ligne('span', 'p-prix', `${e.prix.toLocaleString('fr-FR')} € / m³`),
+      ligne(
+        'span',
+        'p-prix-detail',
+        `TTC en ${e.annee}, pour 120 m³ · médiane nationale ${e.median?.toLocaleString('fr-FR')} €` +
+          (e.gestion ? ` · ${e.gestion.toLowerCase()}` : '') +
+          (e.operateur ? ` (${e.operateur})` : ''),
+      ),
+    );
+    return p;
   }
 
   /**

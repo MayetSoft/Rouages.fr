@@ -52,7 +52,12 @@ async function obstine(url: string, essais = 5): Promise<Response> {
   let derniere: unknown;
   for (let i = 0; i < essais; i++) {
     try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(180_000) });
+      // Le catalogue de l'OFB refuse l'en-tête de langue par défaut de Node
+      // (« Couldn't find 3-letter language code for * ») : on en pose un.
+      const r = await fetch(url, {
+        headers: { 'accept-language': 'fre' },
+        signal: AbortSignal.timeout(180_000),
+      });
       if (r.ok) return r;
       derniere = new Error(`HTTP ${r.status}`);
     } catch (e) {
@@ -153,7 +158,11 @@ async function principal() {
   dire(`${GRIS}Repères financiers (${reperes.length}) :${RAZ}`);
   const finances = await collecterFinances(reperes, obstine, (m) => dire(`${GRIS}${m}${RAZ}`));
 
-  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances);
+  // Le prix de l'eau, rattaché à la structure qui la distribue réellement.
+  const { collecterEau } = await import('./eau-emettre.ts');
+  const eau = await collecterEau(telecharger, CACHE, (m) => dire(`${GRIS}${m}${RAZ}`));
+
+  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances, eau);
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */
@@ -257,6 +266,7 @@ async function ecrire(
     parCommune: Map<string, (number | null)[]>;
     statutParticulier: Map<string, string>;
   } | null,
+  eau: Awaited<ReturnType<typeof import('./eau-emettre.ts')['collecterEau']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -266,6 +276,7 @@ async function ecrire(
     dateExport,
     natures,
     finances,
+    eau,
     sortie: SORTIE,
     dire,
     VERT,

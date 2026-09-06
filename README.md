@@ -41,8 +41,8 @@ Un seul modèle de données pour les quatre premières. C'est le pari structuran
 Le site ne se contente plus de dire « variable selon le territoire » : indiquez
 votre commune et il nomme la structure qui exerce réellement chaque compétence —
 votre syndicat des eaux, votre intercommunalité, votre syndicat de SCoT. Il
-affiche aussi les comptes de la commune, par habitant et rapportés à la médiane
-des communes de taille voisine.
+affiche aussi les comptes de la commune — par habitant et rapportés à la médiane
+des communes de taille voisine — et le prix de l'eau du service qui la dessert.
 
 ```sh
 npm run territoires          # refait la jointure BANATIC × découpage Etalab

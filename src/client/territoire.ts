@@ -72,6 +72,21 @@ export interface Finances {
   reperes: Repere[];
 }
 
+export interface ServiceEau {
+  /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
+  prix: number | null;
+  nom: string;
+  /** Régie ou délégation. */
+  gestion: string;
+  /** Le délégataire, s'il y en a un. */
+  operateur: string;
+  annee: number;
+  /** Prix médian national, pour situer le sien. */
+  median: number | null;
+  /** La compétence à laquelle rattacher cette information. */
+  competence: string;
+}
+
 export interface Territoire {
   commune: CommuneBreve;
   population: number;
@@ -82,6 +97,8 @@ export interface Territoire {
   verdict(competence: string): Verdict;
   /** Les comptes de la commune, en euros par habitant. */
   finances: Finances | null;
+  /** Le service d'eau qui la dessert, et son prix. */
+  eau: ServiceEau | null;
   maj: string;
 }
 
@@ -118,10 +135,15 @@ let meta: {
   natures: Record<string, string>;
   couverture: Record<string, number>;
   finances?: MetaFinances;
+  eau?: { annee: number; indicateur: string; competence: string; prixMedian: number | null };
   maj: string;
 } | null = null;
 const departements = new Map<string, unknown>();
 const financesDep = new Map<string, { annee: number; c: Record<string, (number | null)[]> } | null>();
+const eauDep = new Map<
+  string,
+  { annee: number; c: Record<string, [number | null, string, string, string]> } | null
+>();
 
 /** Les strates de population, dans le même ordre qu'à l'ingestion. */
 const BORNES = [500, 2000, 10000, 50000, Infinity];
@@ -245,14 +267,18 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent] = await Promise.all([
+    const [structure, argent, eau] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; c: Record<string, (number | null)[]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
       ).catch(() => null),
+      json<{ annee: number; c: Record<string, [number | null, string, string, string]> }>(
+        `${BASE}/dep/${commune.dep}-eau.json`,
+      ).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
+    eauDep.set(commune.dep, eau);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -301,7 +327,26 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     parCompetence,
     verdict,
     finances: assemblerFinances(commune, ligne[2]),
+    eau: assemblerEau(commune),
     maj: dep.maj,
+  };
+}
+
+/** Le service d'eau qui dessert la commune, avec son prix et son mode de gestion. */
+function assemblerEau(commune: CommuneBreve): ServiceEau | null {
+  const m = meta?.eau;
+  const dep = eauDep.get(commune.dep);
+  const v = m && dep ? dep.c[commune.code] : undefined;
+  if (!m || !dep || !v) return null;
+  const [prix, nom, gestion, operateur] = v;
+  return {
+    prix,
+    nom,
+    gestion,
+    operateur,
+    annee: dep.annee,
+    median: m.prixMedian,
+    competence: m.competence,
   };
 }
 

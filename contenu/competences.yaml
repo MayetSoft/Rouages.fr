@@ -105,6 +105,7 @@ competences:
     resume: "Captage, traitement, distribution. Exercée en régie ou déléguée à une entreprise ; le prix au mètre cube varie fortement d'un territoire à l'autre."
     partagee_avec: [commune, syndicat-eau, delegataire-eau]
     banatic: ["1505"]
+    sispea: "D102.0"
     liens: [cgct, od-sispea, eaufrance, od-banatic]
     verifie_le: 2026-09-05
     confiance: variable_selon_territoire

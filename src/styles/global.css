@@ -344,6 +344,10 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 .p-structures { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .p-structures li { display: grid; gap: .05rem; font-size: .9rem; }
 .p-nature-jur { color: var(--encre-douce); font-size: .78rem; }
+.p-prix-eau { margin: .7rem 0 0; display: grid; gap: .1rem; }
+.p-prix { font-size: 1.15rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.p-prix-detail { font-size: .76rem; color: var(--encre-douce); line-height: 1.45; }
+.p-prix-incise { display: block; font-size: .78rem; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
 .p-resolution { margin: 0; display: grid; gap: .45rem; }
 .p-resolution > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: .6rem; align-items: baseline; }
 .p-resolution dt button {

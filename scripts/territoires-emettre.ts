@@ -17,6 +17,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import type { chargerGraphe } from '../src/modele/graphe.ts';
 import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.ts';
+import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 
 interface Groupement {
   siren: string;
@@ -53,13 +54,14 @@ export function emettre(o: {
     parCommune: Map<string, (number | null)[]>;
     statutParticulier: Map<string, string>;
   } | null;
+  eau: Eau | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
   RAZ: string;
   GRIS: string;
 }) {
-  const { groupements, codesSuivis, dateExport, natures, finances, sortie, dire, VERT, RAZ, GRIS } = o;
+  const { groupements, codesSuivis, dateExport, natures, finances, eau, sortie, dire, VERT, RAZ, GRIS } = o;
   const reperes = [...o.graphe.reperes.values()];
 
   // Le découpage administratif vient d'un paquet npm plutôt que d'une API :
@@ -146,6 +148,12 @@ export function emettre(o: {
   const couvertureNationale = new Map<string, number>(compsSuivies.map((c) => [c, 0]));
   const totalCommunes = communes.length;
 
+  // La compétence qui déclare un indicateur SISPEA : c'est elle qui dit quelle
+  // structure interroger pour le prix.
+  const compEau = [...o.graphe.competences.values()].find((c) => c.sispea)?.id;
+  const codesEau = compEau ? (codesDeComp.get(compEau) ?? []) : [];
+  let servicesEau = 0;
+
   let couvertes = 0;
   let sansRattachement = 0;
   for (const [dep, liste] of parDep) {
@@ -188,6 +196,19 @@ export function emettre(o: {
       couverture: couvertureDep,
     });
 
+    if (eau && codesEau.length > 0) {
+      const services = new Map<string, ServiceEau>();
+      for (const c of liste) {
+        const competents = closure(c.siren!).filter((s) =>
+          [...(groupements.get(s)?.codes ?? [])].some((code) => codesEau.includes(code)),
+        );
+        const s = serviceDe(eau, c.siren!, c.code, competents);
+        if (s) services.set(c.code, s);
+      }
+      servicesEau += services.size;
+      ecrireEau(sortie, dep, eau, services);
+    }
+
     if (finances) {
       ecrireFinances(
         sortie,
@@ -211,6 +232,16 @@ export function emettre(o: {
     couverture: Object.fromEntries(
       [...couvertureNationale].map(([k, v]) => [k, Math.round((v / totalCommunes) * 100) / 100]),
     ),
+    ...(eau
+      ? {
+          eau: {
+            annee: eau.annee,
+            indicateur: eau.indicateur,
+            competence: compEau,
+            prixMedian: eau.prixMedian,
+          },
+        }
+      : {}),
     ...(finances
       ? {
           finances: {
@@ -235,6 +266,12 @@ export function emettre(o: {
       : {}),
   });
 
+  if (eau) {
+    dire(
+      `${GRIS}Prix de l'eau rattaché à ${servicesEau.toLocaleString('fr-FR')} communes ` +
+        `sur ${communes.length.toLocaleString('fr-FR')}.${RAZ}`,
+    );
+  }
   dire(
     `${VERT}Écrit${RAZ} ${parDep.size} départements · ` +
       `${couvertes.toLocaleString('fr-FR')} communes rattachées à au moins un groupement suivi · ` +
