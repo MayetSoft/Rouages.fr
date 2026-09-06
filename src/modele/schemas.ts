@@ -78,6 +78,34 @@ export const Source = z.object({
   consulte_le: dateSimple,
 });
 
+/**
+ * Les branches du pouvoir, pour les entités nationales.
+ *
+ * La séparation en trois est le cadre que tout le monde a appris, et elle ne
+ * décrit pas exactement la France. Deux écarts sont assumés ici plutôt que
+ * masqués :
+ *
+ *   — `independant` n'est pas une quatrième branche inventée pour l'occasion,
+ *     c'est une catégorie juridique existante (loi n° 2017-55) : les autorités
+ *     administratives et publiques indépendantes sont placées par la loi hors
+ *     de la hiérarchie des trois pouvoirs. Les ranger sous « exécutif » parce
+ *     qu'elles sont administratives dirait le contraire de ce qui les définit.
+ *
+ *   — le champ est une *liste*, parce qu'au moins une institution en exerce
+ *     réellement deux : le Conseil d'État est à la fois le conseil juridique
+ *     obligatoire du Gouvernement et le juge suprême de l'ordre administratif.
+ *     Choisir l'une des deux serait plus simple, et faux.
+ */
+export const POUVOIRS = ['executif', 'legislatif', 'judiciaire', 'independant'] as const;
+export type Pouvoir = (typeof POUVOIRS)[number];
+
+export const LIBELLE_POUVOIR: Record<Pouvoir, string> = {
+  executif: 'Exécutif',
+  legislatif: 'Législatif',
+  judiciaire: 'Judiciaire',
+  independant: 'Autorités indépendantes',
+};
+
 export const Acteur = z.object({
   id: Id,
   nom: z.string().min(2),
@@ -90,12 +118,22 @@ export const Acteur = z.object({
     'service_administratif',
     'service_deconcentre',
     'collectivite',
+    'juridiction',
+    'autorite_independante',
+    'organe_collegial',
     'entreprise',
     'association',
     'metier',
   ]),
   /** Détermine la colonne du nœud sur la carte d'ensemble. */
   echelon: z.enum(ECHELONS),
+  /**
+   * De quelle branche relève l'entité. Exigé des entités nationales et refusé
+   * ailleurs : la séparation des pouvoirs se joue à l'échelon de l'État, une
+   * commune n'a pas de pouvoir judiciaire à déclarer. La règle est appliquée
+   * par `scripts/valider.ts`.
+   */
+  pouvoirs: z.array(z.enum(POUVOIRS)).min(1).optional(),
   /** Une phrase, pas un paragraphe : le détail est sur les pages liées. */
   resume: z.string().min(10).max(280, 'une phrase suffit — le reste est sur les pages liées'),
   ...tracable,

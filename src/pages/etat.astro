@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import { chargerGraphe } from '../modele/graphe.ts';
+import { construireGlossaire } from '../modele/glossaire.ts';
+import { schemaBranches } from '../vues/branches.ts';
+import { LIBELLE_POUVOIR, POUVOIRS } from '../modele/schemas.ts';
+import Glose from '../composants/Glose.astro';
+
+const g = chargerGraphe();
+const acteurs = [...g.acteurs.values()].filter((a) => a.pouvoirs);
+const schema = schemaBranches(acteurs, 'branches');
+
+const glossaire = construireGlossaire([...g.sigles.values()]);
+const siglesEmployes = glossaire.employes(acteurs.map((a) => `${a.nom} ${a.resume}`).join(' '));
+
+const parBranche = POUVOIRS.map((p) => ({
+  pouvoir: p,
+  membres: acteurs.filter((a) => a.pouvoirs?.includes(p)),
+})).filter((b) => b.membres.length > 0);
+
+const doubles = acteurs.filter((a) => (a.pouvoirs?.length ?? 0) > 1);
+---
+
+<Base
+  titre="Les branches du pouvoir"
+  description="Les entités de l'État rangées par branche : qui fait la loi, qui l'applique, qui tranche, et qui n'est ni l'un ni l'autre."
+>
+  <div class="page">
+    <h1>Les branches du pouvoir</h1>
+    <p class="resume">
+      La carte d’ensemble range par échelon&nbsp;: qui est loin, qui est près.
+      La séparation des pouvoirs, elle, se joue à l’intérieur d’une seule de ces
+      colonnes. Voici donc la même chose vue autrement&nbsp;: {acteurs.length} entités
+      de l’État rangées par branche, chacune renvoyant vers les pages qui font
+      autorité. Certaines siègent en région — une chambre régionale des comptes
+      reste une juridiction de l’État.
+    </p>
+
+    <div class="cadre-schema">
+      <Fragment set:html={schema.svg} />
+    </div>
+    <p class="indice-defilement">Le schéma se fait défiler horizontalement.</p>
+
+    <details class="equivalent">
+      <summary>Le même contenu sous forme de tableau</summary>
+      <Fragment set:html={schema.tableau} />
+    </details>
+
+    <h2 class="badge">Ce que la division en trois ne dit pas</h2>
+    <p class="mesure">
+      Le schéma appris à l’école compte trois pouvoirs. La France en a quatre
+      catégories, et deux écarts méritent d’être dits plutôt que masqués.
+    </p>
+    <ul>
+      <li>
+        <strong>Les autorités indépendantes ne sont pas une quatrième branche
+        inventée pour l’occasion.</strong> C’est une catégorie juridique
+        existante&nbsp;: la loi de 2017 les place hors de la hiérarchie des trois
+        pouvoirs. Les ranger sous «&nbsp;exécutif&nbsp;» parce qu’elles sont
+        administratives dirait exactement le contraire de ce qui les définit.
+      </li>
+      {doubles.length > 0 && (
+        <li>
+          <strong>Une institution peut en exercer deux.</strong>{' '}
+          {doubles.map((a) => a.nom).join(', ')} — d’où le tracé en pointillé, et
+          la présence dans deux bandes. Choisir l’une des deux serait plus
+          simple, et faux.
+        </li>
+      )}
+      <li>
+        <strong>Deux ordres de juridiction, pas un.</strong> Un litige avec une
+        administration ne va pas devant le même juge qu’un litige entre voisins.
+        C’est la distinction la plus utile à connaître avant d’agir.
+      </li>
+    </ul>
+
+    <div class="grille-liens">
+      {parBranche.map((b) => (
+        <section>
+          <h2>{LIBELLE_POUVOIR[b.pouvoir]}</h2>
+          <ul>
+            {b.membres.map((a) => (
+              <li><a href={`/n/${a.id}`}>{a.nom}</a></li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    {siglesEmployes.length > 0 && (
+      <>
+        <h2 class="badge">Les sigles de cette page</h2>
+        <dl class="sigles">
+          {siglesEmployes.map((s) => (
+            <div>
+              <dt>{s.sigle}</dt>
+              <dd>
+                <strong>{s.developpe}</strong>
+                {s.definition && <> — <Glose texte={s.definition} /></>}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </>
+    )}
+  </div>
+</Base>

@@ -73,7 +73,10 @@ export function schemaVoisinage(
   const lVoisin = (n: Noeud) => Math.min(290, largeurPastille(n.court, 13, 108));
   const lMax = Math.max(120, ...voisins.map((v) => lVoisin(v.noeud)));
 
-  const rayonX = Math.max(230, Math.min(400, 190 + voisins.length * 8), lCentre / 2 + lMax / 2 + 56);
+  // L'écart entre les deux pastilles doit rester assez large pour que le nom
+  // de la relation y tienne : c'est lui qui porte le sens, une arête muette ne
+  // dit pas si l'on détient, partage ou verse.
+  const rayonX = Math.max(230, Math.min(400, 190 + voisins.length * 8), lCentre / 2 + lMax / 2 + 78);
   const rayonY = Math.max(150, Math.min(270, 120 + voisins.length * 9));
   const LARGEUR = Math.round(rayonX * 2 + lMax + 60);
   const hauteur = rayonY * 2 + 150;
@@ -101,8 +104,13 @@ export function schemaVoisinage(
         `${centre.nom} — ${v.label} — ${v.noeud.nom}`,
       )}</title></path>`,
     );
+    // Au milieu du segment réellement tracé, pas au milieu du rayon : les deux
+    // extrémités sont sur le bord des pastilles, donc ce point est toujours
+    // dans l'espace libre entre elles. Placé sur le rayon, le libellé passait
+    // sous une pastille large — la couche des nœuds est dessinée par-dessus
+    // celle des arêtes, et il disparaissait sans bruit.
     aretes.push(
-      `<text class="a-label" x="${cx + (x - cx) * 0.62}" y="${cy + (y - cy) * 0.62 - 9}" text-anchor="middle">${echapper(
+      `<text class="a-label" x="${(depart.x + arrivee.x) / 2}" y="${(depart.y + arrivee.y) / 2 - 9}" text-anchor="middle">${echapper(
         v.label,
       )}</text>`,
     );

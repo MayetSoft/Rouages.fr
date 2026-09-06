@@ -10,6 +10,7 @@
  */
 import { chargerGraphe, estPerime, formaterDate } from '../src/modele/graphe.ts';
 import { construireGlossaire } from '../src/modele/glossaire.ts';
+import { construireReseau } from '../src/modele/reseau.ts';
 
 const args = new Set(process.argv.slice(2));
 const verifierLiens = args.has('--liens');
@@ -82,6 +83,54 @@ for (const [sigle, ou] of sigleManquant) {
   erreurs.push(
     `sigle « ${sigle} » employé dans ${ou} sans entrée au glossaire — ajoutez-le à contenu/glossaire.yaml`,
   );
+}
+
+// « Un nœud isolé n'apporte rien » : le premier critère d'admission de
+// docs/02-familles.md, jusqu'ici seulement écrit. Un nœud que rien ne relie est
+// invisible depuis tout autre point du réseau — sur un site qui *est* un
+// réseau, c'est une page morte.
+//
+// Un document fait exception, en avertissement seulement : il ne peut être
+// relié que par un processus qui le produit, et tous les processus qui
+// comptent ne sont pas encore décrits. L'exiger reviendrait à interdire de
+// nommer un document avant d'avoir modélisé son processus.
+for (const n of construireReseau().noeuds) {
+  if (n.degre > 0) continue;
+  const ligne =
+    `${n.type} « ${n.id} » n'est relié à aucun autre nœud — ` +
+    `un nœud isolé n'apporte rien (docs/02-familles.md).`;
+  (n.type === 'document' ? avertissements : erreurs).push(ligne);
+}
+
+// La branche du pouvoir est exigée là où elle a un sens, et refusée ailleurs.
+// Sans cette règle, `pouvoirs` serait un champ facultatif que personne ne
+// remplirait : la classification par branche resterait à moitié faite, et une
+// vue « par branche » à moitié faite est pire que pas de vue du tout.
+//
+// Le critère n'est pas seulement l'échelon. Une chambre régionale des comptes
+// siège en région tout en étant une juridiction de l'État : c'est le fait
+// d'être une juridiction ou une autorité indépendante qui appelle la réponse,
+// autant que d'être une entité nationale.
+for (const a of g.acteurs.values()) {
+  // Les personnes physiques sont exclues : un commissaire enquêteur est
+  // désigné pour une mission, il n'incarne pas une branche. Un mandat électif,
+  // lui, en est bien un organe — d'où la distinction entre les deux types.
+  const concerne =
+    (a.echelon === 'etat' && a.type !== 'personne') ||
+    a.type === 'juridiction' ||
+    a.type === 'autorite_independante';
+  if (concerne && !a.pouvoirs) {
+    erreurs.push(
+      `acteur « ${a.id} » relève de l'État ou d'une juridiction sans déclarer sa branche — ` +
+        `ajoutez « pouvoirs: [...] » (docs/02-familles.md).`,
+    );
+  }
+  if (!concerne && a.pouvoirs) {
+    erreurs.push(
+      `acteur « ${a.id} » déclare une branche du pouvoir alors qu'il n'est ni national, ` +
+        `ni juridiction, ni autorité indépendante — la séparation des pouvoirs ne s'y joue pas.`,
+    );
+  }
 }
 
 // Famille « influence » : mécanismes, jamais de personnes. Contrôle grossier

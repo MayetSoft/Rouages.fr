@@ -162,8 +162,9 @@ acteurs:
     nom_court: "État"
     type: collectivite
     echelon: etat
+    pouvoirs: [executif]
     resume: "Fixe la règle, finance une large part des budgets locaux par dotations, et conserve les compétences régaliennes."
-    liens: [cgct, vp-competences, od-ofgl]
+    liens: [cgct, vp-competences, od-ofgl, wp-separation-pouvoirs, vp-separation-pouvoirs]
     verifie_le: 2026-09-05
     confiance: etabli
 
@@ -172,6 +173,7 @@ acteurs:
     nom_court: "Préfet"
     type: mandat_electif
     echelon: etat
+    pouvoirs: [executif]
     resume: "Représentant de l'État dans le département : ordre public, gestion de crise, et contrôle de légalité des actes des collectivités."
     liens: [wp-prefet, cgct, prefectures]
     verifie_le: 2026-09-05
@@ -182,6 +184,7 @@ acteurs:
     nom_court: "Rectorat"
     type: service_deconcentre
     echelon: etat
+    pouvoirs: [executif]
     resume: "Services de l'Éducation nationale : enseignants, programmes, ouvertures et fermetures de classes."
     liens: [wp-rectorat, code-education, education-gouv]
     verifie_le: 2026-09-05
@@ -192,6 +195,7 @@ acteurs:
     nom_court: "Bâtiments de France"
     type: service_deconcentre
     echelon: etat
+    pouvoirs: [executif]
     resume: "Rend un avis, parfois conforme, sur les projets situés en périmètre de protection du patrimoine."
     liens: [wp-abf, code-patrimoine]
     verifie_le: 2026-09-05
@@ -202,6 +206,7 @@ acteurs:
     nom_court: "CAF"
     type: service_administratif
     echelon: etat
+    pouvoirs: [executif]
     resume: "Verse les prestations familiales et sociales, dont le RSA financé par le département."
     liens: [wp-caf, caf-fr, code-action-sociale]
     verifie_le: 2026-09-05
@@ -212,6 +217,7 @@ acteurs:
     nom_court: "Agence de l'eau"
     type: service_administratif
     echelon: etat
+    pouvoirs: [executif]
     resume: "Établissement de bassin qui perçoit des redevances sur l'eau et subventionne les travaux des collectivités."
     liens: [wp-agence-eau, code-environnement, eaufrance]
     verifie_le: 2026-09-05
@@ -220,11 +226,176 @@ acteurs:
   - id: tribunal-administratif
     nom: "Le tribunal administratif"
     nom_court: "Tribunal admin."
-    type: service_deconcentre
+    type: juridiction
     echelon: etat
+    pouvoirs: [judiciaire]
     resume: "Juge les litiges entre les particuliers et l'administration, dont les recours contre les autorisations d'urbanisme."
     liens: [wp-tribunal-administratif, sp-recours-urbanisme]
     verifie_le: 2026-09-05
+    confiance: etabli
+
+  # --- Législatif : qui vote la loi ---------------------------------------
+  - id: assemblee-nationale
+    nom: "L'Assemblée nationale"
+    nom_court: "Assemblée nationale"
+    type: assemblee
+    echelon: etat
+    pouvoirs: [legislatif]
+    resume: "577 députés élus au suffrage universel direct : ils votent la loi et le budget de l'État, et peuvent renverser le Gouvernement."
+    liens: [wp-assemblee-nationale, an-fr, vp-parlement, od-nosdeputes]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: senat
+    nom: "Le Sénat"
+    nom_court: "Sénat"
+    type: assemblee
+    echelon: etat
+    pouvoirs: [legislatif]
+    resume: "348 sénateurs élus par des grands électeurs très majoritairement issus des conseils municipaux ; la Constitution lui confie la représentation des collectivités territoriales."
+    liens: [wp-senat, senat-fr, constitution, od-senat]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: depute
+    nom: "Le député"
+    nom_court: "Député"
+    type: mandat_electif
+    echelon: etat
+    pouvoirs: [legislatif]
+    resume: "Élu d'une circonscription pour cinq ans : il vote la loi, contrôle le Gouvernement, et reste le relais national des communes de son territoire."
+    liens: [wp-depute, an-fr, od-nosdeputes]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: senateur
+    nom: "Le sénateur"
+    nom_court: "Sénateur"
+    type: mandat_electif
+    echelon: etat
+    pouvoirs: [legislatif]
+    resume: "Élu pour six ans par les grands électeurs du département ; les textes portant sur l'organisation des collectivités territoriales lui sont soumis en premier."
+    liens: [wp-senateur, senat-fr, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  # --- Exécutif : qui décide et qui exécute --------------------------------
+  - id: president-republique
+    nom: "Le président de la République"
+    nom_court: "Président de la Rép."
+    type: mandat_electif
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Élu pour cinq ans au suffrage universel direct : il nomme le Premier ministre, promulgue les lois et peut dissoudre l'Assemblée nationale."
+    liens: [wp-president-republique, elysee-fr, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: gouvernement
+    nom: "Le Gouvernement"
+    nom_court: "Gouvernement"
+    type: organe_collegial
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Le Premier ministre et les ministres : ils déterminent et conduisent la politique de la nation, et disposent de l'administration pour l'appliquer."
+    liens: [wp-gouvernement, gouvernement-fr, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: administration-centrale
+    nom: "L'administration centrale"
+    nom_court: "Admin. centrale"
+    type: service_administratif
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Les directions des ministères : elles préparent les textes, répartissent les crédits et pilotent les services déconcentrés qui appliquent la règle sur le terrain."
+    liens: [wp-gouvernement, gouvernement-fr, od-annuaire-administration]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
+
+  # --- Judiciaire : qui tranche --------------------------------------------
+  # La France a deux ordres de juridiction séparés. Un litige avec une
+  # administration ne va pas devant le même juge qu'un litige entre voisins,
+  # et c'est la distinction la plus utile à connaître avant d'agir.
+  - id: conseil-etat
+    nom: "Le Conseil d'État"
+    nom_court: "Conseil d'État"
+    type: juridiction
+    echelon: etat
+    pouvoirs: [judiciaire, executif]
+    resume: "Deux fonctions à la fois : conseil juridique obligatoire du Gouvernement sur les projets de loi et d'ordonnance, et juge suprême de l'ordre administratif."
+    liens: [wp-conseil-etat, conseil-etat-fr, code-justice-administrative, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: cour-administrative-appel
+    nom: "La cour administrative d'appel"
+    nom_court: "Cour admin. d'appel"
+    type: juridiction
+    echelon: etat
+    pouvoirs: [judiciaire]
+    resume: "Réexamine les jugements des tribunaux administratifs, dont ceux rendus sur les autorisations d'urbanisme, avant un éventuel pourvoi au Conseil d'État."
+    liens: [wp-cour-administrative-appel, code-justice-administrative, conseil-etat-fr]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: tribunal-judiciaire
+    nom: "Le tribunal judiciaire"
+    nom_court: "Tribunal judiciaire"
+    type: juridiction
+    echelon: etat
+    pouvoirs: [judiciaire]
+    resume: "Juge les litiges entre personnes privées et les infractions pénales : l'autre ordre de juridiction, distinct de celui qui juge l'administration."
+    liens: [wp-tribunal-judiciaire, code-organisation-judiciaire, justice-fr, wp-ordres-juridiction]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: cour-comptes
+    nom: "La Cour des comptes"
+    nom_court: "Cour des comptes"
+    type: juridiction
+    echelon: etat
+    pouvoirs: [judiciaire]
+    resume: "Juge les comptes publics et contrôle l'emploi des fonds, en assistant le Parlement comme le Gouvernement ; les chambres régionales font ce travail pour les collectivités."
+    liens: [wp-cour-comptes, ccomptes, code-juridictions-financieres, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: conseil-constitutionnel
+    nom: "Le Conseil constitutionnel"
+    nom_court: "Conseil constit."
+    type: juridiction
+    echelon: etat
+    pouvoirs: [judiciaire]
+    resume: "Contrôle la conformité des lois à la Constitution, avant promulgation ou sur question prioritaire de constitutionnalité ; il n'appartient à aucun des deux ordres de juridiction."
+    liens: [wp-conseil-constitutionnel, conseil-constitutionnel-fr, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  # --- Autorités indépendantes : ni exécutif, ni juge -----------------------
+  # Placées par la loi hors de la hiérarchie des trois pouvoirs. Les ranger
+  # sous « exécutif » parce qu'elles sont administratives dirait exactement le
+  # contraire de ce qui les définit.
+  - id: defenseur-des-droits
+    nom: "Le Défenseur des droits"
+    nom_court: "Défenseur des droits"
+    type: autorite_independante
+    echelon: etat
+    pouvoirs: [independant]
+    resume: "Autorité inscrite dans la Constitution, que toute personne peut saisir gratuitement en cas de litige avec un service public ou de discrimination."
+    liens: [wp-defenseur-droits, defenseur-droits, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: cnil
+    nom: "La CNIL"
+    nom_court: "CNIL"
+    type: autorite_independante
+    echelon: etat
+    pouvoirs: [independant]
+    resume: "Contrôle l'usage des données personnelles, y compris par les administrations et les collectivités, et peut être saisie par toute personne concernée."
+    liens: [wp-cnil, cnil-fr, loi-aai, wp-aai]
+    verifie_le: 2026-09-06
     confiance: etabli
 
   # --- Union européenne -------------------------------------------------
@@ -273,10 +444,11 @@ acteurs:
   - id: cada
     nom: "La CADA"
     nom_court: "CADA"
-    type: service_administratif
+    type: autorite_independante
     echelon: etat
+    pouvoirs: [independant]
     resume: "Autorité que l'on saisit gratuitement quand une administration refuse de communiquer un document ; elle rend un avis."
-    liens: [wp-cada, cada, crpa]
+    liens: [wp-cada, cada, crpa, vp-aai]
     verifie_le: 2026-09-05
     confiance: etabli
 
@@ -303,20 +475,11 @@ acteurs:
   - id: chambre-regionale-comptes
     nom: "La chambre régionale des comptes"
     nom_court: "Chambre des comptes"
-    type: service_deconcentre
+    type: juridiction
     echelon: region
+    pouvoirs: [judiciaire]
     resume: "Contrôle les comptes et la gestion des collectivités, et publie des rapports d'observations publics."
     liens: [wp-crc, code-juridictions-financieres, ccomptes]
-    verifie_le: 2026-09-05
-    confiance: etabli
-
-  - id: defenseur-des-droits
-    nom: "Le Défenseur des droits"
-    nom_court: "Défenseur des droits"
-    type: service_administratif
-    echelon: etat
-    resume: "Autorité indépendante que l'on saisit gratuitement en cas de litige avec un service public."
-    liens: [wp-defenseur-droits, defenseur-droits]
     verifie_le: 2026-09-05
     confiance: etabli
 

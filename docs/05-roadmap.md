@@ -141,6 +141,26 @@ Le piège n'était pas le FTP mais le DNS : Cloudflare ne relaie que HTTP et
 HTTPS, un enregistrement proxifié ne transporte rien d'autre. Voir
 `06-stack-technique.md`.
 
+### Les branches du pouvoir ✔
+
+Les entités de l'État étaient jusque-là un seul échelon indifférencié : sept
+nœuds, sans distinction entre celui qui vote la loi, celui qui l'applique et
+celui qui tranche. Elles sont maintenant 23, rangées par branche, avec une page
+dédiée — la carte d'ensemble range par échelon, la séparation des pouvoirs est
+orthogonale à cet axe.
+
+Manquaient entièrement : le Parlement et ses deux chambres, le président de la
+République, le Gouvernement, l'administration centrale, le Conseil d'État, le
+Conseil constitutionnel, la Cour des comptes, les juridictions d'appel et
+l'ordre judiciaire, la CNIL. Le Sénat méritait à lui seul d'être ajouté : ses
+grands électeurs sont très majoritairement des conseillers municipaux, et les
+textes sur l'organisation des collectivités lui sont soumis en premier.
+
+La règle de validation a payé immédiatement : elle a révélé que le tribunal
+administratif et la chambre régionale des comptes étaient typés
+`service_deconcentre`, c'est-à-dire rangés parmi les bras de l'exécutif. Voir
+`02-familles.md`.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

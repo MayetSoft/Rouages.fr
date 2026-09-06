@@ -95,6 +95,15 @@ const HAUTEUR_LIGNE = 92;
 const MARGE_HAUT = 54;
 /** Vide entre deux colonnes, une fois les pastilles dimensionnées. */
 const ECART_COLONNES = 44;
+/** Écart entre deux sous-piles d'un même échelon : plus serré qu'entre échelons. */
+const ECART_PILES = 18;
+/**
+ * Au-delà, une colonne devient une bande verticale interminable : l'échelon
+ * « État » compte à lui seul plus d'entités que tous les échelons locaux
+ * réunis, et une pile de vingt-quatre pastilles face à des piles de huit rend
+ * la carte entière illisible. L'échelon se replie alors sur plusieurs piles.
+ */
+const PILE_MAX = 12;
 
 let cache: Reseau | undefined;
 
@@ -206,21 +215,35 @@ function disposerCarte(noeuds: Map<string, Noeud>, aretes: Arete[]): Reseau['car
       .filter((a) => a.echelon === echelon)
       .sort((a, b) => b.degre - a.degre || a.nom.localeCompare(b.nom, 'fr')),
   }));
-  const largeurs = contenus.map((c) => Math.max(104, ...c.dedans.map((a) => largeurPastille(a.court))));
+  const largeursPile = contenus.map((c) =>
+    Math.max(104, ...c.dedans.map((a) => largeurPastille(a.court))),
+  );
+  // Un échelon trop peuplé se replie sur plusieurs piles côte à côte plutôt que
+  // de s'étirer vers le bas. Il reste une seule colonne — une seule bande, un
+  // seul intitulé : c'est bien un seul échelon, seulement plié en deux.
+  const piles = contenus.map((c) => Math.max(1, Math.ceil(c.dedans.length / PILE_MAX)));
+  const parPile = contenus.map((c, i) => Math.ceil(c.dedans.length / piles[i]));
+  const largeurs = contenus.map(
+    (_, i) => largeursPile[i] * piles[i] + ECART_PILES * (piles[i] - 1),
+  );
 
-  const hauteurMax = Math.max(...contenus.map((c) => c.dedans.length)) * HAUTEUR_LIGNE;
+  const hauteurMax = Math.max(...parPile) * HAUTEUR_LIGNE;
   let hautNoeuds = Infinity;
   let basNoeuds = 0;
   let curseur = ECART_COLONNES;
   const colonnes = contenus.map((c, i) => {
-    const x = Math.round(curseur + largeurs[i] / 2);
+    const gauche = curseur;
+    const x = Math.round(gauche + largeurs[i] / 2);
     curseur += largeurs[i] + ECART_COLONNES;
     // Chaque pile est centrée verticalement : la carte respire, et l'œil suit
     // les traits horizontaux plutôt que des rangées artificielles.
-    const decalage = MARGE_HAUT + (hauteurMax - c.dedans.length * HAUTEUR_LIGNE) / 2;
+    const hauteurOccupee = Math.min(c.dedans.length, parPile[i]) * HAUTEUR_LIGNE;
+    const decalage = MARGE_HAUT + (hauteurMax - hauteurOccupee) / 2;
     c.dedans.forEach((a, j) => {
-      a.x = x;
-      a.y = Math.round(decalage + j * HAUTEUR_LIGNE);
+      const pile = Math.floor(j / parPile[i]);
+      const rang = j % parPile[i];
+      a.x = Math.round(gauche + pile * (largeursPile[i] + ECART_PILES) + largeursPile[i] / 2);
+      a.y = Math.round(decalage + rang * HAUTEUR_LIGNE);
       hautNoeuds = Math.min(hautNoeuds, a.y);
       basNoeuds = Math.max(basNoeuds, a.y);
     });
@@ -230,7 +253,7 @@ function disposerCarte(noeuds: Map<string, Noeud>, aretes: Arete[]): Reseau['car
       x,
       largeur: Math.round(largeurs[i]),
       haut: Math.round(decalage),
-      bas: Math.round(decalage + (c.dedans.length - 1) * HAUTEUR_LIGNE),
+      bas: Math.round(decalage + (Math.min(c.dedans.length, parPile[i]) - 1) * HAUTEUR_LIGNE),
     };
   });
 

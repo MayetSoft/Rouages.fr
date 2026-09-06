@@ -15,6 +15,13 @@ sigles:
     noeud: cada
     liens: [cada, wp-cada]
 
+  - id: sigle-cnil
+    sigle: CNIL
+    developpe: "Commission nationale de l'informatique et des libertés"
+    definition: "Autorité indépendante qui contrôle l'usage des données personnelles, y compris par les collectivités."
+    noeud: cnil
+    liens: [cnil-fr, wp-cnil]
+
   - id: sigle-plu
     sigle: PLU
     developpe: "Plan local d'urbanisme"

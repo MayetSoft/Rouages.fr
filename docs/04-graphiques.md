@@ -68,8 +68,25 @@ arête par paire d'acteurs, épaisseur = nombre de compétences en commun.
 L'agrégation est ce qui rend la carte lisible : sans elle, cinquante nœuds et
 deux cents arêtes ne montrent rien.
 
+Un échelon trop peuplé se replie sur plusieurs piles côte à côte plutôt que de
+s'étirer vers le bas : il reste une seule colonne — une seule bande, un seul
+intitulé — seulement pliée en deux. L'État compte à lui seul plus d'entités que
+tous les échelons locaux réunis, et une pile de vingt-quatre pastilles face à
+des piles de huit rendait la carte entière illisible.
+
+**Les branches du pouvoir.** La carte range par échelon territorial ; la
+séparation des pouvoirs est orthogonale à cet axe, puisqu'elle se joue
+entièrement dans une seule colonne. Elle a donc sa page, en bandes horizontales
+— une par branche. Une entité qui en exerce deux figure dans les deux bandes,
+tracée en pointillé : c'est le seul moyen de ne pas devoir choisir.
+
 **Le focus.** Un nœud au centre, ses relations autour, groupées par famille pour
 que les couches se lisent comme des secteurs, chacune nommée en toutes lettres.
+Le nom de la relation se place au milieu du segment tracé, pas au milieu du
+rayon : les deux extrémités étant sur le bord des pastilles, ce point est
+toujours dans l'espace libre entre elles. Placé sur le rayon, il passait sous
+une pastille large et disparaissait sans bruit, la couche des nœuds étant
+dessinée par-dessus celle des arêtes.
 
 **La chronologie** et **les fenêtres d'action**, pour les processus seulement :
 un graphe ne sait pas montrer le temps.

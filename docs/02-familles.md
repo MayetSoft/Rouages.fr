@@ -134,6 +134,45 @@ Un nœud est publiable si, et seulement si :
 - [ ] son niveau de `confiance` est honnête, y compris
       « variable selon le territoire ».
 
+## Les branches du pouvoir
+
+La carte d'ensemble range par échelon territorial : qui est loin, qui est près.
+La séparation des pouvoirs est orthogonale à cet axe — elle se joue entièrement
+à l'intérieur d'une seule colonne, celle de l'État. Les deux ne tiennent donc
+pas dans le même schéma, d'où la page dédiée.
+
+Toute entité de l'État déclare la branche dont elle relève, dans `pouvoirs`.
+Le champ est **exigé** de tout acteur national, de toute juridiction et de toute
+autorité indépendante, et **refusé** partout ailleurs — `scripts/valider.ts`
+applique la règle. Sans elle, `pouvoirs` serait un champ facultatif que
+personne ne remplirait, et une vue « par branche » à moitié remplie est pire
+que pas de vue du tout.
+
+Trois écarts au schéma appris à l'école sont assumés plutôt que masqués.
+
+**`independant` n'est pas une quatrième branche inventée pour l'occasion.**
+C'est une catégorie juridique existante : la loi n° 2017-55 place les autorités
+administratives et publiques indépendantes hors de la hiérarchie des trois
+pouvoirs. Les ranger sous « exécutif » parce qu'elles sont administratives
+dirait exactement le contraire de ce qui les définit.
+
+**Le champ est une liste, parce qu'une institution peut en exercer deux.** Le
+Conseil d'État est à la fois le conseil juridique obligatoire du Gouvernement
+et le juge suprême de l'ordre administratif. Choisir l'une des deux fonctions
+serait plus simple, et faux : il apparaît donc dans les deux bandes, tracé en
+pointillé.
+
+**Le critère n'est pas seulement l'échelon.** Une chambre régionale des comptes
+siège en région tout en étant une juridiction de l'État. À l'inverse, les
+personnes physiques sont exclues : un commissaire enquêteur est désigné pour
+une mission, il n'incarne aucune branche. Un mandat électif, lui, en est bien
+un organe — d'où la distinction entre les types `personne` et `mandat_electif`.
+
+Cette classification a immédiatement corrigé deux erreurs de typage qui
+dataient du socle : le tribunal administratif et la chambre régionale des
+comptes étaient tous deux déclarés `service_deconcentre`. Un service déconcentré
+est un bras de l'exécutif, ce qu'une juridiction n'est précisément pas.
+
 ## Granularité
 
 Un nœud = **une chose qu'on peut relier**, pas un thème. « L'urbanisme » n'est

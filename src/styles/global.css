@@ -437,6 +437,16 @@ abbr[title] {
 footer { border-top: 1px solid var(--trait); margin-top: 3rem; padding: 1.2rem 1.1rem; color: var(--encre-douce); font-size: .82rem; }
 footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
 
+/* --- les branches du pouvoir --- */
+/* La pastille reste la forme de l'acteur, comme partout ailleurs : c'est la
+   bande qui porte la branche, pas la couleur du nœud. */
+.v-branche { fill: var(--fond-carte); stroke: var(--trait-fort); stroke-width: 1.5; }
+.n:hover .v-branche, .n:focus-visible .v-branche { fill: var(--fond-doux); stroke: var(--encre); }
+.n:focus-visible .v-branche { stroke-width: 2.5; }
+/* Pointillé : l'entité figure aussi dans une autre bande — elle exerce deux
+   pouvoirs, et le schéma refuse de choisir pour elle. */
+.v-branche--partagee { stroke-dasharray: 5 3; }
+
 /* --- schémas générés au build (chronologie, fenêtres d'action) --- */
 .v-schema text { font-family: var(--sans); }
 .v-texte { fill: var(--encre); font-size: 13px; }

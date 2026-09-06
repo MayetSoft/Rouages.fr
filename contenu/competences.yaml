@@ -392,3 +392,177 @@ competences:
     liens: [wp-agence-urbanisme, fnau, code-urbanisme]
     verifie_le: 2026-09-05
     confiance: a_confirmer
+
+  # --- Les branches du pouvoir --------------------------------------------
+  # Ces compétences existent d'abord pour que les entités de l'État ne soient
+  # pas des nœuds isolés : un nœud qu'on ne peut relier à rien n'apprend rien.
+  # Chacune est une attribution réelle, et le partage y est l'information
+  # principale — c'est lui qui explique pourquoi une décision met du temps.
+  - id: vote-loi
+    nom: "Vote de la loi"
+    acteur: assemblee-nationale
+    resume: "Les deux chambres examinent le même texte jusqu'à l'accord ; en cas de désaccord persistant, le Gouvernement peut donner le dernier mot à l'Assemblée."
+    partagee_avec: [senat, gouvernement, president-republique]
+    liens: [constitution, vp-parlement, an-fr]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: vote-budget-etat
+    nom: "Vote du budget de l'État"
+    nom_court: "Budget de l'État"
+    acteur: assemblee-nationale
+    resume: "C'est ce vote qui fixe les dotations versées aux collectivités : le budget d'une commune se joue en partie ici."
+    partagee_avec: [senat, gouvernement, cour-comptes]
+    liens: [constitution, vp-parlement, od-ofgl]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: controle-gouvernement
+    nom: "Contrôle du Gouvernement"
+    acteur: depute
+    resume: "Questions, commissions d'enquête, motions de censure : le Parlement contrôle l'exécutif, et c'est par là qu'un dossier local peut remonter."
+    partagee_avec: [senateur, assemblee-nationale, senat, cour-comptes]
+    liens: [constitution, vp-parlement, wp-depute]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: representation-collectivites
+    nom: "Représentation des collectivités territoriales"
+    nom_court: "Voix des collectivités"
+    acteur: senat
+    resume: "La Constitution confie cette représentation au Sénat, élu par des grands électeurs très majoritairement issus des conseils municipaux."
+    partagee_avec: [senateur, commune, departement, region]
+    liens: [constitution, senat-fr, wp-senat]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: pouvoir-reglementaire
+    nom: "Pouvoir réglementaire"
+    acteur: gouvernement
+    resume: "Décrets et arrêtés d'application : entre la loi votée et ce qui s'applique réellement en mairie, il y a ces textes-là."
+    partagee_avec: [president-republique, administration-centrale, conseil-etat]
+    liens: [constitution, gouvernement-fr, wp-gouvernement]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: nomination-prefets
+    nom: "Nomination des préfets"
+    acteur: president-republique
+    resume: "Le préfet est nommé en conseil des ministres : le représentant de l'État dans le département dépend directement du sommet de l'exécutif."
+    partagee_avec: [gouvernement, prefet]
+    liens: [constitution, elysee-fr, wp-prefet]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: conseil-textes
+    nom: "Avis sur les projets de loi et d'ordonnance"
+    nom_court: "Avis sur les textes"
+    acteur: conseil-etat
+    resume: "Le Gouvernement doit consulter le Conseil d'État avant de déposer un projet de loi : c'est sa fonction de conseil, distincte de celle de juge."
+    partagee_avec: [gouvernement, administration-centrale]
+    liens: [constitution, conseil-etat-fr, wp-conseil-etat]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: juger-administration
+    nom: "Juger les litiges avec l'administration"
+    nom_court: "Juger l'administration"
+    acteur: tribunal-administratif
+    resume: "Un refus de permis, une décision de la mairie ou de la préfecture se conteste devant ce juge — puis en appel, puis en cassation."
+    partagee_avec: [cour-administrative-appel, conseil-etat]
+    liens: [code-justice-administrative, sp-recours-urbanisme, wp-ordres-juridiction]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: juger-litiges-prives
+    nom: "Juger les litiges entre personnes et les infractions"
+    nom_court: "Juger les particuliers"
+    acteur: tribunal-judiciaire
+    resume: "L'autre ordre de juridiction : un conflit de voisinage ou une infraction pénale ne relève pas du juge administratif."
+    partagee_avec: [citoyen]
+    liens: [code-organisation-judiciaire, justice-fr, wp-ordres-juridiction]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: controle-constitutionnalite
+    nom: "Contrôle de constitutionnalité"
+    acteur: conseil-constitutionnel
+    resume: "Avant promulgation, ou à l'occasion d'un procès par question prioritaire de constitutionnalité : une loi déjà en vigueur peut encore tomber."
+    partagee_avec: [conseil-etat, assemblee-nationale, senat, president-republique]
+    liens: [constitution, conseil-constitutionnel-fr, wp-conseil-constitutionnel]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: controle-comptes-publics
+    nom: "Contrôle des comptes et de la gestion publics"
+    nom_court: "Contrôle des comptes"
+    acteur: cour-comptes
+    resume: "La Cour juge les comptes de l'État et assiste le Parlement ; les chambres régionales font le même travail sur les collectivités, et publient."
+    partagee_avec: [chambre-regionale-comptes, assemblee-nationale, senat]
+    liens: [code-juridictions-financieres, ccomptes, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: recours-mediation
+    nom: "Recours non contentieux contre un service public"
+    nom_court: "Recours amiable"
+    acteur: defenseur-des-droits
+    resume: "Saisine gratuite, sans avocat et sans passer par un juge : c'est souvent la première marche avant un recours contentieux."
+    partagee_avec: [citoyen, cada, cnil]
+    liens: [defenseur-droits, wp-defenseur-droits, constitution]
+    verifie_le: 2026-09-06
+    confiance: etabli
+
+  - id: protection-donnees
+    nom: "Protection des données personnelles"
+    acteur: cnil
+    resume: "Fichiers, vidéoprotection, téléservices : une commune qui traite des données personnelles répond devant la CNIL, et toute personne peut la saisir."
+    partagee_avec: [citoyen, commune, epci, etat]
+    liens: [cnil-fr, wp-cnil, loi-aai]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
+
+  - id: preparation-textes
+    nom: "Préparation des textes et répartition des crédits"
+    nom_court: "Préparation des textes"
+    acteur: administration-centrale
+    resume: "C'est là que se décide le détail d'application d'une loi, et la clé de répartition d'une dotation entre collectivités."
+    partagee_avec: [gouvernement, prefet, rectorat]
+    liens: [gouvernement-fr, od-annuaire-administration, od-ofgl]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
+
+  # --- Les assemblées délibérantes ------------------------------------------
+  # Les compétences ci-dessus sont attribuées à la collectivité ; ce sont ses
+  # assemblées qui les votent. Sans ces trois entrées, les conseils
+  # communautaire, départemental et régional restaient des nœuds isolés — donc
+  # invisibles depuis n'importe quel autre point du réseau.
+  - id: interet-communautaire
+    nom: "Définition de l'intérêt communautaire"
+    nom_court: "Intérêt communautaire"
+    acteur: conseil-communautaire
+    resume: "Une compétence transférée n'est pas exercée entièrement : le conseil fixe le seuil à partir duquel elle passe à l'intercommunalité, et ce qui reste à la commune."
+    partagee_avec: [epci, commune, conseil-municipal]
+    liens: [cgct, wp-intercommunalite, od-banatic]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
+
+  - id: vote-budget-departemental
+    nom: "Vote du budget départemental"
+    nom_court: "Budget départemental"
+    acteur: conseil-departemental
+    resume: "L'assemblée vote un budget dont l'action sociale, le RSA en tête, occupe la plus grande part — une dépense qu'elle ne fixe pourtant pas elle-même."
+    partagee_avec: [departement, prefet, chambre-regionale-comptes, etat]
+    liens: [cgct, od-ofgl, vp-budget-local]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
+
+  - id: vote-budget-regional
+    nom: "Vote du budget régional"
+    nom_court: "Budget régional"
+    acteur: conseil-regional
+    resume: "L'assemblée vote le budget et les schémas qui s'imposent ensuite aux documents d'urbanisme locaux."
+    partagee_avec: [region, prefet, chambre-regionale-comptes]
+    liens: [cgct, od-ofgl, vp-budget-local]
+    verifie_le: 2026-09-06
+    confiance: a_confirmer
