@@ -1,5 +1,5 @@
 {
-  "dernier_controle": "2026-09-06",
+  "dernier_controle": "2026-09-07",
   "constats": {
     "banatic-referentiel": {
       "empreinte": "a9d1b65dfa4eea62",
@@ -25,7 +25,7 @@
       "gravite": "ok"
     },
     "annuaire-administration": {
-      "millesime": 93784,
+      "millesime": 93779,
       "gravite": "ok"
     },
     "finess-referentiel": {
