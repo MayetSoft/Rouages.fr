@@ -321,3 +321,38 @@ Ce que le site peut faire, et fait : montrer **ce qui a changé** dans les
 comptes, et nommer **qui décide** — c'est déjà de quoi savoir à qui poser la
 question. Le reste relèverait des délibérations, qui ne sont pas en données
 ouvertes exploitables : c'est la phase 4, et c'est un autre projet.
+
+## La navigation
+
+**Ouvrir un nœud est une navigation, pas un changement d'affichage.** Elle
+empile une entrée d'historique, et le bouton Retour du navigateur y ramène.
+Auparavant tout passait par `replaceState` sans écouteur `popstate` : parcourir
+dix nœuds n'en laissait aucune trace, le Retour faisait sortir du site, et
+coller un lien `#id` dans une page déjà ouverte ne redessinait rien — le
+fragment changeait, l'écran non.
+
+La famille dépliée d'un voisinage replié, elle, reste **hors de l'URL** : c'est
+un état d'affichage, pas un endroit où l'on se trouve, et l'empiler rendrait le
+Retour imprévisible. Échap et « Vue d'ensemble » remontent d'abord aux grappes,
+puis à la carte — un cran à la fois.
+
+## Le téléphone
+
+L'interface occupait 290 px sur un écran de 844, soit **34 %**, contre 11 % sur
+ordinateur : la carte n'avait plus la place d'être une carte. Trois économies
+sans rien retirer — la signature disparaît (le nom du site la porte déjà), la
+légende descend en dernier pour que « chez moi » et les commandes de zoom
+partagent une ligne, et la carte prend ce qui reste du premier écran au lieu
+d'une fraction fixe. 290 px d'interface deviennent 242, et la carte passe de
+506 à 596 px.
+
+`dvh` plutôt que `vh` : la barre d'adresse des navigateurs mobiles se rétracte,
+et `vh` l'ignore.
+
+**Une mise en garde de méthode.** Les premières captures de cette page, prises
+avec `chrome --headless --screenshot`, montraient du texte coupé et une
+navigation qui débordait. J'ai failli corriger un débordement horizontal qui
+n'existait pas : mesuré avec un vrai viewport, `scrollWidth` vaut exactement la
+largeur de la fenêtre sur toutes les pages. Le drapeau `--window-size` n'impose
+pas le viewport CSS qu'on croit. Pour juger d'un rendu, mesurer dans la page,
+pas regarder une capture.

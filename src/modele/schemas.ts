@@ -139,6 +139,13 @@ export const Acteur = z.object({
   ...tracable,
 });
 
+/**
+ * Les catégories d'intercommunalité à fiscalité propre, telles que BANATIC les
+ * nomme. Ce sont elles que la loi désigne quand elle rend une compétence
+ * obligatoire.
+ */
+export const NATURES_FISCALITE_PROPRE = ['CC', 'CA', 'CU', 'METRO', 'MET69', 'EPT', 'SAN'] as const;
+
 export const Competence = z.object({
   id: Id,
   nom: z.string().min(3),
@@ -160,6 +167,33 @@ export const Competence = z.object({
   acteur: Id,
   resume: z.string().min(10).max(280, 'une phrase suffit — le reste est sur les pages liées'),
   partagee_avec: z.array(Id).default([]),
+  /**
+   * Les catégories d'intercommunalité auxquelles la loi transfère cette
+   * compétence de plein droit.
+   *
+   * BANATIC enregistre les transferts *déclarés*, et il en manque beaucoup :
+   * 54 % seulement des intercommunalités à fiscalité propre y déclarent le
+   * développement économique, que la loi impose pourtant à toutes depuis 2017.
+   * Conclure « la commune » du silence du registre était donc faux une fois
+   * sur deux. Quand la loi tranche, c'est elle qui répond.
+   *
+   * À ne renseigner que sur vérification de l'article : une compétence
+   * faussement déclarée obligatoire ferait mentir le site avec l'autorité de
+   * la loi. La règle de validation exige d'ailleurs une source de droit.
+   */
+  obligatoire_pour: z.array(z.enum(NATURES_FISCALITE_PROPRE)).default([]),
+  /**
+   * Une réserve à afficher avec la réponse territoriale, quand le registre ne
+   * capte pas le mécanisme réel.
+   *
+   * Le cas type est l'instruction des permis : le maire signe — c'est bien une
+   * compétence communale — mais l'instruction est très souvent confiée à un
+   * service mutualisé, par convention et non par transfert. Une convention
+   * n'entre pas à BANATIC, d'où les 2 à 4 % de couverture. Répondre « la
+   * commune » est exact et pourtant trompeur : la réserve dit ce que la
+   * réponse ne dit pas.
+   */
+  reserve: z.string().min(20).max(400).optional(),
   ...tracable,
 });
 

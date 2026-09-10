@@ -160,3 +160,7 @@ sources:
   - { id: od-finess, type: donnees_ouvertes, titre: "Référentiel FINESS — les établissements de santé et leurs autorisations", url: "https://www.data.gouv.fr/datasets/referentiel-finess-t-finess", consulte_le: 2026-09-06 }
   - { id: france-services-gouv, type: page_officielle, titre: "France services — trouver la structure la plus proche", url: "https://www.france-services.gouv.fr/", consulte_le: 2026-09-06 }
   - { id: wp-france-services, type: wikipedia, titre: "France Services", url: "https://fr.wikipedia.org/wiki/France_Services", consulte_le: 2026-09-06 }
+
+  # --- Socle légal des compétences transférées de plein droit ----------------
+  - { id: cgct-l5214-16, type: droit, titre: "CGCT art. L5214-16 — compétences des communautés de communes", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000051459827", consulte_le: 2026-09-06 }
+  - { id: cgct-l5216-5, type: droit, titre: "CGCT art. L5216-5 — compétences des communautés d'agglomération", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045210287", consulte_le: 2026-09-06 }

@@ -44,6 +44,11 @@ export interface Structure {
  */
 export type Verdict =
   | { etat: 'transferee'; structures: Structure[] }
+  /**
+   * La loi transfère cette compétence de plein droit à cette catégorie
+   * d'intercommunalité, que le registre l'ait enregistré ou non.
+   */
+  | { etat: 'transferee-par-loi'; structures: Structure[] }
   | { etat: 'communale' }
   | { etat: 'non-renseigne'; couvertureDep: number; couvertureNationale: number };
 
@@ -138,6 +143,8 @@ export interface Territoire {
   parCompetence: Map<string, Structure[]>;
   /** compétence Rouages -> ce qu'on peut honnêtement en dire ici. */
   verdict(competence: string): Verdict;
+  /** La réserve déclarée par la compétence, quand elle en porte une. */
+  reserve(competence: string): string | null;
   /** Les comptes de la commune, en euros par habitant. */
   finances: Finances | null;
   /** Le service d'eau qui la dessert, et son prix. */
@@ -181,6 +188,10 @@ let meta: {
   codes: Record<string, string[]>;
   natures: Record<string, string>;
   couverture: Record<string, number>;
+  /** Compétence -> catégories d'intercommunalité que la loi oblige. */
+  obligatoires?: Record<string, string[]>;
+  /** Compétence -> réserve à afficher avec la réponse. */
+  reserves?: Record<string, string>;
   finances?: MetaFinances;
   eau?: { annee: number; indicateur: string; competence: string; prixMedian: number | null };
   services?: {
@@ -377,6 +388,18 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   const verdict = (competence: string): Verdict => {
     const trouves = parCompetence.get(competence);
     if (trouves && trouves.length > 0) return { etat: 'transferee', structures: trouves };
+
+    // Avant de conclure quoi que ce soit du silence du registre : la loi a
+    // peut-être déjà tranché. 54 % seulement des intercommunalités à fiscalité
+    // propre déclarent à BANATIC le développement économique, que la loi leur
+    // impose pourtant à toutes depuis 2017 — répondre « la commune » y était
+    // faux presque une fois sur deux.
+    const natures = meta!.obligatoires?.[competence] ?? [];
+    if (natures.length > 0) {
+      const tenues = structures.filter((s) => natures.includes(s.nature));
+      if (tenues.length > 0) return { etat: 'transferee-par-loi', structures: tenues };
+    }
+
     const dansLeDep = dep.couverture?.[competence] ?? 0;
     const enFrance = meta!.couverture?.[competence] ?? 0;
     if (enFrance >= 0.5 && dansLeDep < enFrance * 0.5) {
@@ -391,6 +414,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     structures,
     parCompetence,
     verdict,
+    reserve: (c: string) => meta!.reserves?.[c] ?? null,
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),

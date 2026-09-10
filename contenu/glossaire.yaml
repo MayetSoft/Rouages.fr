@@ -35,6 +35,12 @@ sigles:
     definition: "Le répertoire officiel des hôpitaux, cliniques et établissements médico-sociaux, avec les soins que chacun est autorisé à pratiquer."
     liens: [od-finess]
 
+  - id: sigle-cgct
+    sigle: CGCT
+    developpe: "Code général des collectivités territoriales"
+    definition: "Le code qui fixe ce que chaque collectivité peut faire, et ce que la loi transfère d'office à l'intercommunalité."
+    liens: [cgct, cgct-l5214-16, cgct-l5216-5]
+
   - id: sigle-plui
     sigle: PLUi
     developpe: "Plan local d'urbanisme intercommunal"

@@ -88,6 +88,21 @@ toujours dans l'espace libre entre elles. Placé sur le rayon, il passait sous
 une pastille large et disparaissait sans bruit, la couche des nœuds étant
 dessinée par-dessus celle des arêtes.
 
+Au-delà de quatorze voisins, la couronne du focus devient illisible : « Vous »
+en compte 41 relations, « La commune » 33, et les étiquettes se recouvrent bien
+avant. Le voisinage se replie alors en **une grappe par famille de relation** —
+trois ou cinq nœuds au lieu de quarante — portant chacune son décompte, que
+l'on déplie d'un clic. Le seuil n'est pas une préférence : c'est le nombre
+au-delà duquel les étiquettes ne tiennent plus sur le pourtour. C'est aussi ce
+qui permettra d'ajouter police, gendarmerie, ministères et agences sans que la
+vue se dégrade — elle ne dépend plus du nombre de voisins, mais du nombre de
+familles, qui est fixe.
+
+Le cadrage vient de `getBBox`, l'emprise réelle du dessin, et non d'un gabarit
+fixe. Le focus se cadrait sur 1 060 unités quelle que soit la fenêtre : sur un
+téléphone de 390 px tout était réduit d'un tiers et illisible, et sur un grand
+écran un voisinage replié flottait au milieu du vide.
+
 **La chronologie** et **les fenêtres d'action**, pour les processus seulement :
 un graphe ne sait pas montrer le temps.
 

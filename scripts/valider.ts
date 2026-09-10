@@ -102,6 +102,21 @@ for (const n of construireReseau().noeuds) {
   (n.type === 'document' ? avertissements : erreurs).push(ligne);
 }
 
+// Une compétence déclarée obligatoire par la loi doit citer le texte qui le
+// dit. Sans cette règle, le site pourrait affirmer « l'intercommunalité, la loi
+// l'y oblige » sans que rien ne permette de le vérifier — et se tromper avec
+// l'autorité de la loi est pire que se tromper tout court.
+for (const c of g.competences.values()) {
+  if (c.obligatoire_pour.length === 0) continue;
+  const cite = c.liens.some((l) => g.sources.get(l)?.type === 'droit');
+  if (!cite) {
+    erreurs.push(
+      `compétence « ${c.id} » est déclarée obligatoire pour ${c.obligatoire_pour.join(', ')} ` +
+        `sans citer de texte de droit — ajoutez l'article aux liens.`,
+    );
+  }
+}
+
 // La branche du pouvoir est exigée là où elle a un sens, et refusée ailleurs.
 // Sans cette règle, `pouvoirs` serait un champ facultatif que personne ne
 // remplirait : la classification par branche resterait à moitié faite, et une

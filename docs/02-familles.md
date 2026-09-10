@@ -173,6 +173,29 @@ dataient du socle : le tribunal administratif et la chambre régionale des
 comptes étaient tous deux déclarés `service_deconcentre`. Un service déconcentré
 est un bras de l'exécutif, ce qu'une juridiction n'est précisément pas.
 
+## Quand la loi répond avant le registre
+
+BANATIC enregistre les transferts *déclarés*. Il en manque beaucoup : **54 %
+seulement** des 1 264 intercommunalités à fiscalité propre y déclarent le
+développement économique, que la loi NOTRe leur impose pourtant à toutes depuis
+le 1er janvier 2017. Conclure « la commune » du silence du registre était donc
+faux presque une fois sur deux.
+
+Une compétence peut donc déclarer `obligatoire_pour`, la liste des catégories
+d'intercommunalité auxquelles la loi la transfère de plein droit. La résolution
+consulte le registre d'abord, la loi ensuite, et le silence en dernier — et
+elle dit laquelle des trois a répondu. `scripts/valider.ts` exige qu'une
+compétence ainsi déclarée cite un texte de droit : se tromper avec l'autorité
+de la loi est pire que se tromper tout court.
+
+**La couverture d'un code n'est pas toujours un défaut de saisie.** Le code
+« délivrance des autorisations d'urbanisme » n'est déclaré que par 2 à 4 % des
+intercommunalités, et c'est exact : le maire signe — la compétence est
+communale — et seule l'*instruction* se mutualise, par convention de service
+commun. Une convention n'est pas un transfert et n'entre dans aucun registre.
+La compétence porte donc une `reserve` : une phrase affichée avec la réponse,
+qui dit ce que la réponse, même exacte, laisse de côté.
+
 ## Granularité
 
 Un nœud = **une chose qu'on peut relier**, pas un thème. « L'urbanisme » n'est

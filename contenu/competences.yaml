@@ -83,8 +83,12 @@ competences:
     resume: "Le maire signe, au nom de la commune si elle a un document d'urbanisme, au nom de l'État sinon."
     partagee_avec: [abf, prefet]
     banatic: ["5530"]
+    # Seuls 2 à 4 % des intercommunalités déclarent ce transfert, parce que le
+    # mécanisme réel n'en est pas un : l'instruction se mutualise par
+    # convention de service commun, et une convention n'entre pas au registre.
+    reserve: "Le maire signe, mais l'instruction du dossier est souvent confiée au service d'urbanisme de l'intercommunalité. Cette mutualisation se fait par convention, pas par transfert de compétence : elle n'apparaît donc dans aucun registre national."
     liens: [cu-l422-1, code-patrimoine, sp-permis]
-    verifie_le: 2026-09-05
+    verifie_le: 2026-09-06
     confiance: etabli
 
   # --- Intercommunalité -------------------------------------------------
@@ -127,9 +131,13 @@ competences:
     resume: "Zones d'activité et immobilier d'entreprise pour l'intercommunalité ; la stratégie et les aides relèvent de la région."
     partagee_avec: [region]
     banatic: ["4000", "4005"]
-    liens: [cgct, vp-competences, wp-loi-notre]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    # La loi NOTRe la transfère de plein droit depuis le 1er janvier 2017. Les
+    # EPT en sont exclus : dans le Grand Paris, c'est la métropole qui l'exerce,
+    # ce que confirme le registre — aucun des onze EPT ne la déclare.
+    obligatoire_pour: [CC, CA, CU, METRO, MET69]
+    liens: [cgct, cgct-l5214-16, cgct-l5216-5, vp-competences, wp-loi-notre]
+    verifie_le: 2026-09-06
+    confiance: etabli
 
   - id: logement-social
     nom: "Logement social"

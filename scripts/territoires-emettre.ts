@@ -299,6 +299,19 @@ export function emettre(o: {
     decoupage: '@etalab/decoupage-administratif',
     // code BANATIC -> compétences de Rouages qu'il permet de résoudre
     codes: Object.fromEntries(codesSuivis),
+    // Compétence -> catégories d'intercommunalité auxquelles la loi la
+    // transfère de plein droit. BANATIC n'enregistre que les transferts
+    // déclarés, et il en manque beaucoup : conclure « la commune » de son
+    // silence serait faux là où la loi a déjà tranché.
+    obligatoires: Object.fromEntries(
+      [...o.graphe.competences.values()]
+        .filter((c) => c.obligatoire_pour.length > 0)
+        .map((c) => [c.id, c.obligatoire_pour]),
+    ),
+    // Les réserves : ce que la réponse territoriale ne dit pas d'elle-même.
+    reserves: Object.fromEntries(
+      [...o.graphe.competences.values()].filter((c) => c.reserve).map((c) => [c.id, c.reserve]),
+    ),
     natures: Object.fromEntries(natures),
     // Part nationale des communes pour lesquelles un exerçant est identifié.
     couverture: Object.fromEntries(

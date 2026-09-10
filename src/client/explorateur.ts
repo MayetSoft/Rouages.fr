@@ -48,6 +48,13 @@ interface Etat {
   focus: string | null;
   /** Familles affichées. La légende est la commande. */
   visibles: Set<Famille>;
+  /**
+   * La famille dépliée dans un voisinage replié. `null` = les grappes.
+   * Volontairement hors de l'URL : c'est un état d'affichage, pas un endroit
+   * où l'on se trouve, et l'empiler dans l'historique rendrait le bouton
+   * Retour imprévisible.
+   */
+  familleDepliee: Famille | null;
 }
 
 interface Boite {
@@ -57,6 +64,17 @@ interface Boite {
   l: number;
   h: number;
 }
+
+/**
+ * Au-delà d'une poignée de voisins, la couronne devient illisible : « Vous »
+ * en compte 41, « La commune » 33, et les étiquettes se recouvrent bien avant.
+ * Le voisinage se replie alors en une grappe par famille de relation — cinq
+ * nœuds au lieu de quarante — que l'on déplie d'un clic.
+ *
+ * Le seuil n'est pas une préférence : c'est le nombre au-delà duquel les
+ * étiquettes de relation ne tiennent plus sur le pourtour.
+ */
+const SEUIL_REPLI_VOISINAGE = 14;
 
 const donnees = document.getElementById('donnees-reseau');
 if (donnees) demarrer(JSON.parse(donnees.textContent ?? '{}') as Reseau);
@@ -99,6 +117,7 @@ function demarrer(reseau: Reseau) {
     mode: 'carte',
     focus: null,
     visibles: new Set(FAMILLES.map((f) => f.id)),
+    familleDepliee: null,
   };
   let vue = { x: 0, y: 0, l: reseau.carte.largeur, h: reseau.carte.hauteur };
 
@@ -411,8 +430,23 @@ function demarrer(reseau: Reseau) {
       (a, b) => ordre.get(a.fam)! - ordre.get(b.fam)! || a.noeud.nom.localeCompare(b.noeud.nom, 'fr'),
     );
 
+    // Replier ou non, et sur quoi. Une famille dépliée qui ne contient rien —
+    // parce qu'on vient d'un autre nœud — revient d'elle-même aux grappes.
+    const parFamille = new Map<Famille, typeof voisins>();
+    for (const v of voisins) {
+      const l = parFamille.get(v.fam);
+      if (l) l.push(v);
+      else parFamille.set(v.fam, [v]);
+    }
+    if (etat.familleDepliee && !parFamille.has(etat.familleDepliee)) etat.familleDepliee = null;
+    const dense = voisins.length > SEUIL_REPLI_VOISINAGE;
+    const grappes = dense && !etat.familleDepliee;
+    const affiches = etat.familleDepliee ? parFamille.get(etat.familleDepliee)! : voisins;
+
+    const couronne = grappes ? [...parFamille.keys()] : affiches;
+
     const L = 1060;
-    const rayon = Math.min(370, 160 + voisins.length * 11);
+    const rayon = Math.min(370, 160 + couronne.length * 11);
     const H = rayon * 2 + 170;
     vue = { x: -L / 2, y: -H / 2, l: L, h: H };
     appliquerVue();
@@ -424,9 +458,19 @@ function demarrer(reseau: Reseau) {
     const lCentre = largeurPastille(centre.court, 15, 160) + 16;
     const bCentre: Boite = { noeud: centre, x: 0, y: 0, l: lCentre, h: 46 };
 
-    voisins.forEach((v, i) => {
+    if (grappes) {
+      dessinerGrappes(centre, bCentre, parFamille, rayon, gAretes, gNoeuds);
+      toile.append(gAretes, gNoeuds);
+      gNoeuds.append(dessinerNoeud(bCentre, 'centre'));
+      cadrerSurContenu();
+      retour?.removeAttribute('hidden');
+      ecrirePanneau(centre, voisins);
+      return;
+    }
+
+    affiches.forEach((v, i) => {
       // Départ à midi puis rotation : l'ordre est stable d'une visite à l'autre.
-      const angle = (i / voisins.length) * Math.PI * 2 - Math.PI / 2;
+      const angle = (i / affiches.length) * Math.PI * 2 - Math.PI / 2;
       const x = Math.cos(angle) * rayon * 1.3;
       const y = Math.sin(angle) * rayon * 0.86;
       const l = Math.min(300, largeurPastille(v.noeud.court, 13, 108));
@@ -465,8 +509,72 @@ function demarrer(reseau: Reseau) {
 
     gNoeuds.append(dessinerNoeud(bCentre, 'centre'));
     toile.append(gAretes, gNoeuds);
+    cadrerSurContenu();
     retour?.removeAttribute('hidden');
     ecrirePanneau(centre, voisins);
+  }
+
+  /**
+   * Une grappe par famille de relation, au lieu de quarante pastilles qui se
+   * recouvrent. Le compte est sur la grappe : on sait ce qu'on ne voit pas.
+   */
+  function dessinerGrappes(
+    centre: Noeud,
+    bCentre: Boite,
+    parFamille: Map<Famille, { noeud: Noeud; label: string; fam: Famille; sortante: boolean }[]>,
+    rayon: number,
+    gAretes: SVGGElement,
+    gNoeuds: SVGGElement,
+  ) {
+    const familles = [...parFamille.keys()];
+    familles.forEach((fam, i) => {
+      const membres = parFamille.get(fam)!;
+      const angle = (i / familles.length) * Math.PI * 2 - Math.PI / 2;
+      const x = Math.cos(angle) * rayon * 1.15;
+      const y = Math.sin(angle) * rayon * 0.8;
+      const libelle = FAMILLES.find((f) => f.id === fam)?.libelle ?? fam;
+      const texte = `${libelle} · ${membres.length}`;
+      const l = largeurPastille(texte, 13, 132);
+      const b = { x, y, l, h: 38 };
+
+      const depart = bord(bCentre, x, y);
+      const arrivee = bord({ ...b, noeud: centre }, -x, -y);
+      const chemin = dessinerArete(
+        courbe(depart.x, depart.y, arrivee.x, arrivee.y),
+        fam,
+        `${membres.length} relation(s) de type « ${libelle} »`,
+      );
+      gAretes.append(chemin);
+
+      const g = el('g', {
+        class: `n n--grappe${etat.visibles.has(fam) ? '' : ' masque'}`,
+        transform: `translate(${x - l / 2} ${y - b.h / 2})`,
+        tabindex: 0,
+        role: 'button',
+        'aria-label': `Déplier les ${membres.length} relations « ${libelle} » de ${centre.nom}`,
+        'data-famille': fam,
+      });
+      g.append(el('rect', { class: 'n-fond', width: l, height: b.h, rx: 8 }));
+      const t = el('text', { class: 'n-nom', x: l / 2, y: b.h / 2 + 4.5, 'text-anchor': 'middle' });
+      t.textContent = texte;
+      g.append(t);
+      const titre = el('title');
+      titre.textContent = membres.map((m) => m.noeud.nom).join(' · ');
+      g.append(titre);
+
+      const deplier = () => {
+        etat.familleDepliee = fam;
+        rendreFocus(centre.id);
+      };
+      g.addEventListener('click', deplier);
+      g.addEventListener('keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+          e.preventDefault();
+          deplier();
+        }
+      });
+      gNoeuds.append(g);
+    });
   }
 
   /* ---------------------------------------------------------------- *
@@ -524,7 +632,7 @@ function demarrer(reseau: Reseau) {
     if (idCompetence) {
       const v = territoire.verdict(idCompetence);
       bloc.append(ligne('h3', 'p-titre-section', `Chez vous, à ${territoire.commune.nom}`));
-      if (v.etat === 'transferee') {
+      if (v.etat === 'transferee' || v.etat === 'transferee-par-loi') {
         const ul = document.createElement('ul');
         ul.className = 'p-structures';
         for (const s of v.structures) {
@@ -533,6 +641,18 @@ function demarrer(reseau: Reseau) {
           ul.append(li);
         }
         bloc.append(ul);
+        // Dire d'où vient la réponse : ici ce n'est pas le registre des
+        // transferts déclarés, c'est la loi elle-même.
+        if (v.etat === 'transferee-par-loi') {
+          bloc.append(
+            ligne(
+              'p',
+              'p-par-loi',
+              `La loi transfère cette compétence de plein droit à cette catégorie ` +
+                `d'intercommunalité, même quand le registre des transferts ne l'a pas enregistré.`,
+            ),
+          );
+        }
         const prix = blocPrixEau(idCompetence);
         if (prix) bloc.append(prix);
       } else if (v.etat === 'communale') {
@@ -550,6 +670,10 @@ function demarrer(reseau: Reseau) {
           ),
         );
       }
+      // La réserve vaut quelle que soit la réponse : elle dit ce que la
+      // réponse, même exacte, laisse de côté.
+      const reserve = territoire.reserve(idCompetence);
+      if (reserve) bloc.append(ligne('p', 'p-reserve', reserve));
       return bloc;
     }
 
@@ -568,8 +692,11 @@ function demarrer(reseau: Reseau) {
       b.addEventListener('click', () => ouvrir(n.id));
       dt.append(b);
       const dd = document.createElement('dd');
-      if (v.etat === 'transferee') {
+      if (v.etat === 'transferee' || v.etat === 'transferee-par-loi') {
         dd.append(fragmentGlose(v.structures.map((s) => s.nom).join(' · ')));
+        if (v.etat === 'transferee-par-loi') {
+          dd.append(ligne('span', 'p-incise-loi', 'transfert prévu par la loi'));
+        }
         const e = territoire.eau;
         if (e && e.competence === n.id && e.prix !== null) {
           dd.append(ligne('span', 'p-prix-incise', `${e.prix.toLocaleString('fr-FR')} €/m³`));
@@ -1002,23 +1129,72 @@ function demarrer(reseau: Reseau) {
    * Navigation
    * ---------------------------------------------------------------- */
 
-  function ouvrir(id: string) {
+  /**
+   * Ouvrir un nœud est une navigation, pas un changement d'affichage : elle
+   * ajoute une entrée à l'historique, et le bouton Retour du navigateur y
+   * ramène. Sans cela, parcourir dix nœuds n'en laissait aucune trace et le
+   * Retour faisait sortir du site.
+   *
+   * `remplacer` sert au démarrage et aux retours arrière, qui restituent un
+   * état déjà présent dans l'historique plutôt que d'en empiler un de plus.
+   */
+  function ouvrir(id: string, remplacer = false) {
     etat.mode = 'focus';
+    // Changer de nœud referme la famille dépliée : elle appartenait au nœud
+    // précédent, la reporter sur le suivant n'aurait pas de sens.
+    if (etat.focus !== id) etat.familleDepliee = null;
     etat.focus = id;
-    history.replaceState(null, '', `${location.pathname}${location.search}#${id}`);
+    const url = `${location.pathname}${location.search}#${id}`;
+    if (remplacer) history.replaceState({ noeud: id }, '', url);
+    else history.pushState({ noeud: id }, '', url);
     rendreFocus(id);
   }
 
-  function versCarte() {
+  function versCarte(remplacer = false) {
     etat.mode = 'carte';
     etat.focus = null;
-    history.replaceState(null, '', location.pathname + location.search);
+    const url = location.pathname + location.search;
+    if (remplacer) history.replaceState({ noeud: null }, '', url);
+    else history.pushState({ noeud: null }, '', url);
     rendreCarte();
   }
 
-  retour?.addEventListener('click', versCarte);
+  /**
+   * L'URL fait foi : Retour, Suivant, et un lien `#id` collé dans la barre
+   * d'adresse d'une page déjà ouverte passent tous par ici. Auparavant ce
+   * dernier cas ne redessinait rien — le fragment changeait, l'écran non.
+   */
+  window.addEventListener('popstate', () => {
+    const id = location.hash.slice(1);
+    if (id && index.has(id)) {
+      etat.mode = 'focus';
+      if (etat.focus !== id) etat.familleDepliee = null;
+      etat.focus = id;
+      rendreFocus(id);
+    } else {
+      etat.mode = 'carte';
+      etat.focus = null;
+      rendreCarte();
+    }
+  });
+
+  /**
+   * Depuis une famille dépliée, on remonte d'abord aux grappes : c'est l'écran
+   * d'où l'on vient. Sans cela, déplier puis vouloir revenir renverrait
+   * directement à la carte, deux crans trop loin.
+   */
+  function remonter() {
+    if (etat.mode === 'focus' && etat.familleDepliee && etat.focus) {
+      etat.familleDepliee = null;
+      rendreFocus(etat.focus);
+      return;
+    }
+    versCarte();
+  }
+
+  retour?.addEventListener('click', remonter);
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && etat.mode === 'focus') versCarte();
+    if (e.key === 'Escape' && etat.mode === 'focus') remonter();
   });
 
   /* --- la légende commande l'affichage ----------------------------- */
@@ -1154,6 +1330,35 @@ function demarrer(reseau: Reseau) {
   }
 
   /**
+   * Cadre sur ce qui est réellement dessiné, au lieu d'un gabarit fixe.
+   *
+   * Le focus se cadrait sur 1 060 unités de large quelle que soit la fenêtre :
+   * sur un téléphone de 390 px, tout était réduit d'un tiers et illisible ;
+   * sur un grand écran, un voisinage replié en trois grappes flottait au
+   * milieu du vide. `getBBox` donne l'emprise exacte du contenu, et on
+   * l'élargit dans la dimension qui manque pour respecter les proportions de
+   * la scène — sinon le navigateur rogne pour nous.
+   */
+  function cadrerSurContenu(marge = 46) {
+    const r = toile.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return;
+    let bb: DOMRect;
+    try {
+      bb = (toile as SVGSVGElement).getBBox();
+    } catch {
+      return;
+    }
+    if (bb.width === 0 || bb.height === 0) return;
+    const proportion = r.width / r.height;
+    let l = bb.width + marge * 2;
+    let h = bb.height + marge * 2;
+    if (l / h < proportion) l = h * proportion;
+    else h = l / proportion;
+    vue = { x: bb.x + bb.width / 2 - l / 2, y: bb.y + bb.height / 2 - h / 2, l, h };
+    appliquerVue();
+  }
+
+  /**
    * Sur un grand écran, on montre toute la carte. Sur un téléphone, la montrer
    * entière la rendrait illisible : on entre alors à taille lisible, près de
    * chez soi — la commune — et on se déplace.
@@ -1235,8 +1440,13 @@ function demarrer(reseau: Reseau) {
   // Lu avant tout rendu : l'ouverture d'un nœud réécrit l'URL.
   const communeDemandee = new URL(location.href).searchParams.get('commune');
   const ancre = location.hash.slice(1);
-  if (ancre && index.has(ancre)) ouvrir(ancre);
-  else rendreCarte();
+  // Au chargement, l'entrée d'historique existe déjà : on la complète au lieu
+  // d'en ajouter une seconde, sinon un premier Retour ne ferait rien.
+  if (ancre && index.has(ancre)) ouvrir(ancre, true);
+  else {
+    history.replaceState({ noeud: null }, '', location.href);
+    rendreCarte();
+  }
 
   // La commune vient de l'URL — une adresse partagée doit montrer le même
   // territoire — sinon du choix précédent, qu'on ne redemande pas à chaque fois.

@@ -357,6 +357,15 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 .p-resolution dd { margin: 0; font-size: .86rem; }
 .p-commune-seule { color: var(--encre-douce); font-style: italic; }
 .p-incertain { color: var(--alerte); font-style: italic; }
+/* La réponse ne vient pas du registre mais de la loi : on le dit, sans en
+   faire une alerte — ce n'est pas une incertitude, c'est une certitude d'une
+   autre origine. */
+.p-par-loi { font-size: .78rem; margin: .5rem 0 0; color: var(--encre-douce); line-height: 1.45; }
+.p-incise-loi { display: block; font-size: .74rem; color: var(--encre-tres-douce); font-style: italic; }
+.p-reserve {
+  font-size: .78rem; margin: .6rem 0 0; color: var(--encre-douce); line-height: 1.5;
+  border-left: 2px solid var(--trait-fort); padding-left: .6rem;
+}
 .p-verdict { font-size: .88rem; margin: 0; color: var(--encre-douce); }
 .p-verdict--incertain { color: var(--alerte); }
 .p-source-territoire { color: var(--encre-tres-douce); font-size: .75rem; margin: .9rem 0 0; }
@@ -475,6 +484,15 @@ abbr[title] {
 footer { border-top: 1px solid var(--trait); margin-top: 3rem; padding: 1.2rem 1.1rem; color: var(--encre-douce); font-size: .82rem; }
 footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
 
+/* Une grappe : un paquet de relations, pas un nœud du réseau. Le trait
+   interrompu dit qu'elle se déplie — elle n'a pas de fiche derrière elle. */
+.n--grappe .n-fond {
+  fill: var(--fond-doux); stroke: var(--trait-fort); stroke-width: 1.5; stroke-dasharray: 6 3;
+}
+.n--grappe:hover .n-fond, .n--grappe:focus-visible .n-fond { fill: var(--accent-doux); stroke: var(--accent); }
+.n--grappe .n-nom { font-weight: 600; }
+.n--grappe.masque { opacity: .2; }
+
 /* --- les branches du pouvoir --- */
 /* La pastille reste la forme de l'acteur, comme partout ailleurs : c'est la
    bande qui porte la branche, pas la couleur du nœud. */
@@ -516,11 +534,30 @@ footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
      place en retirant son intitulé, que les clés rendent évident. */
   .legende legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .cle { padding: .28rem .6rem .28rem .4rem; }
+
+  /* L'interface occupait 34 % d'un écran de téléphone, contre 11 % sur
+     ordinateur — la carte n'avait plus la place d'être une carte. Trois
+     économies, sans rien retirer : la signature passe à la trappe (le nom du
+     site la porte déjà), et la légende descend en dernier pour que « chez
+     moi » et les commandes de zoom partagent une ligne au lieu d'en occuper
+     deux. */
+  .baseline { display: none; }
+  .bandeau-int { padding: .5rem 1.1rem; }
+  .legende { order: 3; }
+  .zooms { order: 2; }
+  .outils { padding: .4rem 1.1rem; gap: .35rem .7rem; }
 }
 
 @media (max-width: 900px) {
   .explorateur { grid-template-columns: 1fr; height: auto; }
-  .scene { height: 60vh; border-bottom: 1px solid var(--trait); }
+  /* La carte prend ce qui reste du premier écran, au lieu d'une fraction fixe :
+     sinon les pixels repris à la barre d'outils ne lui profitent pas. `dvh`
+     plutôt que `vh` parce que la barre d'adresse des navigateurs mobiles se
+     rétracte, et que `vh` l'ignore. */
+  .scene {
+    height: calc(100dvh - 15.5rem); min-height: 20rem;
+    border-bottom: 1px solid var(--trait);
+  }
   #panneau { border-left: 0; }
   .outils { gap: .45rem .7rem; }
   .champ-recherche input { width: 100%; max-width: none; }
