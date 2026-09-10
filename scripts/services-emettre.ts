@@ -93,7 +93,8 @@ function sansSuffixeCommune(nom: string): string {
 
 export async function collecterServices(
   json: <T>(url: string) => Promise<T>,
-  lignesCsv: (url: string) => AsyncIterable<Record<string, string>>,
+  /** Le référentiel FINESS, déjà en cache : c'est l'appelant qui l'a rapatrié. */
+  lignesFiness: () => AsyncIterable<Record<string, string>>,
   dire: (m: string) => void,
 ): Promise<Services> {
   const parCommune = new Map<string, Service[]>();
@@ -159,7 +160,7 @@ export async function collecterServices(
   // et non l'entité juridique qui le gère, souvent domiciliée ailleurs.
   let sante = 0;
   let urgences = 0;
-  for await (const r of lignesCsv(FINESS)) {
+  for await (const r of lignesFiness()) {
     if (r.etat !== 'ACTUEL' || r.type !== 'ET' || r.san !== 'OUI') continue;
     const insee = (r.com_code ?? '').trim();
     const nom = (r.rs ?? '').trim();
@@ -203,6 +204,16 @@ export function ecrireServices(
   for (const code of codes) {
     const l = services.parCommune.get(code);
     if (!l || l.length === 0) continue;
+    // Trié avant écriture : les API ne garantissent pas l'ordre de leurs
+    // enregistrements, et sans cela deux ingestions des mêmes données
+    // produisaient des fichiers différents — une centaine de départements
+    // « modifiés » à chaque passage, où rien n'avait bougé. Un diff qui bruit
+    // ainsi finit par ne plus être lu.
+    l.sort(
+      (a, b) =>
+        FAMILLES_SERVICE.indexOf(a.famille) - FAMILLES_SERVICE.indexOf(b.famille) ||
+        a.nom.localeCompare(b.nom, 'fr'),
+    );
     // Drapeaux : 1 = privé (école) ou urgences (santé). Un seul entier plutôt
     // qu'un objet par service : le fichier est lu, pas relu.
     c[code] = l.map((s) => [

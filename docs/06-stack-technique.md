@@ -99,6 +99,33 @@ les processus, qui portent beaucoup plus de détail, restent isolés.
 | `xlsx` (SheetJS) | et cette archive ne contient qu'un classeur `.xls` |
 | `@etalab/decoupage-administratif` | le découpage communal, épinglé et reproductible |
 
+### Le cache d'ingestion
+
+`npm run territoires -- --cache` réutilise les gros fichiers déjà rapatriés :
+l'export BANATIC (77 Mo) et le référentiel FINESS (244 Mo). Le gain n'est pas
+la vitesse — le temps part surtout dans les exports OFGL et le parcours des
+1,4 Go de XML — mais la **résilience** : la connexion a lâché en pleine session
+sur les 244 Mo de FINESS, et sans cache chaque reprise repartait de zéro.
+
+Deux garde-fous, parce qu'un cache silencieusement faux est pire que pas de
+cache :
+
+- **Écriture dans un fichier temporaire, renommé à la fin.** Un transfert coupé
+  en route laissait sinon un fichier tronqué que le passage suivant prenait
+  pour un cache valide, et l'ingestion produisait des données incomplètes sans
+  rien signaler.
+- **L'URL d'origine est déposée à côté du fichier.** FINESS est épinglé à une
+  version datée : le jour où la veille en signale une plus récente et qu'on
+  change l'URL, le cache porterait toujours le même nom et `--cache` servirait
+  l'ancien millésime indéfiniment. Comparer l'URL est le seul moyen de s'en
+  apercevoir.
+
+**L'ingestion est reproductible.** Les API ne garantissent pas l'ordre de leurs
+enregistrements : deux passages sur les mêmes données produisaient une centaine
+de fichiers départementaux « modifiés » où rien n'avait bougé. Les services
+sont donc triés avant écriture. Un diff qui bruit ainsi finit par ne plus être
+lu — et c'est précisément là qu'un vrai changement passe inaperçu.
+
 **SheetJS est installé depuis le dépôt de son éditeur**, pas depuis le registre
 npm public : le paquet `xlsx` qui s'y trouve est abandonné à la version 0.18.5 et
 porte des vulnérabilités de sévérité haute sans correctif. Une dépendance

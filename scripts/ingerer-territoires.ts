@@ -18,7 +18,17 @@
  * flux plutôt que de le charger en mémoire).
  */
 import { spawn, spawnSync } from 'node:child_process';
-import { createWriteStream, existsSync, mkdirSync, statSync } from 'node:fs';
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { chargerGraphe, RACINE } from '../src/modele/graphe.ts';
 
@@ -43,6 +53,7 @@ const REFERENTIEL_NATURES =
 const CACHE = join(RACINE, '.cache');
 const SORTIE = join(RACINE, 'public', 'territoires');
 const XLSX = join(CACHE, 'banatic-france.xlsx');
+const FINESS_CACHE = join(CACHE, 't-finess.csv');
 
 const VERT = '\x1b[32m', JAUNE = '\x1b[33m', GRIS = '\x1b[90m', RAZ = '\x1b[0m';
 const dire = (m: string) => console.log(m);
@@ -68,6 +79,56 @@ async function obstine(url: string, essais = 5): Promise<Response> {
   throw new Error(`${url} : ${(derniere as Error)?.message ?? 'injoignable'}`);
 }
 
+/**
+ * Télécharge vers le cache, sauf si le fichier y est déjà et qu'on a demandé de
+ * le réutiliser.
+ *
+ * L'écriture passe par un fichier temporaire renommé à la fin. Sans cela, un
+ * transfert coupé en route — ce qui arrive : le référentiel FINESS pèse 244 Mo
+ * et la connexion a lâché en pleine session — laisserait un fichier tronqué
+ * que le passage suivant prendrait pour un cache valide, et l'ingestion
+ * produirait des données incomplètes sans rien signaler.
+ *
+ * L'URL d'origine est déposée à côté du fichier. Le référentiel FINESS est
+ * épinglé à une version datée : le jour où la veille en signale une plus
+ * récente et qu'on change l'URL, le cache porterait toujours le même nom et
+ * `--cache` servirait l'ancien millésime sans fin. Comparer l'URL est le seul
+ * moyen de s'en apercevoir.
+ */
+async function telechargerEnCache(
+  url: string,
+  vers: string,
+  reutiliser: boolean,
+  annonce: string,
+): Promise<void> {
+  const provenance = `${vers}.source`;
+  const sourceConnue = existsSync(provenance) ? readFileSync(provenance, 'utf8').trim() : null;
+  if (reutiliser && existsSync(vers) && sourceConnue === url) {
+    dire(`${GRIS}${annonce} : déjà en cache (${(statSync(vers).size / 1e6).toFixed(0)} Mo)${RAZ}`);
+    return;
+  }
+  if (reutiliser && existsSync(vers)) {
+    // Distinguer les deux : « je ne sais pas d'où vient ce fichier » n'est pas
+    // « l'adresse a changé », et le journal ne doit pas laisser croire à une
+    // mise à jour de la source là où il n'y en a pas eu.
+    dire(
+      sourceConnue === null
+        ? `${GRIS}${annonce} : provenance du cache inconnue, on le refait${RAZ}`
+        : `${GRIS}${annonce} : l'adresse a changé, le cache est périmé${RAZ}`,
+    );
+  }
+  dire(`${GRIS}${annonce}…${RAZ}`);
+  const partiel = `${vers}.partiel`;
+  try {
+    await telecharger(url, partiel);
+    renameSync(partiel, vers);
+    writeFileSync(provenance, `${url}\n`);
+  } catch (e) {
+    rmSync(partiel, { force: true });
+    throw e;
+  }
+}
+
 async function telecharger(url: string, vers: string): Promise<void> {
   const r = await obstine(url);
   if (!r.body) throw new Error(`${url} : réponse sans corps`);
@@ -82,20 +143,18 @@ async function telecharger(url: string, vers: string): Promise<void> {
 }
 
 /**
- * Lit un CSV distant ligne à ligne : le référentiel FINESS pèse 244 Mo, et
- * `JSON.parse` d'un fichier entier tiendrait sans doute, mais le flux évite de
- * poser la question à chaque nouveau millésime.
+ * Lit un CSV du cache ligne à ligne : le référentiel FINESS pèse 244 Mo, et le
+ * flux évite d'avoir à se demander, à chaque nouveau millésime, s'il tient
+ * encore en mémoire.
  *
  * Analyse les guillemets plutôt que de découper sur la virgule : plusieurs
  * raisons sociales en contiennent une.
  */
-async function* lignesCsv(url: string): AsyncIterable<Record<string, string>> {
-  const r = await obstine(url);
-  if (!r.body) throw new Error(`${url} : réponse sans corps`);
+async function* lignesCsv(chemin: string): AsyncIterable<Record<string, string>> {
   let reste = '';
   let entetes: string[] | null = null;
   const decoder = new TextDecoder('utf-8');
-  for await (const morceau of r.body as unknown as AsyncIterable<Uint8Array>) {
+  for await (const morceau of createReadStream(chemin) as unknown as AsyncIterable<Uint8Array>) {
     reste += decoder.decode(morceau, { stream: true });
     let coupe: number;
     while ((coupe = prochaineFinDeLigne(reste)) !== -1) {
@@ -191,10 +250,7 @@ async function principal() {
   }
 
   // 3. L'export national.
-  if (!reutiliser || !existsSync(XLSX)) {
-    dire(`${GRIS}Téléchargement de l'export national (environ 75 Mo)…${RAZ}`);
-    await telecharger(EXPORT_NATIONAL, XLSX);
-  }
+  await telechargerEnCache(EXPORT_NATIONAL, XLSX, reutiliser, "Export national BANATIC (environ 75 Mo)");
   dire(`${GRIS}Export : ${(statSync(XLSX).size / 1e6).toFixed(0)} Mo${RAZ}`);
 
   // Les natures juridiques sont elles-mêmes des sigles — SIVU, SMF, PETR — que
@@ -224,10 +280,11 @@ async function principal() {
   const eau = await collecterEau(telecharger, CACHE, (m) => dire(`${GRIS}${m}${RAZ}`));
 
   // Où sont les services publics : écoles, France services, CCAS, santé.
-  const { collecterServices } = await import('./services-emettre.ts');
+  const { collecterServices, FINESS } = await import('./services-emettre.ts');
+  await telechargerEnCache(FINESS, FINESS_CACHE, reutiliser, 'Référentiel FINESS (environ 244 Mo)');
   const services = await collecterServices(
     async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
-    lignesCsv,
+    () => lignesCsv(FINESS_CACHE),
     (m) => dire(`${GRIS}${m}${RAZ}`),
   );
 
