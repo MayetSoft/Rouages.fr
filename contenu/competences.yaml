@@ -585,3 +585,104 @@ competences:
     liens: [france-services-gouv, wp-france-services, od-annuaire-administration]
     verifie_le: 2026-09-06
     confiance: a_confirmer
+
+  # --- Sécurité, contrôle, médiation, financement ----------------------------
+  - id: securite-publique-etat
+    nom: "Sécurité publique et enquêtes"
+    nom_court: "Sécurité de l'État"
+    acteur: gendarmerie
+    resume: "Gendarmerie en zone rurale, police nationale en zone urbaine : elles ne se partagent pas les tâches mais la carte, et ce découpage décide de qui vous recevez."
+    partagee_avec: [police-nationale, prefet, police-municipale, maire, citoyen]
+    liens: [wp-gendarmerie, annuaire-gendarmerie, sp-porter-plainte]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  - id: instruction-etat-permis
+    nom: "Instruction des permis par l'État"
+    nom_court: "Instruction par l'État"
+    acteur: ddt
+    resume: "Les communes sans document d'urbanisme font instruire gratuitement leurs permis par les services de l'État ; celles qui en ont un doivent s'organiser autrement."
+    partagee_avec: [commune, maire, prefet, service-instructeur]
+    liens: [wp-ddt, annuaire-ddt, code-urbanisme, cu-l422-1]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: installations-classees
+    nom: "Autorisation des installations classées"
+    nom_court: "Installations classées"
+    acteur: dreal
+    resume: "Élevages, carrières, industries, méthaniseurs : c'est l'État qui autorise et contrôle, le maire n'ayant qu'un avis — souvent une surprise pour les riverains."
+    partagee_avec: [prefet, commune, citoyen, commissaire-enqueteur]
+    liens: [wp-dreal, annuaire-dreal, code-environnement]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: comptable-public
+    nom: "Recouvrement de l'impôt et tenue des comptes"
+    nom_court: "Comptable public"
+    acteur: dgfip
+    resume: "Le maire engage la dépense, le comptable public la paie et la contrôle : la séparation de l'ordonnateur et du comptable est ce qui rend le détournement difficile."
+    partagee_avec: [commune, maire, citoyen, chambre-regionale-comptes]
+    liens: [wp-dgfip, impots-gouv, cgct]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: reglement-amiable
+    nom: "Règlement amiable d'un litige"
+    nom_court: "Règlement amiable"
+    acteur: conciliateur-justice
+    resume: "Gratuit et sans avocat, et même obligatoire avant le juge pour un litige de voisinage ou de moins de 5 000 € : la marche que la plupart des gens ignorent."
+    partagee_avec: [citoyen, tribunal-judiciaire, defenseur-des-droits, mediateur-energie]
+    liens: [wp-conciliateur, sp-conciliateur, conciliateurs-fr]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  - id: litige-energie
+    nom: "Litige avec un fournisseur d'énergie"
+    nom_court: "Litige énergie"
+    acteur: mediateur-energie
+    resume: "Saisine gratuite après une réclamation restée sans réponse deux mois, pour l'électricité comme pour le gaz."
+    partagee_avec: [citoyen, enedis, syndicat-energie]
+    liens: [wp-mediateur-energie, mediateur-energie-fr, code-energie]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  - id: aides-renovation
+    nom: "Aides à la rénovation du logement"
+    nom_court: "Aides à la rénovation"
+    acteur: anah
+    resume: "Énergie, adaptation au grand âge, habitat dégradé : les aides sont nationales mais souvent complétées par la commune, le département ou la région."
+    partagee_avec: [citoyen, commune, epci, departement, region]
+    liens: [wp-anah, anah-fr, code-construction]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: ingenierie-etat
+    nom: "Ingénierie de l'État pour les collectivités"
+    nom_court: "Ingénierie de l'État"
+    acteur: anct
+    resume: "Une petite commune sans bureau d'études peut demander à l'État de financer l'étude qu'elle n'a pas les moyens de commander."
+    partagee_avec: [commune, epci, prefet, agence-urbanisme, caue]
+    liens: [wp-anct, anct-fr]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: aides-transition
+    nom: "Aides à la transition écologique"
+    nom_court: "Aides transition"
+    acteur: ademe
+    resume: "Subventions et conseil pour les projets d'énergie, de déchets et de mobilité, ouverts aux collectivités comme aux entreprises."
+    partagee_avec: [commune, epci, region, employeur]
+    liens: [wp-ademe, ademe-fr, code-environnement]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: conseil-architecture
+    nom: "Conseil gratuit en architecture et urbanisme"
+    nom_court: "Conseil architecture"
+    acteur: caue
+    resume: "Ouvert au particulier qui construit comme à la commune qui planifie, et financé par une part de la taxe d'aménagement que chacun paie déjà."
+    partagee_avec: [citoyen, petitionnaire, commune, departement, abf]
+    liens: [wp-caue, fncaue, code-urbanisme]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer

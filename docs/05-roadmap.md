@@ -186,6 +186,27 @@ décision, n'existent en open data national exploitable. Le détail des
 vérifications est dans `06-stack-technique.md`. Mieux vaut le dire que le
 simuler.
 
+### Onze entités de plus ✔
+
+Sécurité (gendarmerie, police nationale), services déconcentrés (DDT, DREAL,
+finances publiques), médiation (conciliateur de justice, médiateur de
+l'énergie) et agences (Anah, ANCT, ADEME, CAUE). 53 acteurs deviennent 64, et
+66 compétences.
+
+Le choix n'est pas encyclopédique : ce sont les entités qu'un habitant ou une
+petite commune rencontre vraiment. Gendarmerie et police nationale ne se
+partagent pas les tâches mais la carte, et c'est la première chose à savoir.
+Le conciliateur de justice est gratuit et son passage est obligatoire avant le
+juge sous 5 000 €. Le CAUE conseille gratuitement celui qui construit, et il
+est déjà financé par la taxe d'aménagement qu'il paie.
+
+Les liens pointent vers l'annuaire de Service-public plutôt que vers les pages
+nationales : ce qu'on cherche, c'est sa brigade, sa DDT, sa DREAL.
+
+Le repli par famille a tenu : « La commune » passe de 29 à 29 relations
+partagées sans qu'une pastille de plus soit dessinée, et la colonne « État » du
+plan d'ensemble s'est repliée d'elle-même en trois piles.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

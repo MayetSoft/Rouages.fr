@@ -130,8 +130,15 @@ for (const a of g.acteurs.values()) {
   // Les personnes physiques sont exclues : un commissaire enquêteur est
   // désigné pour une mission, il n'incarne pas une branche. Un mandat électif,
   // lui, en est bien un organe — d'où la distinction entre les deux types.
+  //
+  // Un service déconcentré est un organe de l'État par définition, où qu'il
+  // siège : une DREAL est régionale, une chambre régionale des comptes aussi,
+  // et toutes deux relèvent de l'État. C'est la nature qui tranche, pas
+  // l'adresse — la première version de cette règle ne regardait que l'échelon
+  // et refusait la DREAL.
   const concerne =
     (a.echelon === 'etat' && a.type !== 'personne') ||
+    a.type === 'service_deconcentre' ||
     a.type === 'juridiction' ||
     a.type === 'autorite_independante';
   if (concerne && !a.pouvoirs) {

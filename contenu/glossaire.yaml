@@ -41,6 +41,34 @@ sigles:
     definition: "Le code qui fixe ce que chaque collectivité peut faire, et ce que la loi transfère d'office à l'intercommunalité."
     liens: [cgct, cgct-l5214-16, cgct-l5216-5]
 
+  - id: sigle-ddt
+    sigle: DDT
+    developpe: "Direction départementale des territoires"
+    definition: "Le bras technique du préfet sur l'urbanisme, l'eau et les risques ; elle instruit encore les permis des communes sans document d'urbanisme."
+    noeud: ddt
+    liens: [annuaire-ddt, wp-ddt]
+
+  - id: sigle-dreal
+    sigle: DREAL
+    developpe: "Direction régionale de l'environnement, de l'aménagement et du logement"
+    definition: "Autorise et contrôle les installations classées : élevages, carrières, industries, méthaniseurs."
+    noeud: dreal
+    liens: [annuaire-dreal, wp-dreal]
+
+  - id: sigle-anct
+    sigle: ANCT
+    developpe: "Agence nationale de la cohésion des territoires"
+    definition: "Finance l'ingénierie des collectivités qui n'ont pas les moyens de commander une étude."
+    noeud: anct
+    liens: [anct-fr, wp-anct]
+
+  - id: sigle-caue
+    sigle: CAUE
+    developpe: "Conseil d'architecture, d'urbanisme et de l'environnement"
+    definition: "Conseil gratuit, départemental, ouvert aux particuliers comme aux communes."
+    noeud: caue
+    liens: [fncaue, wp-caue]
+
   - id: sigle-plui
     sigle: PLUi
     developpe: "Plan local d'urbanisme intercommunal"

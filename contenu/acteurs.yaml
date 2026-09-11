@@ -151,6 +151,7 @@ acteurs:
     nom_court: "Agence de santé (ARS)"
     type: service_deconcentre
     echelon: region
+    pouvoirs: [executif]
     resume: "Pilote l'offre de soins dans la région : autorisations d'activité, hôpitaux, prévention."
     liens: [wp-ars, ars-gouv, od-finess]
     verifie_le: 2026-09-05
@@ -408,6 +409,132 @@ acteurs:
     liens: [wp-france-services, france-services-gouv, od-annuaire-administration]
     verifie_le: 2026-09-06
     confiance: etabli
+
+  # --- Sécurité : qui intervient, et sur quel territoire --------------------
+  # Gendarmerie et police nationale ne se partagent pas les tâches mais la
+  # carte : l'une en zone rurale et périurbaine, l'autre en zone urbaine. C'est
+  # la première chose à savoir, et celle qu'on ignore le plus souvent.
+  - id: gendarmerie
+    nom: "La brigade de gendarmerie"
+    nom_court: "Gendarmerie"
+    type: service_deconcentre
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Compétente en zone rurale et périurbaine, soit environ la moitié de la population et la quasi-totalité du territoire ; on y dépose plainte comme au commissariat."
+    liens: [wp-gendarmerie, annuaire-gendarmerie, sp-porter-plainte]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  - id: police-nationale
+    nom: "La police nationale"
+    nom_court: "Police nationale"
+    type: service_deconcentre
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Compétente en zone urbaine, où elle remplace la gendarmerie ; distincte de la police municipale, qui dépend du maire et n'a pas les mêmes pouvoirs."
+    liens: [wp-police-nationale, annuaire-police, sp-porter-plainte]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  # --- Les services de l'État qu'une commune rencontre vraiment --------------
+  - id: ddt
+    nom: "La direction départementale des territoires"
+    nom_court: "DDT"
+    type: service_deconcentre
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Le bras technique du préfet sur l'urbanisme, l'eau, les risques et les routes ; elle instruit encore les permis pour les communes sans document d'urbanisme."
+    liens: [wp-ddt, annuaire-ddt, code-urbanisme]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: dreal
+    nom: "La DREAL"
+    nom_court: "DREAL"
+    type: service_deconcentre
+    echelon: region
+    pouvoirs: [executif]
+    resume: "Environnement, risques industriels et logement à l'échelle régionale : c'est elle qui autorise et contrôle les installations classées."
+    liens: [wp-dreal, annuaire-dreal, code-environnement]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: dgfip
+    nom: "Les finances publiques"
+    nom_court: "Finances publiques"
+    type: service_deconcentre
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Calcule et recouvre l'impôt, et tient les comptes de la commune : le maire engage la dépense, le comptable public la paie — la séparation est la règle."
+    liens: [wp-dgfip, impots-gouv, cgct]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  # --- Régler un litige sans aller au tribunal -------------------------------
+  - id: conciliateur-justice
+    nom: "Le conciliateur de justice"
+    nom_court: "Conciliateur"
+    type: personne
+    echelon: etat
+    resume: "Bénévole assermenté, saisi gratuitement : le passage par lui est même obligatoire avant le juge pour un litige de voisinage ou de moins de 5 000 €."
+    liens: [wp-conciliateur, sp-conciliateur, conciliateurs-fr]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  - id: mediateur-energie
+    nom: "Le médiateur national de l'énergie"
+    nom_court: "Médiateur énergie"
+    type: autorite_independante
+    echelon: etat
+    pouvoirs: [independant]
+    resume: "Autorité indépendante saisie gratuitement pour un litige avec un fournisseur d'électricité ou de gaz, après une réclamation restée sans réponse."
+    liens: [wp-mediateur-energie, mediateur-energie-fr, code-energie]
+    verifie_le: 2026-09-11
+    confiance: etabli
+
+  # --- Les agences : là où se trouvent l'argent et l'ingénierie ---------------
+  - id: anah
+    nom: "L'Agence nationale de l'habitat"
+    nom_court: "Anah"
+    type: service_administratif
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Finance la rénovation des logements privés — énergie, adaptation au grand âge, habitat dégradé — sous conditions de ressources."
+    liens: [wp-anah, anah-fr, code-construction]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: anct
+    nom: "L'Agence nationale de la cohésion des territoires"
+    nom_court: "ANCT"
+    type: service_administratif
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Apporte de l'ingénierie aux collectivités qui n'en ont pas les moyens : c'est l'interlocuteur des petites communes sans bureau d'études."
+    liens: [wp-anct, anct-fr]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: ademe
+    nom: "L'ADEME"
+    nom_court: "ADEME"
+    type: service_administratif
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Subventionne et conseille les projets de transition écologique, des collectivités comme des entreprises."
+    liens: [wp-ademe, ademe-fr, code-environnement]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
+
+  - id: caue
+    nom: "Le CAUE"
+    nom_court: "CAUE"
+    type: association
+    echelon: departement
+    resume: "Conseil gratuit en architecture et urbanisme, ouvert aux particuliers comme aux communes, financé par une part de la taxe d'aménagement."
+    liens: [wp-caue, fncaue, code-urbanisme]
+    verifie_le: 2026-09-11
+    confiance: a_confirmer
 
   # --- Union européenne -------------------------------------------------
   - id: union-europeenne

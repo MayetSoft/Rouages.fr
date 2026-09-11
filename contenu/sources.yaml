@@ -164,3 +164,34 @@ sources:
   # --- Socle légal des compétences transférées de plein droit ----------------
   - { id: cgct-l5214-16, type: droit, titre: "CGCT art. L5214-16 — compétences des communautés de communes", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000051459827", consulte_le: 2026-09-06 }
   - { id: cgct-l5216-5, type: droit, titre: "CGCT art. L5216-5 — compétences des communautés d'agglomération", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045210287", consulte_le: 2026-09-06 }
+
+  # --- Sécurité, services déconcentrés, médiation, agences --------------------
+  # Les liens pointent vers l'annuaire de Service-public plutôt que vers la page
+  # nationale de chaque corps : ce qu'on cherche, c'est sa brigade, sa DDT, sa
+  # DREAL — pas un site institutionnel.
+  - { id: code-construction, type: droit, titre: "Code de la construction et de l'habitation", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006074096/", consulte_le: 2026-09-11 }
+  - { id: wp-gendarmerie, type: wikipedia, titre: "Gendarmerie nationale (France)", url: "https://fr.wikipedia.org/wiki/Gendarmerie_nationale_(France)", consulte_le: 2026-09-11 }
+  - { id: wp-police-nationale, type: wikipedia, titre: "Police nationale (France)", url: "https://fr.wikipedia.org/wiki/Police_nationale_(France)", consulte_le: 2026-09-11 }
+  - { id: wp-ddt, type: wikipedia, titre: "Direction départementale des territoires", url: "https://fr.wikipedia.org/wiki/Direction_d%C3%A9partementale_des_territoires", consulte_le: 2026-09-11 }
+  - { id: wp-dreal, type: wikipedia, titre: "Direction régionale de l'environnement, de l'aménagement et du logement", url: "https://fr.wikipedia.org/wiki/Direction_r%C3%A9gionale_de_l%27environnement,_de_l%27am%C3%A9nagement_et_du_logement", consulte_le: 2026-09-11 }
+  - { id: wp-dgfip, type: wikipedia, titre: "Direction générale des Finances publiques", url: "https://fr.wikipedia.org/wiki/Direction_g%C3%A9n%C3%A9rale_des_Finances_publiques", consulte_le: 2026-09-11 }
+  - { id: wp-conciliateur, type: wikipedia, titre: "Conciliateur de justice", url: "https://fr.wikipedia.org/wiki/Conciliateur_de_justice", consulte_le: 2026-09-11 }
+  - { id: wp-mediateur-energie, type: wikipedia, titre: "Médiateur national de l'énergie", url: "https://fr.wikipedia.org/wiki/M%C3%A9diateur_national_de_l%27%C3%A9nergie", consulte_le: 2026-09-11 }
+  - { id: wp-anah, type: wikipedia, titre: "Agence nationale de l'habitat", url: "https://fr.wikipedia.org/wiki/Agence_nationale_de_l%27habitat", consulte_le: 2026-09-11 }
+  - { id: wp-anct, type: wikipedia, titre: "Agence nationale de la cohésion des territoires", url: "https://fr.wikipedia.org/wiki/Agence_nationale_de_la_coh%C3%A9sion_des_territoires", consulte_le: 2026-09-11 }
+  - { id: wp-ademe, type: wikipedia, titre: "Agence de la transition écologique", url: "https://fr.wikipedia.org/wiki/Agence_de_la_transition_%C3%A9cologique", consulte_le: 2026-09-11 }
+  - { id: wp-caue, type: wikipedia, titre: "Conseil d'architecture, d'urbanisme et de l'environnement", url: "https://fr.wikipedia.org/wiki/Conseil_d%27architecture,_d%27urbanisme_et_de_l%27environnement", consulte_le: 2026-09-11 }
+
+  - { id: annuaire-gendarmerie, type: page_officielle, titre: "Trouver sa brigade de gendarmerie", url: "https://lannuaire.service-public.gouv.fr/navigation/gendarmerie", consulte_le: 2026-09-11 }
+  - { id: annuaire-police, type: page_officielle, titre: "Trouver son commissariat de police", url: "https://lannuaire.service-public.gouv.fr/navigation/commissariat_police", consulte_le: 2026-09-11 }
+  - { id: annuaire-ddt, type: page_officielle, titre: "Trouver sa direction départementale des territoires", url: "https://lannuaire.service-public.gouv.fr/navigation/ddt", consulte_le: 2026-09-11 }
+  - { id: annuaire-dreal, type: page_officielle, titre: "Trouver sa direction régionale de l'environnement", url: "https://lannuaire.service-public.gouv.fr/navigation/dreal", consulte_le: 2026-09-11 }
+  - { id: sp-porter-plainte, type: page_officielle, titre: "Porter plainte — service-public.gouv.fr", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F1435", consulte_le: 2026-09-11 }
+  - { id: sp-conciliateur, type: page_officielle, titre: "Le conciliateur de justice — service-public.gouv.fr", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F1736", consulte_le: 2026-09-11 }
+  - { id: conciliateurs-fr, type: page_officielle, titre: "Conciliateurs de France — saisir un conciliateur", url: "https://www.conciliateurs.fr/", consulte_le: 2026-09-11 }
+  - { id: mediateur-energie-fr, type: page_officielle, titre: "Médiateur national de l'énergie", url: "https://www.energie-mediateur.fr/", consulte_le: 2026-09-11 }
+  - { id: impots-gouv, type: page_officielle, titre: "impots.gouv.fr", url: "https://www.impots.gouv.fr/", consulte_le: 2026-09-11 }
+  - { id: anah-fr, type: page_officielle, titre: "Agence nationale de l'habitat — les aides à la rénovation", url: "https://www.anah.gouv.fr/", consulte_le: 2026-09-11 }
+  - { id: anct-fr, type: page_officielle, titre: "Agence nationale de la cohésion des territoires", url: "https://agence-cohesion-territoires.gouv.fr/", consulte_le: 2026-09-11 }
+  - { id: ademe-fr, type: page_officielle, titre: "ADEME — l'agence de la transition écologique", url: "https://www.ademe.fr/", consulte_le: 2026-09-11 }
+  - { id: fncaue, type: page_officielle, titre: "Fédération nationale des CAUE — trouver le sien", url: "https://www.fncaue.com/", consulte_le: 2026-09-11 }
