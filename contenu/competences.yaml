@@ -53,6 +53,10 @@ competences:
     verifie_le: 2026-09-05
     confiance: etabli
 
+  # Pas d'`obligatoire_pour` : le transfert du PLU aux communautés de communes
+  # et d'agglomération est bien prévu par défaut, mais une minorité de blocage
+  # de communes peut s'y opposer, et beaucoup l'ont fait. Une règle
+  # conditionnelle ne se réduit pas à « la loi tranche ».
   - id: redaction-plu
     nom: "Écrire la règle d'urbanisme (PLU)"
     nom_court: "Règle d'urbanisme (PLU)"
@@ -99,10 +103,21 @@ competences:
     resume: "Compétence intercommunale dans la quasi-totalité des territoires, financée par la taxe ou la redevance d'enlèvement."
     partagee_avec: [commune]
     banatic: ["2080", "2085"]
-    liens: [cgct, od-sinoe, od-banatic]
-    verifie_le: 2026-09-05
-    confiance: variable_selon_territoire
+    # Obligatoire pour les communautés de communes et d'agglomération depuis le
+    # 1er janvier 2017 (loi NOTRe), et par construction pour les communautés
+    # urbaines et les métropoles. Le registre le reflète déjà — 100 % de
+    # couverture — mais l'inscrire protège d'un trou de saisie à venir.
+    obligatoire_pour: [CC, CA, CU, METRO, MET69]
+    liens: [cgct, cgct-l5214-16, cgct-l5216-5, od-sinoe, od-banatic, wp-loi-notre]
+    verifie_le: 2026-09-11
+    confiance: etabli
 
+  # Pas d'`obligatoire_pour` : le transfert aux communautés de communes a été
+  # reporté plusieurs fois, et la date applicable dépend du calendrier en
+  # vigueur. Le registre couvre déjà 92 % des communes pour l'eau et 97 % pour
+  # l'assainissement : le gain serait mince, et le risque de se tromper avec
+  # l'autorité de la loi ne vaut pas la peine tant que l'article n'est pas
+  # vérifié.
   - id: eau-potable
     nom: "Eau potable"
     acteur: epci
@@ -143,11 +158,19 @@ competences:
     nom: "Logement social"
     acteur: epci
     resume: "Programmation et attribution partagées entre l'intercommunalité, la commune, l'État et les bailleurs."
-    partagee_avec: [commune, etat, bailleur-social]
+    partagee_avec: [commune, etat, bailleur-social, anah]
     banatic: ["6500", "6505"]
-    liens: [wp-hlm, anct-hlm, cgct]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    # « Équilibre social de l'habitat » est obligatoire pour les communautés
+    # d'agglomération (L5216-5), urbaines (L5215-20) et les métropoles
+    # (L5217-2), et la loi y range explicitement le programme local de
+    # l'habitat et les aides au logement social — les deux codes ci-dessus.
+    # Les communautés de communes en sont exclues : chez elles la politique du
+    # logement reste facultative (L5214-16).
+    obligatoire_pour: [CA, CU, METRO, MET69]
+    reserve: "Dans une communauté d'agglomération, les aides au logement social ne portent que sur ce que le conseil communautaire a défini comme d'intérêt communautaire ; une communauté urbaine ou une métropole, elle, est compétente sur tout le champ sans avoir à le délimiter."
+    liens: [wp-hlm, anct-hlm, cgct, cgct-l5216-5]
+    verifie_le: 2026-09-11
+    confiance: etabli
 
   # --- Département ------------------------------------------------------
   - id: colleges
@@ -376,8 +399,16 @@ competences:
     resume: "Lignes, horaires, tarifs, vélo et transport à la demande sur un ressort donné, la région prenant le relais là où personne ne s'en saisit."
     partagee_avec: [region, epci, commune, operateur-transport]
     banatic: ["6000"]
+    # Pas d'`obligatoire_pour` ici, et c'est délibéré : la loi d'orientation des
+    # mobilités n'a rien transféré d'office. Chaque communauté de communes
+    # devait délibérer avant le 31 mars 2021 pour devenir autorité
+    # organisatrice ; à défaut, c'est la région qui l'est devenue sur son
+    # territoire au 1er juillet 2021. Le registre muet ne signifie donc ni
+    # « l'intercommunalité » ni « la commune », mais « la région » — d'où la
+    # réserve plutôt qu'une marque d'obligation.
+    reserve: "Quand aucune intercommunalité ne s'est saisie de cette compétence, elle n'est pas restée à la commune : c'est la région qui est devenue autorité organisatrice sur ce territoire en juillet 2021."
     liens: [code-transports, wp-aom, vp-mobilite, od-transport]
-    verifie_le: 2026-09-05
+    verifie_le: 2026-09-11
     confiance: a_confirmer
 
   - id: planification-scot

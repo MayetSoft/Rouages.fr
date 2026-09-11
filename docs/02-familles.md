@@ -188,6 +188,36 @@ elle dit laquelle des trois a répondu. `scripts/valider.ts` exige qu'une
 compétence ainsi déclarée cite un texte de droit : se tromper avec l'autorité
 de la loi est pire que se tromper tout court.
 
+Trois compétences sont marquées à ce jour, chacune après vérification de son
+article, et l'effet se mesure :
+
+| Compétence | Catégories | Réponses corrigées |
+|---|---|---|
+| Développement économique | CC, CA, CU, métropoles | **12 114 communes** |
+| Logement social | CA, CU, métropoles — pas les CC | **1 110 communes** |
+| Déchets ménagers | CC, CA, CU, métropoles | **57 communes** |
+
+Soit 13 281 réponses que le site donnait fausses. Les déchets sont
+instructifs : la couverture du registre s'affichait à 100 %, l'arrondi cachait
+57 trous réels.
+
+**Ce qui n'est délibérément pas marqué compte autant.** Trois compétences ont
+été examinées puis écartées, et la raison est consignée dans le contenu à côté
+de chacune :
+
+- **Mobilité** — la loi d'orientation des mobilités n'a rien transféré d'office.
+  Chaque communauté de communes devait délibérer avant mars 2021 ; à défaut,
+  c'est la *région* qui est devenue autorité organisatrice. Un registre muet ne
+  veut donc dire ni « l'intercommunalité » ni « la commune » : la réponse juste
+  est ailleurs. D'où une réserve, et non une marque d'obligation.
+- **PLU** — transféré par défaut, mais une minorité de blocage de communes peut
+  s'y opposer, et beaucoup l'ont fait. Une règle conditionnelle ne se réduit
+  pas à « la loi tranche ».
+- **Eau et assainissement** — le calendrier de transfert aux communautés de
+  communes a été repoussé plusieurs fois. Le registre couvre déjà 92 % et 97 %
+  des communes : le gain serait mince, et se tromper avec l'autorité de la loi
+  coûte plus cher que de ne rien dire.
+
 **La couverture d'un code n'est pas toujours un défaut de saisie.** Le code
 « délivrance des autorisations d'urbanisme » n'est déclaré que par 2 à 4 % des
 intercommunalités, et c'est exact : le maire signe — la compétence est
