@@ -8,6 +8,7 @@ import { construireGlossaire } from '../../modele/glossaire.ts';
 import Glose from '../../composants/Glose.astro';
 import { chronologie } from '../../vues/chronologie.ts';
 import { fenetresAction } from '../../vues/fenetres-action.ts';
+import { urlSignaler } from '../../modele/signalement.ts';
 
 export function getStaticPaths() {
   return construireReseau().noeuds.map((n) => ({ params: { id: n.id }, props: { noeud: n } }));
@@ -131,5 +132,8 @@ const groupes = ORDRE_LIENS.map((type) => ({
       <p class="v-nature">Vérifié le {formaterDate(source.verifie_le)}.</p>
     )}
     <p><a href={`/#${noeud.id}`}>Voir ce nœud dans la carte</a></p>
+    <p class="p-signaler">
+      <a href={urlSignaler(noeud.id)}>Signaler une erreur sur cette fiche</a>
+    </p>
   </div>
 </Base>

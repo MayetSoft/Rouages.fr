@@ -40,6 +40,9 @@
   --rayon: 10px;
   --sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
   --transition: 180ms cubic-bezier(0.2, 0, 0.2, 1);
+  /* L'encre posée sur l'accent : elle s'inverse en sombre, où l'accent
+     s'éclaircit pour rester lisible sur fond noir. */
+  --sur-accent: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -59,6 +62,7 @@
     --accent-doux: #1d3238;
     --alerte: #e0a468;
     --alerte-doux: #2c2317;
+    --sur-accent: #15171a;
 
     --rel-pouvoir: #3987e5;
     --rel-partage: #d95926;
@@ -316,6 +320,8 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
   text-align: left; text-decoration: underline; text-underline-offset: 2px;
 }
 .p-permalien { margin-top: 1.6rem; font-size: .8rem; }
+.p-signaler { margin: .35rem 0 0; font-size: .8rem; }
+.p-signaler a { color: var(--encre-douce); }
 .p-vide { color: var(--encre-douce); font-size: .88rem; }
 .p-chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin: 1.4rem 0 0; }
 .p-chiffres div { background: var(--fond-doux); border-radius: var(--rayon); padding: .6rem .75rem; }
@@ -572,3 +578,36 @@ footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
   .bandeau, .outils, footer, .aide { display: none; }
   body { background: #fff; }
 }
+
+/* ------------------------------------------------------------------ *
+ * Signaler une erreur
+ *
+ * Le relevé est encadré comme une citation : c'est ce que le site dit,
+ * pas ce que le lecteur écrit. La distinction doit se voir avant d'être
+ * lue, sinon le formulaire se remplit de « c'est faux » sans objet.
+ * ------------------------------------------------------------------ */
+.page--etroite { max-width: 46rem; }
+.releve {
+  background: var(--fond-doux); border: 1px solid var(--trait);
+  border-radius: var(--rayon); padding: .9rem 1.1rem; margin: 1.6rem 0 0;
+}
+.releve .badge { margin-top: 0; }
+.releve-liste { margin: 0; display: grid; gap: .4rem; }
+.releve-liste > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: .7rem; align-items: baseline; }
+.releve-liste dt { font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--encre-tres-douce); }
+.releve-liste dd { margin: 0; font-size: .92rem; line-height: 1.45; overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+  .releve-liste > div { grid-template-columns: 1fr; gap: .05rem; }
+}
+#dire {
+  font: inherit; width: 100%; box-sizing: border-box; padding: .6rem .8rem;
+  border: 1px solid var(--trait); border-radius: var(--rayon);
+  background: var(--fond-carte); color: var(--encre); line-height: 1.5; resize: vertical;
+}
+.actions-signalement { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin: .9rem 0 .4rem; }
+.bouton {
+  display: inline-block; background: var(--accent); color: var(--sur-accent); text-decoration: none;
+  border-radius: 999px; padding: .4rem 1rem; font-size: .92rem;
+  transition: filter var(--transition);
+}
+.bouton:hover { filter: brightness(.92); }

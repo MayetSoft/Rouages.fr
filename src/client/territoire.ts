@@ -550,6 +550,60 @@ export function variation(serie: (number | null)[]): number | null {
   return Math.round(((fin - debut) / Math.abs(debut)) * 100);
 }
 
+/**
+ * Le verdict en une phrase.
+ *
+ * Le panneau rend chaque état avec ses nuances — une liste de structures, une
+ * incise sur la loi, une réserve. Un signalement d'erreur, lui, a besoin d'une
+ * seule ligne : celle que le lecteur conteste, recopiable telle quelle dans
+ * l'issue. Les deux rendus ne peuvent pas diverger sur le fond, le compilateur
+ * exigeant de chacun qu'il traite les cinq états.
+ */
+export function resumerVerdict(v: Verdict): string {
+  switch (v.etat) {
+    case 'transferee':
+      return v.structures.map((s) => `${s.nom} (${s.natureLibelle})`).join(' · ');
+    case 'transferee-par-loi':
+      return (
+        v.structures.map((s) => `${s.nom} (${s.natureLibelle})`).join(' · ') +
+        ' — transfert prévu de plein droit par la loi'
+      );
+    case 'a-defaut':
+      return `${v.qui} — la loi l'y oblige à défaut`;
+    case 'communale':
+      return 'la commune (aucun transfert enregistré)';
+    case 'non-renseigne':
+      return (
+        `non renseigné ici — ${Math.round(v.couvertureDep * 100)} % des communes du ` +
+        `département ont un exerçant identifié, contre ` +
+        `${Math.round(v.couvertureNationale * 100)} % en France`
+      );
+  }
+}
+
+/**
+ * D'où sort la réponse.
+ *
+ * Écrire « d'après BANATIC » sous une réponse que le registre ne contient pas
+ * serait une fausse citation — c'est précisément le cas des transferts de
+ * plein droit et des compétences exercées à défaut. Chaque état nomme sa
+ * propre origine.
+ */
+export function origineVerdict(v: Verdict, maj: string): string {
+  switch (v.etat) {
+    case 'transferee':
+      return `transferts déclarés à BANATIC, mise à jour ${maj}`;
+    case 'transferee-par-loi':
+      return `la loi, qui opère le transfert de plein droit ; BANATIC (${maj}) ne l'enregistre pas`;
+    case 'a-defaut':
+      return `la loi, qui désigne cet échelon à défaut d'exercice local ; BANATIC (${maj}) est muet`;
+    case 'communale':
+      return `absence de transfert déclaré à BANATIC, mise à jour ${maj}`;
+    case 'non-renseigne':
+      return `BANATIC (${maj}), incomplet pour ce département`;
+  }
+}
+
 /* --- mémoire du choix : on ne redemande pas sa commune à chaque visite --- */
 
 export function memoriser(c: CommuneBreve | null): void {

@@ -1,0 +1,99 @@
+---
+import Base from '../layouts/Base.astro';
+import { construireReseau } from '../modele/reseau.ts';
+import { chargerGraphe, formaterDate } from '../modele/graphe.ts';
+import { DEPOT } from '../modele/signalement.ts';
+
+const reseau = construireReseau();
+const g = chargerGraphe();
+
+// Un index minuscule plutôt que le réseau entier : cette page n'a besoin que
+// de nommer une fiche et de dire quand elle a été vérifiée.
+const fiches = reseau.noeuds.map((n) => {
+  const src = g.acteurs.get(n.id) ?? g.competences.get(n.id) ?? g.processus.get(n.id);
+  return {
+    id: n.id,
+    nom: n.nom,
+    territoriale: (n.banatic ?? []).length > 0,
+    verifieLe: src && 'verifie_le' in src ? formaterDate(src.verifie_le) : undefined,
+  };
+});
+---
+
+<Base
+  titre="Signaler une erreur"
+  description="Corriger ce que Rouages affiche : le signalement emporte le contexte, la correction reste publique."
+>
+  <div class="page page--etroite">
+    <h1>Signaler une erreur</h1>
+    <p class="resume">
+      Rouages agrège des référentiels qui ont des trous, et du droit qui bouge.
+      Vous habitez peut-être la commune dont il est question&nbsp;: vous en
+      savez alors plus que la donnée.
+    </p>
+
+    <p>
+      Votre signalement devient une <a href={`${DEPOT}/issues`} rel="noopener" target="_blank"
+        >issue publique du dépôt</a
+      >. C’est voulu&nbsp;: la correction se discute et se vérifie au même
+      endroit que le reste du contenu. Rien de ce que vous écrivez ici n’est
+      envoyé avant que vous ne validiez sur GitHub.
+    </p>
+
+    {/* Le relevé est l'essentiel : sans lui, « c'est faux » n'est pas
+        corrigeable. La page le reconstitue elle-même, avec le code de
+        l'explorateur, pour décrire l'état réel de la donnée. */}
+    <section id="releve" class="releve">
+      <h2 class="badge">Ce que le site affiche</h2>
+      <p class="v-nature" id="releve-attente">Relevé en cours…</p>
+    </section>
+
+    <h2 class="badge">Ce qui est faux, et ce que vous savez</h2>
+    <p class="v-nature">
+      Une source — délibération, arrêté préfectoral, page officielle — est ce
+      qui permet de corriger&nbsp;; sans elle, un signalement reste une piste.
+    </p>
+    <textarea
+      id="dire"
+      rows="6"
+      placeholder="La compétence a été transférée à la communauté de communes en 2023, voir la délibération n°…"
+    ></textarea>
+
+    <p class="actions-signalement">
+      <a class="bouton" id="vers-issue" href={`${DEPOT}/issues/new`} rel="noopener" target="_blank">
+        Ouvrir le signalement sur GitHub
+      </a>
+      <button type="button" class="plat" id="copier">Copier le signalement</button>
+      <span class="v-nature" id="copie-faite" hidden>Copié.</span>
+    </p>
+    <p class="v-nature">
+      Sans compte GitHub&nbsp;: copiez le signalement et transmettez-le par le
+      moyen qui vous convient — il est complet, il se suffit à lui-même.
+    </p>
+
+    <h2 class="badge">Ce qui se passe ensuite</h2>
+    <ul>
+      <li>Un signalement sans source est vérifié avant correction&nbsp;; cela prend plus longtemps.</li>
+      <li>
+        Quand la donnée vient d’un référentiel national (BANATIC, OFGL, l’annuaire
+        de l’administration), la correction remonte aussi à sa source&nbsp;: la
+        corriger ici seulement la laisserait fausse partout ailleurs.
+      </li>
+      <li>Chaque fiche porte sa date de vérification&nbsp;: une correction la met à jour.</li>
+    </ul>
+
+    <noscript>
+      <p>
+        Cette page compose le relevé avec JavaScript. Sans lui, ouvrez
+        directement <a href={`${DEPOT}/issues/new`} rel="noopener">une issue</a>
+        en indiquant la page concernée, votre commune s’il y a lieu, et ce que
+        le site affichait.
+      </p>
+    </noscript>
+  </div>
+
+  <script is:inline type="application/json" id="donnees-fiches" set:html={JSON.stringify(fiches)} />
+  <script>
+    import '../client/signaler.ts';
+  </script>
+</Base>

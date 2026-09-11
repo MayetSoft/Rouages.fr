@@ -31,6 +31,7 @@ import {
 } from '../modele/relations.ts';
 import { decalageTexte, formeNoeud, largeurPastille } from '../vues/formes.ts';
 import { construireGlossaire, expansions } from '../modele/glossaire.ts';
+import { urlSignaler } from '../modele/signalement.ts';
 import {
   chercher as chercherCommune,
   memorisee,
@@ -1056,6 +1057,16 @@ function demarrer(reseau: Reseau) {
       formes.append(li);
     }
     panneau.append(formes);
+
+    // La carte n'a pas de pied de page : sans ce lien, le signalement serait
+    // hors d'atteinte depuis la page où le site se lit le plus.
+    const signaler = document.createElement('p');
+    signaler.className = 'p-signaler';
+    const vers = document.createElement('a');
+    vers.href = urlSignaler(undefined, territoire?.commune.code, '/');
+    vers.textContent = 'Signaler une erreur';
+    signaler.append(vers);
+    panneau.append(signaler);
   }
 
   function ecrirePanneau(n: Noeud, voisins: { noeud: Noeud; label: string; fam: Famille }[]) {
@@ -1133,6 +1144,17 @@ function demarrer(reseau: Reseau) {
     a.textContent = 'Page de ce nœud, sans JavaScript';
     permalien.append(a);
     panneau.append(permalien);
+
+    // Le signalement part d'où l'erreur se voit, et emporte ce que le lecteur
+    // avait sous les yeux — la fiche, et la commune s'il en a choisi une. Un
+    // formulaire de contact générique produirait des messages incorrigeables.
+    const signaler = document.createElement('p');
+    signaler.className = 'p-signaler';
+    const s = document.createElement('a');
+    s.href = urlSignaler(n.id, territoire?.commune.code);
+    s.textContent = 'Signaler une erreur sur cette fiche';
+    signaler.append(s);
+    panneau.append(signaler);
   }
 
   /* ---------------------------------------------------------------- *

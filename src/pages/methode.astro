@@ -45,9 +45,19 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
     <ul>
       <li><strong>Ce qui est affirmé</strong>&nbsp;: le registre déclare un
         transfert, et nous nommons la structure.</li>
-      <li><strong>Ce qui est déduit</strong>&nbsp;: aucun transfert déclaré, et
-        le registre est bien renseigné dans ce département — la compétence reste
-        alors à la commune.</li>
+      <li><strong>Ce que la loi impose</strong>&nbsp;: le registre est muet,
+        mais la loi transfère la compétence de plein droit à cette catégorie
+        d’intercommunalité. Le silence du registre ne vaut alors rien&nbsp;:
+        54&nbsp;% seulement des intercommunalités à fiscalité propre déclarent
+        le développement économique, que la loi leur impose pourtant à toutes
+        depuis 2017.</li>
+      <li><strong>Ce que la loi désigne à défaut</strong>&nbsp;: personne ne
+        s’en est saisi localement, et la loi nomme alors l’échelon qui prend le
+        relais — la région pour la mobilité, depuis le 1<sup>er</sup> juillet
+        2021, dans les communautés de communes qui n’ont pas délibéré.</li>
+      <li><strong>Ce qui est déduit</strong>&nbsp;: aucun transfert déclaré,
+        aucune obligation légale, et le registre est bien renseigné dans ce
+        département — la compétence reste alors à la commune.</li>
       <li><strong>Ce qui n’est pas conclu</strong>&nbsp;: aucun transfert
         déclaré, mais le département décroche nettement de la moyenne nationale.
         Le registre y est probablement incomplet, et nous le disons plutôt que
@@ -104,6 +114,18 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       cinq chiffres comme un code postal plutôt que comme un code
       <abbr title="Institut national de la statistique et des études économiques">INSEE</abbr>,
       qui occupe pourtant le même espace de valeurs.
+    </p>
+
+    <h2 class="badge">Quand c’est faux</h2>
+    <p class="mesure">
+      Ce sera parfois faux. Les référentiels nationaux ignorent ce qui se
+      décide en conseil communautaire, et une convention de mutualisation ne
+      laisse aucune trace dans l’open data. Chaque fiche porte donc un lien de
+      <a href="/signaler">signalement</a> qui emporte le contexte&nbsp;: la
+      page, la commune, la réponse exacte, et d’où elle sort. Le signalement
+      devient une issue publique du dépôt — la correction se vérifie au même
+      endroit que le reste du contenu, et quand l’erreur vient d’un référentiel
+      national, elle remonte aussi à sa source.
     </p>
 
     <h2 class="badge">Ce que le site ne fait pas</h2>
