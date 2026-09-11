@@ -194,6 +194,18 @@ export const Competence = z.object({
    * réponse ne dit pas.
    */
   reserve: z.string().min(20).max(400).optional(),
+  /**
+   * L'échelon auquel la loi confie cette compétence quand personne d'autre ne
+   * s'en est saisi.
+   *
+   * Une réserve dit « débrouillez-vous » — l'inverse de ce que ce site promet.
+   * Quand une communauté de communes n'a pas délibéré pour devenir autorité
+   * organisatrice de la mobilité, la compétence n'est pas restée à la commune :
+   * la région l'a reprise au 1er juillet 2021. C'est une réponse, pas une
+   * incertitude, et le site la connaît puisqu'il sait de quelle région dépend
+   * chaque commune.
+   */
+  a_defaut: z.enum(['region', 'departement', 'etat']).optional(),
   ...tracable,
 });
 

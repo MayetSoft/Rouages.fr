@@ -655,6 +655,13 @@ function demarrer(reseau: Reseau) {
         }
         const prix = blocPrixEau(idCompetence);
         if (prix) bloc.append(prix);
+      } else if (v.etat === 'a-defaut') {
+        // Nommer celui qui répond, plutôt que de constater que personne n'a
+        // rien déclaré. C'est la même exigence que partout ailleurs ici : une
+        // réponse vaut mieux qu'une mise en garde.
+        bloc.append(
+          ligne('p', 'p-verdict p-verdict--defaut', `${v.qui} — la loi l'y oblige à défaut.`),
+        );
       } else if (v.etat === 'communale') {
         bloc.append(
           ligne('p', 'p-verdict', 'Aucun transfert enregistré : la compétence reste exercée par la commune.'),
@@ -702,7 +709,10 @@ function demarrer(reseau: Reseau) {
           dd.append(ligne('span', 'p-prix-incise', `${e.prix.toLocaleString('fr-FR')} €/m³`));
         }
       }
-      else if (v.etat === 'communale') dd.append(ligne('span', 'p-commune-seule', 'la commune'));
+      else if (v.etat === 'a-defaut') {
+        dd.append(fragmentGlose(v.qui));
+        dd.append(ligne('span', 'p-incise-loi', "à défaut d'intercommunalité, par la loi"));
+      } else if (v.etat === 'communale') dd.append(ligne('span', 'p-commune-seule', 'la commune'));
       else dd.append(ligne('span', 'p-incertain', 'non renseigné ici'));
       d.append(dt, dd);
       dl.append(d);

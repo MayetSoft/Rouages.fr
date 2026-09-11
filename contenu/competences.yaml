@@ -399,17 +399,20 @@ competences:
     resume: "Lignes, horaires, tarifs, vélo et transport à la demande sur un ressort donné, la région prenant le relais là où personne ne s'en saisit."
     partagee_avec: [region, epci, commune, operateur-transport]
     banatic: ["6000"]
-    # Pas d'`obligatoire_pour` ici, et c'est délibéré : la loi d'orientation des
-    # mobilités n'a rien transféré d'office. Chaque communauté de communes
-    # devait délibérer avant le 31 mars 2021 pour devenir autorité
-    # organisatrice ; à défaut, c'est la région qui l'est devenue sur son
-    # territoire au 1er juillet 2021. Le registre muet ne signifie donc ni
-    # « l'intercommunalité » ni « la commune », mais « la région » — d'où la
-    # réserve plutôt qu'une marque d'obligation.
-    reserve: "Quand aucune intercommunalité ne s'est saisie de cette compétence, elle n'est pas restée à la commune : c'est la région qui est devenue autorité organisatrice sur ce territoire en juillet 2021."
+    # Trois cas, et aucun ne laisse la question ouverte :
+    #   — une structure déclarée au registre l'exerce ;
+    #   — sinon les agglomérations, communautés urbaines et métropoles le sont
+    #     de plein droit, elles l'étaient déjà avant la loi d'orientation des
+    #     mobilités ;
+    #   — sinon la région, qui a repris la compétence au 1er juillet 2021 sur
+    #     le territoire des communautés de communes n'ayant pas délibéré avant
+    #     le 31 mars 2021.
+    # La commune n'est jamais la réponse : c'est ce que le site répondait.
+    obligatoire_pour: [CA, CU, METRO, MET69]
+    a_defaut: region
     liens: [code-transports, wp-aom, vp-mobilite, od-transport]
     verifie_le: 2026-09-11
-    confiance: a_confirmer
+    confiance: etabli
 
   - id: planification-scot
     nom: "Planification à l'échelle du bassin de vie"

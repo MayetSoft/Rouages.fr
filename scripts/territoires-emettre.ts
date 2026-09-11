@@ -36,6 +36,13 @@ interface Groupement {
 interface DepartementEtalab {
   code: string;
   nom: string;
+  /** Code de la région dont il relève. */
+  region?: string;
+}
+
+interface RegionEtalab {
+  code: string;
+  nom: string;
 }
 
 interface CommuneEtalab {
@@ -110,7 +117,14 @@ export function emettre(o: {
   }
   // Le nom du département, pas son numéro : « Sarthe » se reconnaît, « 72 » non.
   // Plus d'une commune sur dix porte un nom qu'une autre porte aussi.
-  const nomsDep = new Map(lire<DepartementEtalab[]>('departements.json').map((d) => [d.code, d.nom]));
+  const departements = lire<DepartementEtalab[]>('departements.json');
+  const nomsDep = new Map(departements.map((d) => [d.code, d.nom]));
+  // La région de chaque département : c'est elle qui répond quand la loi la
+  // désigne à défaut d'intercommunalité — pour la mobilité, notamment.
+  const nomsRegion = new Map(lire<RegionEtalab[]>('regions.json').map((r) => [r.code, r.nom]));
+  const regionDeDep = new Map(
+    departements.filter((d) => d.region).map((d) => [d.code, nomsRegion.get(d.region!) ?? d.region!]),
+  );
   dire(`${GRIS}${communes.length.toLocaleString('fr-FR')} communes au découpage Etalab.${RAZ}`);
 
   // Qui est membre de quoi. Un membre peut être une commune ou un autre
@@ -312,6 +326,13 @@ export function emettre(o: {
     reserves: Object.fromEntries(
       [...o.graphe.competences.values()].filter((c) => c.reserve).map((c) => [c.id, c.reserve]),
     ),
+    // Qui répond quand personne ne s'est saisi de la compétence. Une réponse,
+    // pas une incertitude : la loi désigne un échelon, et le site le nomme.
+    aDefaut: Object.fromEntries(
+      [...o.graphe.competences.values()].filter((c) => c.a_defaut).map((c) => [c.id, c.a_defaut]),
+    ),
+    // Département -> nom de sa région, pour pouvoir nommer celle qui répond.
+    regions: Object.fromEntries(regionDeDep),
     natures: Object.fromEntries(natures),
     // Part nationale des communes pour lesquelles un exerçant est identifié.
     couverture: Object.fromEntries(

@@ -49,6 +49,12 @@ export type Verdict =
    * d'intercommunalité, que le registre l'ait enregistré ou non.
    */
   | { etat: 'transferee-par-loi'; structures: Structure[] }
+  /**
+   * Personne ne s'en est saisi localement, et la loi désigne alors un échelon
+   * supérieur — la région pour la mobilité. C'est une réponse, pas un aveu
+   * d'ignorance : `qui` la nomme.
+   */
+  | { etat: 'a-defaut'; echelon: 'region' | 'departement' | 'etat'; qui: string }
   | { etat: 'communale' }
   | { etat: 'non-renseigne'; couvertureDep: number; couvertureNationale: number };
 
@@ -192,6 +198,10 @@ let meta: {
   obligatoires?: Record<string, string[]>;
   /** Compétence -> réserve à afficher avec la réponse. */
   reserves?: Record<string, string>;
+  /** Compétence -> échelon qui répond quand personne ne s'en est saisi. */
+  aDefaut?: Record<string, 'region' | 'departement' | 'etat'>;
+  /** Département -> nom de sa région. */
+  regions?: Record<string, string>;
   finances?: MetaFinances;
   eau?: { annee: number; indicateur: string; competence: string; prixMedian: number | null };
   services?: {
@@ -398,6 +408,20 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     if (natures.length > 0) {
       const tenues = structures.filter((s) => natures.includes(s.nature));
       if (tenues.length > 0) return { etat: 'transferee-par-loi', structures: tenues };
+    }
+
+    // Quand la loi désigne un échelon à défaut, il répond avant qu'on aille
+    // conclure « la commune » ou « non renseigné » : c'est lui qui est
+    // compétent, la question n'est pas ouverte.
+    const defaut = meta!.aDefaut?.[competence];
+    if (defaut) {
+      const qui =
+        defaut === 'region'
+          ? (meta!.regions?.[commune.dep] ?? 'la région')
+          : defaut === 'departement'
+            ? (commune.depNom ?? 'le département')
+            : "l'État";
+      return { etat: 'a-defaut', echelon: defaut, qui };
     }
 
     const dansLeDep = dep.couverture?.[competence] ?? 0;
