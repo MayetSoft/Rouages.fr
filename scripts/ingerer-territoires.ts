@@ -270,10 +270,26 @@ async function principal() {
   dire(`${GRIS}${groupements.size.toLocaleString('fr-FR')} groupements lus.${RAZ}`);
 
   // Les repères financiers : les comptes des communes, en euros par habitant.
+  // Un repère déclare l'échelon où sa mesure a un sens ; les deux collectes
+  // n'interrogent pas le même jeu de données.
   const { collecterFinances } = await import('./finances-emettre.ts');
-  const reperes = [...graphe.reperes.values()];
+  const tous = [...graphe.reperes.values()];
+  const reperes = tous.filter((r) => r.echelon === 'commune');
+  const reperesGfp = tous.filter((r) => r.echelon === 'groupement');
   dire(`${GRIS}Repères financiers (${reperes.length}) :${RAZ}`);
   const finances = await collecterFinances(reperes, obstine, (m) => dire(`${GRIS}${m}${RAZ}`));
+
+  // Les flux perçus par l'intercommunalité. Ils suivent le même exercice que
+  // les comptes communaux : deux millésimes différents sur la même page ne se
+  // compareraient pas, et personne ne verrait pourquoi.
+  const { collecterFluxGroupements } = await import('./flux-emettre.ts');
+  let fluxGfp = null;
+  if (reperesGfp.length > 0 && finances) {
+    dire(`${GRIS}Flux perçus par les groupements (${reperesGfp.length}) :${RAZ}`);
+    fluxGfp = await collecterFluxGroupements(reperesGfp, finances.annee, obstine, (m) =>
+      dire(`${GRIS}${m}${RAZ}`),
+    );
+  }
 
   // Le prix de l'eau, rattaché à la structure qui la distribue réellement.
   const { collecterEau } = await import('./eau-emettre.ts');
@@ -288,7 +304,7 @@ async function principal() {
     (m) => dire(`${GRIS}${m}${RAZ}`),
   );
 
-  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances, eau, services);
+  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances, eau, services, reperesGfp, fluxGfp);
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */
@@ -390,6 +406,8 @@ async function ecrire(
   finances: Awaited<ReturnType<typeof import('./finances-emettre.ts')['collecterFinances']>>,
   eau: Awaited<ReturnType<typeof import('./eau-emettre.ts')['collecterEau']>>,
   services: Awaited<ReturnType<typeof import('./services-emettre.ts')['collecterServices']>>,
+  reperesGfp: import('../src/modele/schemas.ts').Repere[],
+  fluxGfp: Awaited<ReturnType<typeof import('./flux-emettre.ts')['collecterFluxGroupements']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -401,6 +419,8 @@ async function ecrire(
     finances,
     eau,
     services,
+    reperesGfp,
+    fluxGfp,
     sortie: SORTIE,
     dire,
     VERT,

@@ -96,6 +96,30 @@ export interface Finances {
   reperes: Repere[];
 }
 
+/**
+ * Un flux perçu par l'intercommunalité plutôt que par la commune.
+ *
+ * La taxe d'enlèvement des ordures ménagères et le versement mobilité ne sont
+ * presque jamais dans les comptes communaux : les chercher là ne trouve rien,
+ * et « la commune ne perçoit rien » serait exact et sans intérêt. Le site sait
+ * quelle structure sert la commune ; il lui manquait le chiffre en face.
+ */
+export interface FluxPercu {
+  nom: string;
+  explication: string;
+  /** La structure qui perçoit, nommée : c'est elle qu'on ira voir. */
+  structure: string;
+  natureLibelle: string;
+  /** Euros par habitant, dernier exercice. */
+  valeur: number;
+  /** Médiane des seuls groupements qui perçoivent effectivement. */
+  mediane: number | null;
+  /** Combien de groupements perçoivent : l'absence ailleurs se dit en chiffres. */
+  percepteurs: number;
+  serie: (number | null)[];
+  evolution: number | null;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -157,6 +181,10 @@ export interface Territoire {
   eau: ServiceEau | null;
   /** Les services publics implantés sur son territoire. */
   services: Services | null;
+  /** Ce que perçoit l'intercommunalité, quand l'OFGL le chiffre. */
+  fluxPercus: FluxPercu[];
+  /** Les exercices de la série des flux intercommunaux. */
+  anneesFlux: number[];
   maj: string;
 }
 
@@ -228,6 +256,25 @@ type ServicesDep = {
   fs?: Record<string, { n: number; l: string[] }>;
 };
 const servicesDep = new Map<string, ServicesDep | null>();
+
+/**
+ * Les flux perçus par les groupements : un seul fichier national, chargé une
+ * fois. Il pèse 88 ko et ne dépend pas du département — le découper coûterait
+ * plus en requêtes qu'il ne ferait gagner en octets.
+ */
+interface FichierFlux {
+  annees: number[];
+  reperes: {
+    id: string;
+    nom: string;
+    explication: string;
+    flux?: string;
+    mediane: number | null;
+    percepteurs: number;
+  }[];
+  h: Record<string, (number | null)[][]>;
+}
+let fluxGfp: FichierFlux | null = null;
 
 /** Les strates de population, dans le même ordre qu'à l'ingestion. */
 const BORNES = [500, 2000, 10000, 50000, Infinity];
@@ -348,6 +395,9 @@ export async function trouverParCode(code: string): Promise<CommuneBreve | null>
 
 export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   meta ??= await json(`${BASE}/meta.json`);
+  // Absent tant qu'aucun repère ne se mesure sur un groupement : le site doit
+  // continuer à fonctionner sans, pas échouer.
+  fluxGfp ??= await json<FichierFlux>(`${BASE}/flux.json`).catch(() => null);
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
@@ -442,8 +492,46 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),
+    fluxPercus: assemblerFluxPercus(structures),
+    anneesFlux: fluxGfp?.annees ?? [],
     maj: dep.maj,
   };
+}
+
+/**
+ * Ce que perçoit l'intercommunalité, structure par structure.
+ *
+ * Une commune relève de plusieurs groupements — sa communauté, un syndicat de
+ * déchets, un syndicat d'énergie. On interroge chacun : c'est celui qui perçoit
+ * qui répond, et il est nommé, parce que « votre intercommunalité » ne dit pas
+ * à qui écrire.
+ */
+function assemblerFluxPercus(structures: Structure[]): FluxPercu[] {
+  if (!fluxGfp) return [];
+  const out: FluxPercu[] = [];
+  for (const [i, r] of fluxGfp.reperes.entries()) {
+    for (const s of structures) {
+      const serie = fluxGfp.h[s.siren]?.[i];
+      if (!serie) continue;
+      const valeur = serie[serie.length - 1];
+      // Une série qui s'arrête avant le dernier exercice ne se lit pas comme un
+      // zéro : le groupement a pu cesser de percevoir, ou fusionner.
+      if (valeur === null || valeur === undefined) continue;
+      out.push({
+        nom: r.nom,
+        explication: r.explication,
+        structure: s.nom,
+        natureLibelle: s.natureLibelle,
+        valeur,
+        mediane: r.mediane,
+        percepteurs: r.percepteurs,
+        serie,
+        evolution: variation(serie),
+      });
+      break;
+    }
+  }
+  return out;
 }
 
 /** Le service d'eau qui dessert la commune, avec son prix et son mode de gestion. */

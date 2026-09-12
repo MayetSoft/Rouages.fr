@@ -102,7 +102,7 @@ function lireMeta(): { finances?: { annee: number }; eau?: { annee: number } } {
 
 const controles: Record<
   Surveillance['type'],
-  (s: Surveillance, ctx: { codesBanatic: Set<string>; agregats: Set<string>; meta: ReturnType<typeof lireMeta> }) => Promise<Omit<Constat, 'id' | 'nom' | 'alimente'>>
+  (s: Surveillance, ctx: { codesBanatic: Set<string>; agregats: Record<'commune' | 'groupement', Set<string>>; meta: ReturnType<typeof lireMeta> }) => Promise<Omit<Constat, 'id' | 'nom' | 'alimente'>>
 > = {
   /** Le service répond-il encore ? Le minimum, et rarement suffisant. */
   async disponibilite(s) {
@@ -141,12 +141,20 @@ const controles: Record<
     const annees = facettes.facets.find((f) => f.name === 'annee_join')?.facets ?? [];
     const disponibles = facettes.facets.find((f) => f.name === 'agregat')?.facets ?? [];
     const connus = new Set(disponibles.map((a) => a.name));
-    const perdus = [...agregats].filter((a) => !connus.has(a));
+    const attendus = agregats[s.echelon];
+    const perdus = [...attendus].filter((a) => !connus.has(a));
     if (perdus.length > 0) {
       return {
         gravite: 'alerte',
         message: `agrégat(s) disparu(s), l'ingestion échouera : ${perdus.join(' ; ')}`,
       };
+    }
+    // Le millésime des flux intercommunaux n'est pas choisi par cette base :
+    // il suit celui des comptes communaux, pour que deux chiffres affichés
+    // côte à côte portent sur le même exercice. Ici on ne contrôle donc que la
+    // survie des agrégats.
+    if (s.echelon === 'groupement') {
+      return { gravite: 'ok', message: `${attendus.size} agrégat(s) toujours publiés` };
     }
     // Un millésime tout juste ouvert est souvent incomplet : on ne le retient
     // que s'il couvre la quasi-totalité des communes.
@@ -408,7 +416,16 @@ if (surveillances.length === 0) {
 
 const ctx = {
   codesBanatic: new Set([...g.competences.values()].flatMap((c) => c.banatic)),
-  agregats: new Set([...g.reperes.values()].map((r) => r.agregat)),
+  // Par échelon : chaque base de l'OFGL n'est comptable que des agrégats que
+  // le site y lit réellement.
+  agregats: {
+    commune: new Set(
+      [...g.reperes.values()].filter((r) => r.echelon === 'commune').map((r) => r.agregat),
+    ),
+    groupement: new Set(
+      [...g.reperes.values()].filter((r) => r.echelon === 'groupement').map((r) => r.agregat),
+    ),
+  },
   meta,
 };
 

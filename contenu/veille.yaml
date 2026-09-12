@@ -31,6 +31,19 @@ surveillances:
     url: "https://data.ofgl.fr/api/explore/v2.1/catalog/datasets/ofgl-base-communes-consolidee"
     lien: od-ofgl
 
+  # Le même fournisseur, une autre base : le versement mobilité et la taxe
+  # d'enlèvement des ordures ménagères sont perçus par les groupements, pas par
+  # les communes. Les surveiller dans la base communale les y trouverait — il y
+  # traîne quelques centaines de lignes résiduelles — et masquerait leur
+  # disparition là où le site les lit.
+  - id: ofgl-groupements
+    nom: "OFGL — comptes des groupements à fiscalité propre"
+    alimente: "les flux perçus par l'intercommunalité"
+    type: ofgl-millesime
+    echelon: groupement
+    url: "https://data.ofgl.fr/api/explore/v2.1/catalog/datasets/ofgl-base-gfp"
+    lien: od-ofgl-flux
+
   - id: sispea-eau-potable
     nom: "SISPEA — services publics d'eau potable"
     alimente: "le prix de l'eau"

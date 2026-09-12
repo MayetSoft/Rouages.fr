@@ -31,10 +31,6 @@ Fait :
 - 39 acteurs, 37 compétences, 18 flux, 215 relations, 86 pages de référence.
 
 Reste :
-- **chiffrer les flux.** Ils sont structurellement en place et liés à l'OFGL,
-  mais leurs ordres de grandeur restent qualitatifs : les chiffrer commune par
-  commune demande d'ingérer les données, donc un environnement ayant accès au
-  réseau ouvert (voir plus bas) ;
 - **la relecture par un praticien** des attributions marquées
   `confiance: a_confirmer` — c'est le vrai reste à faire, pas le volume.
 
@@ -275,6 +271,40 @@ cimetière, et rien ne l'aurait signalé.
 Une règle de validation compare désormais les trois champs recopiés —
 `obligatoires`, `reserves`, `aDefaut` — et refuse de publier tant qu'ils
 divergent. Elle a attrapé son auteur dans la minute.
+
+### Chiffrer les flux ✔
+
+Deux des flux dont on parle le plus à un habitant — la taxe d'enlèvement des
+ordures ménagères et le versement mobilité — n'apparaissaient nulle part sur le
+site. La raison est un piège d'échelon : ils ne sont presque jamais dans les
+comptes d'une commune, c'est le groupement qui les perçoit. Les chercher au
+mauvais endroit ramène 568 lignes au lieu de 1 942, et répondre « la commune ne
+perçoit rien » aurait été exact et sans intérêt.
+
+Un repère déclare donc désormais l'échelon où sa mesure a un sens, et le site
+sait déjà quelle structure sert chaque commune : la jointure BANATIC lui donne
+le SIREN de chacun de ses groupements. Il ne manquait que le chiffre en face.
+1 016 structures sont chiffrées, sur huit exercices, dans un fichier de 88 ko
+chargé à part — le fondre dans `meta.json` ferait payer ce poids à chaque
+visite pour une information que peu de gens ouvriront.
+
+Ce qui a été refusé : combler l'absence. 886 intercommunalités perçoivent la
+taxe d'enlèvement et 281 le versement mobilité ; les autres financent le
+service autrement, par une redevance ou par un syndicat qui n'est pas un
+groupement à fiscalité propre. La médiane ne porte donc que sur celles qui
+perçoivent — les compter pour zéro ferait passer un taux ordinaire pour une
+anomalie — et une valeur manquante reste manquante.
+
+En vérifiant l'affichage, un défaut plus ancien est apparu : l'évolution était
+annoncée « depuis 2018 » quelle que soit la première année réellement
+renseignée. La communauté de communes Sud Sarthe n'a de taxe d'enlèvement qu'à
+partir de 2022, et le site écrivait pourtant « + 6 % depuis 2018 ». Les deux
+blocs nomment maintenant l'année du premier chiffre.
+
+La veille, enfin, ne surveillait que la base communale de l'OFGL. Un agrégat
+peut disparaître d'une base sans bouger dans l'autre, et « Versement transport »
+existe résiduellement dans les deux : le contrôle aurait été rassurant à tort.
+Chaque surveillance déclare désormais l'échelon dont elle répond.
 
 ## Phase 3 — Élargir
 

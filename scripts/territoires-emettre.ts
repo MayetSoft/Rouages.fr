@@ -16,7 +16,9 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import type { chargerGraphe } from '../src/modele/graphe.ts';
+import type { Repere } from '../src/modele/schemas.ts';
 import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.ts';
+import { ecrireFlux, type FluxGroupements } from './flux-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -73,6 +75,8 @@ export function emettre(o: {
   } | null;
   eau: Eau | null;
   services: Services | null;
+  reperesGfp: Repere[];
+  fluxGfp: FluxGroupements | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -80,7 +84,10 @@ export function emettre(o: {
   GRIS: string;
 }) {
   const { groupements, codesSuivis, dateExport, natures, finances, eau, services, sortie, dire, VERT, RAZ, GRIS } = o;
-  const reperes = [...o.graphe.reperes.values()];
+  // Seuls les repères mesurés sur la commune : leur ordre doit correspondre
+  // colonne pour colonne aux séries collectées, sinon les médianes se
+  // décaleraient d'un repère sans que rien ne le signale.
+  const reperes = [...o.graphe.reperes.values()].filter((r) => r.echelon === 'commune');
 
   // Le découpage administratif vient d'un paquet npm plutôt que d'une API :
   // le registre est autrement plus fiable qu'un service web, et la version est
@@ -304,6 +311,14 @@ export function emettre(o: {
       }
       servicesEcrits += ecrireServices(sortie, dep, liste.map((c) => c.code), services, voisines);
     }
+  }
+
+  // --- les flux perçus par les groupements, dans leur propre fichier -----
+  // Il n'est chargé que si l'on ouvre un flux : le fondre dans meta.json, que
+  // toute visite télécharge, ferait payer ce poids à qui ne le lira jamais.
+  if (o.fluxGfp && o.reperesGfp.length > 0) {
+    const n = ecrireFlux(sortie, o.reperesGfp, o.fluxGfp);
+    dire(`${GRIS}Flux des groupements : ${n.toLocaleString('fr-FR')} structures chiffrées.${RAZ}`);
   }
 
   // --- métadonnées : la correspondance est aussi de la donnée ------------

@@ -1,5 +1,5 @@
 {
-  "dernier_controle": "2026-09-07",
+  "dernier_controle": "2026-09-12",
   "constats": {
     "banatic-referentiel": {
       "empreinte": "a9d1b65dfa4eea62",
@@ -12,6 +12,9 @@
       "millesime": 2025,
       "gravite": "ok"
     },
+    "ofgl-groupements": {
+      "gravite": "ok"
+    },
     "sispea-eau-potable": {
       "millesime": 2024,
       "gravite": "ok"
@@ -21,11 +24,11 @@
       "gravite": "ok"
     },
     "annuaire-education": {
-      "millesime": 68939,
+      "millesime": 68607,
       "gravite": "ok"
     },
     "annuaire-administration": {
-      "millesime": 93779,
+      "millesime": 93801,
       "gravite": "ok"
     },
     "finess-referentiel": {

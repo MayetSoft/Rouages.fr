@@ -48,3 +48,32 @@ reperes:
     agregat: "Encours de dette"
     explication: "Ce qui reste à rembourser, tous emprunts confondus."
     liens: [od-ofgl]
+
+  # --- Perçus par l'intercommunalité, pas par la commune --------------------
+  # Les chercher dans les comptes communaux ne donnerait presque rien. Le site
+  # sait quelle structure sert chaque commune : c'est là qu'il faut regarder.
+  - id: repere-teom
+    nom: "Taxe d'enlèvement des ordures ménagères"
+    # L'OFGL écrit « enlévement ». Le libellé est recopié tel quel : c'est une
+    # clé de requête, pas du texte affiché, et le corriger casserait l'appel.
+    agregat: "Taxe d'enlévement des ordures ménagères"
+    echelon: groupement
+    flux: teom
+    explication: >
+      Ce que l'intercommunalité perçoit pour le service des déchets. Beaucoup la
+      remplacent par une redevance, qui n'apparaît pas ici : l'absence de chiffre
+      ne veut pas dire que le service est gratuit.
+    liens: [od-ofgl, wp-teom]
+
+  - id: repere-versement-mobilite
+    nom: "Versement mobilité"
+    # « Versement transport » est l'ancien nom, et celui que l'OFGL emploie
+    # toujours. Le site affiche le nom actuel et interroge l'ancien.
+    agregat: "Versement transport"
+    echelon: groupement
+    flux: versement-mobilite
+    explication: >
+      Payé par les employeurs de onze salariés et plus, et perçu par l'autorité
+      organisatrice de la mobilité. Seules celles qui organisent un service
+      régulier peuvent l'instituer.
+    liens: [od-ofgl-flux, wp-versement-mobilite, code-transports]

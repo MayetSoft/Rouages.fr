@@ -89,6 +89,25 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       se lirait «&nbsp;Paris ne reçoit rien&nbsp;».
     </p>
 
+    <h2 class="badge">Ce que perçoit l’intercommunalité</h2>
+    <p class="mesure">
+      La taxe d’enlèvement des ordures ménagères et le versement mobilité
+      n’apparaissent presque jamais dans les comptes d’une commune&nbsp;: c’est
+      le groupement qui les perçoit. Les chercher au mauvais échelon ramène
+      568&nbsp;lignes au lieu de 1&nbsp;942, et répondre «&nbsp;la commune ne
+      perçoit rien&nbsp;» serait exact et sans intérêt. Chaque repère déclare
+      donc l’échelon où sa mesure a un sens, et le site sait déjà quelle
+      structure sert chaque commune.
+    </p>
+    <p class="mesure">
+      La médiane ne porte que sur les intercommunalités qui perçoivent
+      effectivement — 886 pour la taxe d’enlèvement, 281 pour le versement
+      mobilité. Beaucoup d’autres financent le service par une redevance, qui
+      n’entre pas dans cette mesure&nbsp;: les compter pour zéro tirerait la
+      référence vers le bas et ferait passer un taux ordinaire pour une
+      anomalie. Une valeur manquante reste manquante.
+    </p>
+
     <h2 class="badge">Le prix de l’eau</h2>
     <p class="mesure">
       Il n’a de sens qu’attaché au service qui la distribue&nbsp;: c’est le même

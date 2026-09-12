@@ -322,6 +322,18 @@ export const Repere = z.object({
   nom: z.string().min(3).max(60),
   /** Libellé exact de l'agrégat OFGL : l'ingestion échoue s'il ne correspond pas. */
   agregat: z.string().min(3),
+  /**
+   * L'échelon où la mesure a un sens.
+   *
+   * Les comptes d'une commune ne portent pas le versement mobilité ni, le plus
+   * souvent, la taxe d'enlèvement des ordures ménagères : ces ressources sont
+   * perçues par l'intercommunalité. Les chercher dans les comptes communaux
+   * n'y trouve presque rien — 568 lignes contre 1 942 — et conclure « la
+   * commune ne perçoit rien » serait exact et sans intérêt. Le repère déclare
+   * donc où regarder, et le site sait déjà quelle structure sert chaque
+   * commune.
+   */
+  echelon: z.enum(['commune', 'groupement']).default('commune'),
   /** Le flux du réseau que ce repère chiffre, quand la correspondance est exacte. */
   flux: Id.optional(),
   explication: z.string().min(10).max(280),
@@ -350,6 +362,15 @@ export const Surveillance = z.object({
     'paquet-npm',
   ]),
   url: z.string().min(3),
+  /**
+   * Pour `ofgl-millesime` : l'échelon des repères que cette base alimente.
+   *
+   * L'OFGL publie un jeu par échelon, et un agrégat peut disparaître de l'un
+   * sans bouger dans l'autre. Chercher « Versement transport » dans les
+   * comptes des communes le trouverait — 568 lignes résiduelles — et laisserait
+   * croire que tout va bien alors que le site le lit chez les groupements.
+   */
+  echelon: z.enum(['commune', 'groupement']).default('commune'),
   /**
    * Pour `datagouv-ressource` : le motif que doit porter le nom de la
    * ressource suivie. Un jeu de données en publie souvent plusieurs, dont des

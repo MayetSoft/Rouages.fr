@@ -721,6 +721,8 @@ function demarrer(reseau: Reseau) {
     bloc.append(dl);
     const argent = blocFinances();
     if (argent) bloc.append(argent);
+    const percus = blocFluxPercus();
+    if (percus) bloc.append(percus);
     const equipements = blocServices();
     if (equipements) bloc.append(equipements);
 
@@ -916,7 +918,8 @@ function demarrer(reseau: Reseau) {
               'p-evolution',
               // Un vrai signe moins (U+2212), pas le trait d'union du clavier :
               // il s'aligne sur le plus et sur les chiffres.
-              `${r.evolution >= 0 ? '+' : '\u2212'}${Math.abs(r.evolution)} % depuis ${f.annees[0]}`,
+              `${r.evolution >= 0 ? '+' : '\u2212'}${Math.abs(r.evolution)} % depuis ` +
+                `${debutSerie(r.serie, f.annees) ?? f.annees[0]}`,
             ),
           );
         }
@@ -929,8 +932,99 @@ function demarrer(reseau: Reseau) {
     return bloc;
   }
 
+  /**
+   * Ce que perçoit l'intercommunalité.
+   *
+   * « Ses comptes » dit ce que la commune encaisse et dépense. Mais la taxe
+   * d'enlèvement des ordures ménagères et le versement mobilité n'y sont pas :
+   * c'est le groupement qui les perçoit. Sans ce bloc, le site montrait un
+   * budget communal amputé des deux flux dont on parle le plus à un habitant.
+   *
+   * La structure est nommée. « Votre intercommunalité » ne dit pas à qui
+   * écrire, et c'est tout l'objet du site.
+   */
+  function blocFluxPercus(): HTMLElement | null {
+    const t = territoire;
+    if (!t || t.fluxPercus.length === 0) return null;
+    const liste = t.fluxPercus;
+    const annees = t.anneesFlux;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-finances p-flux-percus';
+    bloc.append(ligne('h3', 'p-titre-section', "Ce que perçoit l'intercommunalité"));
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        "Par habitant, et rapporté aux seules intercommunalités qui perçoivent : y " +
+          "compter les autres pour zéro ferait passer un taux ordinaire pour une anomalie.",
+      ),
+    );
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    for (const f of liste) {
+      const d = document.createElement('div');
+      const dt = document.createElement('dt');
+      dt.append(document.createTextNode(f.nom));
+      dt.title = f.explication;
+      dt.append(glose('span', 'p-percepteur', `${f.structure} — ${f.natureLibelle}`));
+      const dd = document.createElement('dd');
+      dd.append(
+        ligne('span', 'p-montant', `${f.valeur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} \u20ac`),
+      );
+      if (f.mediane !== null && f.mediane > 0) {
+        dd.append(reglette(f.valeur, f.mediane, 'la médiane de celles qui perçoivent'));
+        dd.append(
+          ligne(
+            'span',
+            'p-mediane',
+            // « sur 886 » seul ne dit pas sur 886 quoi : le mot compte plus que
+            // la place qu'il prend.
+            `médiane ${f.mediane.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} \u20ac, ` +
+              `sur ${f.percepteurs.toLocaleString('fr-FR')} intercommunalités`,
+          ),
+        );
+      }
+      const courbe = tendance(f.serie, annees);
+      if (courbe) {
+        const rang = document.createElement('span');
+        rang.className = 'p-tendance-ligne';
+        rang.append(courbe);
+        if (f.evolution !== null) {
+          rang.append(
+            ligne(
+              'span',
+              'p-evolution',
+              `${f.evolution >= 0 ? '+' : '\u2212'}${Math.abs(f.evolution)} % depuis ` +
+                `${debutSerie(f.serie, annees) ?? annees[0]}`,
+            ),
+          );
+        }
+        dd.append(rang);
+      }
+      d.append(dt, dd);
+      dl.append(d);
+    }
+    bloc.append(dl);
+    return bloc;
+  }
+
+  /**
+   * L'année du premier chiffre réellement renseigné.
+   *
+   * `variation()` calcule l'écart entre le premier et le dernier point non
+   * nuls ; écrire « depuis 2018 » sous prétexte que la fenêtre commence là
+   * serait faux dès qu'une série démarre plus tard. La communauté de communes
+   * Sud Sarthe n'a de taxe d'enlèvement qu'à partir de 2022, et le site
+   * annonçait pourtant « + 6 % depuis 2018 ».
+   */
+  function debutSerie(serie: (number | null)[], annees: number[]): number | null {
+    const i = serie.findIndex((v) => v !== null);
+    return i === -1 ? null : (annees[i] ?? null);
+  }
+
   /** Une réglette : le trait est la médiane, le point la commune. */
-  function reglette(valeur: number, mediane: number): SVGSVGElement {
+  function reglette(valeur: number, mediane: number, reference = 'la médiane de la strate'): SVGSVGElement {
     const L = 108;
     const H = 14;
     // L'échelle va de 0 à deux fois la médiane : au-delà, on bute au bord et le
@@ -939,7 +1033,7 @@ function demarrer(reseau: Reseau) {
     const s = el('svg', { class: 'reglette', width: L, height: H, viewBox: `0 0 ${L} ${H}` });
     const titre = el('title');
     const ecart = Math.round((valeur / mediane - 1) * 100);
-    titre.textContent = `${ecart >= 0 ? '+' : ''}${ecart} % par rapport à la médiane de la strate`;
+    titre.textContent = `${ecart >= 0 ? '+' : ''}${ecart} % par rapport à ${reference}`;
     s.append(
       titre,
       el('line', { class: 'reglette-axe', x1: 2, y1: H / 2, x2: L - 2, y2: H / 2 }),
