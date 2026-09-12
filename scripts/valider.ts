@@ -11,6 +11,7 @@
 import { chargerGraphe, estPerime, formaterDate } from '../src/modele/graphe.ts';
 import { construireGlossaire } from '../src/modele/glossaire.ts';
 import { construireReseau } from '../src/modele/reseau.ts';
+import { existsSync, readFileSync } from 'node:fs';
 
 const args = new Set(process.argv.slice(2));
 const verifierLiens = args.has('--liens');
@@ -200,6 +201,47 @@ for (const [id, a] of g.acteurs) controlerFraicheur('acteur', id, a);
 for (const [id, c] of g.competences) controlerFraicheur('compétence', id, c);
 for (const [id, f] of g.flux) controlerFraicheur('flux', id, f);
 for (const [id, p] of g.processus) controlerFraicheur('processus', id, p);
+
+/**
+ * Les fichiers territoriaux disent-ils encore ce que dit le contenu ?
+ *
+ * `public/territoires/meta.json` est écrit par `npm run territoires`, pas par
+ * le build : corriger une réserve dans les compétences ne suffit donc pas à la
+ * corriger sur le site. C'est la panne la plus silencieuse possible — le
+ * contenu est juste, la validation passe, et le panneau affiche l'ancien
+ * texte. On l'a vécu en écrivant la réserve du cimetière.
+ *
+ * Trois champs seulement sont recopiés dans meta.json, et ce sont eux qu'on
+ * compare. Les autres — couverture, natures, découpage — sont des mesures
+ * faites sur la donnée, pas du contenu : elles ne peuvent pas diverger d'une
+ * source qu'on tiendrait à jour ici.
+ */
+const META = 'public/territoires/meta.json';
+if (existsSync(META)) {
+  const meta = JSON.parse(readFileSync(META, 'utf8')) as {
+    obligatoires?: Record<string, string[]>;
+    reserves?: Record<string, string>;
+    aDefaut?: Record<string, string>;
+  };
+  const comp = [...g.competences.values()];
+  const attendu = {
+    obligatoires: Object.fromEntries(
+      comp.filter((c) => c.obligatoire_pour.length > 0).map((c) => [c.id, c.obligatoire_pour]),
+    ),
+    reserves: Object.fromEntries(comp.filter((c) => c.reserve).map((c) => [c.id, c.reserve])),
+    aDefaut: Object.fromEntries(comp.filter((c) => c.a_defaut).map((c) => [c.id, c.a_defaut])),
+  };
+  for (const champ of ['obligatoires', 'reserves', 'aDefaut'] as const) {
+    const ici = JSON.stringify(attendu[champ]);
+    const la = JSON.stringify(meta[champ] ?? {});
+    if (ici !== la) {
+      erreurs.push(
+        `${META} → ${champ} ne reflète plus contenu/competences.yaml — ` +
+          `relancez « npm run territoires -- --cache » pour le régénérer.`,
+      );
+    }
+  }
+}
 
 /* ------------------------------------------------------------------ *
  * Liens (réseau, sur demande)

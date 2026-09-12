@@ -195,3 +195,22 @@ sources:
   - { id: anct-fr, type: page_officielle, titre: "Agence nationale de la cohésion des territoires", url: "https://agence-cohesion-territoires.gouv.fr/", consulte_le: 2026-09-11 }
   - { id: ademe-fr, type: page_officielle, titre: "ADEME — l'agence de la transition écologique", url: "https://www.ademe.fr/", consulte_le: 2026-09-11 }
   - { id: fncaue, type: page_officielle, titre: "Fédération nationale des CAUE — trouver le sien", url: "https://www.fncaue.com/", consulte_le: 2026-09-11 }
+
+  # --- Culture, sport, funéraire, numérique ----------------------------------
+  # Culture et sport partagent un article : L1111-4 les déclare partagés entre
+  # tous les échelons. C'est l'inverse du reste du site, où chaque compétence a
+  # un exerçant — et c'est justement ce qu'il faut dire.
+  - { id: cgct-l1111-4, type: droit, titre: "CGCT art. L1111-4 — compétences partagées : culture, sport, tourisme", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045215059", consulte_le: 2026-09-12 }
+  - { id: wp-bibliotheque-municipale, type: wikipedia, titre: "Bibliothèque municipale", url: "https://fr.wikipedia.org/wiki/Biblioth%C3%A8que_municipale", consulte_le: 2026-09-12 }
+  - { id: culture-gouv, type: page_officielle, titre: "Ministère de la Culture", url: "https://www.culture.gouv.fr/", consulte_le: 2026-09-12 }
+  - { id: code-sport, type: droit, titre: "Code du sport", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006071318/", consulte_le: 2026-09-12 }
+  - { id: wp-equipement-sportif, type: wikipedia, titre: "Équipement sportif", url: "https://fr.wikipedia.org/wiki/%C3%89quipement_sportif", consulte_le: 2026-09-12 }
+  - { id: sports-gouv, type: page_officielle, titre: "Ministère chargé des sports", url: "https://www.sports.gouv.fr/", consulte_le: 2026-09-12 }
+  - { id: od-equipements-sportifs, type: donnees_ouvertes, titre: "Équipements sportifs en France — carte et données ouvertes", url: "https://equipements.sports.gouv.fr/", consulte_le: 2026-09-12 }
+  - { id: cgct-l2223-1, type: droit, titre: "CGCT art. L2223-1 — chaque commune dispose d'au moins un cimetière", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000019983164", consulte_le: 2026-09-12 }
+  - { id: wp-cimetiere, type: wikipedia, titre: "Cimetière", url: "https://fr.wikipedia.org/wiki/Cimeti%C3%A8re", consulte_le: 2026-09-12 }
+  - { id: sp-concession-funeraire, type: page_officielle, titre: "Qu'est-ce qu'une concession funéraire ? — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/F31001", consulte_le: 2026-09-12 }
+  - { id: cgct-l1425-1, type: droit, titre: "CGCT art. L1425-1 — réseaux locaux de communications électroniques", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000039248089", consulte_le: 2026-09-12 }
+  - { id: wp-reseau-initiative-publique, type: wikipedia, titre: "Réseau d'initiative publique", url: "https://fr.wikipedia.org/wiki/R%C3%A9seau_d%27initiative_publique", consulte_le: 2026-09-12 }
+  - { id: arcep-connexion, type: page_officielle, titre: "Ma connexion internet — l'éligibilité adresse par adresse", url: "https://maconnexioninternet.arcep.fr/", consulte_le: 2026-09-12 }
+  - { id: od-arcep-cartes, type: donnees_ouvertes, titre: "Cartes et données de l'Arcep — couverture fixe et mobile", url: "https://www.arcep.fr/cartes-et-donnees.html", consulte_le: 2026-09-12 }

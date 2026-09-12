@@ -31,8 +31,6 @@ Fait :
 - 39 acteurs, 37 compétences, 18 flux, 215 relations, 86 pages de référence.
 
 Reste :
-
-- les compétences manquantes : culture, sport, funéraire, numérique ;
 - **chiffrer les flux.** Ils sont structurellement en place et liés à l'OFGL,
   mais leurs ordres de grandeur restent qualitatifs : les chiffrer commune par
   commune demande d'ingérer les données, donc un environnement ayant accès au
@@ -206,6 +204,77 @@ nationales : ce qu'on cherche, c'est sa brigade, sa DDT, sa DREAL.
 Le repli par famille a tenu : « La commune » passe de 29 à 29 relations
 partagées sans qu'une pastille de plus soit dessinée, et la colonne « État » du
 plan d'ensemble s'est repliée d'elle-même en trois piles.
+
+### La mobilité ne retombe jamais sur la commune ✔
+
+La loi du 24 décembre 2019 ne laisse pas de trou : les communautés
+d'agglomération, urbaines et les métropoles sont autorités organisatrices de
+plein droit ; les communautés de communes le sont si elles ont délibéré avant
+le 31 mars 2021 ; sinon la région exerce la compétence depuis le 1er juillet
+2021. Le site répondait « la commune » là où le registre était muet —
+c'est-à-dire dans le seul cas où la commune n'est certainement pas la réponse.
+
+D'où un quatrième état du verdict : `a-defaut` nomme celui que la loi désigne,
+et s'affiche à l'encre pleine parce que c'est une réponse, pas une incertitude.
+12 113 communes répondent désormais avec leur région.
+
+### Signaler une erreur ✔
+
+Le site se trompera. Le registre ignore ce qui se décide en conseil
+communautaire, une convention de mutualisation ne laisse aucune trace dans
+l'open data, et le droit bouge. Le lecteur qui habite la commune en sait alors
+plus que la donnée.
+
+Un formulaire de contact générique aurait produit des messages incorrigeables.
+« C'est faux » n'est pas une correction. `/signaler` ne reçoit donc que des
+identifiants — un nœud, un code INSEE, un chemin interne — et recalcule le
+relevé avec le code de l'explorateur : la page, la fiche, la commune, la
+réponse exacte et son origine. Un relevé recopié depuis l'URL serait
+falsifiable par qui fabrique un lien, et vieillirait sans qu'on le sache.
+
+Le signalement devient une issue publique du dépôt : la correction se discute
+au même endroit que le contenu. Pour qui n'a pas de compte, le même texte se
+copie et part par un autre canal — pas d'adresse inventée, un lien mort vaut
+moins que pas de lien.
+
+### Culture, sport, funéraire, numérique ✔
+
+Les quatre compétences qui manquaient, plus une cinquième que le référentiel
+imposait de distinguer : BANATIC sépare les *activités* culturelles (5035) et
+sportives (5040) des *équipements* qui les abritent (5000), et les
+intercommunalités ne déclarent pas les mêmes.
+
+Culture et sport sont un cas à part dans tout le site : l'article L1111-4 du
+CGCT les déclare **partagés** entre commune, département, région et État.
+Ailleurs, Rouages répond « qui exerce » ; ici la réponse honnête est
+« plusieurs à la fois », et la réserve le dit plutôt que de laisser croire à un
+exerçant unique.
+
+Le cimetière est l'enseignement le plus utile. Sa couverture est de 5 %, et
+c'est **correct** — l'inverse du cas de la concession électrique, où un
+département à 15 % contre 94 % en France signale un registre incomplet. Ici,
+l'article L2223-1 oblige chaque commune à disposer d'un cimetière : presque
+aucune ne le transfère, et le silence du registre veut bien dire « la commune ».
+L'heuristique ne s'y trompe pas, parce qu'elle compare le département à la
+moyenne nationale et non à 100 %.
+
+Reste que la Métropole du Grand Paris déclare ce code, et le site la nomme donc
+pour Paris. En conclure qu'elle gère le Père-Lachaise serait faux : déclarer la
+compétence n'est pas gérer chaque cimetière. C'est le cas où la réserve compte
+le plus, parce que la réponse est exacte et l'inférence qu'on en tire ne l'est
+pas.
+
+### Une panne qu'on ne pouvait pas voir ✔
+
+`public/territoires/meta.json` est écrit par `npm run territoires`, pas par le
+build. Corriger une réserve dans les compétences ne suffisait donc pas à la
+corriger sur le site : le contenu était juste, la validation passait, et le
+panneau affichait l'ancien texte. C'est arrivé en écrivant la réserve du
+cimetière, et rien ne l'aurait signalé.
+
+Une règle de validation compare désormais les trois champs recopiés —
+`obligatoires`, `reserves`, `aDefaut` — et refuse de publier tant qu'ils
+divergent. Elle a attrapé son auteur dans la minute.
 
 ## Phase 3 — Élargir
 

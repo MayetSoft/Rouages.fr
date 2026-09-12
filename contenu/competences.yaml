@@ -720,3 +720,79 @@ competences:
     liens: [wp-caue, fncaue, code-urbanisme]
     verifie_le: 2026-09-11
     confiance: a_confirmer
+
+  # --- Culture, sport, funéraire, numérique -------------------------------
+  # Quatre compétences que le site décrivait par leur absence. Les deux
+  # premières sont un cas à part : l'article L1111-4 du CGCT les déclare
+  # *partagées* entre commune, département, région et État. Le reste du site
+  # répond « qui exerce » ; ici la réponse honnête est « plusieurs à la fois »,
+  # et la réserve le dit plutôt que de laisser croire à un exerçant unique.
+  - id: action-culturelle
+    nom: "Culture et lecture publique"
+    nom_court: "Culture"
+    acteur: commune
+    resume: "Bibliothèque, école de musique, salle de spectacle : rien de tout cela n'est obligatoire, et c'est pourtant le service culturel le plus proche de chez soi."
+    partagee_avec: [epci, departement, region, etat]
+    banatic: ["5035"]
+    reserve: "La culture est une compétence partagée : commune, département, région et État peuvent intervenir sur le même équipement. La réponse ci-dessus dit qui l'exerce localement, pas qui le finance."
+    liens: [wp-bibliotheque-municipale, culture-gouv, cgct-l1111-4, code-patrimoine]
+    verifie_le: 2026-09-12
+    confiance: etabli
+
+  - id: activites-sportives
+    nom: "Sport et activités sportives"
+    nom_court: "Sport"
+    acteur: commune
+    resume: "Subventions aux clubs, créneaux dans les salles, écoles municipales de sport : la commune décide de ce qu'elle soutient, sans y être tenue."
+    partagee_avec: [epci, departement, region, etat]
+    banatic: ["5040"]
+    reserve: "Le sport est une compétence partagée : les quatre échelons peuvent subventionner le même club. La réponse ci-dessus dit qui exerce la compétence, pas d'où vient l'argent d'une association donnée."
+    liens: [wp-equipement-sportif, sports-gouv, cgct-l1111-4, code-sport]
+    verifie_le: 2026-09-12
+    confiance: etabli
+
+  - id: equipements-culturels-sportifs
+    nom: "Équipements culturels et sportifs"
+    nom_court: "Équipements culture-sport"
+    acteur: commune
+    resume: "Gymnase, piscine, médiathèque, salle polyvalente : les bâtir est une décision, les faire fonctionner est une dépense annuelle — et c'est la seconde qui pèse."
+    partagee_avec: [epci, departement, region]
+    banatic: ["5000"]
+    liens: [wp-equipement-sportif, od-equipements-sportifs, cgct-l1111-4]
+    verifie_le: 2026-09-12
+    confiance: etabli
+
+  # 5 % de couverture seulement, et c'est correct — l'inverse du cas de la
+  # concession électrique. Là-bas, un registre à 15 % dans un département contre
+  # 94 % en France signale un registre incomplet. Ici, 5 % est le chiffre réel :
+  # l'article L2223-1 oblige chaque commune à disposer d'un cimetière, donc
+  # presque aucune ne le transfère. Le silence du registre veut bien dire « la
+  # commune », et l'heuristique de couverture, qui compare le département à la
+  # moyenne nationale et non à 100 %, ne s'y trompe pas.
+  - id: cimetiere
+    nom: "Cimetière et sites cinéraires"
+    nom_court: "Cimetière"
+    acteur: commune
+    resume: "Chaque commune doit disposer d'un cimetière, et à partir de 2 000 habitants d'un site cinéraire. Le conseil municipal en fixe le règlement et le prix des concessions."
+    partagee_avec: [maire, epci]
+    banatic: ["2500"]
+    # La Métropole du Grand Paris déclare bien ce code à BANATIC, et le site la
+    # nomme donc pour Paris. En conclure qu'elle gère le Père-Lachaise serait
+    # faux : déclarer la compétence n'est pas gérer chaque cimetière. C'est le
+    # cas où la réserve compte le plus, parce que la réponse est exacte et
+    # l'inférence naturelle qu'on en tire ne l'est pas.
+    reserve: "Chaque commune doit disposer de son cimetière : une intercommunalité qui déclare cette compétence ne gère pas forcément le vôtre. Le crématorium est encore autre chose, souvent porté par un syndicat distinct."
+    liens: [wp-cimetiere, sp-concession-funeraire, cgct-l2223-1]
+    verifie_le: 2026-09-12
+    confiance: etabli
+
+  - id: reseaux-numeriques
+    nom: "Réseaux de communications électroniques"
+    nom_court: "Numérique et fibre"
+    acteur: commune
+    resume: "Là où aucun opérateur privé ne déploie, une collectivité peut construire le réseau elle-même puis le confier à un exploitant : c'est ainsi qu'une grande partie de la fibre rurale existe."
+    partagee_avec: [epci, departement, region, etat]
+    banatic: ["7530"]
+    liens: [wp-reseau-initiative-publique, arcep-connexion, od-arcep-cartes, cgct-l1425-1]
+    verifie_le: 2026-09-12
+    confiance: etabli
