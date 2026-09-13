@@ -196,6 +196,38 @@ const controles: Record<
    * si elle a disparu — un référentiel qui perd la moitié de ses lignes, ou
    * change d'identifiant, casse l'ingestion en silence.
    */
+  /**
+   * Une ressource servie par l'API tabulaire de data.gouv.
+   *
+   * Deux pannes distinctes à attraper, et la seconde est la plus vicieuse : la
+   * ressource peut disparaître — data.gouv change d'identifiant à chaque
+   * remplacement de fichier — ou rester en place et se vider. Un répertoire
+   * d'élus qui maigrit est une alerte, pas une curiosité : le site enverrait
+   * écrire à des gens qui ne sont plus en fonction.
+   */
+  async 'datagouv-tabulaire'(s) {
+    const r = (await (await obstine(`${s.url}?page_size=1`)).json()) as {
+      meta?: { total?: number };
+    };
+    const n = r.meta?.total ?? 0;
+    if (n === 0) {
+      return { gravite: 'alerte', message: 'la ressource ne renvoie plus aucune ligne' };
+    }
+    const attendu = s.attendu ?? n;
+    const ecart = Math.abs(n - attendu) / attendu;
+    if (ecart > 0.05) {
+      return {
+        gravite: n < attendu ? 'alerte' : 'a-regarder',
+        message:
+          `${n.toLocaleString('fr-FR')} lignes, contre ${attendu.toLocaleString('fr-FR')} attendues ` +
+          `(${n < attendu ? '\u2212' : '+'}${Math.round(ecart * 100)} %) — relancer l'ingestion, ` +
+          `puis mettre à jour « attendu »`,
+        millesime: n,
+      };
+    }
+    return { gravite: 'ok', message: `${n.toLocaleString('fr-FR')} lignes`, millesime: n };
+  },
+
   async 'opendatasoft-total'(s) {
     const r = (await (await obstine(`${s.url}/records?limit=1`)).json()) as {
       total_count?: number;

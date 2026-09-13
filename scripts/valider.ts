@@ -156,28 +156,28 @@ for (const a of g.acteurs.values()) {
   }
 }
 
-// Famille « influence » : mécanismes, jamais de personnes. Contrôle grossier
-// mais suffisant pour attraper l'écart le plus probable — une civilité suivie
-// d'un nom propre. Il ne remplace pas la relecture, il la rend obligatoire.
+// Mécanismes, jamais de personnes — dans tout le contenu, plus seulement dans
+// la famille « influence ».
+//
+// Depuis que le site nomme le maire de chaque commune, la frontière compte
+// davantage, et elle est nette : le **graphe** décrit des fonctions — « le
+// maire », « le préfet » — et le nom de leur titulaire est une **donnée**,
+// produite depuis le répertoire national des élus et affichée dans la
+// résolution territoriale. Un nom qui entrerait dans `contenu/` brouillerait
+// exactement cette distinction, en plus de se périmer sans que rien ne le
+// signale : le contenu n'a pas de date de rafraîchissement, les fichiers de
+// données en ont une.
+//
+// Contrôle grossier — une civilité suivie d'une majuscule — mais il attrape
+// l'écart le plus probable, et il ne remplace pas la relecture : il la rend
+// obligatoire.
 const CIVILITES = /\b(M\.|MM\.|Mme|Mmes|Monsieur|Madame|Maître)\s+[A-ZÉÈÀÂÎÔÛÇ]/;
-for (const p of g.processus.values()) {
-  if (p.famille !== 'influence') continue;
-  const textes = [
-    p.nom,
-    p.resume,
-    p.declencheur,
-    p.sortie,
-    ...p.etapes.flatMap((e) => [e.action, e.note ?? '']),
-    ...p.leviers.flatMap((l) => [l.quoi, l.quand, l.aupres_de, l.piege ?? '']),
-  ];
-  for (const t of textes) {
-    if (CIVILITES.test(t)) {
-      erreurs.push(
-        `processus « ${p.id} » (famille influence) semble nommer une personne physique : « ${t.slice(0, 80)}… ». ` +
-          `Cette famille décrit des mécanismes, jamais des personnes (docs/07-risques.md).`,
-      );
-    }
-  }
+for (const [ou, t] of textesVisibles) {
+  if (!CIVILITES.test(t)) continue;
+  erreurs.push(
+    `${ou} semble nommer une personne physique : « ${t.slice(0, 80)}… ». Le contenu décrit ` +
+      `des fonctions ; le nom de leur titulaire est une donnée, pas un nœud (docs/07-risques.md).`,
+  );
 }
 
 // Un levier sans « quand » exploitable ne sert à rien : c'est la question 5.

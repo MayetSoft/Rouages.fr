@@ -313,6 +313,14 @@ async function principal() {
     (m) => dire(`${GRIS}${m}${RAZ}`),
   );
 
+  // Le maire de chaque commune. Le graphe garde la fonction ; le nom est une
+  // précision de donnée, et rien d'autre du répertoire n'est retenu.
+  const { collecterMaires } = await import('./elus-emettre.ts');
+  const elus = await collecterMaires(
+    async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+    (m) => dire(`${GRIS}${m}${RAZ}`),
+  );
+
   ecrire(
     graphe,
     groupements,
@@ -325,6 +333,7 @@ async function principal() {
     reperesGfp,
     fluxGfp,
     effectifs,
+    elus,
   );
 }
 
@@ -430,6 +439,7 @@ async function ecrire(
   reperesGfp: import('../src/modele/schemas.ts').Repere[],
   fluxGfp: Awaited<ReturnType<typeof import('./flux-emettre.ts')['collecterFluxGroupements']>>,
   effectifs: Awaited<ReturnType<typeof import('./ecoles-emettre.ts')['collecterEffectifs']>>,
+  elus: Awaited<ReturnType<typeof import('./elus-emettre.ts')['collecterMaires']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -444,6 +454,7 @@ async function ecrire(
     reperesGfp,
     fluxGfp,
     effectifs,
+    elus,
     sortie: SORTIE,
     dire,
     VERT,

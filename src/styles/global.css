@@ -366,6 +366,17 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 .p-structures { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .p-structures li { display: grid; gap: .05rem; font-size: .9rem; }
 .p-nature-jur { color: var(--encre-douce); font-size: .78rem; }
+
+/* --- qui est le maire ---
+   La fonction en étiquette, le nom en encre pleine, la date en dessous :
+   c'est le nom qu'on cherche, mais c'est la date qui dit s'il est à jour. */
+.p-maire { margin: 0 0 .9rem; display: grid; gap: .05rem; }
+.p-maire-fonction {
+  font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--encre-tres-douce);
+}
+.p-maire-nom { font-size: 1rem; font-weight: 650; }
+.p-maire-depuis { font-size: .76rem; color: var(--encre-douce); }
 .p-prix-eau { margin: .7rem 0 0; display: grid; gap: .1rem; }
 .p-prix { font-size: 1.15rem; font-weight: 650; font-variant-numeric: tabular-nums; }
 .p-prix-detail { font-size: .76rem; color: var(--encre-douce); line-height: 1.45; }

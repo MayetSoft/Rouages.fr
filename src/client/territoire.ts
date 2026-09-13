@@ -120,6 +120,22 @@ export interface FluxPercu {
   evolution: number | null;
 }
 
+/**
+ * Le maire en fonction.
+ *
+ * Le graphe garde la fonction — « le maire » — et ne nomme personne ; le nom
+ * de son titulaire est une donnée territoriale, au même titre que le nom de la
+ * communauté de communes. La date de prise de fonction est affichée avec lui :
+ * un nom sans date vieillit en silence, et envoyer quelqu'un écrire à un élu
+ * qui n'est plus en poste serait pire que ne rien dire.
+ */
+export interface Maire {
+  prenom: string;
+  nom: string;
+  /** Date de prise de fonction, au format ISO. */
+  depuis: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -195,6 +211,10 @@ export interface Territoire {
   eau: ServiceEau | null;
   /** Les services publics implantés sur son territoire. */
   services: Services | null;
+  /** Le maire en fonction, quand le répertoire national le publie. */
+  maire: Maire | null;
+  /** La date de lecture du répertoire des élus. */
+  majElus: string | null;
   /** Ce que perçoit l'intercommunalité, quand l'OFGL le chiffre. */
   fluxPercus: FluxPercu[];
   /** Les exercices de la série des flux intercommunaux. */
@@ -277,6 +297,10 @@ type EcolesDep = {
   h: Record<string, [(number | null)[], (number | null)[]]>;
 };
 const ecolesDep = new Map<string, EcolesDep | null>();
+
+/** Le maire de chaque commune du département : [prénom, nom, prise de fonction]. */
+type ElusDep = { maj: string; c: Record<string, [string, string, string]> };
+const elusDep = new Map<string, ElusDep | null>();
 const servicesDep = new Map<string, ServicesDep | null>();
 
 /**
@@ -423,7 +447,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles, elus] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -433,12 +457,14 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       ).catch(() => null),
       json<ServicesDep>(`${BASE}/dep/${commune.dep}-services.json`).catch(() => null),
       json<EcolesDep>(`${BASE}/dep/${commune.dep}-ecoles.json`).catch(() => null),
+      json<ElusDep>(`${BASE}/dep/${commune.dep}-elus.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
     eauDep.set(commune.dep, eau);
     servicesDep.set(commune.dep, servs);
     ecolesDep.set(commune.dep, ecoles);
+    elusDep.set(commune.dep, elus);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -516,10 +542,19 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),
+    maire: assemblerMaire(commune),
+    majElus: elusDep.get(commune.dep)?.maj ?? null,
     fluxPercus: assemblerFluxPercus(structures),
     anneesFlux: fluxGfp?.annees ?? [],
     maj: dep.maj,
   };
+}
+
+function assemblerMaire(commune: CommuneBreve): Maire | null {
+  const l = elusDep.get(commune.dep)?.c[commune.code];
+  if (!l) return null;
+  const [prenom, nom, depuis] = l;
+  return { prenom, nom, depuis };
 }
 
 /**

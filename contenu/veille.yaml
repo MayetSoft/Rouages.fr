@@ -88,6 +88,19 @@ surveillances:
     attendu: 93784
     lien: od-annuaire-administration
 
+  # Un nom périmé est pire qu'un nom absent : il envoie écrire à quelqu'un qui
+  # n'est plus en fonction. Le seuil est serré — 5 % — parce qu'un répertoire
+  # d'élus ne varie pas de beaucoup entre deux scrutins, et qu'une chute
+  # signalerait une ressource tronquée plutôt qu'une actualité.
+  - id: rne-maires
+    nom: "Répertoire national des élus — maires"
+    alimente: "le nom du maire de chaque commune"
+    type: datagouv-tabulaire
+    url: "https://tabular-api.data.gouv.fr/api/resources/2876a346-d50c-4911-934e-19ee07b0e503/data/"
+    # Relevé au 13 septembre 2026, pas estimé.
+    attendu: 34826
+    lien: od-rne
+
   - id: finess-referentiel
     nom: "FINESS — établissements de santé"
     alimente: "les hôpitaux et les services d'urgences"

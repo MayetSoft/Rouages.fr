@@ -688,6 +688,8 @@ function demarrer(reseau: Reseau) {
 
     // Vue d'ensemble : toutes les compétences que ce territoire déplace.
     bloc.append(ligne('h3', 'p-titre-section', `Chez vous, à ${territoire.commune.nom}`));
+    const qui = blocMaire();
+    if (qui) bloc.append(qui);
     const resolvables = reseau.noeuds.filter((n) => n.banatic && n.banatic.length > 0);
     const dl = document.createElement('dl');
     dl.className = 'p-resolution';
@@ -732,7 +734,10 @@ function demarrer(reseau: Reseau) {
         'p',
         'p-source-territoire',
         `D'après les transferts de compétences déclarés à BANATIC (${territoire.maj}). ` +
-          `Une compétence exercée sans transfert déclaré — par convention, par exemple — n'y figure pas.`,
+          `Une compétence exercée sans transfert déclaré — par convention, par exemple — n'y figure pas.` +
+          (territoire.majElus
+            ? ` Le maire vient du répertoire national des élus (${territoire.majElus}).`
+            : ''),
       ),
     );
     return bloc;
@@ -1067,6 +1072,38 @@ function demarrer(reseau: Reseau) {
     const courbe = tendance(e.eleves, e.rentrees);
     if (courbe) bloc.append(courbe);
     return bloc;
+  }
+
+  /**
+   * Qui est le maire.
+   *
+   * Le graphe n'a jamais nommé personne, et il continue : le nœud reste « le
+   * maire », la fonction. Mais « la commune décide » ne dit pas à qui écrire,
+   * et c'est la question qui amène le plus de monde. Le nom est donc une
+   * précision de donnée, affichée là où le site répond « chez vous » — au même
+   * rang que le nom de la communauté de communes.
+   *
+   * La date de prise de fonction l'accompagne toujours. Un nom sans date
+   * vieillit en silence, et envoyer quelqu'un écrire à un élu qui n'est plus en
+   * poste serait pire que de ne rien dire.
+   */
+  function blocMaire(): HTMLElement | null {
+    const m = territoire?.maire;
+    if (!m) return null;
+    const p = document.createElement('p');
+    p.className = 'p-maire';
+    p.append(ligne('span', 'p-maire-fonction', 'Maire'));
+    p.append(ligne('span', 'p-maire-nom', `${m.prenom} ${m.nom}`));
+    const depuis = moisAnnee(m.depuis);
+    if (depuis) p.append(ligne('span', 'p-maire-depuis', `en fonction depuis ${depuis}`));
+    return p;
+  }
+
+  /** « 2026-03-20 » devient « mars 2026 » : le jour exact n'apprend rien. */
+  function moisAnnee(iso: string): string | null {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   }
 
   /** Une réglette : le trait est la médiane, le point la commune. */

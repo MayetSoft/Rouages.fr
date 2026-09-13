@@ -358,6 +358,7 @@ export const Surveillance = z.object({
     'ofgl-millesime',
     'sispea-millesime',
     'opendatasoft-total',
+    'datagouv-tabulaire',
     'datagouv-ressource',
     'paquet-npm',
   ]),

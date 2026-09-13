@@ -36,10 +36,43 @@ pas de la même façon qu'un paragraphe d'explication.
 Le prebunking peut faire basculer la perception du site de « ressource » à
 « militant », et rétroactivement discréditer les familles A à C.
 
-**Garde-fous** : mécanismes uniquement, **aucun nom de personne physique**
-(règle vérifiée automatiquement) ; sources académiques ou cas documentés
+**Garde-fous** : mécanismes uniquement, **aucun nom de personne physique dans
+le contenu** (règle vérifiée automatiquement, sur tout `contenu/` et non plus
+seulement sur cette famille) ; sources académiques ou cas documentés
 publiquement ; publication seulement après la phase 2 ; séparation visuelle
 claire de cette famille.
+
+### La frontière, depuis que le site nomme les maires
+
+La règle n'a pas été levée, elle a été **précisée** — et en le devenant, elle
+s'est durcie plutôt qu'assouplie.
+
+- Le **graphe** décrit des fonctions. Le nœud est « le maire », « le préfet »,
+  jamais leur titulaire. Rien n'a changé de ce côté.
+- Le **nom** du titulaire est une **donnée territoriale**, produite depuis le
+  répertoire national des élus et affichée dans le bloc « chez vous », au même
+  rang que le nom de la communauté de communes. Il ne crée aucun nœud, aucune
+  arête, aucune page.
+
+Trois conséquences pratiques :
+
+1. **Aucun nom n'entre dans `contenu/`.** Le contrôle des civilités, qui ne
+   visait que la famille « influence », porte désormais sur tous les textes
+   visibles. Un nom en dur s'y périmerait en silence — le contenu n'a pas de
+   date de rafraîchissement, les fichiers de données en ont une.
+2. **Minimisation.** Le répertoire publie la date de naissance, le sexe et la
+   catégorie socio-professionnelle de chaque élu. Aucun des trois ne sert à
+   savoir qui décide : seuls le nom, le prénom et la date de prise de fonction
+   sont collectés. Ce qui n'est pas collecté n'a pas à être protégé.
+3. **La péremption est le risque principal**, avant la vie privée : le nom est
+   public par nature, mais un nom périmé envoie écrire à quelqu'un qui n'est
+   plus en poste. D'où la date de prise de fonction affichée avec le nom, la
+   surveillance du répertoire dans la veille, et le mécanisme de signalement
+   ouvert à qui constate l'erreur.
+
+Ce qui reste interdit est inchangé : relier une personne à une opinion, à un
+financement, à un réseau. C'est ce que visait la règle, et cela ne devient pas
+permis parce qu'un annuaire est devenu lisible.
 
 ## 4. Risques juridiques directs
 

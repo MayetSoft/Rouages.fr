@@ -335,6 +335,39 @@ sans erreur visible ni ligne perdue : le pire genre de bogue, celui qui produit
 une réponse plausible. La clé retenue est le numéro UAI, que l'annuaire de
 l'éducation fournit avec le bon code INSEE.
 
+### Qui est le maire ✔
+
+Le site nommait des structures et ne nommait personne. « La commune décide » ne
+dit pas à qui écrire, et c'est la question qui amène le plus de monde. Les
+34 743 communes pour lesquelles le répertoire national publie un maire
+l'affichent désormais, avec sa date de prise de fonction.
+
+**La règle « aucun nom de personne physique » n'a pas été levée, elle a été
+précisée — et en le devenant, elle s'est durcie.** Le graphe décrit des
+fonctions : le nœud reste « le maire ». Le nom du titulaire est une donnée
+territoriale, au même rang que le nom de la communauté de communes ; il ne crée
+ni nœud, ni arête, ni page. Et le contrôle des civilités, qui ne visait que la
+famille « influence », porte maintenant sur **tout** le contenu : un nom en dur
+dans `contenu/` s'y périmerait en silence, puisque le contenu n'a pas de date de
+rafraîchissement là où les fichiers de données en ont une. La règle a été
+éprouvée en y glissant volontairement un nom : elle l'a refusé.
+
+Minimisation : le répertoire publie la date de naissance, le sexe et la
+catégorie socio-professionnelle de chaque élu. Aucun des trois ne sert à savoir
+qui décide, aucun n'est collecté — ce qui n'est pas collecté n'a pas à être
+protégé.
+
+Le risque principal n'est pas la vie privée, le mandat étant public par nature :
+c'est la péremption. D'où la date affichée avec le nom, la surveillance du
+répertoire dans la veille avec un seuil serré à 5 %, et le signalement ouvert à
+qui constate l'erreur. Voir `07-risques.md`.
+
+Note d'outillage : `data.gouv.fr` reste hors d'atteinte depuis l'environnement
+de développement, mais son API tabulaire (`tabular-api.data.gouv.fr`) répond.
+Elle sert la ressource par pages de cent — 349 pages, environ 90 secondes — et
+l'ingestion refuse d'écrire si elle en a perdu plus d'un dixième : mieux vaut
+échouer que publier un annuaire troué.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,
