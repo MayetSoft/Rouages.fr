@@ -19,6 +19,7 @@ import type { chargerGraphe } from '../src/modele/graphe.ts';
 import type { Repere } from '../src/modele/schemas.ts';
 import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.ts';
 import { ecrireFlux, type FluxGroupements } from './flux-emettre.ts';
+import { ecrireEcoles, type Effectifs } from './ecoles-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -77,6 +78,7 @@ export function emettre(o: {
   services: Services | null;
   reperesGfp: Repere[];
   fluxGfp: FluxGroupements | null;
+  effectifs: Effectifs | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -232,6 +234,7 @@ export function emettre(o: {
     }
   }
   let servicesEcrits = 0;
+  let ecolesEcrites = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -310,6 +313,17 @@ export function emettre(o: {
         }
       }
       servicesEcrits += ecrireServices(sortie, dep, liste.map((c) => c.code), services, voisines);
+
+      // Les effectifs des écoles du département, dans leur propre fichier :
+      // ils ne servent qu'à qui ouvre le détail d'une commune, et les joindre
+      // au fichier des services alourdirait tout le monde.
+      if (o.effectifs) {
+        const uais = liste
+          .flatMap((c) => services.parCommune.get(c.code) ?? [])
+          .map((s) => s.uai)
+          .filter((u): u is string => !!u);
+        ecolesEcrites += ecrireEcoles(sortie, dep, uais, o.effectifs);
+      }
     }
   }
 
@@ -408,6 +422,12 @@ export function emettre(o: {
     dire(
       `${GRIS}Prix de l'eau rattaché à ${servicesEau.toLocaleString('fr-FR')} communes ` +
         `sur ${communes.length.toLocaleString('fr-FR')}.${RAZ}`,
+    );
+  }
+  if (o.effectifs) {
+    dire(
+      `${GRIS}Effectifs scolaires : ${ecolesEcrites.toLocaleString('fr-FR')} écoles ` +
+        `suivies sur ${o.effectifs.rentrees.length} rentrées.${RAZ}`,
     );
   }
   if (services) {

@@ -47,6 +47,16 @@ export interface Service {
   prive?: boolean;
   /** Établissement de santé doté d'un service d'urgences. */
   urgences?: boolean;
+  /**
+   * Le numéro UAI d'un établissement scolaire.
+   *
+   * C'est la seule clé sûre pour rattacher ses effectifs. Le jeu des effectifs
+   * porte bien un champ `code_commune_insee`, mais il contient le code postal :
+   * pour Mayet il vaut 72360, qui est aussi un vrai code INSEE — celui de
+   * Trangé, à quarante kilomètres. Une jointure par ce champ rattacherait les
+   * écoles à la mauvaise commune sans rien signaler.
+   */
+  uai?: string;
 }
 
 export interface Services {
@@ -110,6 +120,7 @@ export async function collecterServices(
 
   // --- Écoles, collèges, lycées ------------------------------------------
   type Etab = {
+    identifiant_de_l_etablissement: string | null;
     nom_etablissement: string | null;
     type_etablissement: string | null;
     statut_public_prive: string | null;
@@ -117,7 +128,7 @@ export async function collecterServices(
   };
   const ecoles = await json<Etab[]>(
     'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/exports/json' +
-      '?select=nom_etablissement,type_etablissement,statut_public_prive,code_commune' +
+      '?select=identifiant_de_l_etablissement,nom_etablissement,type_etablissement,statut_public_prive,code_commune' +
       '&where=etat%3D%22OUVERT%22',
   );
   for (const e of ecoles) {
@@ -127,6 +138,7 @@ export async function collecterServices(
       famille,
       nom: e.nom_etablissement,
       ...(e.statut_public_prive === 'Privé' ? { prive: true } : {}),
+      ...(e.identifiant_de_l_etablissement ? { uai: e.identifiant_de_l_etablissement } : {}),
     });
   }
   dire(`Établissements scolaires : ${ecoles.length.toLocaleString('fr-FR')} lus.`);
@@ -199,7 +211,7 @@ export function ecrireServices(
   services: Services,
   franceServicesVoisines: Map<string, { nom: string; commune: string }[]>,
 ): number {
-  const c: Record<string, [number, string, number][]> = {};
+  const c: Record<string, ([number, string, number] | [number, string, number, string])[]> = {};
   let n = 0;
   for (const code of codes) {
     const l = services.parCommune.get(code);
@@ -216,11 +228,22 @@ export function ecrireServices(
     );
     // Drapeaux : 1 = privé (école) ou urgences (santé). Un seul entier plutôt
     // qu'un objet par service : le fichier est lu, pas relu.
-    c[code] = l.map((s) => [
-      FAMILLES_SERVICE.indexOf(s.famille),
-      s.nom,
-      s.prive || s.urgences ? 1 : 0,
-    ]);
+    // Le quatrième élément n'existe que pour un établissement scolaire : c'est
+    // par lui que ses effectifs le retrouvent.
+    c[code] = l.map((s) =>
+      s.uai
+        ? ([FAMILLES_SERVICE.indexOf(s.famille), s.nom, s.prive || s.urgences ? 1 : 0, s.uai] as [
+            number,
+            string,
+            number,
+            string,
+          ])
+        : ([FAMILLES_SERVICE.indexOf(s.famille), s.nom, s.prive || s.urgences ? 1 : 0] as [
+            number,
+            string,
+            number,
+          ]),
+    );
     n += l.length;
   }
   const voisines: Record<string, { n: number; l: string[] }> = {};

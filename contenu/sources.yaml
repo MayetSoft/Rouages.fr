@@ -214,3 +214,6 @@ sources:
   - { id: wp-reseau-initiative-publique, type: wikipedia, titre: "Réseau d'initiative publique", url: "https://fr.wikipedia.org/wiki/R%C3%A9seau_d%27initiative_publique", consulte_le: 2026-09-12 }
   - { id: arcep-connexion, type: page_officielle, titre: "Ma connexion internet — l'éligibilité adresse par adresse", url: "https://maconnexioninternet.arcep.fr/", consulte_le: 2026-09-12 }
   - { id: od-arcep-cartes, type: donnees_ouvertes, titre: "Cartes et données de l'Arcep — couverture fixe et mobile", url: "https://www.arcep.fr/cartes-et-donnees.html", consulte_le: 2026-09-12 }
+
+  # --- Ce qu'une école est devenue ------------------------------------------
+  - { id: od-effectifs-ecoles, type: donnees_ouvertes, titre: "Effectifs d'élèves et nombre de classes, école par école, depuis 2009", url: "https://data.education.gouv.fr/explore/dataset/fr-en-ecoles-effectifs-nb_classes/", consulte_le: 2026-09-13 }

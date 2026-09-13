@@ -124,6 +124,28 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       pris au hasard, l’écart avec 2024 atteint 30&nbsp;%.
     </p>
 
+    <h2 class="badge">Ce qu’une école est devenue</h2>
+    <p class="mesure">
+      Le nombre de classes et d’élèves de chaque école du premier degré, sur dix
+      rentrées. Le site montre le fait — «&nbsp;une classe de moins à la rentrée
+      2025&nbsp;» — et rien de plus. Le motif n’est publié nulle part&nbsp;: ni le
+      seuil appliqué cette année-là, ni l’arbitrage. Ce que Rouages ajoute, c’est
+      le nom de celui qui décide, et ce n’est pas le maire&nbsp;: la carte
+      scolaire relève des services de l’État, même quand la commune est
+      propriétaire des murs.
+    </p>
+    <p class="mesure">
+      <strong>La jointure méritait de la méfiance.</strong> Le jeu des effectifs
+      porte un champ nommé <code>code_commune_insee</code> qui contient en
+      réalité le code postal. Pour Mayet (Sarthe) il vaut 72360 — qui est aussi
+      un vrai code INSEE, celui de Trangé, à quarante kilomètres. S’y fier
+      aurait rattaché les écoles à la mauvaise commune, sans erreur visible ni
+      ligne perdue. La clé retenue est le numéro
+      <abbr title="Unité administrative immatriculée">UAI</abbr> de
+      l’établissement, que l’annuaire de l’éducation fournit avec le bon code
+      INSEE.
+    </p>
+
     <h2 class="badge">Trouver sa commune</h2>
     <p class="mesure">
       Plus d’une commune sur dix porte un nom qu’une autre porte aussi —

@@ -23,14 +23,19 @@ competences:
     verifie_le: 2026-09-05
     confiance: etabli
 
+  # Le site montre désormais le fait — « −1 classe à la rentrée 2025 », école par
+  # école, sur dix rentrées — et rien de plus. Le motif d'une fermeture n'est
+  # publié nulle part : ni le seuil appliqué cette année-là, ni l'arbitrage du
+  # rectorat. Montrer le fait et nommer le décideur suffit à savoir à qui
+  # écrire ; prétendre expliquer serait inventer.
   - id: carte-scolaire
     nom: "Ouverture et fermeture de classes"
     nom_court: "Ouverture de classes"
     acteur: rectorat
     resume: "Décidée par les services de l'État, pas par le maire — même quand la commune est propriétaire de l'école."
     partagee_avec: [commune]
-    liens: [code-education, education-gouv]
-    verifie_le: 2026-09-05
+    liens: [code-education, education-gouv, od-effectifs-ecoles]
+    verifie_le: 2026-09-13
     confiance: a_confirmer
 
   - id: police-tranquillite

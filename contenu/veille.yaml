@@ -66,6 +66,18 @@ surveillances:
     attendu: 68939
     lien: od-annuaire-education
 
+  # Le total sert de garde-fou, mais le vrai signal est ailleurs : une rentrée
+  # de plus paraît chaque automne, et c'est elle qu'il faut aller chercher. Un
+  # total qui grimpe d'environ 47 000 lignes le dira.
+  - id: effectifs-ecoles
+    nom: "Effectifs d'élèves par école"
+    alimente: "le nombre de classes et d'élèves, école par école"
+    type: opendatasoft-total
+    url: "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-ecoles-effectifs-nb_classes"
+    # Relevé au 13 septembre 2026, pas estimé.
+    attendu: 859372
+    lien: od-effectifs-ecoles
+
   - id: annuaire-administration
     nom: "Annuaire de l'administration"
     alimente: "les France services, les CCAS et les SDIS"

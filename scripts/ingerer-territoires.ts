@@ -304,7 +304,28 @@ async function principal() {
     (m) => dire(`${GRIS}${m}${RAZ}`),
   );
 
-  ecrire(graphe, groupements, codesSuivis, dateExport, natures, finances, eau, services, reperesGfp, fluxGfp);
+  // Les effectifs d'élèves, école par école : ce que le site disait ne pas
+  // pouvoir tracer. La clé est l'UAI, jamais le code de commune du jeu — il
+  // contient un code postal (voir scripts/ecoles-emettre.ts).
+  const { collecterEffectifs } = await import('./ecoles-emettre.ts');
+  const effectifs = await collecterEffectifs(
+    async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+    (m) => dire(`${GRIS}${m}${RAZ}`),
+  );
+
+  ecrire(
+    graphe,
+    groupements,
+    codesSuivis,
+    dateExport,
+    natures,
+    finances,
+    eau,
+    services,
+    reperesGfp,
+    fluxGfp,
+    effectifs,
+  );
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */
@@ -408,6 +429,7 @@ async function ecrire(
   services: Awaited<ReturnType<typeof import('./services-emettre.ts')['collecterServices']>>,
   reperesGfp: import('../src/modele/schemas.ts').Repere[],
   fluxGfp: Awaited<ReturnType<typeof import('./flux-emettre.ts')['collecterFluxGroupements']>>,
+  effectifs: Awaited<ReturnType<typeof import('./ecoles-emettre.ts')['collecterEffectifs']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -421,6 +443,7 @@ async function ecrire(
     services,
     reperesGfp,
     fluxGfp,
+    effectifs,
     sortie: SORTIE,
     dire,
     VERT,

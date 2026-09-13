@@ -173,10 +173,10 @@ avec une courbe et la variation depuis le début de la série. Un chiffre isolé
 ne se discute pas ; « +57 % depuis 2018 » appelle une question, et le site
 nomme déjà celui à qui la poser.
 
-Le traçage des **décisions** — pourquoi une classe ferme, pourquoi des lits
-disparaissent — ne se fera pas : ni les subventions de l'État aux communes, ni
-les effectifs par école année après année, ni a fortiori le motif d'une
-décision, n'existent en open data national exploitable. Le détail des
+Le traçage des **décisions** restait à voir. Une partie de ce constat était
+fausse et a été corrigée depuis : voir « Ce qu'une école est devenue ». Ce qui
+tient : ni les subventions de l'État aux communes, ni a fortiori le **motif**
+d'une décision n'existent en open data national exploitable. Le détail des
 vérifications est dans `06-stack-technique.md`. Mieux vaut le dire que le
 simuler.
 
@@ -305,6 +305,35 @@ La veille, enfin, ne surveillait que la base communale de l'OFGL. Un agrégat
 peut disparaître d'une base sans bouger dans l'autre, et « Versement transport »
 existe résiduellement dans les deux : le contrôle aurait été rassurant à tort.
 Chaque surveillance déclare désormais l'échelon dont elle répond.
+
+### Ce qu'une école est devenue ✔ *(et un constat corrigé)*
+
+Cette feuille de route affirmait que les effectifs par école, année après
+année, n'existaient pas en open data exploitable. **C'était faux.** L'Éducation
+nationale les publie depuis 2009 : 859 372 lignes, 55 928 écoles, avec le
+nombre de classes. Le constat a été écrit sans vérifier, et il a tenu jusqu'à
+ce qu'on cherche.
+
+Le site montre désormais, pour chaque école du premier degré d'une commune, son
+nombre de classes et d'élèves sur dix rentrées, et nomme la dernière variation :
+« −1 classe à la rentrée 2025 ». À Mayet, l'école Jules Ferry est passée de 7 à
+6 classes en 2018 et la maternelle St Exupéry de 4 à 3 en 2025 ; au
+Mayet-de-Montagne, l'école Yves Duteil a perdu une classe en 2021. 46 670
+écoles sont suivies.
+
+Ce qui reste refusé, c'est le **motif**. Ni le seuil appliqué cette année-là, ni
+l'arbitrage du rectorat ne sont publiés. Montrer le fait et nommer le décideur
+suffit à savoir à qui écrire — et c'est justement là que le site sert : la
+carte scolaire relève des services de l'État, pas du maire, même quand la
+commune est propriétaire des murs.
+
+**La jointure méritait de la méfiance.** Le jeu des effectifs porte un champ
+nommé `code_commune_insee` qui contient en réalité le code postal. Pour Mayet
+(Sarthe) il vaut 72360 — qui est aussi un vrai code INSEE, celui de Trangé, à
+quarante kilomètres. S'y fier aurait rattaché les écoles à la mauvaise commune,
+sans erreur visible ni ligne perdue : le pire genre de bogue, celui qui produit
+une réponse plausible. La clé retenue est le numéro UAI, que l'annuaire de
+l'éducation fournit avec le bon code INSEE.
 
 ## Phase 3 — Élargir
 

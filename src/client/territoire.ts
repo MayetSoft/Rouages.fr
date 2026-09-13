@@ -143,6 +143,20 @@ export interface ServicePublic {
   prive: boolean;
   /** Établissement de santé doté d'un service d'urgences. */
   urgences: boolean;
+  /**
+   * Pour une école du premier degré : ce qu'elle est devenue.
+   *
+   * C'est la seule chose que le site sache dire d'une décision, et il ne
+   * prétend pas en dire plus : le nombre de classes a changé telle année. Le
+   * motif ne se publie nulle part.
+   */
+  ecole?: {
+    rentrees: number[];
+    classes: (number | null)[];
+    eleves: (number | null)[];
+    /** La dernière variation du nombre de classes : { rentree, ecart }. */
+    dernierChangement: { rentree: number; ecart: number } | null;
+  };
 }
 
 export interface Services {
@@ -251,10 +265,18 @@ const eauDep = new Map<
 >();
 type ServicesDep = {
   maj: string;
-  c: Record<string, [number, string, number][]>;
+  /** [famille, nom, drapeau] — et le numéro UAI en quatrième pour une école. */
+  c: Record<string, ([number, string, number] | [number, string, number, string])[]>;
   sdis?: string;
   fs?: Record<string, { n: number; l: string[] }>;
 };
+
+/** Les effectifs des écoles du département, par numéro UAI. */
+type EcolesDep = {
+  rentrees: number[];
+  h: Record<string, [(number | null)[], (number | null)[]]>;
+};
+const ecolesDep = new Map<string, EcolesDep | null>();
 const servicesDep = new Map<string, ServicesDep | null>();
 
 /**
@@ -401,7 +423,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -410,11 +432,13 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
         `${BASE}/dep/${commune.dep}-eau.json`,
       ).catch(() => null),
       json<ServicesDep>(`${BASE}/dep/${commune.dep}-services.json`).catch(() => null),
+      json<EcolesDep>(`${BASE}/dep/${commune.dep}-ecoles.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
     eauDep.set(commune.dep, eau);
     servicesDep.set(commune.dep, servs);
+    ecolesDep.set(commune.dep, ecoles);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -542,15 +566,29 @@ export function assemblerServices(commune: CommuneBreve): Services | null {
   const parFamille = new Map<string, ServicePublic[]>();
   // L'ordre des familles est celui des métadonnées : le fichier départemental
   // ne transporte qu'un index, ce qui évite de répéter 80 000 fois « ecole ».
-  for (const [i, nom, drapeau] of dep.c[commune.code] ?? []) {
+  const ecoles = ecolesDep.get(commune.dep);
+  for (const entree of dep.c[commune.code] ?? []) {
+    const [i, nom, drapeau] = entree;
+    const uai = entree.length === 4 ? entree[3] : undefined;
     const famille = m.familles[i];
     if (!famille) continue;
     if (!parFamille.has(famille)) parFamille.set(famille, []);
+    const serie = uai && ecoles ? ecoles.h[uai] : undefined;
     parFamille.get(famille)!.push({
       famille,
       nom,
       prive: famille === 'sante' ? false : drapeau === 1,
       urgences: famille === 'sante' && drapeau === 1,
+      ...(serie
+        ? {
+            ecole: {
+              rentrees: ecoles!.rentrees,
+              classes: serie[0],
+              eleves: serie[1],
+              dernierChangement: dernierChangement(serie[0], ecoles!.rentrees),
+            },
+          }
+        : {}),
     });
   }
   // Les urgences en tête : c'est l'établissement qu'on cherche quand on
@@ -619,6 +657,32 @@ function assemblerFinances(commune: CommuneBreve, population: number): Finances 
       };
     }),
   };
+}
+
+/**
+ * La dernière fois que le nombre de classes a bougé.
+ *
+ * C'est le fait, et le site s'en tient là : « une classe de moins à la rentrée
+ * 2025 ». Pourquoi, personne ne le publie — ni les seuils d'ouverture appliqués
+ * cette année-là, ni l'arbitrage du rectorat. Prétendre l'expliquer serait
+ * inventer ; le taire serait cacher ce qui est vérifiable.
+ */
+export function dernierChangement(
+  classes: (number | null)[],
+  rentrees: number[],
+): { rentree: number; ecart: number } | null {
+  let precedent: number | null = null;
+  let trouve: { rentree: number; ecart: number } | null = null;
+  for (const [i, v] of classes.entries()) {
+    if (v === null) continue;
+    // Une rentrée manquante au milieu ne fabrique pas un saut : on compare au
+    // dernier chiffre connu, pas à la case précédente.
+    if (precedent !== null && v !== precedent) {
+      trouve = { rentree: rentrees[i], ecart: v - precedent };
+    }
+    precedent = v;
+  }
+  return trouve;
 }
 
 /**

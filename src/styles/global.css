@@ -340,6 +340,19 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 /* Le percepteur sous le nom du flux : c'est lui qu'on ira voir, pas « l'interco ». */
 .p-flux-percus { margin-top: 1.2rem; }
 .p-percepteur { display: block; font-size: .74rem; color: var(--encre-tres-douce); line-height: 1.35; }
+
+/* --- ce qu'est devenue une école ---
+   Le chiffre en encre douce, le changement en encre pleine : c'est lui qui
+   fait poser la question, et le site ne colore pas pour autant en « bon » ou
+   « mauvais » — une classe de moins dans une commune qui se vide et dans une
+   commune qui grandit ne se lisent pas pareil. */
+.p-ecole { display: block; margin: .1rem 0 .25rem; }
+.p-ecole-chiffres { font-size: .76rem; color: var(--encre-tres-douce); font-variant-numeric: tabular-nums; }
+.p-ecole-changement {
+  display: inline-block; margin-left: .5rem; font-size: .76rem; color: var(--encre);
+  font-variant-numeric: tabular-nums; font-weight: 600;
+}
+.p-ecole .tendance { display: block; margin-top: .1rem; }
 .reglette { flex: 0 0 auto; overflow: visible; }
 .reglette-axe { stroke: var(--trait); stroke-width: 1; }
 .reglette-mediane { stroke: var(--trait-fort); stroke-width: 1; }

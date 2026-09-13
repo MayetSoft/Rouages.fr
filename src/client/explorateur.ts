@@ -32,6 +32,7 @@ import {
 import { decalageTexte, formeNoeud, largeurPastille } from '../vues/formes.ts';
 import { construireGlossaire, expansions } from '../modele/glossaire.ts';
 import { urlSignaler } from '../modele/signalement.ts';
+import type { ServicePublic } from './territoire.ts';
 import {
   chercher as chercherCommune,
   memorisee,
@@ -763,6 +764,8 @@ function demarrer(reseau: Reseau) {
         // pas de la même façon un dimanche soir.
         if (e.prive) li.append(ligne('span', 'p-service-note', 'privé'));
         if (e.urgences) li.append(ligne('span', 'p-service-note p-service-note--fort', 'urgences'));
+        const chiffres = chiffresEcole(e.ecole);
+        if (chiffres) li.append(chiffres);
         ul.append(li);
       }
 
@@ -822,7 +825,8 @@ function demarrer(reseau: Reseau) {
         'p',
         'p-source-territoire',
         `D'après l'Annuaire de l'administration, l'Annuaire de l'éducation et le répertoire ` +
-          `FINESS (${s.maj}).`,
+          `FINESS (${s.maj}). Les effectifs et le nombre de classes viennent du recensement ` +
+          `annuel des écoles du premier degré : les collèges et lycées n'y figurent pas.`,
       ),
     );
     return bloc;
@@ -1021,6 +1025,48 @@ function demarrer(reseau: Reseau) {
   function debutSerie(serie: (number | null)[], annees: number[]): number | null {
     const i = serie.findIndex((v) => v !== null);
     return i === -1 ? null : (annees[i] ?? null);
+  }
+
+  /**
+   * Ce qu'est devenue une école.
+   *
+   * C'est la seule décision que le site sache montrer, et il ne montre que le
+   * fait : le nombre de classes a changé telle rentrée. Le motif ne se publie
+   * nulle part — ni le seuil appliqué cette année-là, ni l'arbitrage. Ce que le
+   * site apporte, c'est le nom de celui qui décide : le rectorat, pas le maire,
+   * même quand c'est la commune qui possède les murs.
+   */
+  function chiffresEcole(e: ServicePublic['ecole']): HTMLElement | null {
+    if (!e) return null;
+    const i = e.classes.reduce<number>((d, v, k) => (v !== null ? k : d), -1);
+    if (i === -1) return null;
+    const bloc = document.createElement('span');
+    bloc.className = 'p-ecole';
+    const classes = e.classes[i]!;
+    const eleves = e.eleves[i];
+    bloc.append(
+      ligne(
+        'span',
+        'p-ecole-chiffres',
+        `${classes} classe${classes > 1 ? 's' : ''}` +
+          (eleves !== null && eleves !== undefined ? ` · ${eleves} élèves` : '') +
+          ` en ${e.rentrees[i]}`,
+      ),
+    );
+    const c = e.dernierChangement;
+    if (c) {
+      const n = Math.abs(c.ecart);
+      bloc.append(
+        ligne(
+          'span',
+          `p-ecole-changement p-ecole-changement--${c.ecart < 0 ? 'moins' : 'plus'}`,
+          `${c.ecart < 0 ? '\u2212' : '+'}${n} classe${n > 1 ? 's' : ''} à la rentrée ${c.rentree}`,
+        ),
+      );
+    }
+    const courbe = tendance(e.eleves, e.rentrees);
+    if (courbe) bloc.append(courbe);
+    return bloc;
   }
 
   /** Une réglette : le trait est la médiane, le point la commune. */
