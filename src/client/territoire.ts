@@ -136,6 +136,40 @@ export interface Maire {
   depuis: string;
 }
 
+/**
+ * Ce qu'un acheteur public a commandé.
+ *
+ * L'objet d'un marché dit ce qu'une collectivité fait de son argent bien mieux
+ * qu'un agrégat comptable : « collecte des ordures ménagères », « réhabilitation
+ * des réseaux d'assainissement », « maison médicale ». C'est la forme la plus
+ * concrète de « où va l'argent ».
+ *
+ * Les montants ne s'additionnent pas, et le site ne les additionne pas : un
+ * accord-cadre déclare un plafond, et chacun de ses lots le redéclare en
+ * entier. Sept marchés parisiens portent ainsi 21 M€ chacun pour un seul
+ * accord-cadre.
+ */
+export interface Marche {
+  objet: string;
+  /** Montant déclaré pour ce marché. Pour un accord-cadre, c'est un plafond. */
+  montant: number | null;
+  date: string;
+  /** Libellé de la procédure, ou null si le référentiel a changé. */
+  procedure: string | null;
+  /** Nombre de lots regroupés sous cette ligne. */
+  lots: number;
+}
+
+export interface AcheteurMarches {
+  /** La commune elle-même, ou l'un de ses groupements. */
+  nom: string;
+  natureLibelle: string | null;
+  /** Nombre total de marchés notifiés depuis `depuis`, avant troncature. */
+  total: number;
+  /** Les plus récents seulement. */
+  liste: Marche[];
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -211,6 +245,10 @@ export interface Territoire {
   eau: ServiceEau | null;
   /** Les services publics implantés sur son territoire. */
   services: Services | null;
+  /** Ce que la commune et ses groupements ont commandé, acheteur par acheteur. */
+  marches: AcheteurMarches[];
+  /** L'année à partir de laquelle les marchés sont recensés, et la date de lecture. */
+  marchesDepuis: string | null;
   /** Le maire en fonction, quand le répertoire national le publie. */
   maire: Maire | null;
   /** La date de lecture du répertoire des élus. */
@@ -297,6 +335,24 @@ type EcolesDep = {
   h: Record<string, [(number | null)[], (number | null)[]]>;
 };
 const ecolesDep = new Map<string, EcolesDep | null>();
+
+/** Les marchés publics des acheteurs du département, par SIREN. */
+type MarchesDep = {
+  depuis: string;
+  maj: string;
+  procedures: string[];
+  /** Code INSEE -> SIREN, pour les communes qui ont passé des marchés. */
+  com: Record<string, string>;
+  h: Record<string, { n: number; m: MarcheBrut[] }>;
+};
+type MarcheBrut = {
+  objet: string;
+  montant: number | null;
+  date: string;
+  procedure: number;
+  lots: number;
+};
+const marchesDep = new Map<string, MarchesDep | null>();
 
 /** Le maire de chaque commune du département : [prénom, nom, prise de fonction]. */
 type ElusDep = { maj: string; c: Record<string, [string, string, string]> };
@@ -447,7 +503,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles, elus, mar] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -458,6 +514,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<ServicesDep>(`${BASE}/dep/${commune.dep}-services.json`).catch(() => null),
       json<EcolesDep>(`${BASE}/dep/${commune.dep}-ecoles.json`).catch(() => null),
       json<ElusDep>(`${BASE}/dep/${commune.dep}-elus.json`).catch(() => null),
+      json<MarchesDep>(`${BASE}/dep/${commune.dep}-marches.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -465,6 +522,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     servicesDep.set(commune.dep, servs);
     ecolesDep.set(commune.dep, ecoles);
     elusDep.set(commune.dep, elus);
+    marchesDep.set(commune.dep, mar);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -542,12 +600,48 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),
+    marches: assemblerMarches(commune, structures),
+    marchesDepuis: marchesDep.get(commune.dep)?.depuis ?? null,
     maire: assemblerMaire(commune),
     majElus: elusDep.get(commune.dep)?.maj ?? null,
     fluxPercus: assemblerFluxPercus(structures),
     anneesFlux: fluxGfp?.annees ?? [],
     maj: dep.maj,
   };
+}
+
+/**
+ * Les marchés de la commune, puis ceux de chacun de ses groupements.
+ *
+ * L'ordre n'est pas neutre : la commune d'abord, parce que c'est d'elle qu'on
+ * part, puis les syndicats, qui sont souvent ceux qui dépensent le plus et que
+ * personne ne pense à regarder. Le syndicat d'eau de Mayet a passé un marché à
+ * bons de commande de 2 M€ que la commune n'aurait jamais porté seule.
+ */
+function assemblerMarches(commune: CommuneBreve, structures: Structure[]): AcheteurMarches[] {
+  const d = marchesDep.get(commune.dep);
+  if (!d) return [];
+  const out: AcheteurMarches[] = [];
+  const lire = (siren: string, nom: string, natureLibelle: string | null) => {
+    const e = d.h[siren];
+    if (!e || e.m.length === 0) return;
+    out.push({
+      nom,
+      natureLibelle,
+      total: e.n,
+      liste: e.m.map((m) => ({
+        objet: m.objet,
+        montant: m.montant,
+        date: m.date,
+        procedure: d.procedures[m.procedure] ?? null,
+        lots: m.lots,
+      })),
+    });
+  };
+  const sirenCommune = d.com[commune.code];
+  if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
+  for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
+  return out;
 }
 
 function assemblerMaire(commune: CommuneBreve): Maire | null {

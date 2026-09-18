@@ -554,8 +554,8 @@ acteurs:
     type: entreprise
     echelon: prive
     resume: "Entreprise à qui une collectivité confie l'exploitation d'un service public, par contrat de délégation."
-    liens: [od-decp, od-sispea, cgct]
-    verifie_le: 2026-09-05
+    liens: [od-decp, od-decp-bercy, od-sispea, cgct]
+    verifie_le: 2026-09-18
     confiance: a_confirmer
 
   - id: bailleur-social

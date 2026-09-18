@@ -726,6 +726,8 @@ function demarrer(reseau: Reseau) {
     if (argent) bloc.append(argent);
     const percus = blocFluxPercus();
     if (percus) bloc.append(percus);
+    const commandes = blocMarches();
+    if (commandes) bloc.append(commandes);
     const equipements = blocServices();
     if (equipements) bloc.append(equipements);
 
@@ -1104,6 +1106,92 @@ function demarrer(reseau: Reseau) {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return null;
     return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  }
+
+  /**
+   * Ce que la commune et ses syndicats commandent.
+   *
+   * L'objet d'un marché dit ce qu'une collectivité fait de son argent mieux
+   * qu'un agrégat comptable : « collecte des ordures ménagères »,
+   * « réhabilitation des réseaux d'assainissement », « maison médicale ». Les
+   * syndicats viennent après la commune, mais ce sont eux qui dépensent le
+   * plus souvent le plus gros, et personne ne pense à les regarder.
+   *
+   * **Aucun total n'est affiché, et c'est le point important.** Un accord-cadre
+   * déclare un plafond, et chacun de ses lots le redéclare en entier : sept
+   * marchés parisiens portent 21 M€ chacun pour un seul accord. Additionner
+   * donnerait un chiffre faux d'un ordre de grandeur, et faux avec aplomb.
+   */
+  function blocMarches(): HTMLElement | null {
+    const liste = territoire?.marches;
+    if (!liste || liste.length === 0) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-marches';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui est commandé'));
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        `Marchés notifiés depuis ${(territoire?.marchesDepuis ?? '').slice(0, 4)}, du plus récent au ` +
+          `plus ancien. Les montants ne s'additionnent pas : un accord-cadre déclare un plafond, et ` +
+          `chacun de ses lots le redéclare en entier. Un même marché peut aussi figurer deux fois, ` +
+          `publié sous deux libellés — le recensement n'est pas dédoublonné à la source.`,
+      ),
+    );
+
+    for (const [rang, a] of liste.entries()) {
+      // La commune est ouverte, ses syndicats sont repliés. Six acheteurs à
+      // cinq marchés font trente lignes : déplié, le bloc chasse tout le reste
+      // du panneau, et sur un téléphone il le remplace. Le décompte reste
+      // visible sur chaque en-tête, c'est lui qui donne envie d'ouvrir.
+      const replie = rang > 0;
+      const groupe = document.createElement(replie ? 'details' : 'div');
+      groupe.className = 'p-marche-acheteur';
+      const titre = document.createElement(replie ? 'summary' : 'p');
+      titre.className = 'p-marche-qui';
+      titre.append(glose('span', 'p-marche-nom', a.nom));
+      if (a.natureLibelle) titre.append(ligne('span', 'p-marche-nature', a.natureLibelle));
+      titre.append(
+        ligne(
+          'span',
+          'p-marche-total',
+          `${a.total} marché${a.total > 1 ? 's' : ''}${a.total > a.liste.length ? `, les ${a.liste.length} plus récents` : ''}`,
+        ),
+      );
+      groupe.append(titre);
+
+      const ul = document.createElement('ul');
+      for (const m of a.liste) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-marche-montant', montantCourt(m.montant)));
+        const droite = document.createElement('span');
+        droite.append(ligne('span', 'p-marche-objet', m.objet));
+        const sous: string[] = [moisAnnee(m.date) ?? m.date];
+        if (m.procedure) sous.push(m.procedure.toLowerCase());
+        if (m.lots > 1) sous.push(`${m.lots} lots`);
+        droite.append(ligne('span', 'p-marche-detail', sous.join(' · ')));
+        li.append(droite);
+        ul.append(li);
+      }
+      groupe.append(ul);
+      bloc.append(groupe);
+    }
+    return bloc;
+  }
+
+  /**
+   * Un montant lisible d'un coup d'œil : 489 k€, 2,0 M€.
+   *
+   * L'euro près n'apprend rien sur un marché public, et « 489 025 € » se lit
+   * plus lentement que « 489 k€ » quand on parcourt une liste.
+   */
+  function montantCourt(v: number | null): string {
+    if (v === null) return '—';
+    if (Math.abs(v) >= 1_000_000) {
+      return `${(v / 1_000_000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M\u20ac`;
+    }
+    if (Math.abs(v) >= 1_000) return `${Math.round(v / 1000).toLocaleString('fr-FR')} k\u20ac`;
+    return `${Math.round(v).toLocaleString('fr-FR')} \u20ac`;
   }
 
   /** Une réglette : le trait est la médiane, le point la commune. */

@@ -377,6 +377,32 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 }
 .p-maire-nom { font-size: 1rem; font-weight: 650; }
 .p-maire-depuis { font-size: .76rem; color: var(--encre-douce); }
+
+/* --- ce qui est commandé ---
+   Le montant à gauche, aligné et tabulaire : c'est lui qu'on balaie. L'objet
+   porte l'information, la ligne grise en dessous la date et la procédure. */
+.p-marches { margin-top: 1.2rem; }
+.p-marche-acheteur { margin: .9rem 0 0; }
+.p-marche-qui { margin: 0 0 .35rem; display: grid; gap: .02rem; }
+/* Replié : le résumé reste une ligne cliquable, pas un bouton déguisé.
+   `display: list-item` est nécessaire — une grille supprime le triangle, et
+   sans lui rien ne dit que la ligne s'ouvre. */
+details.p-marche-acheteur > summary { cursor: pointer; display: list-item; }
+summary.p-marche-qui > span { display: block; }
+details.p-marche-acheteur > summary::marker { color: var(--encre-tres-douce); }
+details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
+.p-marche-nom { font-size: .9rem; font-weight: 650; }
+.p-marche-nature { font-size: .76rem; color: var(--encre-douce); }
+.p-marche-total { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--encre-tres-douce); }
+.p-marches ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+.p-marches li { display: grid; grid-template-columns: 4.6rem 1fr; gap: .6rem; align-items: baseline; }
+.p-marche-montant { font-variant-numeric: tabular-nums; font-weight: 650; font-size: .86rem; text-align: right; }
+.p-marche-objet { display: block; font-size: .84rem; line-height: 1.35; }
+.p-marche-detail { display: block; font-size: .74rem; color: var(--encre-tres-douce); }
+@media (max-width: 480px) {
+  .p-marches li { grid-template-columns: 1fr; gap: .05rem; }
+  .p-marche-montant { text-align: left; }
+}
 .p-prix-eau { margin: .7rem 0 0; display: grid; gap: .1rem; }
 .p-prix { font-size: 1.15rem; font-weight: 650; font-variant-numeric: tabular-nums; }
 .p-prix-detail { font-size: .76rem; color: var(--encre-douce); line-height: 1.45; }

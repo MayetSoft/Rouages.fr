@@ -59,7 +59,7 @@ const VERT = '\x1b[32m', JAUNE = '\x1b[33m', GRIS = '\x1b[90m', RAZ = '\x1b[0m';
 const dire = (m: string) => console.log(m);
 
 /** Le tunnel du proxy lâche par intermittence : on réessaie plutôt que d'abandonner. */
-async function obstine(url: string, essais = 5): Promise<Response> {
+async function obstine(url: string, essais = 8): Promise<Response> {
   let derniere: unknown;
   for (let i = 0; i < essais; i++) {
     try {
@@ -77,6 +77,28 @@ async function obstine(url: string, essais = 5): Promise<Response> {
     await new Promise((r) => setTimeout(r, (i + 1) * 2000));
   }
   throw new Error(`${url} : ${(derniere as Error)?.message ?? 'injoignable'}`);
+}
+
+/**
+ * Une collecte facultative qui échoue ne doit pas jeter l'ingestion entière.
+ *
+ * Le rapatriement complet dure une dizaine de minutes et touche huit sources.
+ * Qu'une seule soit momentanément injoignable — c'est arrivé sur le répertoire
+ * des élus — et tout était perdu, y compris ce qui avait déjà abouti. Les
+ * fichiers de la source en échec ne sont alors pas réécrits : ceux de la
+ * dernière ingestion restent en place, datés, plutôt que de disparaître.
+ *
+ * Ce qui reste fatal : un référentiel dont dépend la structure même du réseau,
+ * comme BANATIC ou le découpage. Sans eux il n'y a rien à écrire.
+ */
+async function tenter<T>(quoi: string, f: () => Promise<T | null>): Promise<T | null> {
+  try {
+    return await f();
+  } catch (e) {
+    dire(`${JAUNE}${quoi} : ${(e as Error).message}${RAZ}`);
+    dire(`${JAUNE}  → les fichiers de cette source ne seront pas réécrits.${RAZ}`);
+    return null;
+  }
 }
 
 /**
@@ -308,17 +330,50 @@ async function principal() {
   // pouvoir tracer. La clé est l'UAI, jamais le code de commune du jeu — il
   // contient un code postal (voir scripts/ecoles-emettre.ts).
   const { collecterEffectifs } = await import('./ecoles-emettre.ts');
-  const effectifs = await collecterEffectifs(
-    async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
-    (m) => dire(`${GRIS}${m}${RAZ}`),
+  const effectifs = await tenter('Effectifs scolaires', () =>
+    collecterEffectifs(
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
+  // Les marchés publics du bloc communal. Le filtre est donné ici : le module
+  // ne retient que les acheteurs dont le site connaît le SIREN — communes du
+  // découpage et groupements de BANATIC.
+  const { collecterMarches } = await import('./marches-emettre.ts');
+  const sirensSuivis = new Set<string>();
+  for (const g of groupements.values()) sirensSuivis.add(g.siren);
+  // Le même registre que l'émetteur, lu ici pour connaître les SIREN communaux :
+  // un paquet npm épinglé, donc reproductible.
+  {
+    const { createRequire } = await import('node:module');
+    const chemin = createRequire(import.meta.url).resolve(
+      '@etalab/decoupage-administratif/data/communes.json',
+    );
+    const communes = JSON.parse(readFileSync(chemin, 'utf8')) as {
+      type: string;
+      siren?: string;
+    }[];
+    for (const c of communes) {
+      if (c.type === 'commune-actuelle' && c.siren) sirensSuivis.add(c.siren);
+    }
+  }
+  const marches = await tenter('Marchés publics', () =>
+    collecterMarches(
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      sirensSuivis,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
   );
 
   // Le maire de chaque commune. Le graphe garde la fonction ; le nom est une
   // précision de donnée, et rien d'autre du répertoire n'est retenu.
   const { collecterMaires } = await import('./elus-emettre.ts');
-  const elus = await collecterMaires(
-    async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
-    (m) => dire(`${GRIS}${m}${RAZ}`),
+  const elus = await tenter('Répertoire des élus', () =>
+    collecterMaires(
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
   );
 
   ecrire(
@@ -334,6 +389,7 @@ async function principal() {
     fluxGfp,
     effectifs,
     elus,
+    marches,
   );
 }
 
@@ -440,6 +496,7 @@ async function ecrire(
   fluxGfp: Awaited<ReturnType<typeof import('./flux-emettre.ts')['collecterFluxGroupements']>>,
   effectifs: Awaited<ReturnType<typeof import('./ecoles-emettre.ts')['collecterEffectifs']>>,
   elus: Awaited<ReturnType<typeof import('./elus-emettre.ts')['collecterMaires']>>,
+  marches: Awaited<ReturnType<typeof import('./marches-emettre.ts')['collecterMarches']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -455,6 +512,7 @@ async function ecrire(
     fluxGfp,
     effectifs,
     elus,
+    marches,
     sortie: SORTIE,
     dire,
     VERT,

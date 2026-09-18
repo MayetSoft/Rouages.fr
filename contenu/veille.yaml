@@ -69,6 +69,18 @@ surveillances:
   # Le total sert de garde-fou, mais le vrai signal est ailleurs : une rentrée
   # de plus paraît chaque automne, et c'est elle qu'il faut aller chercher. Un
   # total qui grimpe d'environ 47 000 lignes le dira.
+  # Le recensement grossit d'année en année — 12 630 marchés notifiés en 2021,
+  # 254 191 en 2025. Le seuil est donc large : c'est une chute qui alerterait,
+  # pas une hausse.
+  - id: decp-marches
+    nom: "Commande publique — marchés valides"
+    alimente: "ce que commandent la commune et ses syndicats"
+    type: opendatasoft-total
+    url: "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/decp-2022-marches-valides"
+    # Relevé au 18 septembre 2026, pas estimé.
+    attendu: 704853
+    lien: od-decp-bercy
+
   - id: effectifs-ecoles
     nom: "Effectifs d'élèves par école"
     alimente: "le nombre de classes et d'élèves, école par école"

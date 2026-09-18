@@ -368,6 +368,44 @@ Elle sert la ressource par pages de cent — 349 pages, environ 90 secondes — 
 l'ingestion refuse d'écrire si elle en a perdu plus d'un dixième : mieux vaut
 échouer que publier un annuaire troué.
 
+### Ce qui est commandé ✔
+
+Les données essentielles de la commande publique disent à quoi une collectivité
+passe commande. C'est la forme la plus concrète de « où va l'argent » : un
+objet, une date, un montant. Le site montre les marchés de la commune, puis
+ceux de chacun de ses syndicats — qui dépensent souvent davantage et que
+personne ne pense à regarder. 13 473 acheteurs du bloc communal sont couverts,
+sur 379 986 marchés notifiés depuis 2023.
+
+La jointure est sûre : `acheteur_id` est un SIRET dont les neuf premiers
+chiffres sont le SIREN, et le site connaît déjà le SIREN de chaque commune
+(découpage Etalab) comme de chaque groupement (BANATIC).
+
+**Ce qui a demandé le plus de discernement, c'est de refuser le total.** Un
+accord-cadre déclare un plafond, et chacun de ses lots le redéclare en entier :
+sept marchés parisiens portent 21 M€ chacun pour un seul accord. Additionner
+les 661 873 marchés attribue 185 Md€ au seul bloc communal en trois ans —
+davantage que la commande publique française entière. Le chiffre aurait été
+faux d'un ordre de grandeur, et personne ne l'aurait vu. Le site affiche donc
+les lignes et pas de somme, et dit pourquoi.
+
+Deux limites de plus sont dites plutôt que corrigées : un même marché figure
+parfois deux fois sous deux libellés — le recensement n'est pas dédoublonné à
+la source, et un rapprochement approximatif serait une devinette ; et le
+recensement n'est complet que depuis 2023. Une seule correction est appliquée,
+parce qu'elle ne peut rien abîmer : `¿` tient lieu d'apostrophe dans 3 603
+objets, toujours entre deux lettres.
+
+### Une ingestion qui ne se perd plus en route
+
+Le rapatriement complet touche huit sources et dure une dizaine de minutes.
+Qu'une seule soit momentanément injoignable — c'est arrivé sur le répertoire
+des élus — et tout était perdu, y compris ce qui avait déjà abouti. Les
+collectes facultatives sont désormais isolées : celle qui échoue laisse en
+place les fichiers de l'ingestion précédente, datés, plutôt que de tout
+emporter. Restent fatals les référentiels dont dépend la structure du réseau,
+BANATIC et le découpage : sans eux il n'y a rien à écrire.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

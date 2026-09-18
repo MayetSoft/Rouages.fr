@@ -217,3 +217,9 @@ sources:
 
   # --- Ce qu'une école est devenue ------------------------------------------
   - { id: od-effectifs-ecoles, type: donnees_ouvertes, titre: "Effectifs d'élèves et nombre de classes, école par école, depuis 2009", url: "https://data.education.gouv.fr/explore/dataset/fr-en-ecoles-effectifs-nb_classes/", consulte_le: 2026-09-13 }
+
+  # --- Ce qui est commandé ---------------------------------------------------
+  # Le jeu consolidé de data.gouv est la référence éditoriale ; celui de Bercy
+  # est celui que l'ingestion lit, parce qu'il est servi par une interface
+  # requêtable. Les deux sont cités : on lie ce qu'on lit.
+  - { id: od-decp-bercy, type: donnees_ouvertes, titre: "Données essentielles de la commande publique — marchés valides", url: "https://data.economie.gouv.fr/explore/dataset/decp-2022-marches-valides/", consulte_le: 2026-09-18 }

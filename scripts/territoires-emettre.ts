@@ -21,6 +21,7 @@ import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.t
 import { ecrireFlux, type FluxGroupements } from './flux-emettre.ts';
 import { ecrireEcoles, type Effectifs } from './ecoles-emettre.ts';
 import { ecrireElus, type Elus } from './elus-emettre.ts';
+import { ecrireMarches, type Marches } from './marches-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -81,6 +82,7 @@ export function emettre(o: {
   fluxGfp: FluxGroupements | null;
   effectifs: Effectifs | null;
   elus: Elus | null;
+  marches: Marches | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -238,6 +240,7 @@ export function emettre(o: {
   let servicesEcrits = 0;
   let ecolesEcrites = 0;
   let elusEcrits = 0;
+  let marchesEcrits = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -245,6 +248,22 @@ export function emettre(o: {
     // Le maire ne dépend d'aucun autre référentiel : il s'écrit même si
     // l'annuaire des services n'a pas répondu.
     if (o.elus) elusEcrits += ecrireElus(sortie, dep, liste.map((c) => c.code), o.elus);
+
+    // Les marchés sont indexés par SIREN d'acheteur : ceux des communes du
+    // département, et ceux de tous les groupements auxquels elles adhèrent.
+    if (o.marches) {
+      // Les mêmes structures que le panneau sait nommer, et pas d'autres :
+      // écrire les marchés d'un groupement que le client n'affiche jamais
+      // alourdirait le fichier sans que personne ne les voie.
+      const sirens = [
+        ...liste.map((c) => c.siren).filter((x): x is string => !!x),
+        ...liste.flatMap((c) => (c.siren ? utiles(closure(c.siren)) : [])),
+      ];
+      const sirenDeCommune = new Map(
+        liste.filter((c) => c.siren).map((c) => [c.code, c.siren!] as const),
+      );
+      marchesEcrits += ecrireMarches(sortie, dep, sirens, sirenDeCommune, o.marches);
+    }
 
     const refs = new Map<string, number>();
     const table: [string, string, string, string[]][] = [];
@@ -430,6 +449,9 @@ export function emettre(o: {
       `${GRIS}Prix de l'eau rattaché à ${servicesEau.toLocaleString('fr-FR')} communes ` +
         `sur ${communes.length.toLocaleString('fr-FR')}.${RAZ}`,
     );
+  }
+  if (o.marches) {
+    dire(`${GRIS}Marchés publics : ${marchesEcrits.toLocaleString('fr-FR')} acheteurs chiffrés.${RAZ}`);
   }
   if (o.elus) {
     dire(`${GRIS}Maires : ${elusEcrits.toLocaleString('fr-FR')} communes nommées.${RAZ}`);
