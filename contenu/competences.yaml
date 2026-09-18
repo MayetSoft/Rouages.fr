@@ -173,7 +173,7 @@ competences:
     # logement reste facultative (L5214-16).
     obligatoire_pour: [CA, CU, METRO, MET69]
     reserve: "Dans une communauté d'agglomération, les aides au logement social ne portent que sur ce que le conseil communautaire a défini comme d'intérêt communautaire ; une communauté urbaine ou une métropole, elle, est compétente sur tout le champ sans avoir à le délimiter."
-    liens: [wp-hlm, anct-hlm, cgct, cgct-l5216-5]
+    liens: [wp-hlm, anct-hlm, cgct, cgct-l5216-5, cch-l302-5, od-sru]
     verifie_le: 2026-09-11
     confiance: etabli
 

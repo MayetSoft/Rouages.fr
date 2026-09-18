@@ -368,6 +368,32 @@ Elle sert la ressource par pages de cent — 349 pages, environ 90 secondes — 
 l'ingestion refuse d'écrire si elle en a perdu plus d'un dixième : mieux vaut
 échouer que publier un annuaire troué.
 
+### L'obligation de logements sociaux ✔
+
+L'article 55 de la loi SRU est l'une des rares obligations à la fois chiffrée,
+datée et sanctionnée qui pèse sur une commune : un taux à atteindre, un écart
+constaté, un prélèvement quand il n'est pas comblé, et la carence — seule
+situation où le préfet peut se substituer au maire pour délivrer les permis.
+L'inventaire annuel du ministère donne tout cela, commune par commune, avec un
+code INSEE propre : 2 206 communes soumises, 1 140 déficitaires, 335 carencées,
+690 prélevées pour 135 M€.
+
+Deux silences sont volontaires. **Les communes absentes du fichier ne sont pas
+en défaut** : elles n'atteignent pas les seuils de population et
+d'agglomération, et écrire « 0 » se lirait comme un manquement. Et **« Pas
+d'inventaire » n'est pas une donnée manquante** : Le Mans porte cette mention
+avec un taux « >25% », parce que la commune dépasse la cible et que
+l'inventaire détaillé ne lui est donc pas demandé. Le site reprend le texte du
+fichier plutôt que d'afficher un trou.
+
+La fragilité connue : l'identifiant de la ressource change à chaque millésime.
+La veille la surveille pour que sa disparition se voie au lieu de se deviner.
+
+**Le répertoire des logements locatifs sociaux (RPLS) proprement dit n'est pas
+intégré** : le fichier national par commune n'est pas servi par une interface
+requêtable joignable, et l'inventaire SRU couvre déjà les communes où
+l'obligation — et le débat — existent.
+
 ### Ce qui est commandé ✔
 
 Les données essentielles de la commande publique disent à quoi une collectivité

@@ -185,3 +185,16 @@ sigles:
     developpe: "Direction générale des Finances publiques"
     definition: "Tient les comptes des collectivités et recouvre l'impôt local."
     liens: [od-actes-budgetaires, od-ofgl]
+
+  - id: sigle-sru
+    sigle: SRU
+    developpe: "Solidarité et renouvellement urbains"
+    definition: "La loi de 2000 dont l'article 55 impose 20 ou 25 % de logements sociaux à certaines communes, sous peine de prélèvement."
+    noeud: logement-social
+    liens: [wp-loi-sru, cch-l302-5, od-sru]
+
+  - id: sigle-lls
+    sigle: LLS
+    developpe: "Logement locatif social"
+    definition: "L'unité comptée par l'inventaire SRU : un logement conventionné, loué sous plafond de ressources."
+    liens: [od-sru, wp-hlm]

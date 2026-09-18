@@ -366,6 +366,15 @@ async function principal() {
     ),
   );
 
+  // L'inventaire SRU : l'obligation de logements sociaux, commune par commune.
+  const { collecterSru } = await import('./sru-emettre.ts');
+  const sru = await tenter('Inventaire SRU', () =>
+    collecterSru(
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   // Le maire de chaque commune. Le graphe garde la fonction ; le nom est une
   // précision de donnée, et rien d'autre du répertoire n'est retenu.
   const { collecterMaires } = await import('./elus-emettre.ts');
@@ -390,6 +399,7 @@ async function principal() {
     effectifs,
     elus,
     marches,
+    sru,
   );
 }
 
@@ -497,6 +507,7 @@ async function ecrire(
   effectifs: Awaited<ReturnType<typeof import('./ecoles-emettre.ts')['collecterEffectifs']>>,
   elus: Awaited<ReturnType<typeof import('./elus-emettre.ts')['collecterMaires']>>,
   marches: Awaited<ReturnType<typeof import('./marches-emettre.ts')['collecterMarches']>>,
+  sru: Awaited<ReturnType<typeof import('./sru-emettre.ts')['collecterSru']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -513,6 +524,7 @@ async function ecrire(
     effectifs,
     elus,
     marches,
+    sru,
     sortie: SORTIE,
     dire,
     VERT,

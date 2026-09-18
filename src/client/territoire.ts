@@ -245,6 +245,10 @@ export interface Territoire {
   eau: ServiceEau | null;
   /** Les services publics implantés sur son territoire. */
   services: Services | null;
+  /** L'obligation SRU, quand la commune y est soumise. */
+  sru: Sru | null;
+  /** La date de l'inventaire SRU. */
+  sruMaj: string | null;
   /** Ce que la commune et ses groupements ont commandé, acheteur par acheteur. */
   marches: AcheteurMarches[];
   /** L'année à partir de laquelle les marchés sont recensés, et la date de lecture. */
@@ -335,6 +339,27 @@ type EcolesDep = {
   h: Record<string, [(number | null)[], (number | null)[]]>;
 };
 const ecolesDep = new Map<string, EcolesDep | null>();
+
+/**
+ * L'obligation de logements sociaux, pour les communes qui y sont soumises.
+ *
+ * Les autres ne sont pas en défaut : elles n'atteignent pas les seuils de
+ * population et d'agglomération de l'article 55. Le site ne dit donc rien
+ * pour elles, plutôt que « 0 » — qui se lirait comme un manquement.
+ */
+export interface Sru {
+  lls: number | null;
+  llsTexte: string | null;
+  taux: number | null;
+  tauxTexte: string | null;
+  cible: number | null;
+  deficitaire: boolean | null;
+  carencee: boolean;
+  exemptee: boolean;
+  prelevement: number | null;
+}
+type SruDep = { maj: string; c: Record<string, Sru> };
+const sruDep = new Map<string, SruDep | null>();
 
 /** Les marchés publics des acheteurs du département, par SIREN. */
 type MarchesDep = {
@@ -503,7 +528,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -515,6 +540,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<EcolesDep>(`${BASE}/dep/${commune.dep}-ecoles.json`).catch(() => null),
       json<ElusDep>(`${BASE}/dep/${commune.dep}-elus.json`).catch(() => null),
       json<MarchesDep>(`${BASE}/dep/${commune.dep}-marches.json`).catch(() => null),
+      json<SruDep>(`${BASE}/dep/${commune.dep}-sru.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -523,6 +549,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     ecolesDep.set(commune.dep, ecoles);
     elusDep.set(commune.dep, elus);
     marchesDep.set(commune.dep, mar);
+    sruDep.set(commune.dep, inv);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -600,6 +627,8 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),
+    sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
+    sruMaj: sruDep.get(commune.dep)?.maj ?? null,
     marches: assemblerMarches(commune, structures),
     marchesDepuis: marchesDep.get(commune.dep)?.depuis ?? null,
     maire: assemblerMaire(commune),

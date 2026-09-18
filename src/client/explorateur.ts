@@ -726,6 +726,8 @@ function demarrer(reseau: Reseau) {
     if (argent) bloc.append(argent);
     const percus = blocFluxPercus();
     if (percus) bloc.append(percus);
+    const obligation = blocSru();
+    if (obligation) bloc.append(obligation);
     const commandes = blocMarches();
     if (commandes) bloc.append(commandes);
     const equipements = blocServices();
@@ -1192,6 +1194,89 @@ function demarrer(reseau: Reseau) {
     }
     if (Math.abs(v) >= 1_000) return `${Math.round(v / 1000).toLocaleString('fr-FR')} k\u20ac`;
     return `${Math.round(v).toLocaleString('fr-FR')} \u20ac`;
+  }
+
+  /**
+   * L'obligation de logements sociaux.
+   *
+   * C'est l'une des rares obligations chiffrées, datées et sanctionnées qui
+   * pèse sur une commune : un taux à atteindre, un écart constaté, et un
+   * prélèvement quand il n'est pas comblé. Le reste du site dit qui décide ;
+   * ici, il dit ce que la loi exige et où en est la commune.
+   *
+   * Rien n'est affiché pour les communes absentes de l'inventaire : elles ne
+   * sont pas soumises à l'article 55, et écrire « 0 » se lirait comme un
+   * manquement.
+   */
+  function blocSru(): HTMLElement | null {
+    const s = territoire?.sru;
+    if (!s) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-sru';
+    bloc.append(ligne('h3', 'p-titre-section', 'Logement social : ce que la loi exige'));
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-sru-liste';
+    const item = (cle: string, valeur: string, classe = '') => {
+      const d = document.createElement('div');
+      const dt = document.createElement('dt');
+      dt.textContent = cle;
+      d.append(dt, ligne('dd', classe, valeur));
+      dl.append(d);
+    };
+
+    if (s.lls !== null) item('Logements sociaux', s.lls.toLocaleString('fr-FR'));
+    else if (s.llsTexte) item('Logements sociaux', s.llsTexte);
+
+    const taux = s.taux !== null ? `${s.taux.toLocaleString('fr-FR')} %` : s.tauxTexte;
+    if (taux) {
+      item(
+        'Taux atteint',
+        s.cible !== null ? `${taux} — cible ${s.cible.toLocaleString('fr-FR')} %` : taux,
+      );
+    }
+    bloc.append(dl);
+
+    // L'état de la commune, en une phrase. Trois situations distinctes, et la
+    // troisième — la carence — est la seule où l'État peut se substituer au
+    // maire pour délivrer les permis.
+    if (s.exemptee) {
+      bloc.append(ligne('p', 'p-sru-etat', 'Commune exemptée de l’obligation pour la période en cours.'));
+    } else if (s.carencee) {
+      bloc.append(
+        ligne(
+          'p',
+          'p-sru-etat p-sru-etat--carence',
+          'Commune déclarée carencée : le préfet peut se substituer au maire pour délivrer ' +
+            'les permis et majorer le prélèvement.',
+        ),
+      );
+    } else if (s.deficitaire === true) {
+      bloc.append(ligne('p', 'p-sru-etat p-sru-etat--deficit', 'Commune déficitaire : la cible n’est pas atteinte.'));
+    } else if (s.deficitaire === false) {
+      bloc.append(ligne('p', 'p-sru-etat', 'Obligation respectée.'));
+    }
+
+    if (s.prelevement !== null && s.prelevement > 0) {
+      bloc.append(
+        ligne(
+          'p',
+          'p-sru-prelevement',
+          `Prélèvement de l’année : ${Math.round(s.prelevement).toLocaleString('fr-FR')} \u20ac.`,
+        ),
+      );
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `Inventaire annuel de l’article 55 de la loi SRU${territoire?.sruMaj ? ` (${territoire.sruMaj})` : ''}. ` +
+          `Les communes qui n’y figurent pas ne sont pas soumises à l’obligation : elles n’atteignent ` +
+          `pas les seuils de population et d’agglomération.`,
+      ),
+    );
+    return bloc;
   }
 
   /** Une réglette : le trait est la médiane, le point la commune. */

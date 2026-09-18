@@ -22,6 +22,7 @@ import { ecrireFlux, type FluxGroupements } from './flux-emettre.ts';
 import { ecrireEcoles, type Effectifs } from './ecoles-emettre.ts';
 import { ecrireElus, type Elus } from './elus-emettre.ts';
 import { ecrireMarches, type Marches } from './marches-emettre.ts';
+import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -83,6 +84,7 @@ export function emettre(o: {
   effectifs: Effectifs | null;
   elus: Elus | null;
   marches: Marches | null;
+  sru: InventaireSru | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -241,6 +243,7 @@ export function emettre(o: {
   let ecolesEcrites = 0;
   let elusEcrits = 0;
   let marchesEcrits = 0;
+  let sruEcrits = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -248,6 +251,8 @@ export function emettre(o: {
     // Le maire ne dépend d'aucun autre référentiel : il s'écrit même si
     // l'annuaire des services n'a pas répondu.
     if (o.elus) elusEcrits += ecrireElus(sortie, dep, liste.map((c) => c.code), o.elus);
+
+    if (o.sru) sruEcrits += ecrireSru(sortie, dep, liste.map((c) => c.code), o.sru);
 
     // Les marchés sont indexés par SIREN d'acheteur : ceux des communes du
     // département, et ceux de tous les groupements auxquels elles adhèrent.
@@ -449,6 +454,9 @@ export function emettre(o: {
       `${GRIS}Prix de l'eau rattaché à ${servicesEau.toLocaleString('fr-FR')} communes ` +
         `sur ${communes.length.toLocaleString('fr-FR')}.${RAZ}`,
     );
+  }
+  if (o.sru) {
+    dire(`${GRIS}Inventaire SRU : ${sruEcrits.toLocaleString('fr-FR')} communes soumises.${RAZ}`);
   }
   if (o.marches) {
     dire(`${GRIS}Marchés publics : ${marchesEcrits.toLocaleString('fr-FR')} acheteurs chiffrés.${RAZ}`);

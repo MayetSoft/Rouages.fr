@@ -104,6 +104,18 @@ surveillances:
   # n'est plus en fonction. Le seuil est serré — 5 % — parce qu'un répertoire
   # d'élus ne varie pas de beaucoup entre deux scrutins, et qu'une chute
   # signalerait une ressource tronquée plutôt qu'une actualité.
+  # L'identifiant de ressource change à chaque millésime : le fichier 2026
+  # n'est pas le fichier 2025. C'est la fragilité de cette source, et la
+  # surveillance est là pour que sa disparition se voie au lieu de se deviner.
+  - id: sru-inventaire
+    nom: "Inventaire SRU — communes soumises à l'article 55"
+    alimente: "l'obligation de logements sociaux de chaque commune"
+    type: datagouv-tabulaire
+    url: "https://tabular-api.data.gouv.fr/api/resources/2773f8ca-e06b-4a67-9844-ac165d52f47c/data/"
+    # Relevé au 18 septembre 2026, pas estimé.
+    attendu: 2206
+    lien: od-sru
+
   - id: rne-maires
     nom: "Répertoire national des élus — maires"
     alimente: "le nom du maire de chaque commune"

@@ -223,3 +223,8 @@ sources:
   # est celui que l'ingestion lit, parce qu'il est servi par une interface
   # requêtable. Les deux sont cités : on lie ce qu'on lit.
   - { id: od-decp-bercy, type: donnees_ouvertes, titre: "Données essentielles de la commande publique — marchés valides", url: "https://data.economie.gouv.fr/explore/dataset/decp-2022-marches-valides/", consulte_le: 2026-09-18 }
+
+  # --- L'obligation de logements sociaux -------------------------------------
+  - { id: od-sru, type: donnees_ouvertes, titre: "Communes soumises à l'article 55 de la loi SRU et leur inventaire", url: "https://www.data.gouv.fr/datasets/communes-et-inventaire-sru/", consulte_le: 2026-09-18 }
+  - { id: cch-l302-5, type: droit, titre: "Code de la construction, art. L302-5 — communes soumises à l'obligation", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000049642576", consulte_le: 2026-09-18 }
+  - { id: wp-loi-sru, type: wikipedia, titre: "Loi relative à la solidarité et au renouvellement urbains", url: "https://fr.wikipedia.org/wiki/Loi_relative_%C3%A0_la_solidarit%C3%A9_et_au_renouvellement_urbains", consulte_le: 2026-09-18 }

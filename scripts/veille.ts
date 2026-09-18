@@ -67,7 +67,14 @@ interface Etat {
   decouvertes_vues?: string[];
 }
 
-async function obstine(url: string, essais = 4): Promise<Response> {
+/**
+ * Huit tentatives, pas quatre.
+ *
+ * Une coupure de transport n'est pas une source disparue, et les confondre
+ * coûte cher : une alerte hebdomadaire qui crie au loup finit par ne plus être
+ * lue, et c'est précisément ce que cette veille existe pour éviter.
+ */
+async function obstine(url: string, essais = 8): Promise<Response> {
   let derniere: unknown;
   for (let i = 0; i < essais; i++) {
     try {
@@ -82,7 +89,18 @@ async function obstine(url: string, essais = 4): Promise<Response> {
     }
     await new Promise((r) => setTimeout(r, (i + 1) * 1500));
   }
-  throw derniere instanceof Error ? derniere : new Error('injoignable');
+  // La cause d'undici porte le vrai motif — « ECONNRESET », « Connect Timeout
+  // Error » — là où le message de surface se réduit à « fetch failed ». Sans
+  // elle, impossible de distinguer une ressource supprimée d'un tunnel qui a
+  // lâché.
+  if (derniere instanceof Error) {
+    const cause = (derniere as { cause?: { message?: string } }).cause?.message;
+    if (cause && derniere.message === 'fetch failed') {
+      throw new Error(`${derniere.message} (${cause})`);
+    }
+    throw derniere;
+  }
+  throw new Error('injoignable');
 }
 
 const empreinteDe = (s: string) => createHash('sha256').update(s).digest('hex').slice(0, 16);
