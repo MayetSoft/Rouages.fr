@@ -170,6 +170,26 @@ export interface AcheteurMarches {
   liste: Marche[];
 }
 
+/**
+ * Les droits de mutation chez vous.
+ *
+ * La part communale est le point qui mérite l'attention : elle ne revient à la
+ * commune que si celle-ci dépasse 5 000 habitants. En dessous, la même taxe
+ * alimente un fonds de péréquation départemental, redistribué selon un barème
+ * voté par le conseil départemental. Le site connaît la population : il peut
+ * donc dire lequel des deux régimes s'applique, au lieu de décrire les deux.
+ */
+export interface Dmto {
+  annees: number[];
+  /** Recettes du département, en euros, par exercice. */
+  departement: (number | null)[];
+  /** Recettes de l'ensemble des communes du département, en euros. */
+  communes: (number | null)[];
+  /** Vrai si la part communale revient directement à la commune (art. 1584). */
+  partDirecte: boolean;
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -245,6 +265,8 @@ export interface Territoire {
   eau: ServiceEau | null;
   /** Les services publics implantés sur son territoire. */
   services: Services | null;
+  /** Ce que rapportent les droits de mutation dans le département. */
+  dmto: Dmto | null;
   /** L'obligation SRU, quand la commune y est soumise. */
   sru: Sru | null;
   /** La date de l'inventaire SRU. */
@@ -361,6 +383,20 @@ export interface Sru {
 }
 type SruDep = { maj: string; c: Record<string, Sru> };
 const sruDep = new Map<string, SruDep | null>();
+
+/**
+ * Ce que rapportent les droits de mutation, et à qui.
+ *
+ * Un fichier national : cent une lignes de deux séries pèsent moins qu'une
+ * requête de plus.
+ */
+type DmtoNational = {
+  annees: number[];
+  maj: string;
+  /** Code de département -> séries en milliers d'euros. */
+  d: Record<string, { dep: (number | null)[]; com: (number | null)[] }>;
+};
+let dmtoNational: DmtoNational | null = null;
 
 /** Les marchés publics des acheteurs du département, par SIREN. */
 type MarchesDep = {
@@ -526,6 +562,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   // Absent tant qu'aucun repère ne se mesure sur un groupement : le site doit
   // continuer à fonctionner sans, pas échouer.
   fluxGfp ??= await json<FichierFlux>(`${BASE}/flux.json`).catch(() => null);
+  dmtoNational ??= await json<DmtoNational>(`${BASE}/dmto.json`).catch(() => null);
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
@@ -628,6 +665,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),
+    dmto: assemblerDmto(commune, ligne[2]),
     sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
     sruMaj: sruDep.get(commune.dep)?.maj ?? null,
     marches: assemblerMarches(commune, structures),
@@ -672,6 +710,34 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
   if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
   for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
   return out;
+}
+
+/**
+ * Le seuil de 5 000 habitants décide du destinataire de la part communale.
+ *
+ * Au-dessus, l'article 1584 la verse à la commune ; au-dessous, l'article
+ * 1595 bis l'oriente vers un fonds départemental. Les stations de tourisme
+ * classées font exception et relèvent du premier régime quelle que soit leur
+ * taille — le site ne connaît pas ce classement, et le dit plutôt que de
+ * l'ignorer.
+ */
+const SEUIL_PART_COMMUNALE = 5000;
+
+function assemblerDmto(commune: CommuneBreve, population: number): Dmto | null {
+  const n = dmtoNational;
+  if (!n) return null;
+  const s = n.d[commune.dep];
+  if (!s) return null;
+  // Le fichier est en milliers d'euros : on rend des euros, le rendu décidera
+  // de l'échelle à afficher.
+  const enEuros = (l: (number | null)[]) => l.map((v) => (v === null ? null : v * 1000));
+  return {
+    annees: n.annees,
+    departement: enEuros(s.dep),
+    communes: enEuros(s.com),
+    partDirecte: population > SEUIL_PART_COMMUNALE,
+    maj: n.maj,
+  };
 }
 
 function assemblerMaire(commune: CommuneBreve): Maire | null {

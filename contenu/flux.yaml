@@ -187,3 +187,17 @@ flux:
     liens: [od-transport, code-transports]
     verifie_le: 2026-09-05
     confiance: etabli
+
+  # Le malentendu le plus répandu de la fiscalité locale : ce qu'on appelle
+  # « frais de notaire » est à environ 80 % de l'impôt, et cet impôt ne va pas
+  # au notaire. Il va au département et aux communes.
+  - id: dmto
+    nom: "Droits de mutation"
+    nature: argent
+    de: citoyen
+    vers: [departement, commune, notaire]
+    resume: "Payés à l'achat d'un logement et collectés par le notaire : l'essentiel revient au département, une part aux communes, une autre à l'État."
+    ordre_de_grandeur: "Première ressource fiscale propre des départements, et la plus sensible au marché immobilier."
+    liens: [wp-mutation, cgi-1594d, cgi-1584, cgi-1595bis, impots-enregistrement, od-dmto]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer

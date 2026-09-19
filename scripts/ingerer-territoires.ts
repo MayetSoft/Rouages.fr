@@ -366,6 +366,15 @@ async function principal() {
     ),
   );
 
+  // Les droits de mutation : ce que rapporte une vente immobilière, et à qui.
+  const { collecterDmto } = await import('./dmto-emettre.ts');
+  const dmto = await tenter('Droits de mutation', () =>
+    collecterDmto(
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   // L'inventaire SRU : l'obligation de logements sociaux, commune par commune.
   const { collecterSru } = await import('./sru-emettre.ts');
   const sru = await tenter('Inventaire SRU', () =>
@@ -400,6 +409,7 @@ async function principal() {
     elus,
     marches,
     sru,
+    dmto,
   );
 }
 
@@ -508,6 +518,7 @@ async function ecrire(
   elus: Awaited<ReturnType<typeof import('./elus-emettre.ts')['collecterMaires']>>,
   marches: Awaited<ReturnType<typeof import('./marches-emettre.ts')['collecterMarches']>>,
   sru: Awaited<ReturnType<typeof import('./sru-emettre.ts')['collecterSru']>>,
+  dmto: Awaited<ReturnType<typeof import('./dmto-emettre.ts')['collecterDmto']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -525,6 +536,7 @@ async function ecrire(
     elus,
     marches,
     sru,
+    dmto,
     sortie: SORTIE,
     dire,
     VERT,

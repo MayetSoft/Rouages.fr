@@ -368,6 +368,39 @@ Elle sert la ressource par pages de cent — 349 pages, environ 90 secondes — 
 l'ingestion refuse d'écrire si elle en a perdu plus d'un dixième : mieux vaut
 échouer que publier un annuaire troué.
 
+### Les « frais de notaire » sont un impôt ✔
+
+C'est le malentendu le plus répandu de la fiscalité locale, et le site est fait
+pour ce genre de chose. L'essentiel de ce qu'on appelle « frais de notaire » ne
+va pas au notaire : ce sont les droits de mutation, qu'il collecte et reverse au
+département et aux communes — deux échelons déjà décrits ici. Dans l'Allier :
+37,7 M€ pour le département en 2025, 9,2 M€ pour les communes du département.
+Et la série dit ce qu'un chiffre seul ne dirait pas : 42,7 M€ en 2021, 32,8 M€
+en 2024, un quart de la recette perdu en trois ans sur un budget départemental.
+
+**La part communale change de destinataire selon la taille de la commune**, et
+c'est le seul endroit du site où une règle de droit dépend de la population.
+Au-dessus de 5 000 habitants, l'article 1584 du CGI verse la taxe additionnelle
+à la commune ; en dessous, l'article 1595 bis l'oriente vers un fonds de
+péréquation départemental redistribué selon un barème voté par le conseil
+départemental. Le site connaît la population : il tranche au lieu de décrire les
+deux cas. Le Mayet-de-Montagne relève du second, Moulins du premier. Les
+stations de tourisme classées font exception, et le site ne connaît pas ce
+classement — il le dit.
+
+**Le taux voté par chaque département n'est pas recopié.** Il existe, dans un
+tableau officiel département par département, et le site y conduit. Recopier
+cent une valeurs révisées chaque année, c'est se condamner à les laisser
+vieillir : c'est exactement ce que le projet s'interdit ailleurs.
+
+Trois professions entrent au graphe avec le notaire, parce que l'État leur
+délègue une prérogative et que leur intervention est obligatoire, pas choisie :
+le notaire qui donne force authentique, le commissaire de justice sans qui un
+jugement gagné ne s'exécute pas, et le géomètre-expert seul habilité à fixer une
+limite de propriété — le cadastre sert l'impôt et ne délimite rien. Aucune étude
+n'est listée : le site renvoie vers l'annuaire de chaque profession, comme il le
+fait pour la gendarmerie ou la DDT.
+
 ### Le conseil juridique gratuit ✔
 
 2 524 points-justice — permanences d'avocat, de notaire, de conciliateur ou

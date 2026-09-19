@@ -72,6 +72,17 @@ surveillances:
   # Le recensement grossit d'année en année — 12 630 marchés notifiés en 2021,
   # 254 191 en 2025. Le seuil est donc large : c'est une chute qui alerterait,
   # pas une hausse.
+  # Une publication mensuelle : le total grossit d'environ 400 lignes par mois.
+  # C'est une chute qui alerterait, pas une hausse.
+  - id: dmto-recettes
+    nom: "Droits de mutation — recettes par attributaire"
+    alimente: "ce que rapporte une vente immobilière au département et aux communes"
+    type: opendatasoft-total
+    url: "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/dmto_attrib"
+    # Relevé au 19 septembre 2026, pas estimé.
+    attendu: 34935
+    lien: od-dmto
+
   - id: decp-marches
     nom: "Commande publique — marchés valides"
     alimente: "ce que commandent la commune et ses syndicats"

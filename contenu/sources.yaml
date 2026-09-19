@@ -233,3 +233,25 @@ sources:
   - { id: justice-fr-annuaire, type: page_officielle, titre: "Trouver un point-justice — justice.fr", url: "https://www.justice.fr/recherche/annuaires", consulte_le: 2026-09-19 }
   - { id: wp-aide-juridictionnelle, type: wikipedia, titre: "Aide juridictionnelle en France", url: "https://fr.wikipedia.org/wiki/Aide_juridictionnelle_en_France", consulte_le: 2026-09-19 }
   - { id: cdad-justice, type: page_officielle, titre: "Les conseils départementaux de l'accès au droit", url: "https://www.justice.gouv.fr/annuaire/lieux-daccueil-dinformation/conseils-departementaux-dacces-au-droit", consulte_le: 2026-09-19 }
+
+  # --- Les officiers publics et les professions réglementées -----------------
+  # Le site ne liste pas les études : il renvoie vers l'annuaire de chaque
+  # profession, comme il le fait pour la gendarmerie ou la DDT.
+  - { id: wp-notaire, type: wikipedia, titre: "Notaire en France", url: "https://fr.wikipedia.org/wiki/Notaire_en_France", consulte_le: 2026-09-19 }
+  - { id: annuaire-notaires, type: page_officielle, titre: "Annuaire des notaires — notaires.fr", url: "https://www.notaires.fr/fr/annuaire-notaires", consulte_le: 2026-09-19 }
+  - { id: wp-commissaire-justice, type: wikipedia, titre: "Commissaire de justice", url: "https://fr.wikipedia.org/wiki/Commissaire_de_justice", consulte_le: 2026-09-19 }
+  - { id: annuaire-commissaires-justice, type: page_officielle, titre: "Annuaire des commissaires de justice", url: "https://www.commissaire-justice.fr/annuaire/", consulte_le: 2026-09-19 }
+  - { id: wp-geometre-expert, type: wikipedia, titre: "Géomètre-expert", url: "https://fr.wikipedia.org/wiki/G%C3%A9om%C3%A8tre-expert", consulte_le: 2026-09-19 }
+  - { id: ordre-geometres, type: page_officielle, titre: "Ordre des géomètres-experts", url: "https://www.geometre-expert.fr/", consulte_le: 2026-09-19 }
+
+  # --- Les droits de mutation ------------------------------------------------
+  # Les trois articles qui font la répartition : le taux voté par le
+  # département, la part communale, et le fonds qui la remplace sous
+  # 5 000 habitants.
+  - { id: cgi-1594d, type: droit, titre: "CGI art. 1594 D — le taux voté par le conseil départemental", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000030024636", consulte_le: 2026-09-19 }
+  - { id: cgi-1584, type: droit, titre: "CGI art. 1584 — taxe additionnelle pour les communes de plus de 5 000 habitants", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044073354", consulte_le: 2026-09-19 }
+  - { id: cgi-1595bis, type: droit, titre: "CGI art. 1595 bis — le fonds de péréquation départemental, sous 5 000 habitants", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037100546", consulte_le: 2026-09-19 }
+  - { id: impots-enregistrement, type: page_officielle, titre: "Droits d'enregistrement : les taux en vigueur, département par département", url: "https://www.impots.gouv.fr/droits-denregistrement", consulte_le: 2026-09-19 }
+  - { id: od-dmto, type: donnees_ouvertes, titre: "Droits de mutation à titre onéreux — recettes mensuelles par attributaire", url: "https://data.economie.gouv.fr/explore/dataset/dmto_attrib/", consulte_le: 2026-09-19 }
+  - { id: wp-mutation, type: wikipedia, titre: "Mutation (droit)", url: "https://fr.wikipedia.org/wiki/Droit_de_mutation", consulte_le: 2026-09-19 }
+  - { id: wp-cgi, type: wikipedia, titre: "Code général des impôts", url: "https://fr.wikipedia.org/wiki/Code_g%C3%A9n%C3%A9ral_des_imp%C3%B4ts", consulte_le: 2026-09-19 }

@@ -817,3 +817,34 @@ competences:
     liens: [wp-reseau-initiative-publique, arcep-connexion, od-arcep-cartes, cgct-l1425-1]
     verifie_le: 2026-09-12
     confiance: etabli
+
+  # --- Ce que l'État délègue à des professions ------------------------------
+  - id: authentification-actes
+    nom: "Donner force authentique à un acte"
+    nom_court: "Acte authentique"
+    acteur: notaire
+    resume: "Vente, succession, donation, contrat de mariage : l'acte authentique fait foi jusqu'à inscription de faux et s'exécute sans passer par un juge."
+    partagee_avec: [citoyen, etat, tribunal-judiciaire]
+    liens: [wp-notaire, annuaire-notaires]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: execution-decisions
+    nom: "Signifier et exécuter une décision de justice"
+    nom_court: "Exécution d'un jugement"
+    acteur: commissaire-justice
+    resume: "Un jugement gagné ne s'applique pas tout seul : il faut le faire signifier puis exécuter, et cela ne peut passer que par un commissaire de justice."
+    partagee_avec: [citoyen, tribunal-judiciaire, prefet]
+    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: bornage
+    nom: "Fixer la limite d'une propriété"
+    nom_court: "Bornage"
+    acteur: geometre-expert
+    resume: "Le cadastre sert l'impôt, pas la propriété : il ne délimite rien juridiquement. Seul le bornage établi par un géomètre-expert fait foi entre voisins."
+    partagee_avec: [citoyen, petitionnaire, commune, dgfip]
+    liens: [wp-geometre-expert, ordre-geometres, code-urbanisme]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer

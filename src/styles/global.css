@@ -381,6 +381,12 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 /* --- ce qui est commandé ---
    Le montant à gauche, aligné et tabulaire : c'est lui qu'on balaie. L'objet
    porte l'information, la ligne grise en dessous la date et la procédure. */
+/* --- les droits de mutation ---
+   La phrase sur la part communale n'est pas une note de bas de page : c'est la
+   seule réponse du site qui change selon la taille de la commune. */
+.p-dmto { margin-top: 1.2rem; }
+.p-dmto-part { font-size: .84rem; line-height: 1.45; margin: .7rem 0 0; }
+
 /* --- l'obligation SRU ---
    La carence est la seule situation où l'État peut se substituer au maire :
    elle mérite l'encre d'alerte, le simple déficit non. */

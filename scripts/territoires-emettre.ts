@@ -23,6 +23,7 @@ import { ecrireEcoles, type Effectifs } from './ecoles-emettre.ts';
 import { ecrireElus, type Elus } from './elus-emettre.ts';
 import { ecrireMarches, type Marches } from './marches-emettre.ts';
 import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
+import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -86,6 +87,7 @@ export function emettre(o: {
   elus: Elus | null;
   marches: Marches | null;
   sru: InventaireSru | null;
+  dmto: Dmto | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -369,6 +371,11 @@ export function emettre(o: {
         ecolesEcrites += ecrireEcoles(sortie, dep, uais, o.effectifs);
       }
     }
+  }
+
+  if (o.dmto) {
+    const n = ecrireDmto(sortie, o.dmto);
+    dire(`${GRIS}Droits de mutation : ${n} départements chiffrés.${RAZ}`);
   }
 
   // --- les flux perçus par les groupements, dans leur propre fichier -----

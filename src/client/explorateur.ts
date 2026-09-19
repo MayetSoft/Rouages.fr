@@ -37,6 +37,7 @@ import {
   chercher as chercherCommune,
   memorisee,
   memoriser,
+  variation,
   resoudre,
   trouverParCode,
   type CommuneBreve,
@@ -736,6 +737,8 @@ function demarrer(reseau: Reseau) {
     if (argent) bloc.append(argent);
     const percus = blocFluxPercus();
     if (percus) bloc.append(percus);
+    const mutation = blocDmto();
+    if (mutation) bloc.append(mutation);
     const obligation = blocSru();
     if (obligation) bloc.append(obligation);
     const commandes = blocMarches();
@@ -1294,6 +1297,108 @@ function demarrer(reseau: Reseau) {
     return bloc;
   }
 
+  /**
+   * Les droits de mutation : ce qu'une vente rapporte, et à qui.
+   *
+   * C'est le malentendu le plus répandu de la fiscalité locale. Ce qu'on
+   * appelle « frais de notaire » est à environ 80 % de l'impôt, et cet impôt ne
+   * va pas au notaire : il va au département et aux communes — deux échelons
+   * que ce panneau décrit déjà. Le notaire le collecte et le reverse.
+   *
+   * La part communale est le point qui mérite l'attention, et le site peut
+   * trancher parce qu'il connaît la population : au-dessus de 5 000 habitants
+   * elle revient à la commune, en dessous elle alimente un fonds départemental
+   * redistribué selon un barème voté par le conseil départemental.
+   */
+  function blocDmto(): HTMLElement | null {
+    const d = territoire?.dmto;
+    if (!d) return null;
+    const dernier = d.departement.reduce<number>((k, v, i) => (v !== null ? i : k), -1);
+    if (dernier === -1) return null;
+
+    const bloc = document.createElement('section');
+    bloc.className = 'p-finances p-dmto';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce que rapporte une vente immobilière'));
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        `Les droits de mutation — l'essentiel de ce qu'on appelle « frais de notaire » — ` +
+          `sont un impôt, et le notaire ne fait que le collecter. Recettes de ` +
+          `${d.annees[dernier]}.`,
+      ),
+    );
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const rang = (nom: string, aide: string, serie: (number | null)[]) => {
+      const v = serie[dernier];
+      if (v === null || v === undefined) return;
+      const div = document.createElement('div');
+      const dt = document.createElement('dt');
+      dt.textContent = nom;
+      dt.title = aide;
+      const dd = document.createElement('dd');
+      dd.append(ligne('span', 'p-montant', montantCourt(v)));
+      const courbe = tendance(serie, d.annees, montantCourt);
+      if (courbe) {
+        const l = document.createElement('span');
+        l.className = 'p-tendance-ligne';
+        l.append(courbe);
+        const ev = variation(serie);
+        if (ev !== null) {
+          l.append(
+            ligne(
+              'span',
+              'p-evolution',
+              `${ev >= 0 ? '+' : '\u2212'}${Math.abs(ev)} % depuis ` +
+                `${debutSerie(serie, d.annees) ?? d.annees[0]}`,
+            ),
+          );
+        }
+        dd.append(l);
+      }
+      div.append(dt, dd);
+      dl.append(div);
+    };
+    rang(
+      'Au département',
+      "Taxe départementale de publicité foncière et droits départementaux d'enregistrement.",
+      d.departement,
+    );
+    rang(
+      'Aux communes du département',
+      'Taxe communale additionnelle, encaissée pour l’ensemble des communes du département.',
+      d.communes,
+    );
+    bloc.append(dl);
+
+    // Le seul endroit du site où une règle de droit change de réponse selon la
+    // population de la commune, et où le site sait laquelle s'applique.
+    bloc.append(
+      ligne(
+        'p',
+        'p-dmto-part',
+        d.partDirecte
+          ? `Votre commune dépassant 5 000 habitants, la part communale lui revient directement.`
+          : `Votre commune comptant 5 000 habitants ou moins, cette part ne lui revient pas ` +
+              `directement : elle alimente un fonds de péréquation départemental, redistribué ` +
+              `selon un barème voté par le conseil départemental. Les stations de tourisme ` +
+              `classées font exception, et le site ne connaît pas ce classement.`,
+      ),
+    );
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `Recettes mensuelles publiées par la direction générale des finances publiques, ` +
+          `totalisées par exercice complet (${d.maj}). Le taux voté par chaque conseil ` +
+          `départemental est publié à part : le site n'en recopie pas la table.`,
+      ),
+    );
+    return bloc;
+  }
+
   /** Une réglette : le trait est la médiane, le point la commune. */
   function reglette(valeur: number, mediane: number, reference = 'la médiane de la strate'): SVGSVGElement {
     const L = 108;
@@ -1324,7 +1429,17 @@ function demarrer(reseau: Reseau) {
    * comme une inflexion, pas comme un effondrement — ce qu'un cadrage sur les
    * seuls extrêmes ferait croire.
    */
-  function tendance(serie: (number | null)[], annees: number[]): SVGSVGElement | null {
+  function tendance(
+    serie: (number | null)[],
+    annees: number[],
+    /**
+     * Comment écrire un montant dans l'infobulle. Les repères communaux sont
+     * en euros par habitant et se lisent tels quels ; les droits de mutation
+     * se comptent en millions, où « 31 134 000 € » se déchiffre au lieu de se
+     * lire.
+     */
+    formater: (v: number) => string = (v) => `${v.toLocaleString('fr-FR')} \u20ac`,
+  ): SVGSVGElement | null {
     const points = serie
       .map((v, i) => ({ v, i }))
       .filter((p): p is { v: number; i: number } => p.v !== null);
@@ -1343,8 +1458,7 @@ function demarrer(reseau: Reseau) {
     const premier = points[0];
     const dernier = points[points.length - 1];
     titre.textContent =
-      `${annees[premier.i]} : ${premier.v.toLocaleString('fr-FR')} € · ` +
-      `${annees[dernier.i]} : ${dernier.v.toLocaleString('fr-FR')} €`;
+      `${annees[premier.i]} : ${formater(premier.v)} · ${annees[dernier.i]} : ${formater(dernier.v)}`;
     s.append(
       titre,
       el('path', { class: 'tendance-trait', d }),

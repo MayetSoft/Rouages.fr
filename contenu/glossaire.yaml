@@ -198,3 +198,17 @@ sigles:
     developpe: "Logement locatif social"
     definition: "L'unité comptée par l'inventaire SRU : un logement conventionné, loué sous plafond de ressources."
     liens: [od-sru, wp-hlm]
+
+  - id: sigle-cgi
+    sigle: CGI
+    developpe: "Code général des impôts"
+    definition: "Le code qui fixe l'assiette et le taux de chaque impôt, dont les droits payés sur une vente immobilière."
+    liens: [wp-cgi, cgi-1594d]
+
+  - id: sigle-dmto
+    sigle: DMTO
+    developpe: "Droits de mutation à titre onéreux"
+    # Pas de `noeud` : un flux est une arête du réseau, pas une fiche. Renvoyer
+    # vers le notaire ferait atterrir sur le collecteur plutôt que sur l'impôt.
+    definition: "L'impôt payé à l'achat d'un logement, collecté par le notaire et reversé au département et aux communes."
+    liens: [wp-mutation, cgi-1594d, od-dmto]

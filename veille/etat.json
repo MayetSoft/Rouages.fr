@@ -1,5 +1,5 @@
 {
-  "dernier_controle": "2026-09-18",
+  "dernier_controle": "2026-09-19",
   "constats": {
     "banatic-referentiel": {
       "empreinte": "a9d1b65dfa4eea62",
@@ -24,7 +24,11 @@
       "gravite": "ok"
     },
     "annuaire-education": {
-      "millesime": 68595,
+      "millesime": 68583,
+      "gravite": "ok"
+    },
+    "dmto-recettes": {
+      "millesime": 34935,
       "gravite": "ok"
     },
     "decp-marches": {

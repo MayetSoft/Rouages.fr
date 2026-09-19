@@ -701,3 +701,37 @@ acteurs:
     liens: [wp-versement-mobilite, code-transports]
     verifie_le: 2026-09-05
     confiance: a_confirmer
+
+  # --- Les officiers publics et ministériels -------------------------------
+  # Ce ne sont pas des entreprises ordinaires : l'État leur délègue une
+  # prérogative de puissance publique, et leur intervention est obligatoire —
+  # pas choisie. Ils sont donc des rouages, au même titre qu'un délégataire
+  # d'eau ou qu'un commissaire enquêteur, qui figurent déjà ici.
+  - id: notaire
+    nom: "Le notaire"
+    type: metier
+    echelon: prive
+    resume: "Officier public : il confère l'authenticité aux actes, et perçoit pour l'État, le département et les communes les droits dus sur les ventes et les successions."
+    liens: [wp-notaire, annuaire-notaires, cgi-1594d]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: commissaire-justice
+    nom: "Le commissaire de justice"
+    nom_court: "Commissaire de justice"
+    type: metier
+    echelon: prive
+    resume: "Huissier et commissaire-priseur judiciaire réunis depuis 2022 : il signifie les actes, dresse les constats et exécute les décisions de justice."
+    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: geometre-expert
+    nom: "Le géomètre-expert"
+    nom_court: "Géomètre-expert"
+    type: metier
+    echelon: prive
+    resume: "Seul habilité à fixer la limite d'une propriété : le bornage qu'il établit fait foi, là où un relevé quelconque n'engage personne."
+    liens: [wp-geometre-expert, ordre-geometres, code-urbanisme]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
