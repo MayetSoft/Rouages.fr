@@ -24,7 +24,7 @@
  * premiers chiffres sont le SIREN de l'acheteur, et le site connaît le SIREN
  * de chaque commune (découpage Etalab) comme de chaque groupement (BANATIC).
  */
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const DECP =
@@ -37,7 +37,18 @@ const DECP =
  */
 export const DEPUIS = '2023-01-01';
 
-/** Au-delà, la liste cesse d'informer : ce sont les plus récents qui disent ce qui se passe. */
+/**
+ * Ce que le fichier du département porte d'emblée : les plus récents, qui
+ * disent ce qui se passe en ce moment.
+ *
+ * Le reste n'est pas jeté pour autant — il l'était, et c'était un tort : 88 %
+ * des marchés n'atteignaient jamais le site, et la mention « les 5 plus
+ * récents » ne menait nulle part. La suite part dans un fichier par acheteur,
+ * chargé sur demande : le panneau reste léger pour qui ne clique pas, et
+ * complet pour qui clique. Un fichier par acheteur plutôt qu'un par
+ * département, parce qu'on ouvre la liste d'un acheteur, jamais celle de tout
+ * un département : 2 ko à télécharger dans le cas médian au lieu de 1,5 Mo.
+ */
 const PAR_ACHETEUR = 5;
 
 interface LigneDecp {
@@ -80,6 +91,13 @@ export const PROCEDURES = [
 export interface Marches {
   /** SIREN de l'acheteur -> ses marchés les plus récents. */
   parAcheteur: Map<string, Marche[]>;
+  /**
+   * SIREN -> tout ce qui vient après ces plus récents, dans le même ordre.
+   *
+   * Les cinq premiers ne sont pas répétés ici : le client les a déjà, et les
+   * redonner coûterait cinq millions d'octets pour rien.
+   */
+  suites: Map<string, Marche[]>;
   /** SIREN -> nombre total de marchés notifiés depuis `DEPUIS`, avant troncature. */
   totaux: Map<string, number>;
   depuis: string;
@@ -89,17 +107,45 @@ export interface Marches {
 const MAX_OBJET = 90;
 
 /**
- * Un caractère de remplacement traîne dans 3 603 objets sur 661 873 : `¿` y
- * tient la place d'une apostrophe — « d¿un tracteur », « D¿IMPRESSION ». C'est
- * un accident d'encodage à la source, toujours entre deux lettres, et le
- * remplacer là et seulement là ne peut rien abîmer d'autre.
+ * Ce que Windows-1252 devient quand on le lit comme du Latin-1.
+ *
+ * Les octets 0x80 à 0x9F portent en Windows-1252 l'apostrophe typographique,
+ * le tiret demi-cadratin, l'œ lié ; en Latin-1 ce sont des caractères de
+ * commande, et c'est sous cette forme qu'ils arrivent : « GROS \u008cUVRE »,
+ * « D\u0092ACTIONS ». 1 783 objets sur 369 872 en portent au moins un.
+ *
+ * La correction est sans perte et sans jugement : un caractère de commande
+ * n'a aucune raison d'être dans le libellé d'un marché, et la table de
+ * Windows-1252 dit exactement lequel était visé. Les deux positions vides de
+ * cette table restent telles quelles — trois objets, qu'on ne devine pas.
+ */
+const CP1252 = new Map<number, string>([
+  [0x80, '\u20ac'], [0x82, '\u201a'], [0x83, '\u0192'], [0x84, '\u201e'],
+  [0x85, '\u2026'], [0x86, '\u2020'], [0x87, '\u2021'], [0x88, '\u02c6'],
+  [0x89, '\u2030'], [0x8a, '\u0160'], [0x8b, '\u2039'], [0x8c, '\u0152'],
+  [0x8e, '\u017d'], [0x91, '\u2018'], [0x92, '\u2019'], [0x93, '\u201c'],
+  [0x94, '\u201d'], [0x95, '\u2022'], [0x96, '\u2013'], [0x97, '\u2014'],
+  [0x98, '\u02dc'], [0x99, '\u2122'], [0x9a, '\u0161'], [0x9b, '\u203a'],
+  [0x9c, '\u0153'], [0x9e, '\u017e'], [0x9f, '\u0178'],
+]);
+
+/**
+ * Deux accidents d'encodage, corrigés ; le reste, laissé tel quel.
+ *
+ * Le second : un caractère de remplacement traîne dans 3 603 objets sur
+ * 661 873, où `¿` tient la place d'une apostrophe — « d¿un tracteur »,
+ * « D¿IMPRESSION ». Toujours entre deux lettres, et le remplacer là et
+ * seulement là ne peut rien abîmer d'autre.
  *
  * Ce qu'on ne corrige pas : les majuscules sans accents, les fautes de frappe,
  * ni les libellés jumeaux d'un même marché publié deux fois. Le premier serait
  * de la réécriture, le dernier une devinette.
  */
 function nettoyer(objet: string): string {
-  return objet.replace(/(\p{L})\u00bf(\p{L})/gu, '$1\u2019$2').trim();
+  return objet
+    .replace(/[\u0080-\u009f]/g, (c) => CP1252.get(c.charCodeAt(0)) ?? c)
+    .replace(/(\p{L})\u00bf(\p{L})/gu, '$1\u2019$2')
+    .trim();
 }
 
 export async function collecterMarches(
@@ -158,11 +204,13 @@ export async function collecterMarches(
   }
 
   const parAcheteur = new Map<string, Marche[]>();
+  const suites = new Map<string, Marche[]>();
   for (const [siren, m] of brut) {
     const liste = [...m.values()].sort(
       (a, b) => b.date.localeCompare(a.date) || (b.montant ?? 0) - (a.montant ?? 0),
     );
     parAcheteur.set(siren, liste.slice(0, PAR_ACHETEUR));
+    if (liste.length > PAR_ACHETEUR) suites.set(siren, liste.slice(PAR_ACHETEUR));
   }
 
   if (inconnues.size > 0) {
@@ -178,7 +226,13 @@ export async function collecterMarches(
       `dont ${retenus.toLocaleString('fr-FR')} pour ${parAcheteur.size.toLocaleString('fr-FR')} ` +
       `acheteurs du bloc communal.`,
   );
-  return { parAcheteur, totaux, depuis: DEPUIS, maj: new Date().toISOString().slice(0, 10) };
+  return {
+    parAcheteur,
+    suites,
+    totaux,
+    depuis: DEPUIS,
+    maj: new Date().toISOString().slice(0, 10),
+  };
 }
 
 /**
@@ -221,5 +275,32 @@ export function ecrireMarches(
       h,
     }),
   );
+  return n;
+}
+
+/**
+ * La suite de la liste, un fichier par acheteur.
+ *
+ * Écrite une seule fois pour tout le pays, et non département par département :
+ * la métropole d'Aix-Marseille-Provence sert trois départements, et son fichier
+ * serait sinon écrit trois fois à l'identique.
+ *
+ * Le libellé des procédures n'y est pas répété : le client a déjà chargé le
+ * fichier du département — c'est lui qui affiche les cinq premiers marchés et
+ * porte le bouton — et le même index y figure.
+ *
+ * 6 708 fichiers, 47 Mo au total, 2 ko dans le cas médian. Seuls les acheteurs
+ * qui ont plus de cinq marchés en ont un : pour les autres, le fichier du
+ * département dit déjà tout.
+ */
+export function ecrireSuitesMarches(sortie: string, marches: Marches): number {
+  const dossier = join(sortie, 'marches');
+  mkdirSync(dossier, { recursive: true });
+  let n = 0;
+  for (const [siren, liste] of marches.suites) {
+    if (liste.length === 0) continue;
+    writeFileSync(join(dossier, `${siren}.json`), JSON.stringify({ m: liste }));
+    n++;
+  }
   return n;
 }

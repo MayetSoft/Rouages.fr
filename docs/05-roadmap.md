@@ -468,9 +468,36 @@ les lignes et pas de somme, et dit pourquoi.
 Deux limites de plus sont dites plutôt que corrigées : un même marché figure
 parfois deux fois sous deux libellés — le recensement n'est pas dédoublonné à
 la source, et un rapprochement approximatif serait une devinette ; et le
-recensement n'est complet que depuis 2023. Une seule correction est appliquée,
-parce qu'elle ne peut rien abîmer : `¿` tient lieu d'apostrophe dans 3 603
-objets, toujours entre deux lettres.
+recensement n'est complet que depuis 2023. Deux corrections seulement sont
+appliquées, parce qu'aucune ne peut rien abîmer : `¿` tient lieu d'apostrophe
+dans 3 603 objets, toujours entre deux lettres ; et les octets 0x80 à 0x9F de
+Windows-1252 arrivent lus comme du Latin-1, donc comme des caractères de
+commande — « GROS UVRE », « DACTIONS » — dans 1 783 objets sur
+369 872. Un caractère de commande n'a aucune raison d'être dans un libellé, et
+la table de Windows-1252 dit exactement lequel était visé.
+
+### Les 88 % de marchés qu'on ne montrait pas ✔
+
+Le fichier du département ne portait que les cinq marchés les plus récents de
+chaque acheteur : **49 804 lignes sur 419 052**, et la mention « les 5 plus
+récents » ne menait nulle part. Vichy Communauté en a 325, la ville de
+Marseille 5 523 — un lecteur ne pouvait en voir cinq.
+
+La suite de chaque liste a désormais son propre fichier, chargé au clic :
+**6 670 fichiers, 45 Mo, 2 ko dans le cas médian**. Un fichier par acheteur et
+non par département, parce qu'on ouvre la liste d'un acheteur, jamais celle de
+tout un département — et 2 ko à télécharger au lieu de 1,5 Mo. Les cinq
+premiers n'y sont pas répétés : le client les a déjà, et les redonner aurait
+coûté cinq mégaoctets pour rien.
+
+Côté panneau, le bouton se déplie par vingt-cinq et dit toujours combien il
+reste : « voir les 295 autres ». Une liste de 5 523 marchés dépliée d'un coup
+ne se lit pas, et fige le panneau sur un téléphone. Le décompte lui-même
+informe : c'est lui qui donne la mesure de ce qu'une collectivité commande.
+
+Le site passe ainsi de 36 000 à près de 43 000 fichiers, ce qui allonge
+l'envoi FTP complet sans changer le poids de la page : qui ne clique pas ne
+télécharge rien de plus.
 
 ### Une page par commune ✔
 

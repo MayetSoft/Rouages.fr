@@ -241,6 +241,26 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       Remonter plus loin laisserait croire qu’une commune ne commandait rien.
     </p>
 
+    <p class="mesure">
+      Les cinq marchés les plus récents de chaque acheteur sont affichés
+      d’emblée&nbsp;; la suite de la liste se charge au clic, par vingt-cinq.
+      Le fichier du département resterait sinon lourd pour tout le monde afin
+      que quelques lecteurs puissent dérouler les 5&nbsp;523 marchés de
+      Marseille. Le bouton dit toujours combien il reste&nbsp;: ce décompte est
+      lui-même une information sur ce que commande une collectivité.
+    </p>
+    <p class="mesure">
+      Deux accidents d’encodage sont corrigés, parce qu’aucun ne peut rien
+      abîmer&nbsp;: <code>¿</code> tient lieu d’apostrophe dans 3&nbsp;603
+      objets, toujours entre deux lettres&nbsp;; et les octets 0x80 à 0x9F de
+      Windows-1252 arrivent lus comme du Latin-1, donc comme des caractères de
+      commande, dans 1&nbsp;783 objets. Un caractère de commande n’a aucune
+      raison d’être dans le libellé d’un marché, et la table de Windows-1252
+      dit exactement lequel était visé. Les majuscules sans accents et les
+      fautes de frappe, en revanche, restent telles quelles&nbsp;: les
+      corriger serait réécrire.
+    </p>
+
     <h2 class="badge">Nommer le maire, sans nommer dans le graphe</h2>
     <p class="mesure">
       Le graphe décrit des fonctions&nbsp;: le nœud est «&nbsp;le

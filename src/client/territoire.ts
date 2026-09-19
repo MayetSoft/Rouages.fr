@@ -146,6 +146,8 @@ export interface Marche {
 }
 
 export interface AcheteurMarches {
+  /** Le SIREN, pour aller chercher la suite de la liste à la demande. */
+  siren: string;
   /** La commune elle-même, ou l'un de ses groupements. */
   nom: string;
   natureLibelle: string | null;
@@ -714,6 +716,7 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
     const e = d.h[siren];
     if (!e || e.m.length === 0) return;
     out.push({
+      siren,
       nom,
       natureLibelle,
       total: e.n,
@@ -730,6 +733,38 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
   if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
   for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
   return out;
+}
+
+/**
+ * La suite de la liste des marchés d'un acheteur, chargée quand on la demande.
+ *
+ * Le fichier du département ne porte que les cinq plus récents de chacun :
+ * emporter les quatre cent huit marchés de la communauté d'agglomération avec
+ * le reste du panneau ferait payer à tout le monde ce que peu de gens ouvrent.
+ * Le fichier par acheteur ne descend donc qu'au clic, et une fois.
+ *
+ * Les libellés de procédure viennent du fichier du département, déjà chargé :
+ * c'est lui qui a affiché les cinq premiers.
+ */
+const suitesMarches = new Map<string, Marche[]>();
+
+export async function suiteMarches(dep: string, siren: string): Promise<Marche[]> {
+  const deja = suitesMarches.get(siren);
+  if (deja) return deja;
+  const procedures = marchesDep.get(dep)?.procedures ?? [];
+  const f = await json<{ m: MarcheBrut[] }>(`${BASE}/marches/${siren}.json`).catch(() => null);
+  const liste = (f?.m ?? []).map((m) => ({
+    objet: m.objet,
+    montant: m.montant,
+    date: m.date,
+    procedure: procedures[m.procedure] ?? null,
+    lots: m.lots,
+  }));
+  // Un échec n'est pas mis en mémoire : aucun fichier n'est écrit vide, donc
+  // une liste vide ne peut venir que d'une requête ratée, et la retenir
+  // condamnerait le bouton pour le reste de la visite.
+  if (liste.length > 0) suitesMarches.set(siren, liste);
+  return liste;
 }
 
 /**

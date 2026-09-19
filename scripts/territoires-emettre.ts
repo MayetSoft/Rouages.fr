@@ -21,7 +21,7 @@ import { ecrireFinances, medianesParStrate, STRATES } from './finances-emettre.t
 import { ecrireFlux, type FluxGroupements } from './flux-emettre.ts';
 import { ecrireEcoles, type Effectifs } from './ecoles-emettre.ts';
 import { ecrireElus, type Elus } from './elus-emettre.ts';
-import { ecrireMarches, type Marches } from './marches-emettre.ts';
+import { ecrireMarches, ecrireSuitesMarches, type Marches } from './marches-emettre.ts';
 import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
@@ -493,7 +493,13 @@ export function emettre(o: {
     dire(`${GRIS}Inventaire SRU : ${sruEcrits.toLocaleString('fr-FR')} communes soumises.${RAZ}`);
   }
   if (o.marches) {
-    dire(`${GRIS}Marchés publics : ${marchesEcrits.toLocaleString('fr-FR')} acheteurs chiffrés.${RAZ}`);
+    // La suite des listes, un fichier par acheteur, écrite une fois pour tout
+    // le pays : un acheteur peut servir plusieurs départements.
+    const suites = ecrireSuitesMarches(sortie, o.marches);
+    dire(
+      `${GRIS}Marchés publics : ${marchesEcrits.toLocaleString('fr-FR')} acheteurs chiffrés, ` +
+        `${suites.toLocaleString('fr-FR')} listes complètes à la demande.${RAZ}`,
+    );
   }
   if (o.elus) {
     dire(`${GRIS}Maires : ${elusEcrits.toLocaleString('fr-FR')} communes nommées.${RAZ}`);

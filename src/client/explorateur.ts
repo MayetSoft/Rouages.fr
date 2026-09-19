@@ -39,8 +39,11 @@ import {
   memoriser,
   variation,
   resoudre,
+  suiteMarches,
   trouverParCode,
+  type AcheteurMarches,
   type CommuneBreve,
+  type Marche,
   type Territoire,
 } from './territoire.ts';
 
@@ -1289,28 +1292,102 @@ function demarrer(reseau: Reseau) {
         ligne(
           'span',
           'p-marche-total',
-          `${a.total} marché${a.total > 1 ? 's' : ''}${a.total > a.liste.length ? `, les ${a.liste.length} plus récents` : ''}`,
+          `${a.total.toLocaleString('fr-FR')} marché${a.total > 1 ? 's' : ''}` +
+            (a.total > a.liste.length ? `, les ${a.liste.length} plus récents` : ''),
         ),
       );
       groupe.append(titre);
 
       const ul = document.createElement('ul');
-      for (const m of a.liste) {
-        const li = document.createElement('li');
-        li.append(ligne('span', 'p-marche-montant', montantCourt(m.montant)));
-        const droite = document.createElement('span');
-        droite.append(ligne('span', 'p-marche-objet', m.objet));
-        const sous: string[] = [moisAnnee(m.date) ?? m.date];
-        if (m.procedure) sous.push(m.procedure.toLowerCase());
-        if (m.lots > 1) sous.push(`${m.lots} lots`);
-        droite.append(ligne('span', 'p-marche-detail', sous.join(' · ')));
-        li.append(droite);
-        ul.append(li);
-      }
+      for (const m of a.liste) ul.append(ligneMarche(m));
       groupe.append(ul);
+      // Les cinq premiers sont dans le fichier du département ; le reste a son
+      // propre fichier, et ne descend que si on le demande.
+      const suite = boutonSuite(a, ul);
+      if (suite) groupe.append(suite);
       bloc.append(groupe);
     }
     return bloc;
+  }
+
+  /** Une ligne de marché : le montant à gauche, l'objet et son contexte à droite. */
+  function ligneMarche(m: Marche): HTMLLIElement {
+    const li = document.createElement('li');
+    li.append(ligne('span', 'p-marche-montant', montantCourt(m.montant)));
+    const droite = document.createElement('span');
+    droite.append(ligne('span', 'p-marche-objet', m.objet));
+    const sous: string[] = [moisAnnee(m.date) ?? m.date];
+    if (m.procedure) sous.push(m.procedure.toLowerCase());
+    if (m.lots > 1) sous.push(`${m.lots} lots`);
+    droite.append(ligne('span', 'p-marche-detail', sous.join(' · ')));
+    li.append(droite);
+    return li;
+  }
+
+  /** Par pas de vingt-cinq : au-delà, on fait défiler sans plus rien lire. */
+  const PAS_MARCHES = 25;
+
+  /**
+   * « Voir les 403 autres ».
+   *
+   * Deux temps, délibérément. Le premier clic va chercher le fichier de
+   * l'acheteur — quelques kilo-octets, une fois ; les suivants n'ajoutent que
+   * vingt-cinq lignes de plus, parce qu'une liste de 5 523 marchés dépliée d'un
+   * coup ne se lit pas et fige le panneau sur un téléphone.
+   *
+   * Le bouton dit toujours combien il reste : c'est ce chiffre qui donne la
+   * mesure de ce qu'une collectivité commande, bien plus que les cinq lignes
+   * visibles.
+   */
+  function boutonSuite(a: AcheteurMarches, ul: HTMLUListElement): HTMLElement | null {
+    const dep = territoire?.commune.dep;
+    if (!dep || a.total <= a.liste.length) return null;
+    const bouton = document.createElement('button');
+    bouton.type = 'button';
+    bouton.className = 'p-marche-suite';
+    let affiches = a.liste.length;
+    let reste: Marche[] | null = null;
+    let echec: HTMLElement | null = null;
+
+    // Avant le chargement, le décompte du recensement — celui que porte
+    // l'en-tête. Après, le nombre exact de lignes : un accord-cadre publie une
+    // ligne par lot, le site les regroupe, et 1,4 % des lignes en réunissent
+    // plusieurs. L'écart est petit, et le corriger vaut mieux que promettre
+    // trois lignes qui ne viendront pas.
+    const direRestant = () => {
+      const fin = reste ? a.liste.length + reste.length : a.total;
+      bouton.textContent = `Voir les ${(fin - affiches).toLocaleString('fr-FR')} autres`;
+    };
+    direRestant();
+
+    bouton.addEventListener('click', async () => {
+      if (!reste) {
+        bouton.disabled = true;
+        bouton.textContent = 'Chargement…';
+        const charge = await suiteMarches(dep, a.siren);
+        bouton.disabled = false;
+        if (charge.length === 0) {
+          // Aucun fichier n'est écrit vide : une liste vide vient donc d'une
+          // requête qui a échoué. On le dit, et on laisse le bouton — un
+          // réseau qui revient doit pouvoir servir au clic suivant.
+          if (!echec) {
+            echec = ligne('p', 'p-marche-detail', 'La suite ne s\'est pas chargée. À réessayer.');
+            bouton.after(echec);
+          }
+          direRestant();
+          return;
+        }
+        echec?.remove();
+        echec = null;
+        reste = charge;
+      }
+      const lot = reste.slice(affiches - a.liste.length, affiches - a.liste.length + PAS_MARCHES);
+      for (const m of lot) ul.append(ligneMarche(m));
+      affiches += lot.length;
+      if (affiches >= a.liste.length + reste.length) bouton.remove();
+      else direRestant();
+    });
+    return bouton;
   }
 
   /**

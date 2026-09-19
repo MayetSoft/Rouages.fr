@@ -427,9 +427,19 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
 .p-marche-montant { font-variant-numeric: tabular-nums; font-weight: 650; font-size: .86rem; text-align: right; }
 .p-marche-objet { display: block; font-size: .84rem; line-height: 1.35; }
 .p-marche-detail { display: block; font-size: .74rem; color: var(--encre-tres-douce); }
+/* Le bouton qui déplie la suite de la liste. Aligné sur la colonne des objets
+   plutôt que sur le bord : il prolonge la liste, il n'ouvre pas autre chose. */
+.p-marche-suite {
+  font: inherit; font-size: .8rem; margin: .5rem 0 0 5.2rem; padding: 0;
+  background: none; border: 0; text-align: left; color: var(--accent); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.p-marche-suite:hover, .p-marche-suite:focus-visible { color: var(--encre); }
+.p-marche-suite[disabled] { color: var(--encre-tres-douce); cursor: progress; text-decoration: none; }
 @media (max-width: 480px) {
   .p-marches li { grid-template-columns: 1fr; gap: .05rem; }
   .p-marche-montant { text-align: left; }
+  .p-marche-suite { margin-left: 0; }
 }
 .p-prix-eau { margin: .7rem 0 0; display: grid; gap: .1rem; }
 .p-prix { font-size: 1.15rem; font-weight: 650; font-variant-numeric: tabular-nums; }
