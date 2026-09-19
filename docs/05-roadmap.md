@@ -368,6 +368,23 @@ Elle sert la ressource par pages de cent — 349 pages, environ 90 secondes — 
 l'ingestion refuse d'écrire si elle en a perdu plus d'un dixième : mieux vaut
 échouer que publier un annuaire troué.
 
+### Le conseil juridique gratuit ✔
+
+2 524 points-justice — permanences d'avocat, de notaire, de conciliateur ou
+d'association, gratuites, coordonnées par le conseil départemental de l'accès
+au droit. Ils étaient déjà dans l'annuaire que le site ingère : il ne les
+lisait pas.
+
+Le travail n'a pas été de les collecter mais de **généraliser le voisinage**.
+Une école est dans la commune ou elle n'y est pas ; un point-justice existe par
+bassin de vie. Le mécanisme qui signalait les France services des communes
+voisines ne servait qu'à elles ; il vaut maintenant pour toute famille qui le
+mérite. Au Mayet-de-Montagne, le panneau répond « aucun dans la commune —
+Saint-Germain-des-Fossés, Saint-Yorre » là où il n'aurait rien dit.
+
+Les 110 points-justice installés en détention sont écartés : ils ne sont pas
+ouverts au public. Dans l'Allier, 18 des 20 recensés sont retenus.
+
 ### L'obligation de logements sociaux ✔
 
 L'article 55 de la loi SRU est l'une des rares obligations à la fois chiffrée,

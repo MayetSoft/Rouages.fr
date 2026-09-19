@@ -220,7 +220,7 @@ export interface Services {
    * `communes` est vide quand elles sont trop nombreuses pour être nommées
    * utilement — seul `nombre` est alors renseigné.
    */
-  franceServicesVoisines: { nombre: number; communes: string[] };
+  voisines: Map<string, { nombre: number; communes: string[] }>;
   /**
    * Le service d'incendie compétent. Les casernes n'existent pas en open data
    * national : l'annuaire ne publie que les états-majors départementaux.
@@ -330,7 +330,8 @@ type ServicesDep = {
   /** [famille, nom, drapeau] — et le numéro UAI en quatrième pour une école. */
   c: Record<string, ([number, string, number] | [number, string, number, string])[]>;
   sdis?: string;
-  fs?: Record<string, { n: number; l: string[] }>;
+  /** code INSEE -> famille -> ce que les communes voisines accueillent. */
+  v?: Record<string, Record<string, { n: number; l: string[] }>>;
 };
 
 /** Les effectifs des écoles du département, par numéro UAI. */
@@ -754,15 +755,17 @@ export function assemblerServices(commune: CommuneBreve): Services | null {
   for (const l of parFamille.values()) {
     l.sort((a, b) => Number(b.urgences) - Number(a.urgences) || a.nom.localeCompare(b.nom, 'fr'));
   }
-  const brut = dep.fs?.[commune.code];
-  const voisines = { nombre: brut?.n ?? 0, communes: brut?.l ?? [] };
+  const voisines = new Map<string, { nombre: number; communes: string[] }>();
+  for (const [famille, brut] of Object.entries(dep.v?.[commune.code] ?? {})) {
+    if (brut.n > 0) voisines.set(famille, { nombre: brut.n, communes: brut.l ?? [] });
+  }
   const services: Services = {
     parFamille,
-    franceServicesVoisines: voisines,
+    voisines,
     sdis: dep.sdis ?? m.sdis?.[commune.dep] ?? null,
     maj: dep.maj,
   };
-  const vide = parFamille.size === 0 && voisines.nombre === 0 && services.sdis === null;
+  const vide = parFamille.size === 0 && voisines.size === 0 && services.sdis === null;
   return vide ? null : services;
 }
 

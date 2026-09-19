@@ -37,7 +37,19 @@ export const FAMILLES_SERVICE = [
   'france-services',
   'ccas',
   'sante',
+  'point-justice',
 ] as const;
+
+/**
+ * Les familles qu'on signale aussi dans les communes voisines.
+ *
+ * Une école est dans la commune ou n'y est pas. Un point-justice ou une France
+ * services, non : il y en a un par bassin de vie, et ne rien afficher quand il
+ * n'est pas sur place revient à répondre « rien » à quelqu'un qui a un
+ * interlocuteur à vingt kilomètres. Au Mayet-de-Montagne, les plus proches
+ * sont à Lapalisse et Saint-Yorre.
+ */
+export const FAMILLES_VOISINAGE: readonly FamilleService[] = ['france-services', 'point-justice'];
 export type FamilleService = (typeof FAMILLES_SERVICE)[number];
 
 export interface Service {
@@ -148,7 +160,11 @@ export async function collecterServices(
   const organismes = await json<Organisme[]>(
     'https://api-lannuaire.service-public.fr/api/explore/v2.1/catalog/datasets/api-lannuaire-administration/exports/json' +
       '?select=nom,pivot,code_insee_commune' +
-      '&where=pivot%20like%20%22france_services%22%20or%20pivot%20like%20%22sdis%22%20or%20pivot%20like%20%22ccas%22',
+      '&where=' +
+      encodeURIComponent(
+        'pivot like "france_services" or pivot like "sdis" or pivot like "ccas" ' +
+          'or pivot like "point_justice"',
+      ),
   );
   for (const o of organismes) {
     if (!o.nom) continue;
@@ -163,6 +179,8 @@ export async function collecterServices(
       ajouter(insee, { famille: 'france-services', nom: sansSuffixeCommune(o.nom) });
     } else if (types.includes('ccas')) {
       ajouter(insee, { famille: 'ccas', nom: sansSuffixeCommune(o.nom) });
+    } else if (types.includes('point_justice') && !enDetention(o.nom)) {
+      ajouter(insee, { famille: 'point-justice', nom: sansSuffixeCommune(o.nom) });
     }
   }
   dire(`Annuaire de l'administration : ${organismes.length.toLocaleString('fr-FR')} organismes lus.`);
@@ -194,6 +212,19 @@ export async function collecterServices(
 export const FINESS =
   'https://static.data.gouv.fr/resources/referentiel-finess-t-finess/20260519-105542/t-finess.csv';
 
+/**
+ * Un point-justice installé dans une prison n'est pas ouvert au public.
+ *
+ * 110 des 2 524 le sont — maisons d'arrêt, centres pénitentiaires, quartiers
+ * de détention. Les afficher comme un service accessible près de chez soi
+ * enverrait quelqu'un devant une porte qui ne s'ouvrira pas. Le tri se fait sur
+ * le nom, faute d'un champ qui le dise : grossier, mais le libellé de
+ * l'annuaire est constant sur ce point.
+ */
+function enDetention(nom: string): boolean {
+  return /p[ée]nitentiaire|maison d[’']arr[êe]t|d[ée]tention/i.test(nom);
+}
+
 /** Au-delà, on donne le nombre de communes plutôt que leur liste. */
 export const MAX_VOISINES = 3;
 
@@ -201,15 +232,16 @@ export const MAX_VOISINES = 3;
  * Un fichier par département, comme pour l'eau et les finances : le client ne
  * télécharge que le sien.
  *
- * `fs` porte les France services du reste de l'intercommunalité — celles qui
- * ne sont pas dans la commune mais qui la concernent quand même.
+ * `v` porte les services du reste de l'intercommunalité — ceux qui ne sont pas
+ * dans la commune mais qui la concernent quand même, indexés par famille.
  */
 export function ecrireServices(
   sortie: string,
   dep: string,
   codes: string[],
   services: Services,
-  franceServicesVoisines: Map<string, { nom: string; commune: string }[]>,
+  /** famille -> code INSEE -> ce que les communes voisines accueillent. */
+  voisinsParFamille: Map<string, Map<string, { nom: string; commune: string }[]>>,
 ): number {
   const c: Record<string, ([number, string, number] | [number, string, number, string])[]> = {};
   let n = 0;
@@ -246,17 +278,24 @@ export function ecrireServices(
     );
     n += l.length;
   }
-  const voisines: Record<string, { n: number; l: string[] }> = {};
-  for (const code of codes) {
-    const v = franceServicesVoisines.get(code);
-    if (!v || v.length === 0) continue;
-    // Plusieurs France services dans la même commune ne font qu'un endroit où
-    // aller : c'est la commune qui compte, pas le guichet.
-    const communes = [...new Set(v.map((x) => x.commune))].sort((a, b) => a.localeCompare(b, 'fr'));
-    voisines[code] = {
-      n: communes.length,
-      l: communes.length <= MAX_VOISINES ? communes : [],
-    };
+  const voisines: Record<string, Record<string, { n: number; l: string[] }>> = {};
+  for (const famille of FAMILLES_VOISINAGE) {
+    const parCode = voisinsParFamille.get(famille);
+    if (!parCode) continue;
+    for (const code of codes) {
+      const v = parCode.get(code);
+      if (!v || v.length === 0) continue;
+      // Plusieurs guichets dans la même commune ne font qu'un endroit où
+      // aller : c'est la commune qui compte, pas le guichet.
+      const communes = [...new Set(v.map((x) => x.commune))].sort((a, b) =>
+        a.localeCompare(b, 'fr'),
+      );
+      if (!voisines[code]) voisines[code] = {};
+      voisines[code][famille] = {
+        n: communes.length,
+        l: communes.length <= MAX_VOISINES ? communes : [],
+      };
+    }
   }
   writeFileSync(
     join(sortie, 'dep', `${dep}-services.json`),
@@ -265,7 +304,7 @@ export function ecrireServices(
       maj: services.maj,
       c,
       ...(services.sdis.has(dep) ? { sdis: services.sdis.get(dep) } : {}),
-      ...(Object.keys(voisines).length > 0 ? { fs: voisines } : {}),
+      ...(Object.keys(voisines).length > 0 ? { v: voisines } : {}),
     }),
   );
   return n;

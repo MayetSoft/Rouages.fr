@@ -666,6 +666,22 @@ competences:
     verifie_le: 2026-09-11
     confiance: a_confirmer
 
+  # L'acteur retenu est le tribunal judiciaire parce que le conseil
+  # départemental de l'accès au droit est un groupement d'intérêt public présidé
+  # de droit par le président du tribunal judiciaire du chef-lieu, et
+  # vice-présidé par le procureur. C'est lui qui finance et coordonne les
+  # permanences tenues dans les points-justice. Le CDAD n'a pas son propre nœud :
+  # ce serait un organe de plus pour une seule relation.
+  - id: acces-au-droit
+    nom: "Accès gratuit au droit"
+    nom_court: "Accès au droit"
+    acteur: tribunal-judiciaire
+    resume: "Une permanence gratuite pour comprendre ses droits avant d'aller plus loin : avocat, notaire, conciliateur ou association, selon le jour et le lieu."
+    partagee_avec: [citoyen, conciliateur-justice, france-services, departement]
+    liens: [justice-fr-annuaire, cdad-justice, wp-aide-juridictionnelle]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
   - id: reglement-amiable
     nom: "Règlement amiable d'un litige"
     nom_court: "Règlement amiable"

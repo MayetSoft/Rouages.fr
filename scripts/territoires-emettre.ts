@@ -28,6 +28,7 @@ import {
   ecrireServices,
   replierArrondissements,
   FAMILLES_SERVICE,
+  FAMILLES_VOISINAGE,
   type Services,
 } from './services-emettre.ts';
 
@@ -227,15 +228,19 @@ export function emettre(o: {
     const epci = closure(c.siren!).find((s) => A_FISCALITE_PROPRE.has(groupements.get(s)?.nature ?? ''));
     if (epci) epciDe.set(c.code, epci);
   }
-  const fsParEpci = new Map<string, { nom: string; commune: string; code: string }[]>();
+  // famille -> EPCI -> les guichets que ses communes accueillent. Une école ne
+  // s'y trouve pas : elle est dans la commune ou elle n'y est pas.
+  const parEpci = new Map<string, Map<string, { nom: string; commune: string; code: string }[]>>();
   if (services) {
+    for (const famille of FAMILLES_VOISINAGE) parEpci.set(famille, new Map());
     for (const c of communes) {
       const epci = epciDe.get(c.code);
       if (!epci) continue;
       for (const s of services.parCommune.get(c.code) ?? []) {
-        if (s.famille !== 'france-services') continue;
-        if (!fsParEpci.has(epci)) fsParEpci.set(epci, []);
-        fsParEpci.get(epci)!.push({ nom: s.nom, commune: c.nom, code: c.code });
+        const index = parEpci.get(s.famille);
+        if (!index) continue;
+        if (!index.has(epci)) index.set(epci, []);
+        index.get(epci)!.push({ nom: s.nom, commune: c.nom, code: c.code });
       }
     }
   }
@@ -334,14 +339,22 @@ export function emettre(o: {
     }
 
     if (services) {
-      const voisines = new Map<string, { nom: string; commune: string }[]>();
-      for (const c of liste) {
-        const epci = epciDe.get(c.code);
-        if (!epci) continue;
-        const autres = (fsParEpci.get(epci) ?? []).filter((f) => f.code !== c.code);
-        if (autres.length > 0) {
-          voisines.set(c.code, autres.map((f) => ({ nom: f.nom, commune: f.commune })));
+      const voisines = new Map<string, Map<string, { nom: string; commune: string }[]>>();
+      for (const famille of FAMILLES_VOISINAGE) {
+        const index = parEpci.get(famille);
+        if (!index) continue;
+        const parCode = new Map<string, { nom: string; commune: string }[]>();
+        for (const c of liste) {
+          const epci = epciDe.get(c.code);
+          if (!epci) continue;
+          // Sans la commune elle-même : ce bloc ne sert qu'à dire ce qui se
+          // trouve ailleurs, le reste du panneau nomme déjà ce qui est sur place.
+          const autres = (index.get(epci) ?? []).filter((f) => f.code !== c.code);
+          if (autres.length > 0) {
+            parCode.set(c.code, autres.map((f) => ({ nom: f.nom, commune: f.commune })));
+          }
         }
+        voisines.set(famille, parCode);
       }
       servicesEcrits += ecrireServices(sortie, dep, liste.map((c) => c.code), services, voisines);
 

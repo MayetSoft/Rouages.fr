@@ -92,6 +92,16 @@ const LIBELLE_FAMILLE: [string, (n: number) => string][] = [
   ['france-services', (n) => (n > 1 ? `${n} France services` : 'Une France services')],
   ['ccas', () => 'Action sociale'],
   ['sante', (n) => (n > 1 ? `${n} établissements de santé` : 'Un établissement de santé')],
+  ['point-justice', (n) => (n > 1 ? `${n} points-justice` : 'Un point-justice')],
+];
+
+/**
+ * Les familles qu'on signale aussi dans les communes voisines, avec de quoi
+ * écrire la phrase : le libellé, et l'article qui s'accorde avec lui.
+ */
+const VOISINAGE: [string, string, 'un' | 'une'][] = [
+  ['france-services', 'France services', 'une'],
+  ['point-justice', 'Point-justice', 'un'],
 ];
 
 /** Au-delà, la liste d'une famille se replie derrière son décompte. */
@@ -799,8 +809,13 @@ function demarrer(reseau: Reseau) {
       }
     }
 
-    const voisines = s.franceServicesVoisines;
-    if (!s.parFamille.has('france-services') && voisines.nombre > 0) {
+    // Ce qui n'est pas dans la commune mais la concerne quand même. Un
+    // point-justice ou une France services existe par bassin de vie : ne rien
+    // afficher quand il n'est pas sur place reviendrait à répondre « rien » à
+    // quelqu'un qui a un interlocuteur à vingt kilomètres.
+    for (const [famille, libelle, article] of VOISINAGE) {
+      const v = s.voisines.get(famille);
+      if (!v || s.parFamille.has(famille) || v.nombre === 0) continue;
       const p = document.createElement('p');
       p.className = 'p-service-voisin';
       // Le nom de commune est présenté après un deux-points plutôt qu'après une
@@ -808,12 +823,12 @@ function demarrer(reseau: Reseau) {
       // correctement demanderait de connaître le genre et l'article de 34 875
       // noms de communes.
       const ou =
-        voisines.communes.length > 0
-          ? `Dans votre intercommunalité : ${voisines.communes.join(', ')}.`
-          : `${voisines.nombre} communes de votre intercommunalité en accueillent une.`;
+        v.communes.length > 0
+          ? `Dans votre intercommunalité : ${v.communes.join(', ')}.`
+          : `${v.nombre} communes de votre intercommunalité en accueillent ${article}.`;
       p.append(
-        ligne('span', 'p-service-famille', 'France services'),
-        ligne('span', '', `aucune dans la commune. ${ou}`),
+        ligne('span', 'p-service-famille', libelle),
+        ligne('span', '', `${article === 'une' ? 'aucune' : 'aucun'} dans la commune. ${ou}`),
       );
       bloc.append(p);
     }
