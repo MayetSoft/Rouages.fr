@@ -255,3 +255,43 @@ sources:
   - { id: od-dmto, type: donnees_ouvertes, titre: "Droits de mutation à titre onéreux — recettes mensuelles par attributaire", url: "https://data.economie.gouv.fr/explore/dataset/dmto_attrib/", consulte_le: 2026-09-19 }
   - { id: wp-mutation, type: wikipedia, titre: "Mutation (droit)", url: "https://fr.wikipedia.org/wiki/Droit_de_mutation", consulte_le: 2026-09-19 }
   - { id: wp-cgi, type: wikipedia, titre: "Code général des impôts", url: "https://fr.wikipedia.org/wiki/Code_g%C3%A9n%C3%A9ral_des_imp%C3%B4ts", consulte_le: 2026-09-19 }
+
+  # --- Ce que fait le département ------------------------------------------
+  # L'échelon que les gens touchent le plus souvent sans le savoir : le RSA,
+  # l'autonomie, le handicap, l'enfance, les collèges, les routes.
+  - { id: wp-rsa, type: wikipedia, titre: "Revenu de solidarité active", url: "https://fr.wikipedia.org/wiki/Revenu_de_solidarit%C3%A9_active", consulte_le: 2026-09-19 }
+  - { id: sp-rsa, type: page_officielle, titre: "Revenu de solidarité active — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/N19775", consulte_le: 2026-09-19 }
+  - { id: wp-apa, type: wikipedia, titre: "Allocation personnalisée d'autonomie", url: "https://fr.wikipedia.org/wiki/Allocation_personnalis%C3%A9e_d%27autonomie", consulte_le: 2026-09-19 }
+  - { id: sp-apa, type: page_officielle, titre: "Allocation personnalisée d'autonomie — service-public.fr", url: "https://www.service-public.fr/particuliers/vosdroits/F10009", consulte_le: 2026-09-19 }
+  - { id: wp-mdph, type: wikipedia, titre: "Maison départementale des personnes handicapées", url: "https://fr.wikipedia.org/wiki/Maison_d%C3%A9partementale_des_personnes_handicap%C3%A9es", consulte_le: 2026-09-19 }
+  - { id: wp-ase, type: wikipedia, titre: "Aide sociale à l'enfance", url: "https://fr.wikipedia.org/wiki/Aide_sociale_%C3%A0_l%27enfance", consulte_le: 2026-09-19 }
+  - { id: wp-pmi, type: wikipedia, titre: "Protection maternelle et infantile", url: "https://fr.wikipedia.org/wiki/Protection_maternelle_et_infantile", consulte_le: 2026-09-19 }
+  - { id: wp-college, type: wikipedia, titre: "Collège en France", url: "https://fr.wikipedia.org/wiki/Coll%C3%A8ge_en_France", consulte_le: 2026-09-19 }
+  - { id: wp-route-departementale, type: wikipedia, titre: "Route départementale", url: "https://fr.wikipedia.org/wiki/Route_d%C3%A9partementale", consulte_le: 2026-09-19 }
+
+  # --- Ce que fait la région -------------------------------------------------
+  - { id: wp-lycee, type: wikipedia, titre: "Lycée en France", url: "https://fr.wikipedia.org/wiki/Lyc%C3%A9e_en_France", consulte_le: 2026-09-19 }
+  - { id: wp-ter, type: wikipedia, titre: "Transport express régional", url: "https://fr.wikipedia.org/wiki/Transport_express_r%C3%A9gional", consulte_le: 2026-09-19 }
+  - { id: wp-loi-notre-2, type: wikipedia, titre: "Loi NOTRe — la répartition des compétences depuis 2015", url: "https://fr.wikipedia.org/wiki/Loi_NOTRe", consulte_le: 2026-09-19 }
+  - { id: ct-l3111-9, type: droit, titre: "Code des transports, art. L3111-9 — la région peut confier le transport scolaire par convention", url: "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000031104433", consulte_le: 2026-09-19 }
+  - { id: code-travail, type: droit, titre: "Code du travail — rôle des régions dans la formation professionnelle", url: "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006160817/", consulte_le: 2026-09-19 }
+  - { id: wp-france-travail, type: wikipedia, titre: "France Travail", url: "https://fr.wikipedia.org/wiki/France_Travail", consulte_le: 2026-09-19 }
+  - { id: france-travail-fr, type: page_officielle, titre: "France Travail", url: "https://www.francetravail.fr/", consulte_le: 2026-09-19 }
+  - { id: wp-mission-locale, type: wikipedia, titre: "Mission locale", url: "https://fr.wikipedia.org/wiki/Mission_locale", consulte_le: 2026-09-19 }
+
+  # --- Les démarches que l'on fait vraiment ----------------------------------
+  # service-public.fr a migré vers service-public.gouv.fr : les anciennes URL
+  # redirigent, les nouvelles fiches sont enregistrées sous le nouveau domaine.
+  - { id: sp-inscription-ecole, type: page_officielle, titre: "Inscrire son enfant à l'école primaire (élémentaire)", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F1865", consulte_le: 2026-09-19 }
+  - { id: sp-logement-social, type: page_officielle, titre: "Quelles sont les conditions pour obtenir un logement social ?", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F869", consulte_le: 2026-09-19 }
+  - { id: sp-listes-electorales, type: page_officielle, titre: "Listes électorales : en cas de première inscription", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F1367", consulte_le: 2026-09-19 }
+  - { id: sp-mediateur-eau, type: page_officielle, titre: "Médiateur de l'eau : comment y recourir ?", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F20762", consulte_le: 2026-09-19 }
+  - { id: sp-fuite-eau, type: page_officielle, titre: "Demander le plafonnement de sa facture d'eau après une fuite", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/R33731", consulte_le: 2026-09-19 }
+  - { id: mediation-eau-fr, type: page_officielle, titre: "La Médiation de l'eau", url: "https://www.mediation-eau.fr/", consulte_le: 2026-09-19 }
+  - { id: decret-fuites-eau, type: droit, titre: "Décret n° 2012-1078 du 24 septembre 2012 — facturation en cas de fuite après compteur", url: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000026417603", consulte_le: 2026-09-19 }
+  - { id: code-electoral, type: droit, titre: "Code électoral", url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070239/", consulte_le: 2026-09-19 }
+  - { id: insee-reu, type: page_officielle, titre: "Le répertoire électoral unique — Insee", url: "https://www.insee.fr/fr/information/3539086", consulte_le: 2026-09-19 }
+  - { id: wp-procedures-electorales, type: wikipedia, titre: "Procédures électorales françaises", url: "https://fr.wikipedia.org/wiki/Proc%C3%A9dures_%C3%A9lectorales_fran%C3%A7aises", consulte_le: 2026-09-19 }
+  - { id: wp-droit-logement, type: wikipedia, titre: "Droit au logement — dont le droit au logement opposable", url: "https://fr.wikipedia.org/wiki/Droit_au_logement", consulte_le: 2026-09-19 }
+  - { id: wp-mediation-consommation, type: wikipedia, titre: "Médiation de la consommation", url: "https://fr.wikipedia.org/wiki/M%C3%A9diation_de_la_consommation", consulte_le: 2026-09-19 }
+  - { id: loi-inscription-electorale, type: droit, titre: "Loi n° 2016-1048 du 1er août 2016 rénovant les modalités d'inscription sur les listes électorales", url: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000032958104", consulte_le: 2026-09-19 }

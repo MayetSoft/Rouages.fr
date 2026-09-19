@@ -472,6 +472,83 @@ recensement n'est complet que depuis 2023. Une seule correction est appliquée,
 parce qu'elle ne peut rien abîmer : `¿` tient lieu d'apostrophe dans 3 603
 objets, toujours entre deux lettres.
 
+### Une page par commune ✔
+
+Le panneau « chez vous » répondait déjà, mais il ne répondait qu'à qui
+exécutait le JavaScript et savait qu'il existait. 34 875 communes n'avaient
+aucune adresse propre : rien à envoyer à un voisin, rien à indexer, rien à
+ouvrir depuis un moteur de recherche.
+
+Chaque commune a désormais sa page statique, `/commune/03165` pour
+Le Mayet-de-Montagne, construite au build à partir des mêmes fichiers que le
+panneau. Le verdict — qui exerce réellement chaque compétence — a été sorti
+dans `src/modele/verdict.ts` pour que les deux rendus ne puissent pas diverger :
+une seule fonction, deux appelants.
+
+Le coût est réel et il est mesuré : **35 954 fichiers, 455 Mo, 108 secondes de
+build**, environ 10 Ko par page, et de l'ordre d'une demi-heure de miroir FTP
+complet. Le déploiement est passé à huit transferts parallèles pour tenir.
+
+Le plan de site suit la même arithmétique : un index, un plan des pages du
+réseau, puis un plan par département. Un fichier unique serait sous la limite
+de 50 000 URL, mais sans aucune marge.
+
+### Les comptes du département et de la région ✔
+
+Le site nommait le département à chaque écran — le collège, la route, le revenu
+de solidarité active, l'aide à l'autonomie — sans jamais montrer ce qu'il
+dépense. Un lecteur pouvait connaître les six repères financiers de sa commune
+de 1 400 habitants et rien de l'échelon qui décide de son collège.
+
+Les mêmes agrégats de l'OFGL sont désormais lus pour les 97 départements et les
+17 régions qu'il publie, sur huit exercices, et affichés sous les comptes
+communaux avec la médiane de l'échelon. Deux précautions :
+
+- **le budget principal seulement.** 230 391 lignes sur 318 638 sont des
+  budgets annexes — un domaine, un laboratoire, un service d'incendie. Les
+  additionner gonflerait tout sans rien expliquer.
+- **« Impôts locaux » est retiré à ces deux échelons.** La part départementale
+  de la taxe foncière est passée aux communes en 2021 ; départements et régions
+  sont depuis compensés par une fraction de TVA, que cet agrégat ne porte pas.
+  Il reste 65 € par habitant dans l'Allier contre 375 en 2020, et des valeurs
+  *négatives* pour les régions — une écriture de restitution, pas un impôt.
+  Afficher cela sous ce libellé ferait conclure qu'un département ne lève
+  presque rien : vrai de l'agrégat, faux de ses recettes. Le repère est donc
+  absent et la raison écrite dans le code qui l'écarte.
+
+Les explications des repères ne sont pas recopiées non plus : celles de
+`reperes.yaml` sont écrites pour une commune — « ce que l'État verse à la
+commune » — et diraient autre chose que le chiffre affiché sous les comptes
+d'un département.
+
+### Cinq démarches de plus ✔
+
+Le site savait décrire un permis de construire et une enquête publique, c'est-à-
+dire ce qu'on subit. Il ne disait rien de ce qu'on demande. Cinq processus
+comblent le trou, chacun avec ses leviers d'action et ses pièges :
+
+- **inscrire un enfant à l'école** — la mairie inscrit, le directeur admet :
+  deux actes, deux autorités, et un refus possible de chaque côté ;
+- **demander le revenu de solidarité active** — le département décide, la
+  caisse verse, France Travail accompagne. Écrire à la caisse pour contester
+  fait perdre le délai ;
+- **demander un logement social** — la date du premier enregistrement fixe
+  l'ancienneté, et une part des logements est attribuée par des réservataires
+  que le bailleur ne choisit pas ;
+- **contester une facture d'eau** — le plafonnement après fuite n'est jamais
+  automatique, et la médiation exige une réclamation écrite préalable ;
+- **s'inscrire sur la liste électorale** — depuis 2019 le maire décide seul,
+  le recours devant la commission de contrôle est un préalable obligatoire, et
+  c'est le juge judiciaire qui tranche.
+
+Deux acteurs et une compétence sont apparus avec eux : la Médiation de l'eau,
+la commission de contrôle des listes électorales, et la tenue de la liste
+électorale — une compétence que la commune exerce au nom de l'État, sans code
+BANATIC, donc absente de la résolution territoriale et présente dans le réseau.
+
+Les fiches `service-public.fr` sont enregistrées sous `service-public.gouv.fr` :
+le portail a migré, les anciennes adresses redirigent.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

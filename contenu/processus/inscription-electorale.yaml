@@ -1,0 +1,114 @@
+# S'inscrire sur la liste électorale, et voter.
+# Depuis 2019 c'est le maire qui décide seul, l'Insee qui tient le répertoire,
+# et une commission qui contrôle après coup. Le calendrier a changé aussi : on
+# ne s'inscrit plus avant le 31 décembre, mais jusqu'au sixième vendredi qui
+# précède le scrutin.
+documents:
+  - id: carte-electorale
+    nom: "La carte électorale"
+    resume: "Envoyée après l'inscription. Elle n'est pas exigée pour voter : la pièce d'identité l'est."
+    ou_le_trouver: "Adressée par la mairie."
+    liens: [code-electoral, sp-listes-electorales]
+  - id: liste-emargement
+    nom: "La liste d'émargement"
+    resume: "Signée à chaque vote. Communicable pendant dix jours après le scrutin, elle permet de vérifier qui a voté."
+    ou_le_trouver: "Préfecture, sous-préfecture ou mairie, dans les dix jours suivant le scrutin."
+    liens: [code-electoral, cada]
+
+processus:
+  - id: inscription-electorale
+    nom: "L'inscription sur la liste électorale"
+    famille: publics
+    resume: "Qui décide de l'inscription depuis la réforme de 2019, jusqu'à quand on peut s'inscrire, et comment se conteste une radiation."
+    declencheur: "Un déménagement, une majorité, une naturalisation, ou un scrutin qui approche"
+    sortie: "Une inscription au répertoire électoral unique, dans un bureau de vote donné"
+    decideur: maire
+    competences: [listes-electorales, etat-civil]
+    liens: [code-electoral, insee-reu, sp-listes-electorales, loi-inscription-electorale]
+    verifie_le: 2026-09-19
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Demande d'inscription, en ligne ou en mairie"
+        note: "L'inscription est automatique à dix-huit ans lorsque le recensement citoyen a été fait à seize ans, et après une naturalisation. Dans tous les autres cas — un déménagement, notamment — elle se demande."
+        liens: [sp-listes-electorales, code-electoral]
+        confiance: a_confirmer
+      - ordre: 2
+        acteur: maire
+        action: "Décision d'inscription ou de refus"
+        delai: { valeur: 5, unite: jours, nature: maximum_legal }
+        note: "Depuis 2019, le maire décide seul : la commission administrative qui statuait avant n'existe plus. La décision est transmise à l'Insee, qui tient le répertoire national."
+        liens: [code-electoral, insee-reu]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: commission-controle-listes
+        action: "Contrôle a posteriori et examen des recours"
+        note: "La commission vérifie la régularité de la liste et statue sur le recours de l'électeur contre une décision du maire. Elle peut inscrire un électeur omis ou radier une inscription indue."
+        liens: [code-electoral, insee-reu]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: commune
+        action: "Publication de la liste et tenue du bureau de vote"
+        produit: [carte-electorale, liste-emargement]
+        note: "Le bureau de vote est présidé par le maire ou son représentant. Tout électeur de la commune peut être désigné assesseur, et tout électeur du département peut être délégué d'un candidat."
+        liens: [code-electoral, wp-procedures-electorales]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: tribunal-judiciaire
+        action: "Contentieux de l'inscription"
+        conditionnelle: true
+        note: "Le juge judiciaire tranche les litiges sur les listes électorales — pas le juge administratif, contrairement à ce que la nature communale de la décision laisserait croire."
+        liens: [code-electoral, code-organisation-judiciaire, justice-fr]
+        confiance: a_confirmer
+
+    leviers:
+      - id: s-inscrire-avant-le-scrutin
+        quoi: "S'inscrire avant la clôture des listes"
+        quand: "Jusqu'au sixième vendredi précédant le scrutin, en règle générale"
+        aupres_de: "La mairie, ou le service en ligne"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "La date du 31 décembre n'a plus cours depuis 2019. Certaines situations — déménagement professionnel, majorité récente — ouvrent en outre un délai plus tardif, jusqu'au dixième jour précédant le scrutin."
+        liens: [sp-listes-electorales, code-electoral, loi-inscription-electorale]
+        confiance: a_confirmer
+      - id: verifier-son-inscription
+        quoi: "Vérifier sa situation électorale au répertoire national"
+        quand: "À tout moment, et systématiquement après un déménagement"
+        aupres_de: "Le service en ligne de vérification"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Un déménagement dans la même commune ne se propage pas tout seul : l'électeur reste rattaché à son ancien bureau de vote tant qu'il ne le signale pas."
+        liens: [sp-listes-electorales, insee-reu]
+        confiance: a_confirmer
+      - id: contester-une-radiation
+        quoi: "Contester une radiation ou un refus d'inscription"
+        quand: "Dans les délais indiqués sur la décision du maire"
+        aupres_de: "La commission de contrôle de la commune"
+        difficulte: moyenne
+        ancre_etape: 3
+        recours_si_refus: "Tribunal judiciaire"
+        piege: "Le recours devant la commission est un préalable obligatoire : saisir directement le juge fait rejeter la demande sans examen du fond."
+        liens: [code-electoral, wp-recours-administratif, justice-fr]
+        confiance: a_confirmer
+      - id: tenir-un-bureau-de-vote
+        quoi: "Être assesseur ou délégué dans un bureau de vote"
+        quand: "En amont du scrutin, auprès de la mairie ou d'un candidat"
+        aupres_de: "La mairie, ou le candidat que l'on souhaite représenter"
+        difficulte: faible
+        ancre_etape: 4
+        piege: "C'est la seule façon de voir le dépouillement de l'intérieur, et les communes manquent d'assesseurs presque à chaque scrutin."
+        liens: [code-electoral, wp-procedures-electorales]
+        confiance: a_confirmer
+      - id: consulter-la-liste-d-emargement
+        quoi: "Consulter la liste d'émargement après le scrutin"
+        quand: "Dans les dix jours qui suivent le vote"
+        aupres_de: "La mairie"
+        difficulte: moyenne
+        ancre_etape: 4
+        recours_si_refus: "Saisir la CADA"
+        piege: "C'est le document qui permet de vérifier une procuration contestée ou un vote qu'on n'a pas exprimé. Passé les dix jours, la liste rejoint les archives et n'est plus communicable avant cinquante ans."
+        liens: [code-electoral, cada, crpa]
+        confiance: a_confirmer

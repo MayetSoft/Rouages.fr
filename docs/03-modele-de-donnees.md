@@ -76,6 +76,13 @@ l'intégration continue :
    elle a attrapé DGFiP dès sa mise en place.
 7. Un nœud dépassant sa date de revérification déclenche un avertissement, et
    fait échouer le contrôle hebdomadaire de fraîcheur.
+8. **Un `id` ne sert qu'une fois, d'une famille de nœuds à l'autre.** Acteurs,
+   compétences, documents et processus partagent une seule table dans le
+   réseau : un document et un processus qui porteraient le même `id` ne se
+   signaleraient pas, l'un remplacerait l'autre et sa page disparaîtrait sans
+   bruit. Les sources sont hors de cette règle — elles sont citées, jamais
+   affichées comme nœud, et `cada` désigne légitimement l'autorité comme la
+   page qui la décrit.
 
 Ces règles sont la ligne éditoriale rendue exécutable. C'est ce qui permet
 d'accepter des contributions extérieures sans relire chaque virgule.

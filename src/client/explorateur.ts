@@ -699,6 +699,15 @@ function demarrer(reseau: Reseau) {
 
     // Vue d'ensemble : toutes les compétences que ce territoire déplace.
     bloc.append(ligne('h3', 'p-titre-section', `Chez vous, à ${territoire.commune.nom}`));
+    // La page de la commune est l'adresse de tout ceci : c'est elle qu'on
+    // partage, et c'est elle que les moteurs lisent. Le panneau y conduit.
+    const permalienCommune = document.createElement('p');
+    permalienCommune.className = 'p-permalien-commune';
+    const versCommune = document.createElement('a');
+    versCommune.href = `/commune/${territoire.commune.code}`;
+    versCommune.textContent = 'La page de cette commune, sans JavaScript';
+    permalienCommune.append(versCommune);
+    bloc.append(permalienCommune);
     const qui = blocMaire();
     if (qui) bloc.append(qui);
     const resolvables = reseau.noeuds.filter((n) => n.banatic && n.banatic.length > 0);
@@ -737,6 +746,8 @@ function demarrer(reseau: Reseau) {
     if (argent) bloc.append(argent);
     const percus = blocFluxPercus();
     if (percus) bloc.append(percus);
+    const echelons = blocEchelons();
+    if (echelons) bloc.append(echelons);
     const mutation = blocDmto();
     if (mutation) bloc.append(mutation);
     const obligation = blocSru();
@@ -960,6 +971,109 @@ function demarrer(reseau: Reseau) {
       dl.append(d);
     }
     bloc.append(dl);
+    return bloc;
+  }
+
+  /**
+   * Les comptes du département, puis ceux de la région.
+   *
+   * Le panneau nomme le département à chaque écran — pour les collèges, les
+   * routes, l'aide sociale — sans jamais dire ce qu'il dépense. Ces deux
+   * échelons décident d'une part de ce qui arrive à un habitant, et leurs
+   * comptes sont publics au même endroit que ceux de la commune.
+   *
+   * Pas de strate ici : ils sont trop peu nombreux pour qu'une strate ait un
+   * sens. La médiane porte sur l'échelon entier — l'OFGL en publie 97 et 17 —
+   * et le bloc dit sur combien de collectivités elle porte.
+   */
+  function blocEchelons(): HTMLElement | null {
+    const comptes = territoire?.comptesEchelons;
+    if (!comptes || comptes.length === 0) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-finances p-echelons';
+    bloc.append(ligne('h4', 'p-titre-bloc', 'Les comptes des échelons au-dessus'));
+
+    for (const c of comptes) {
+      const lignes = c.reperes.filter((r) => r.valeur !== null);
+      if (lignes.length === 0) continue;
+      const derniere = c.annees[c.annees.length - 1];
+      bloc.append(ligne('h5', 'p-titre-echelon', `${c.nom}, en ${derniere}`));
+      bloc.append(
+        ligne(
+          'p',
+          'p-strate',
+          `Par habitant, et rapportés aux ${c.effectif.toLocaleString('fr-FR')} ` +
+            `collectivités du même échelon.`,
+        ),
+      );
+
+      const dl = document.createElement('dl');
+      dl.className = 'p-reperes';
+      for (const r of lignes) {
+        const d = document.createElement('div');
+        const dt = document.createElement('dt');
+        dt.textContent = r.nom;
+        const dd = document.createElement('dd');
+        dd.append(
+          ligne(
+            'span',
+            'p-montant',
+            `${r.valeur!.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} €`,
+          ),
+        );
+        if (r.mediane !== null && r.mediane > 0) {
+          // Quand le repère n'est pas renseigné partout, la médiane ne porte que
+          // sur ceux qui le déclarent, et le dire évite de faire passer une
+          // poignée de cas particuliers pour la norme de l'échelon.
+          const partiel = r.effectif > 0 && r.effectif < c.effectif;
+          dd.append(
+            reglette(
+              r.valeur!,
+              r.mediane,
+              partiel ? 'la médiane de celles qui en déclarent' : "la médiane de l'échelon",
+            ),
+          );
+          dd.append(
+            ligne(
+              'span',
+              'p-mediane',
+              `médiane ${r.mediane.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} €` +
+                (partiel ? ` sur ${r.effectif.toLocaleString('fr-FR')}` : ''),
+            ),
+          );
+        }
+        const courbe = tendance(r.serie, c.annees);
+        if (courbe) {
+          const rang = document.createElement('span');
+          rang.className = 'p-tendance-ligne';
+          rang.append(courbe);
+          if (r.evolution !== null) {
+            rang.append(
+              ligne(
+                'span',
+                'p-evolution',
+                `${r.evolution >= 0 ? '+' : '\u2212'}${Math.abs(r.evolution)} % depuis ` +
+                  `${debutSerie(r.serie, c.annees) ?? c.annees[0]}`,
+              ),
+            );
+          }
+          dd.append(rang);
+        }
+        d.append(dt, dd);
+        dl.append(d);
+      }
+      bloc.append(dl);
+    }
+    if (!bloc.querySelector('dl')) return null;
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les comptes des collectivités publiés par l'OFGL` +
+          (territoire?.echelonsMaj ? ` (${territoire.echelonsMaj})` : '') +
+          `, budget principal seul — les budgets annexes sont comptés à part.`,
+      ),
+    );
     return bloc;
   }
 

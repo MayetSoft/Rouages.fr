@@ -10,6 +10,16 @@
  * France entière pour chercher sa commune.
  */
 
+import {
+  origineVerdict,
+  resumerVerdict,
+  verdictDe,
+  type StructureExercante,
+  type Verdict,
+} from '../modele/verdict.ts';
+
+export { origineVerdict, resumerVerdict, type Verdict };
+
 export interface CommuneBreve {
   code: string;
   nom: string;
@@ -24,39 +34,14 @@ export interface CommuneBreve {
   population: number;
 }
 
-export interface Structure {
-  siren: string;
-  nom: string;
-  /** Code de nature juridique : CC, CU, SIVU, PETR… */
-  nature: string;
-  natureLibelle: string;
-  /** Compétences de Rouages que cette structure exerce ici. */
+/**
+ * Une structure telle que le panneau l'affiche : ce dont le verdict a besoin,
+ * plus la liste de ce qu'elle exerce ici — utile au panneau, inutile à la
+ * décision, donc absente du modèle partagé.
+ */
+export interface Structure extends StructureExercante {
   competences: string[];
 }
-
-/**
- * Ce qu'on peut dire d'une compétence sur un territoire donné.
- *
- * Trois états, pas deux. Le registre a des trous : dans la Sarthe, 15 % des
- * communes seulement ont un exerçant identifié pour la concession électrique,
- * contre 94 % au niveau national. Conclure « la commune s'en charge » y serait
- * faux — et faux avec aplomb, ce qui est le pire défaut possible pour ce site.
- */
-export type Verdict =
-  | { etat: 'transferee'; structures: Structure[] }
-  /**
-   * La loi transfère cette compétence de plein droit à cette catégorie
-   * d'intercommunalité, que le registre l'ait enregistré ou non.
-   */
-  | { etat: 'transferee-par-loi'; structures: Structure[] }
-  /**
-   * Personne ne s'en est saisi localement, et la loi désigne alors un échelon
-   * supérieur — la région pour la mobilité. C'est une réponse, pas un aveu
-   * d'ignorance : `qui` la nomme.
-   */
-  | { etat: 'a-defaut'; echelon: 'region' | 'departement' | 'etat'; qui: string }
-  | { etat: 'communale' }
-  | { etat: 'non-renseigne'; couvertureDep: number; couvertureNationale: number };
 
 export interface Repere {
   id: string;
@@ -190,6 +175,33 @@ export interface Dmto {
   maj: string;
 }
 
+/**
+ * Les comptes d'un échelon supérieur, prêts à afficher.
+ *
+ * La médiane porte sur toutes les collectivités du même échelon que l'OFGL
+ * publie — 97 départements, 17 régions. Pas de strate de population ici : il
+ * n'y en a pas assez pour qu'une strate ait un sens, et la comparaison directe
+ * reste lisible tant qu'on dit sur combien elle porte.
+ */
+export interface ComptesEchelon {
+  /** « le département de l'Allier », « la région Auvergne-Rhône-Alpes ». */
+  nom: string;
+  annees: number[];
+  /** La taille de l'échelon, pour situer la comparaison. */
+  effectif: number;
+  reperes: (Repere & {
+    /**
+     * Combien de collectivités entrent dans la médiane de *ce* repère.
+     *
+     * Les régions n'ont plus de dotation globale de fonctionnement depuis
+     * 2018 : quelques-unes en déclarent encore une, et annoncer « médiane des
+     * dix-sept régions » sous ce repère ferait passer une poignée de cas
+     * particuliers pour la norme.
+     */
+    effectif: number;
+  })[];
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -265,6 +277,10 @@ export interface Territoire {
   eau: ServiceEau | null;
   /** Les services publics implantés sur son territoire. */
   services: Services | null;
+  /** Les comptes du département, puis ceux de la région. */
+  comptesEchelons: ComptesEchelon[];
+  /** La date de lecture des comptes des échelons supérieurs. */
+  echelonsMaj: string | null;
   /** Ce que rapportent les droits de mutation dans le département. */
   dmto: Dmto | null;
   /** L'obligation SRU, quand la commune y est soumise. */
@@ -328,6 +344,8 @@ let meta: {
   aDefaut?: Record<string, 'region' | 'departement' | 'etat'>;
   /** Département -> nom de sa région. */
   regions?: Record<string, string>;
+  /** Département -> code de sa région, pour retrouver ses comptes. */
+  codesRegion?: Record<string, string>;
   finances?: MetaFinances;
   eau?: { annee: number; indicateur: string; competence: string; prixMedian: number | null };
   services?: {
@@ -397,6 +415,27 @@ type DmtoNational = {
   d: Record<string, { dep: (number | null)[]; com: (number | null)[] }>;
 };
 let dmtoNational: DmtoNational | null = null;
+
+/**
+ * Les comptes du département et de la région : mêmes repères qu'à l'échelon
+ * communal, pour que les ordres de grandeur se comparent d'un coup d'œil.
+ */
+type ComptesFichier = {
+  annees: number[];
+  medianes: (number | null)[];
+  /** Combien de collectivités entrent dans chaque médiane. */
+  effectifs: number[];
+  /** La taille de l'échelon tel que l'OFGL le publie. */
+  effectif: number;
+  h: Record<string, (number | null)[][]>;
+};
+type EchelonsFichier = {
+  maj: string;
+  reperes: { id: string; nom: string }[];
+  departements: ComptesFichier | null;
+  regions: ComptesFichier | null;
+};
+let echelons: EchelonsFichier | null = null;
 
 /** Les marchés publics des acheteurs du département, par SIREN. */
 type MarchesDep = {
@@ -563,6 +602,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   // continuer à fonctionner sans, pas échouer.
   fluxGfp ??= await json<FichierFlux>(`${BASE}/flux.json`).catch(() => null);
   dmtoNational ??= await json<DmtoNational>(`${BASE}/dmto.json`).catch(() => null);
+  echelons ??= await json<EchelonsFichier>(`${BASE}/echelons.json`).catch(() => null);
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
@@ -618,42 +658,20 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
    * décroche nettement signale un trou de saisie, pas 350 communes qui auraient
    * gardé la compétence.
    */
-  const verdict = (competence: string): Verdict => {
-    const trouves = parCompetence.get(competence);
-    if (trouves && trouves.length > 0) return { etat: 'transferee', structures: trouves };
-
-    // Avant de conclure quoi que ce soit du silence du registre : la loi a
-    // peut-être déjà tranché. 54 % seulement des intercommunalités à fiscalité
-    // propre déclarent à BANATIC le développement économique, que la loi leur
-    // impose pourtant à toutes depuis 2017 — répondre « la commune » y était
-    // faux presque une fois sur deux.
-    const natures = meta!.obligatoires?.[competence] ?? [];
-    if (natures.length > 0) {
-      const tenues = structures.filter((s) => natures.includes(s.nature));
-      if (tenues.length > 0) return { etat: 'transferee-par-loi', structures: tenues };
-    }
-
-    // Quand la loi désigne un échelon à défaut, il répond avant qu'on aille
-    // conclure « la commune » ou « non renseigné » : c'est lui qui est
-    // compétent, la question n'est pas ouverte.
-    const defaut = meta!.aDefaut?.[competence];
-    if (defaut) {
-      const qui =
-        defaut === 'region'
-          ? (meta!.regions?.[commune.dep] ?? 'la région')
-          : defaut === 'departement'
-            ? (commune.depNom ?? 'le département')
-            : "l'État";
-      return { etat: 'a-defaut', echelon: defaut, qui };
-    }
-
-    const dansLeDep = dep.couverture?.[competence] ?? 0;
-    const enFrance = meta!.couverture?.[competence] ?? 0;
-    if (enFrance >= 0.5 && dansLeDep < enFrance * 0.5) {
-      return { etat: 'non-renseigne', couvertureDep: dansLeDep, couvertureNationale: enFrance };
-    }
-    return { etat: 'communale' };
-  };
+  // La décision elle-même est dans `src/modele/verdict.ts` : la page statique
+  // de chaque commune la consulte aussi, et deux copies finiraient par se
+  // contredire. Ici on ne fait que rassembler ce dont elle a besoin.
+  const verdict = (competence: string): Verdict =>
+    verdictDe({
+      exercants: parCompetence.get(competence) ?? [],
+      structures,
+      obligatoirePour: meta!.obligatoires?.[competence] ?? [],
+      aDefaut: meta!.aDefaut?.[competence],
+      region: meta!.regions?.[commune.dep],
+      departement: commune.depNom,
+      couvertureDep: dep.couverture?.[competence] ?? 0,
+      couvertureNationale: meta!.couverture?.[competence] ?? 0,
+    });
 
   return {
     commune,
@@ -665,6 +683,8 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     finances: assemblerFinances(commune, ligne[2]),
     eau: assemblerEau(commune),
     services: assemblerServices(commune),
+    comptesEchelons: assemblerEchelons(commune),
+    echelonsMaj: echelons?.maj ?? null,
     dmto: assemblerDmto(commune, ligne[2]),
     sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
     sruMaj: sruDep.get(commune.dep)?.maj ?? null,
@@ -722,6 +742,50 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
  * l'ignorer.
  */
 const SEUIL_PART_COMMUNALE = 5000;
+
+/**
+ * Les comptes du département puis ceux de la région.
+ *
+ * Dans cet ordre : le département est celui qu'on touche le plus souvent sans
+ * le savoir, et c'est de lui qu'on part quand on remonte d'une commune.
+ */
+function assemblerEchelons(commune: CommuneBreve): ComptesEchelon[] {
+  const e = echelons;
+  if (!e) return [];
+  const out: ComptesEchelon[] = [];
+  const lire = (c: ComptesFichier | null, code: string | undefined, nom: string) => {
+    if (!c || !code) return;
+    const series = c.h[code];
+    if (!series) return;
+    const dernier = c.annees.length - 1;
+    out.push({
+      nom,
+      annees: c.annees,
+      effectif: c.effectif,
+      reperes: e.reperes.map((r, i) => {
+        const serie = series[i] ?? [];
+        return {
+          ...r,
+          // Les explications de `reperes.yaml` parlent de la commune : elles
+          // seraient fausses ici, et le bloc dit lui-même ce qu'il montre.
+          explication: '',
+          valeur: serie[dernier] ?? null,
+          mediane: c.medianes[i] ?? null,
+          effectif: c.effectifs?.[i] ?? c.effectif,
+          serie,
+          evolution: variation(serie),
+        };
+      }),
+    });
+  };
+  lire(e.departements, commune.dep, `Le département — ${commune.depNom}`);
+  // Le nom pour l'afficher, le code pour retrouver la ligne de comptes :
+  // `meta.json` porte les deux, département par département.
+  const nomRegion = meta?.regions?.[commune.dep];
+  const codeRegion = meta?.codesRegion?.[commune.dep];
+  if (nomRegion) lire(e.regions, codeRegion, `La région — ${nomRegion}`);
+  return out;
+}
 
 function assemblerDmto(commune: CommuneBreve, population: number): Dmto | null {
   const n = dmtoNational;
@@ -929,59 +993,7 @@ export function variation(serie: (number | null)[]): number | null {
   return Math.round(((fin - debut) / Math.abs(debut)) * 100);
 }
 
-/**
- * Le verdict en une phrase.
- *
- * Le panneau rend chaque état avec ses nuances — une liste de structures, une
- * incise sur la loi, une réserve. Un signalement d'erreur, lui, a besoin d'une
- * seule ligne : celle que le lecteur conteste, recopiable telle quelle dans
- * l'issue. Les deux rendus ne peuvent pas diverger sur le fond, le compilateur
- * exigeant de chacun qu'il traite les cinq états.
- */
-export function resumerVerdict(v: Verdict): string {
-  switch (v.etat) {
-    case 'transferee':
-      return v.structures.map((s) => `${s.nom} (${s.natureLibelle})`).join(' · ');
-    case 'transferee-par-loi':
-      return (
-        v.structures.map((s) => `${s.nom} (${s.natureLibelle})`).join(' · ') +
-        ' — transfert prévu de plein droit par la loi'
-      );
-    case 'a-defaut':
-      return `${v.qui} — la loi l'y oblige à défaut`;
-    case 'communale':
-      return 'la commune (aucun transfert enregistré)';
-    case 'non-renseigne':
-      return (
-        `non renseigné ici — ${Math.round(v.couvertureDep * 100)} % des communes du ` +
-        `département ont un exerçant identifié, contre ` +
-        `${Math.round(v.couvertureNationale * 100)} % en France`
-      );
-  }
-}
 
-/**
- * D'où sort la réponse.
- *
- * Écrire « d'après BANATIC » sous une réponse que le registre ne contient pas
- * serait une fausse citation — c'est précisément le cas des transferts de
- * plein droit et des compétences exercées à défaut. Chaque état nomme sa
- * propre origine.
- */
-export function origineVerdict(v: Verdict, maj: string): string {
-  switch (v.etat) {
-    case 'transferee':
-      return `transferts déclarés à BANATIC, mise à jour ${maj}`;
-    case 'transferee-par-loi':
-      return `la loi, qui opère le transfert de plein droit ; BANATIC (${maj}) ne l'enregistre pas`;
-    case 'a-defaut':
-      return `la loi, qui désigne cet échelon à défaut d'exercice local ; BANATIC (${maj}) est muet`;
-    case 'communale':
-      return `absence de transfert déclaré à BANATIC, mise à jour ${maj}`;
-    case 'non-renseigne':
-      return `BANATIC (${maj}), incomplet pour ce département`;
-  }
-}
 
 /* --- mémoire du choix : on ne redemande pas sa commune à chaque visite --- */
 

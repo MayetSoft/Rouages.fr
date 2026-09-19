@@ -1,0 +1,113 @@
+# Demander un logement social.
+# Une demande unique, un numéro national, et pourtant plusieurs décideurs : le
+# bailleur attribue, mais une partie des logements est réservée à l'avance —
+# par l'État, par Action Logement, par la collectivité qui a garanti l'emprunt.
+documents:
+  - id: numero-unique-logement
+    nom: "Le numéro unique d'enregistrement"
+    resume: "Délivré au dépôt de la demande. Il fixe la date d'ancienneté, dont dépend tout le reste."
+    ou_le_trouver: "demande-logement-social.gouv.fr, ou tout guichet enregistreur."
+    liens: [anct-hlm, code-construction, sp-logement-social]
+  - id: recours-dalo
+    nom: "Le recours devant la commission de médiation (DALO)"
+    resume: "Ouvre la voie à une injonction au préfet quand le délai d'attente dépasse la durée fixée dans le département."
+    ou_le_trouver: "Préfecture du département."
+    liens: [code-construction, wp-droit-logement, prefectures]
+
+processus:
+  - id: demande-logement-social
+    nom: "La demande de logement social"
+    famille: quotidien
+    resume: "Où se dépose la demande, qui attribue réellement, à qui sont réservés les logements, et à partir de quand l'attente devient un droit."
+    declencheur: "Un besoin de logement et des ressources sous plafond"
+    sortie: "Une proposition de logement, ou un délai d'attente qui ouvre un recours"
+    decideur: bailleur-social
+    competences: [logement-social, action-sociale]
+    liens: [sp-logement-social, anct-hlm, wp-hlm]
+    verifie_le: 2026-09-19
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Dépôt de la demande et obtention du numéro unique"
+        produit: [numero-unique-logement]
+        note: "Aucune attribution ne peut être prononcée sans enregistrement au répertoire national. Une seule demande vaut pour tous les bailleurs du périmètre choisi."
+        liens: [anct-hlm, code-construction, sp-logement-social]
+        confiance: a_confirmer
+      - ordre: 2
+        acteur: citoyen
+        action: "Renouvellement annuel de la demande"
+        delai: { valeur: 12, unite: mois, nature: maximum_legal }
+        note: "Faute de renouvellement, la demande est radiée et l'ancienneté repart de zéro. C'est la première cause de perte de rang."
+        liens: [code-construction, sp-logement-social]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: prefet
+        action: "Désignation de candidats sur le contingent réservé de l'État"
+        conditionnelle: true
+        note: "Une part des logements est réservée à des réservataires — l'État, Action Logement, les collectivités — qui proposent leurs propres candidats au bailleur."
+        liens: [code-construction, prefectures, wp-hlm]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: bailleur-social
+        action: "Examen par la commission d'attribution"
+        note: "La commission d'attribution des logements et d'examen de l'occupation des logements examine en principe au moins trois candidatures par logement vacant."
+        liens: [code-construction, wp-hlm, anct-hlm]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: prefet
+        action: "Commission de médiation DALO, puis injonction de relogement"
+        conditionnelle: true
+        produit: [recours-dalo]
+        note: "Au-delà du délai anormalement long fixé dans le département, ou dans certaines situations prioritaires, la commission peut reconnaître le demandeur prioritaire et l'État doit alors le reloger."
+        liens: [code-construction, wp-droit-logement, prefectures]
+        confiance: a_confirmer
+
+    leviers:
+      - id: enregistrer-tot
+        quoi: "Déposer la demande dès que la condition de ressources est remplie"
+        quand: "Sans attendre d'avoir besoin du logement"
+        aupres_de: "Le portail national, ou un guichet enregistreur"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "C'est la date du premier enregistrement qui compte, pas celle du besoin. Attendre coûte exactement le temps attendu."
+        liens: [anct-hlm, sp-logement-social, code-construction]
+        confiance: a_confirmer
+      - id: elargir-le-perimetre
+        quoi: "Élargir les communes demandées sur la demande unique"
+        quand: "À tout moment, par modification de la demande"
+        aupres_de: "Le portail national"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Une demande restreinte à une seule commune n'est examinée que pour les logements de cette commune, quelles que soient les vacances voisines."
+        liens: [anct-hlm, sp-logement-social]
+        confiance: a_confirmer
+      - id: identifier-le-reservataire
+        quoi: "Demander à quel réservataire est rattaché le logement visé"
+        quand: "Avant de relancer, pour relancer le bon interlocuteur"
+        aupres_de: "Le bailleur, la mairie, ou le service logement de la préfecture"
+        difficulte: moyenne
+        ancre_etape: 3
+        piege: "Relancer le bailleur pour un logement du contingent préfectoral ne sert à rien : le candidat est proposé par le réservataire."
+        liens: [code-construction, wp-hlm, prefectures]
+        confiance: a_confirmer
+      - id: saisir-la-commission-dalo
+        quoi: "Saisir la commission de médiation au titre du droit au logement opposable"
+        quand: "Passé le délai anormalement long du département, ou sans délai si la situation est prioritaire"
+        aupres_de: "La préfecture du département"
+        difficulte: moyenne
+        ancre_etape: 5
+        recours_si_refus: "Recours devant le tribunal administratif contre la décision de la commission"
+        piege: "Le délai anormalement long n'est pas national : il est fixé département par département, et il faut le vérifier avant de conclure que l'attente est normale."
+        liens: [code-construction, wp-droit-logement, code-justice-administrative]
+        confiance: a_confirmer
+      - id: verifier-l-obligation-sru
+        quoi: "Vérifier si la commune est en retard sur son obligation de logements sociaux"
+        quand: "À tout moment"
+        aupres_de: "Les données publiées par l'État"
+        difficulte: faible
+        piege: "Une commune carencée paie une majoration et voit le préfet reprendre la main sur les attributions : le contexte local explique une part de l'attente."
+        liens: [od-sru, cch-l302-5, wp-loi-sru]
+        confiance: etabli

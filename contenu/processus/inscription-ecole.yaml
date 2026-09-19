@@ -1,0 +1,104 @@
+# Inscrire un enfant à l'école primaire.
+# Deux guichets pour une seule rentrée : la mairie inscrit, l'école admet. On
+# croit que c'est la même démarche, et c'est là que se perdent les familles
+# arrivées en cours d'année.
+documents:
+  - id: certificat-inscription
+    nom: "Le certificat d'inscription"
+    resume: "Délivré par la mairie : il dit l'école d'affectation, pas encore l'admission dans la classe."
+    ou_le_trouver: "Mairie, service scolaire."
+    liens: [code-education, sp-inscription-ecole]
+  - id: derogation-carte-scolaire
+    nom: "La dérogation à la carte scolaire"
+    resume: "L'autorisation d'inscrire l'enfant hors de son secteur, accordée par le maire de la commune d'accueil."
+    ou_le_trouver: "Mairie de la commune souhaitée."
+    liens: [code-education, sp-inscription-ecole]
+
+processus:
+  - id: inscription-ecole
+    nom: "L'inscription d'un enfant à l'école primaire"
+    famille: quotidien
+    resume: "La mairie inscrit et sectorise, le directeur admet, le conseil d'école suit. Trois rôles distincts que l'on découvre souvent trop tard."
+    declencheur: "Un enfant qui atteint trois ans, ou un déménagement"
+    sortie: "Un enfant admis dans une classe, dans une école désignée par la commune"
+    decideur: maire
+    competences: [ecoles-primaires, carte-scolaire, avis-vie-ecole]
+    liens: [code-education, sp-inscription-ecole, education-gouv]
+    verifie_le: 2026-09-19
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: commune
+        action: "Découpage de la commune en secteurs scolaires"
+        note: "Le conseil municipal fixe la carte scolaire communale. C'est elle qui décide de quelle école dépend une adresse — et c'est une délibération, donc publique."
+        liens: [code-education, cgct]
+        confiance: a_confirmer
+      - ordre: 2
+        acteur: citoyen
+        action: "Inscription en mairie et retrait du certificat"
+        delai: { valeur: 3, unite: mois, nature: indicatif }
+        produit: [certificat-inscription]
+        note: "L'instruction est obligatoire dès trois ans. Les communes ouvrent en général les inscriptions au printemps pour la rentrée de septembre."
+        liens: [code-education, sp-inscription-ecole]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: rectorat
+        action: "Admission de l'élève par le directeur de l'école"
+        note: "Le directeur admet au vu du certificat de la mairie. La mairie inscrit, l'école admet : deux actes, deux autorités, et un refus possible de chaque côté pour des motifs différents."
+        liens: [code-education, sp-inscription-ecole]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: maire
+        action: "Décision sur une demande de dérogation"
+        conditionnelle: true
+        produit: [derogation-carte-scolaire]
+        note: "Hors secteur, l'accord de la commune d'accueil est nécessaire, et une participation financière peut être demandée à la commune de résidence."
+        liens: [code-education, sp-inscription-ecole]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: conseil-ecole
+        action: "Vote du règlement intérieur et avis sur la vie de l'école"
+        note: "Il siège au moins une fois par trimestre et comprend des parents élus. Les décisions de carte scolaire n'y sont pas prises, mais elles s'y annoncent."
+        liens: [code-education, wp-conseil-ecole]
+        confiance: a_confirmer
+
+    leviers:
+      - id: lire-la-carte-scolaire
+        quoi: "Demander la délibération qui fixe les secteurs scolaires"
+        quand: "Avant d'acheter ou de louer, et avant toute demande de dérogation"
+        aupres_de: "La mairie"
+        difficulte: faible
+        ancre_etape: 1
+        recours_si_refus: "Saisir la CADA"
+        piege: "La sectorisation est une délibération communicable. Se fier à l'usage du quartier plutôt qu'au texte fait découvrir l'école d'affectation en juin."
+        liens: [code-education, cada, crpa]
+        confiance: a_confirmer
+      - id: demander-une-derogation
+        quoi: "Demander une dérogation à la carte scolaire"
+        quand: "Au moment de l'inscription, avant la clôture fixée par la commune"
+        aupres_de: "Le maire de la commune de l'école souhaitée"
+        difficulte: moyenne
+        ancre_etape: 4
+        recours_si_refus: "Recours gracieux auprès du maire, puis tribunal administratif"
+        piege: "Motiver par une situation objective — fratrie déjà scolarisée, garde, contrainte professionnelle — et non par une préférence : c'est sur ces motifs que la commune arbitre."
+        liens: [code-education, sp-inscription-ecole, wp-recours-administratif]
+        confiance: a_confirmer
+      - id: se-presenter-au-conseil-ecole
+        quoi: "Se présenter comme représentant des parents au conseil d'école"
+        quand: "Élections dans les premières semaines de la rentrée"
+        aupres_de: "Le directeur de l'école"
+        difficulte: faible
+        ancre_etape: 5
+        piege: "C'est le seul mandat qui donne accès aux échanges entre la commune et l'école — notamment lorsqu'une fermeture de classe se prépare."
+        liens: [code-education, wp-conseil-ecole]
+        confiance: a_confirmer
+      - id: verifier-les-effectifs
+        quoi: "Vérifier l'évolution des effectifs de l'école avant une fermeture de classe"
+        quand: "En amont des décisions de carte scolaire, au premier trimestre"
+        aupres_de: "Les données publiées par l'Éducation nationale"
+        difficulte: faible
+        piege: "Une fermeture se décide sur des effectifs prévisionnels. Les effectifs constatés des années précédentes sont publics, et ils se discutent."
+        liens: [od-effectifs-ecoles, od-annuaire-education, education-gouv]
+        confiance: etabli

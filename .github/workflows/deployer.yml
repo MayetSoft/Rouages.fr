@@ -101,9 +101,18 @@ jobs:
             simuler=""
           fi
 
+          # Le site est passé de 975 à 36 000 fichiers le jour où chaque commune
+          # a eu sa page. Le volume reste modeste — 455 Mo — mais c'est le
+          # nombre de fichiers qui domine désormais la durée : en FTP, chacun
+          # coûte une connexion de données. D'où le parallélisme relevé à 8,
+          # qui reste sous ce qu'un hébergement mutualisé accepte — au-delà, le
+          # compte se fait limiter, et l'envoi échoue au lieu d'aller plus vite.
+          #
+          # Compter une demi-heure environ pour un envoi complet, quelques
+          # minutes ensuite : `mirror` ne transfère que ce qui a changé.
           lftp -c "$reglages
                    open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
-                   mirror --reverse --verbose=1 --parallel=4 \
+                   mirror --reverse --verbose=1 --parallel=8 \
                           $effacer $simuler \
                           dist/ \"$RACINE\""
 

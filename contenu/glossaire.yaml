@@ -123,13 +123,6 @@ sigles:
     noeud: ars
     liens: [wp-ars, ars-gouv]
 
-  - id: sigle-pmi
-    sigle: PMI
-    developpe: "Protection maternelle et infantile"
-    definition: "Service départemental de suivi des jeunes enfants et des femmes enceintes."
-    noeud: protection-enfance
-    liens: [code-action-sociale]
-
   - id: sigle-dsden
     sigle: DSDEN
     developpe: "Direction des services départementaux de l'Éducation nationale"
@@ -212,3 +205,43 @@ sigles:
     # vers le notaire ferait atterrir sur le collecteur plutôt que sur l'impôt.
     definition: "L'impôt payé à l'achat d'un logement, collecté par le notaire et reversé au département et aux communes."
     liens: [wp-mutation, cgi-1594d, od-dmto]
+
+  - id: sigle-mdph
+    sigle: MDPH
+    developpe: "Maison départementale des personnes handicapées"
+    definition: "Le guichet unique où se dépose une demande liée au handicap, et où une commission décide des droits."
+    noeud: mdph
+    liens: [wp-mdph, code-action-sociale]
+
+  - id: sigle-apa
+    sigle: APA
+    developpe: "Allocation personnalisée d'autonomie"
+    definition: "Versée par le département après 60 ans, pour rester chez soi ou payer une partie de l'hébergement."
+    noeud: apa
+    liens: [wp-apa, sp-apa]
+
+  - id: sigle-ter
+    sigle: TER
+    developpe: "Transport express régional"
+    definition: "Les trains et cars du quotidien, dont la région décide les lignes, les horaires et les tarifs."
+    noeud: transport-regional
+    liens: [wp-ter, code-transports]
+
+  - id: sigle-pmi
+    sigle: PMI
+    developpe: "Protection maternelle et infantile"
+    definition: "Le service départemental de santé de la mère et de l'enfant, gratuit jusqu'à six ans."
+    noeud: pmi
+    liens: [wp-pmi, code-action-sociale]
+
+  - id: sigle-dalo
+    sigle: DALO
+    developpe: "Droit au logement opposable"
+    definition: "Le droit de faire reconnaître par une commission que l'État doit vous reloger, quand l'attente dépasse le délai fixé dans le département."
+    liens: [wp-droit-logement, code-construction]
+
+  - id: sigle-msa
+    sigle: MSA
+    developpe: "Mutualité sociale agricole"
+    definition: "Le régime de protection sociale des exploitants et salariés agricoles : elle instruit et verse ce que la caisse d'allocations familiales verse ailleurs."
+    liens: [sp-rsa, code-action-sociale]

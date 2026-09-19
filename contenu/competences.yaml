@@ -181,10 +181,10 @@ competences:
   - id: colleges
     nom: "Collèges"
     acteur: departement
-    resume: "Bâtiments, personnels techniques et restauration au département ; enseignants et programmes à l'État."
-    partagee_avec: [rectorat]
-    liens: [code-education, vp-competences, od-annuaire-education]
-    verifie_le: 2026-09-05
+    resume: "Le département possède les murs, paie les agents d'entretien et de restauration ; l'État recrute les enseignants et arrête la carte des formations."
+    partagee_avec: [rectorat, etat, commune]
+    liens: [code-education, vp-competences, od-annuaire-education, wp-college]
+    verifie_le: 2026-09-19
     confiance: etabli
 
   - id: action-sociale
@@ -197,24 +197,14 @@ competences:
     verifie_le: 2026-09-05
     confiance: etabli
 
-  - id: protection-enfance
-    nom: "Protection de l'enfance et PMI"
-    nom_court: "Protection de l’enfance"
-    acteur: departement
-    resume: "Aide sociale à l'enfance, protection maternelle et infantile, sous contrôle du juge des enfants."
-    partagee_avec: [etat]
-    liens: [code-action-sociale, vp-competences]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
-
   - id: routes-departementales
     nom: "Routes départementales"
     nom_court: "Routes départementales"
     acteur: departement
-    resume: "Le plus gros réseau routier français, y compris quand il traverse un village."
-    partagee_avec: [commune]
-    liens: [cgct, cl-gouv]
-    verifie_le: 2026-09-05
+    resume: "L'essentiel du réseau hors agglomération, y compris en traversée de bourg : la route qui passe devant chez soi n'est pas toujours communale."
+    partagee_avec: [commune, etat, prefet]
+    liens: [cgct, cl-gouv, wp-route-departementale]
+    verifie_le: 2026-09-19
     confiance: etabli
 
   - id: secours-incendie
@@ -231,20 +221,24 @@ competences:
   - id: lycees
     nom: "Lycées"
     acteur: region
-    resume: "Même partage que pour les collèges : les murs à la région, les enseignants à l'État."
-    partagee_avec: [rectorat]
-    liens: [code-education, vp-competences, od-annuaire-education]
-    verifie_le: 2026-09-05
+    resume: "Même partage qu'au collège, un cran plus haut : la région bâtit et entretient, l'État enseigne et décide des ouvertures de sections."
+    partagee_avec: [rectorat, etat, president-region]
+    liens: [code-education, vp-competences, od-annuaire-education, wp-lycee]
+    verifie_le: 2026-09-19
     confiance: etabli
 
+  # Le titre parlait encore d'apprentissage : la loi du 5 septembre 2018 en a
+  # confié le financement aux opérateurs de compétences, et la région n'y garde
+  # qu'un rôle d'information sur les métiers. Le mot est retiré plutôt que
+  # laissé à traîner — c'est le genre d'affirmation qui vieillit sans bruit.
   - id: formation-professionnelle
-    nom: "Formation professionnelle et apprentissage"
+    nom: "Formation professionnelle"
     nom_court: "Formation pro."
     acteur: region
-    resume: "Compétence régionale, dont le partage avec l'État a été plusieurs fois redéfini."
-    partagee_avec: [etat]
-    liens: [vp-competences, wp-loi-notre]
-    verifie_le: 2026-09-05
+    resume: "La région achète des formations pour les demandeurs d'emploi et organise l'information sur les métiers ; France Travail oriente vers elles."
+    partagee_avec: [etat, france-travail, mission-locale, employeur]
+    liens: [vp-competences, wp-loi-notre, code-travail]
+    verifie_le: 2026-09-19
     confiance: a_confirmer
 
   - id: transports-regionaux
@@ -802,7 +796,9 @@ competences:
     # faux : déclarer la compétence n'est pas gérer chaque cimetière. C'est le
     # cas où la réserve compte le plus, parce que la réponse est exacte et
     # l'inférence naturelle qu'on en tire ne l'est pas.
-    reserve: "Chaque commune doit disposer de son cimetière : une intercommunalité qui déclare cette compétence ne gère pas forcément le vôtre. Le crématorium est encore autre chose, souvent porté par un syndicat distinct."
+    # Rédigée à la troisième personne : la même phrase sert au panneau, qui
+    # s'adresse à un habitant, et à la page de la commune, qui parle d'elle.
+    reserve: "Chaque commune doit disposer de son cimetière : une intercommunalité qui déclare cette compétence ne gère pas forcément celui-là. Le crématorium est encore autre chose, souvent porté par un syndicat distinct."
     liens: [wp-cimetiere, sp-concession-funeraire, cgct-l2223-1]
     verifie_le: 2026-09-12
     confiance: etabli
@@ -846,5 +842,108 @@ competences:
     resume: "Le cadastre sert l'impôt, pas la propriété : il ne délimite rien juridiquement. Seul le bornage établi par un géomètre-expert fait foi entre voisins."
     partagee_avec: [citoyen, petitionnaire, commune, dgfip]
     liens: [wp-geometre-expert, ordre-geometres, code-urbanisme]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  # --- Le département : ce qu'on touche sans le savoir ----------------------
+  # « Protection de l'enfance et PMI » ne faisait qu'une fiche pour deux
+  # services qui n'ont ni le même guichet, ni le même déclencheur, ni le même
+  # juge : on y arrive par une information préoccupante d'un côté, par une
+  # consultation gratuite de l'autre. La fiche groupée est remplacée par les
+  # deux qui suivent.
+  - id: rsa
+    nom: "Revenu de solidarité active"
+    nom_court: "RSA"
+    acteur: departement
+    resume: "Le département décide et finance, la caisse d'allocations familiales verse, France Travail accompagne : trois guichets pour une seule allocation."
+    partagee_avec: [citoyen, caf, france-travail, president-departement, etat]
+    liens: [wp-rsa, sp-rsa, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: apa
+    nom: "Allocation personnalisée d'autonomie"
+    nom_court: "Autonomie (APA)"
+    acteur: departement
+    resume: "Pour rester chez soi ou payer une partie de l'hébergement après 60 ans : une équipe médico-sociale du département évalue le degré de perte d'autonomie."
+    partagee_avec: [citoyen, president-departement, ccas]
+    liens: [wp-apa, sp-apa, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: handicap
+    nom: "Droits liés au handicap"
+    nom_court: "Handicap"
+    acteur: mdph
+    resume: "Carte de stationnement, prestation de compensation, orientation scolaire ou professionnelle : une commission décide, le département finance une partie."
+    partagee_avec: [citoyen, departement, etat, rectorat]
+    liens: [wp-mdph, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: aide-sociale-enfance
+    nom: "Protection de l'enfance"
+    nom_court: "Protection de l'enfance"
+    acteur: departement
+    resume: "Information préoccupante, placement, suivi à domicile : le département agit, le juge des enfants tranche quand la famille n'y consent pas."
+    partagee_avec: [tribunal-judiciaire, prefet, president-departement, pmi]
+    liens: [wp-ase, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: protection-maternelle
+    nom: "Santé de la mère et du jeune enfant"
+    nom_court: "PMI"
+    acteur: pmi
+    resume: "Gratuit et sans avance de frais jusqu'à six ans. C'est aussi la PMI qui agrée les assistantes maternelles et contrôle les crèches."
+    partagee_avec: [citoyen, departement, commune, ars]
+    liens: [wp-pmi, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  # --- La région ------------------------------------------------------------
+  - id: transport-regional
+    nom: "Trains et cars régionaux"
+    nom_court: "TER et cars régionaux"
+    acteur: region
+    resume: "La région décide des lignes, des horaires et des tarifs, et paie la différence entre le prix du billet et le coût réel du trajet."
+    partagee_avec: [etat, operateur-transport, aom, president-region]
+    liens: [wp-ter, code-transports, od-transport]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  # Le cas d'école d'une compétence qu'un registre ne montre pas : la loi NOTRe
+  # l'a transférée aux régions au 1er septembre 2017, mais l'article L3111-9 du
+  # code des transports permet à la région de la confier par convention au
+  # département. Une convention ne s'enregistre nulle part — comme pour
+  # l'instruction des permis, la réponse exacte est trompeuse sans sa réserve.
+  - id: transport-scolaire
+    nom: "Transport scolaire"
+    acteur: region
+    resume: "Transféré aux régions en 2017. Beaucoup le reconfient au département par convention, et le transport des élèves handicapés lui reste de toute façon."
+    partagee_avec: [departement, commune, aom, rectorat]
+    reserve: "La région peut confier tout ou partie du transport scolaire au département, à une commune ou à un syndicat, par une convention qui ne figure dans aucun registre. Le transport des élèves handicapés, lui, relève du département."
+    liens: [ct-l3111-9, code-transports, wp-loi-notre-2]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: insertion-jeunes
+    nom: "Accompagnement des 16-25 ans"
+    nom_court: "Insertion des jeunes"
+    acteur: mission-locale
+    resume: "Un seul interlocuteur pour l'emploi, la formation, le logement et la santé d'un jeune sorti du système scolaire, quel que soit le sujet."
+    partagee_avec: [citoyen, region, france-travail, commune, epci]
+    liens: [wp-mission-locale, code-travail]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  # --- Ce que la commune fait au nom de l'État -------------------------------
+  - id: listes-electorales
+    nom: "Tenue de la liste électorale"
+    nom_court: "Liste électorale"
+    acteur: maire
+    resume: "Depuis 2019, le maire décide seul des inscriptions et des radiations, sous le contrôle a posteriori d'une commission ; l'Insee tient le répertoire national."
+    partagee_avec: [etat, commission-controle-listes, citoyen]
+    liens: [code-electoral, insee-reu, sp-listes-electorales, wp-procedures-electorales]
     verifie_le: 2026-09-19
     confiance: a_confirmer

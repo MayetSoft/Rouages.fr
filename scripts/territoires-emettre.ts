@@ -24,6 +24,7 @@ import { ecrireElus, type Elus } from './elus-emettre.ts';
 import { ecrireMarches, type Marches } from './marches-emettre.ts';
 import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
+import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -88,6 +89,7 @@ export function emettre(o: {
   marches: Marches | null;
   sru: InventaireSru | null;
   dmto: Dmto | null;
+  echelons: Echelons | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -142,6 +144,11 @@ export function emettre(o: {
   const nomsRegion = new Map(lire<RegionEtalab[]>('regions.json').map((r) => [r.code, r.nom]));
   const regionDeDep = new Map(
     departements.filter((d) => d.region).map((d) => [d.code, nomsRegion.get(d.region!) ?? d.region!]),
+  );
+  // Le code, à côté du nom : les comptes de l'OFGL sont classés par code de
+  // région, et un nom ne retrouve pas une ligne de compte.
+  const codeRegionDeDep = new Map(
+    departements.filter((d) => d.region).map((d) => [d.code, d.region!]),
   );
   dire(`${GRIS}${communes.length.toLocaleString('fr-FR')} communes au découpage Etalab.${RAZ}`);
 
@@ -373,6 +380,11 @@ export function emettre(o: {
     }
   }
 
+  if (o.echelons) {
+    const n = ecrireEchelons(sortie, reperesEchelons(reperes), o.echelons);
+    dire(`${GRIS}Comptes du département et de la région : ${n} collectivités.${RAZ}`);
+  }
+
   if (o.dmto) {
     const n = ecrireDmto(sortie, o.dmto);
     dire(`${GRIS}Droits de mutation : ${n} départements chiffrés.${RAZ}`);
@@ -413,6 +425,8 @@ export function emettre(o: {
     ),
     // Département -> nom de sa région, pour pouvoir nommer celle qui répond.
     regions: Object.fromEntries(regionDeDep),
+    // Département -> code de sa région, pour retrouver ses comptes.
+    codesRegion: Object.fromEntries(codeRegionDeDep),
     natures: Object.fromEntries(natures),
     // Part nationale des communes pour lesquelles un exerçant est identifié.
     couverture: Object.fromEntries(

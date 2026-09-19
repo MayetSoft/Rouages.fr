@@ -337,6 +337,13 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 .p-reperes dd { margin: 0; display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
 .p-montant { font-size: 1.02rem; font-weight: 650; font-variant-numeric: tabular-nums; min-width: 4.6rem; }
 .p-mediane { font-size: .75rem; color: var(--encre-tres-douce); font-variant-numeric: tabular-nums; }
+/* Deux échelons dans un même bloc : chacun a son en-tête et sa ligne de
+   référence, sinon les six montants du département et ceux de la région se
+   lisent comme une seule liste. */
+.p-echelons .p-titre-echelon {
+  font-size: .82rem; font-weight: 650; margin: .9rem 0 .15rem;
+}
+.p-echelons .p-titre-echelon:first-of-type { margin-top: .4rem; }
 /* Le percepteur sous le nom du flux : c'est lui qu'on ira voir, pas « l'interco ». */
 .p-flux-percus { margin-top: 1.2rem; }
 .p-percepteur { display: block; font-size: .74rem; color: var(--encre-tres-douce); line-height: 1.35; }
@@ -370,6 +377,7 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 /* --- qui est le maire ---
    La fonction en étiquette, le nom en encre pleine, la date en dessous :
    c'est le nom qu'on cherche, mais c'est la date qui dit s'il est à jour. */
+.p-permalien-commune { margin: 0 0 .7rem; font-size: .8rem; }
 .p-maire { margin: 0 0 .9rem; display: grid; gap: .05rem; }
 .p-maire-fonction {
   font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
@@ -684,3 +692,37 @@ footer p { max-width: var(--mesure); margin: 0 0 .5rem; }
   transition: filter var(--transition);
 }
 .bouton:hover { filter: brightness(.92); }
+
+/* ------------------------------------------------------------------ *
+ * La page d'une commune
+ *
+ * Elle se lit sans script et souvent au bout d'un moteur de recherche :
+ * la hiérarchie doit tenir sans la couleur ni l'interaction. Les états du
+ * verdict y reprennent la même logique que le panneau — l'incertitude en
+ * alerte, la réponse par défaut en encre pleine.
+ * ------------------------------------------------------------------ */
+.c-vide { color: var(--alerte); }
+.c-structures { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .4rem; }
+.c-structures li { display: grid; gap: .05rem; font-size: .95rem; }
+.c-verdicts { margin: 0; display: grid; gap: .55rem; }
+.c-verdicts > div {
+  display: grid; grid-template-columns: 13rem 1fr; gap: .8rem; align-items: baseline;
+  padding-bottom: .5rem; border-bottom: 1px solid var(--trait);
+}
+.c-verdicts dt { font-size: .9rem; }
+.c-verdicts dd { margin: 0; display: grid; gap: .15rem; }
+.c-verdict { font-size: .92rem; line-height: 1.45; }
+.c-verdict--non-renseigne { color: var(--alerte); }
+.c-verdict--communale { color: var(--encre-douce); font-style: italic; }
+.c-incise { font-size: .78rem; color: var(--encre-tres-douce); font-style: italic; }
+.c-reserve { font-size: .8rem; color: var(--encre-douce); line-height: 1.45; }
+.c-famille { margin: 0 0 .9rem; }
+.c-famille h3 {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--encre-tres-douce); margin: 0 0 .3rem; font-weight: 500;
+}
+.c-famille ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+.c-famille li { font-size: .92rem; line-height: 1.4; }
+@media (max-width: 560px) {
+  .c-verdicts > div { grid-template-columns: 1fr; gap: .1rem; }
+}

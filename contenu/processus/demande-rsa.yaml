@@ -1,0 +1,110 @@
+# Demander le revenu de solidarité active.
+# Le département décide, la caisse d'allocations familiales verse, France
+# Travail accompagne. Trois interlocuteurs pour une seule allocation : l'un des
+# cas où savoir à qui écrire change le délai du tout au tout.
+documents:
+  - id: dossier-rsa
+    nom: "La demande de RSA"
+    resume: "Un dossier unique, déposé en ligne ou auprès d'un organisme instructeur."
+    ou_le_trouver: "caf.fr, MSA, CCAS ou service social départemental."
+    liens: [sp-rsa, caf-fr, code-action-sociale]
+  - id: contrat-engagement
+    nom: "Le contrat d'engagement"
+    resume: "Ce que l'allocataire et son référent s'engagent à faire : démarches, formation, heures d'activité."
+    ou_le_trouver: "Le référent désigné après l'orientation."
+    liens: [code-action-sociale, france-travail-fr, wp-rsa]
+
+processus:
+  - id: demande-rsa
+    nom: "La demande de revenu de solidarité active"
+    famille: quotidien
+    resume: "Qui instruit, qui décide, qui verse, qui accompagne — et à quel moment un refus ou une suspension peut encore se contester."
+    declencheur: "Des ressources inférieures au montant forfaitaire"
+    sortie: "Une décision d'attribution ou de refus du président du conseil départemental"
+    decideur: president-departement
+    competences: [rsa, action-sociale, aide-sociale-communale, insertion-jeunes]
+    liens: [wp-rsa, sp-rsa, code-action-sociale]
+    verifie_le: 2026-09-19
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Dépôt de la demande auprès d'un organisme instructeur"
+        produit: [dossier-rsa]
+        note: "La caisse d'allocations familiales, la MSA, le CCAS ou le service social du département : le guichet est au choix, la décision non."
+        liens: [sp-rsa, caf-fr, code-action-sociale]
+        confiance: a_confirmer
+      - ordre: 2
+        acteur: caf
+        action: "Instruction du dossier et calcul du droit"
+        note: "La caisse vérifie les conditions et calcule, mais n'attribue pas : elle transmet au département."
+        liens: [caf-fr, code-action-sociale]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: president-departement
+        action: "Décision d'attribution ou de refus"
+        note: "C'est le département qui attribue le RSA et qui le finance. Un recours se dirige donc vers lui, pas vers la caisse qui verse."
+        liens: [code-action-sociale, wp-rsa]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: france-travail
+        action: "Inscription et orientation vers un référent unique"
+        note: "Depuis janvier 2025, l'allocataire et son conjoint sont inscrits à France Travail sans démarche de leur part. L'orientation désigne ensuite qui accompagne : France Travail, le département ou un autre organisme."
+        liens: [france-travail-fr, wp-france-travail, code-action-sociale]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: citoyen
+        action: "Signature du contrat d'engagement"
+        produit: [contrat-engagement]
+        note: "Le contrat fixe les démarches et le volume d'activité hebdomadaire attendu, établi à partir du diagnostic et non identique pour tous."
+        liens: [code-action-sociale, france-travail-fr]
+        confiance: a_confirmer
+      - ordre: 6
+        acteur: president-departement
+        action: "Suspension ou radiation en cas de manquement"
+        conditionnelle: true
+        note: "La sanction relève du département. Elle est précédée d'une procédure contradictoire, et c'est là que se joue l'essentiel."
+        liens: [code-action-sociale, wp-rsa]
+        confiance: a_confirmer
+
+    leviers:
+      - id: faire-instruire-par-le-ccas
+        quoi: "Faire instruire la demande par le CCAS de sa commune"
+        quand: "Au dépôt, plutôt qu'après un premier refus"
+        aupres_de: "Le centre communal d'action sociale"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Le CCAS est un organisme instructeur de plein droit et connaît les aides locales cumulables, que la caisse n'a pas à signaler."
+        liens: [unccas, code-action-sociale, sp-rsa]
+        confiance: a_confirmer
+      - id: contester-un-refus-rsa
+        quoi: "Contester un refus, un indu ou une suspension"
+        quand: "Dans les deux mois de la notification"
+        aupres_de: "Le président du conseil départemental, par recours administratif préalable"
+        difficulte: moyenne
+        ancre_etape: 3
+        recours_si_refus: "Tribunal administratif, après le recours préalable obligatoire"
+        piege: "Écrire à la caisse fait perdre le délai : elle verse, mais elle ne décide pas. Le recours se dirige vers le département."
+        liens: [code-action-sociale, wp-recours-administratif, code-justice-administrative]
+        confiance: a_confirmer
+      - id: demander-le-diagnostic
+        quoi: "Demander communication du diagnostic qui a fondé l'orientation"
+        quand: "Avant de signer le contrat d'engagement"
+        aupres_de: "L'organisme référent"
+        difficulte: moyenne
+        ancre_etape: 5
+        recours_si_refus: "Saisir la CADA"
+        piege: "C'est le diagnostic qui fixe le volume d'activité attendu. Signer sans l'avoir lu revient à accepter un engagement dont on ignore la justification."
+        liens: [crpa, cada, code-action-sociale]
+        confiance: a_confirmer
+      - id: saisir-le-defenseur-des-droits-rsa
+        quoi: "Saisir le Défenseur des droits en cas de blocage durable"
+        quand: "Après un recours resté sans réponse"
+        aupres_de: "Un délégué territorial, souvent présent en France Services"
+        difficulte: faible
+        ancre_etape: 6
+        piege: "Gratuit, et compétent pour les litiges avec un service public. La saisine n'interrompt toutefois pas les délais de recours contentieux."
+        liens: [defenseur-droits, wp-defenseur-droits, france-services-gouv]
+        confiance: a_confirmer

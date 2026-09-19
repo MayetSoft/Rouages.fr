@@ -77,6 +77,14 @@ export function chargerGraphe(): Graphe {
     anomalies: [],
   };
 
+  // Les id des familles qui deviennent des nœuds. Le réseau les range dans une
+  // seule table : un document et un processus qui porteraient le même id ne se
+  // signaleraient pas — l'un remplacerait l'autre et sa page disparaîtrait sans
+  // bruit. Les sources n'en sont pas : elles sont citées, jamais affichées comme
+  // nœud, et `cada` désigne légitimement l'autorité et la page qui la décrit.
+  const FAMILLES_NOEUD = new Set(['acteurs', 'competences', 'documents', 'processus']);
+  const vus = new Map<string, string>();
+
   for (const fichier of fichiersYaml()) {
     const court = relative(RACINE, fichier);
     let brut: unknown;
@@ -107,16 +115,22 @@ export function chargerGraphe(): Graphe {
 
     const contenu = resultat.data;
     const ranger = <T extends { id: string }>(liste: T[], index: Map<string, T>, type: string) => {
+      const noeud = FAMILLES_NOEUD.has(type);
       for (const entite of liste) {
-        if (index.has(entite.id)) {
+        const ailleurs = noeud ? vus.get(entite.id) : index.has(entite.id) ? type : undefined;
+        if (ailleurs) {
           g.anomalies.push({
             fichier: court,
             chemin: `${type}.${entite.id}`,
-            message: `id déjà utilisé ailleurs — les id sont uniques et jamais réutilisés`,
+            message:
+              ailleurs === type
+                ? `id déjà utilisé ailleurs — les id sont uniques et jamais réutilisés`
+                : `id déjà porté par un nœud de type « ${ailleurs} » — les id sont uniques d'une famille à l'autre`,
             gravite: 'erreur',
           });
           continue;
         }
+        if (noeud) vus.set(entite.id, type);
         index.set(entite.id, entite);
       }
     };

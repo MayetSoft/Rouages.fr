@@ -735,3 +735,90 @@ acteurs:
     liens: [wp-geometre-expert, ordre-geometres, code-urbanisme]
     verifie_le: 2026-09-19
     confiance: a_confirmer
+
+  # --- L'échelon qu'on touche sans le savoir --------------------------------
+  # Le département était représenté par quatre nœuds quand l'État en comptait
+  # trente-deux. C'est pourtant lui qui verse le RSA, l'allocation d'autonomie
+  # et la prestation de compensation du handicap, qui protège l'enfance, qui
+  # bâtit les collèges et entretient les routes. Le déséquilibre se voyait sur
+  # la carte : deux colonnes presque vides là où se joue le quotidien.
+  - id: president-departement
+    nom: "Le président du conseil départemental"
+    nom_court: "Président du département"
+    type: mandat_electif
+    echelon: departement
+    resume: "Élu par les conseillers départementaux, il dirige l'exécutif : c'est lui qui signe les décisions d'aide sociale et qui ordonne les dépenses."
+    liens: [wp-conseil-departemental, cgct, cl-gouv]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: mdph
+    nom: "La maison départementale des personnes handicapées"
+    nom_court: "MDPH"
+    type: service_administratif
+    echelon: departement
+    resume: "Guichet unique du handicap : c'est là que se dépose une demande, et une commission y décide des droits et des orientations."
+    liens: [wp-mdph, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: pmi
+    nom: "La protection maternelle et infantile"
+    nom_court: "PMI"
+    type: service_administratif
+    echelon: departement
+    resume: "Consultations gratuites pour les femmes enceintes et les enfants de moins de six ans, et contrôle des assistantes maternelles et des crèches."
+    liens: [wp-pmi, code-action-sociale]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: president-region
+    nom: "Le président du conseil régional"
+    nom_court: "Président de région"
+    type: mandat_electif
+    echelon: region
+    resume: "Élu par les conseillers régionaux, il dirige l'exécutif de la région : lycées, trains régionaux, formation professionnelle, fonds européens."
+    liens: [wp-conseil-regional, cgct, cl-gouv]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: france-travail
+    nom: "France Travail"
+    type: service_administratif
+    echelon: etat
+    pouvoirs: [executif]
+    resume: "Ex-Pôle emploi : inscription, indemnisation et accompagnement, en convention avec le département pour les allocataires du revenu de solidarité active."
+    liens: [wp-france-travail, france-travail-fr, code-travail]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: mission-locale
+    nom: "La mission locale"
+    nom_court: "Mission locale"
+    type: association
+    echelon: epci
+    resume: "Pour les 16-25 ans sortis du système scolaire : emploi, formation, logement, santé, au même guichet. Financée par l'État, la région et les communes."
+    liens: [wp-mission-locale, code-travail]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  # --- Ceux que l'on ne rencontre qu'en cas de litige ou de démarche ---------
+  - id: mediateur-eau
+    nom: "La Médiation de l'eau"
+    nom_court: "Médiation de l'eau"
+    type: association
+    echelon: prive
+    resume: "Médiateur de la consommation pour les litiges d'eau et d'assainissement, gratuit pour l'abonné, saisi après une réclamation écrite restée sans réponse satisfaisante."
+    liens: [mediation-eau-fr, sp-mediateur-eau, wp-mediation-consommation]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer
+
+  - id: commission-controle-listes
+    nom: "La commission de contrôle des listes électorales"
+    nom_court: "Commission de contrôle"
+    type: organe_collegial
+    echelon: commune
+    resume: "Contrôle a posteriori les décisions du maire sur les inscriptions et radiations, et statue sur le recours de l'électeur avant tout passage devant le juge."
+    liens: [code-electoral, insee-reu, sp-listes-electorales]
+    verifie_le: 2026-09-19
+    confiance: a_confirmer

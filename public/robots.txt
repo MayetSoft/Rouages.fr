@@ -1,0 +1,8 @@
+# Rouages — qui fait quoi, et avec qui.
+#
+# Tout est public et destiné à être trouvé : le site n'a d'utilité que si on
+# tombe dessus en cherchant le nom de sa commune.
+User-agent: *
+Allow: /
+
+Sitemap: https://rouages.fr/sitemap.xml

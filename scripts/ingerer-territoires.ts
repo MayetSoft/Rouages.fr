@@ -366,6 +366,21 @@ async function principal() {
     ),
   );
 
+  // Les comptes du département et de la région : les mêmes repères qu'à
+  // l'échelon communal, moins ceux qui n'y ont plus de sens — le module dit
+  // lesquels et pourquoi.
+  const { collecterEchelons, reperesEchelons } = await import('./echelons-emettre.ts');
+  const echelons = finances
+    ? await tenter('Comptes du département et de la région', () =>
+        collecterEchelons(
+          reperesEchelons(reperes),
+          finances.annee,
+          async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+          (m) => dire(`${GRIS}${m}${RAZ}`),
+        ),
+      )
+    : null;
+
   // Les droits de mutation : ce que rapporte une vente immobilière, et à qui.
   const { collecterDmto } = await import('./dmto-emettre.ts');
   const dmto = await tenter('Droits de mutation', () =>
@@ -410,6 +425,7 @@ async function principal() {
     marches,
     sru,
     dmto,
+    echelons,
   );
 }
 
@@ -519,6 +535,7 @@ async function ecrire(
   marches: Awaited<ReturnType<typeof import('./marches-emettre.ts')['collecterMarches']>>,
   sru: Awaited<ReturnType<typeof import('./sru-emettre.ts')['collecterSru']>>,
   dmto: Awaited<ReturnType<typeof import('./dmto-emettre.ts')['collecterDmto']>>,
+  echelons: Awaited<ReturnType<typeof import('./echelons-emettre.ts')['collecterEchelons']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -537,6 +554,7 @@ async function ecrire(
     marches,
     sru,
     dmto,
+    echelons,
     sortie: SORTIE,
     dire,
     VERT,

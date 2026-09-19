@@ -89,6 +89,27 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       se lirait «&nbsp;Paris ne reçoit rien&nbsp;».
     </p>
 
+    <h2 class="badge">Les comptes du département et de la région</h2>
+    <p class="mesure">
+      Les mêmes agrégats sont lus pour les 97&nbsp;départements et les
+      17&nbsp;régions que l’<abbr title="Observatoire des finances et de la gestion publique locales">OFGL</abbr>
+      publie, sur le <strong>budget principal seul</strong>&nbsp;: près des trois
+      quarts des lignes sont des budgets annexes — un domaine, un laboratoire,
+      un service d’incendie — et les additionner gonflerait tout sans rien
+      expliquer. Pas de strate ici&nbsp;: la médiane porte sur l’échelon entier,
+      et le site dit sur combien de collectivités.
+    </p>
+    <p class="mesure">
+      Un repère manque à ces deux échelons, délibérément. La part
+      départementale de la taxe foncière est passée aux communes en 2021, et
+      départements comme régions sont depuis compensés par une fraction de
+      <abbr title="Taxe sur la valeur ajoutée">TVA</abbr> que l’agrégat
+      «&nbsp;impôts locaux&nbsp;» ne porte pas&nbsp;: il en reste 65&nbsp;€ par
+      habitant dans l’Allier contre 375 en 2020, et des valeurs négatives dans
+      les régions. Le montrer sous ce libellé ferait conclure qu’un département
+      ne lève presque rien — vrai de cet agrégat, faux de ses recettes.
+    </p>
+
     <h2 class="badge">Ce que perçoit l’intercommunalité</h2>
     <p class="mesure">
       La taxe d’enlèvement des ordures ménagères et le versement mobilité
@@ -272,6 +293,15 @@ const pages = new Set(reseau.noeuds.flatMap((n) => n.liens.map((l) => l.url))).s
       cinq chiffres comme un code postal plutôt que comme un code
       <abbr title="Institut national de la statistique et des études économiques">INSEE</abbr>,
       qui occupe pourtant le même espace de valeurs.
+    </p>
+
+    <h2 class="badge">Une page par commune</h2>
+    <p class="mesure">
+      Chaque commune a une adresse à elle — <code>/commune/03165</code> pour
+      Le Mayet-de-Montagne — construite à la publication, lisible sans
+      JavaScript, et citable. Le panneau «&nbsp;chez vous&nbsp;» et cette page
+      partagent la même fonction de résolution&nbsp;: elles ne peuvent pas
+      répondre différemment à la même question.
     </p>
 
     <h2 class="badge">Quand c’est faux</h2>
