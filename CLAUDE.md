@@ -1,0 +1,58 @@
+# Conventions de travail sur Rouages
+
+## La commune de référence : Le Mayet-de-Montagne
+
+Code INSEE **03165**, code postal **03250**, Allier.
+
+C'est elle qu'il faut prendre pour tous les exemples, captures et tests
+manuels. La raison n'est pas esthétique : le mainteneur connaît cette commune,
+donc il y repère une erreur d'un coup d'œil, ce qu'aucune vérification
+automatique ne remplace.
+
+Attention à l'homonyme : **Mayet** (Sarthe, 72191) est une autre commune. Les
+deux figurent volontairement dans `scripts/verifier-recherche.ts`, qui fixe le
+fait que la correspondance exacte doit passer avant le nom le plus long — c'est
+un test de tri, pas un exemple.
+
+Quelques repères utiles au Mayet-de-Montagne : CA Vichy Communauté pour la
+mobilité et le développement économique, école primaire Yves Duteil (une classe
+de moins à la rentrée 2021), commune non soumise à l'article 55 de la loi SRU.
+
+## Commandes
+
+```
+npm run valider              structure, références, règles éditoriales
+npm run verifier-recherche   le classement des communes homonymes
+npm run build                valide puis génère (le build refuse un contenu invalide)
+npm run veille               l'état des sources surveillées
+npm run territoires -- --cache   réingère tout en réutilisant les gros fichiers
+```
+
+`npm run territoires` dure une dizaine de minutes et touche huit sources. Les
+collectes facultatives sont isolées : celle qui échoue laisse en place les
+fichiers de l'ingestion précédente plutôt que de tout emporter.
+
+## Ce que l'environnement de développement ne joint pas
+
+`www.data.gouv.fr` ne répond que par intermittence — les grosses réponses font
+tomber le tunnel au bout de sept secondes. Ce qui marche :
+
+- `tabular-api.data.gouv.fr` pour lire une ressource par pages de cent ;
+- `https://www.data.gouv.fr/api/2/datasets/search/?q=…` pour chercher, la
+  réponse étant plus légère que celle de l'API v1 ;
+- les portails Opendatasoft : `data.economie.gouv.fr`, `data.education.gouv.fr`,
+  `data.ofgl.fr`, `data.drees.solidarites-sante.gouv.fr`,
+  `api-lannuaire.service-public.fr`.
+
+Légifrance refuse les requêtes automatisées depuis cet environnement (403) : on
+vérifie un article par recherche web, jamais de mémoire. Un identifiant
+`LEGIARTI` écrit de tête a déjà été faux une fois.
+
+## Deux règles qui ne se négocient pas
+
+- **Le contenu ne nomme aucune personne physique.** Le graphe décrit des
+  fonctions ; le nom d'un titulaire est une donnée produite depuis un
+  répertoire, jamais un nœud. La validation refuse un nom dans `contenu/`.
+- **On ne publie pas un chiffre qu'on n'a pas vérifié**, et on refuse un
+  agrégat dont on sait qu'il serait faux — voir le total des marchés publics
+  dans `docs/05-roadmap.md`.
