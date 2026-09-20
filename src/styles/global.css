@@ -441,6 +441,16 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
   .p-marche-montant { text-align: left; }
   .p-marche-suite { margin-left: 0; }
 }
+/* Les délibérations réutilisent la grille des marchés : même forme de liste,
+   même pli des groupements. La colonne de gauche porte une date et non un
+   montant — plus large, et pas de chiffres alignés à droite. */
+.p-delibs li.p-delib { grid-template-columns: 5.4rem 1fr; }
+.p-delib-date { font-size: .76rem; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
+.p-delib-familles {
+  font-size: .74rem; color: var(--encre-tres-douce); margin: 0 0 .45rem; line-height: 1.4;
+}
+@media (max-width: 480px) { .p-delibs li.p-delib { grid-template-columns: 1fr; gap: .05rem; } }
+
 /* Les mentions légales : deux colonnes tant que la place le permet, une seule
    au téléphone — un intitulé et sa valeur ne se coupent pas. */
 .mentions { margin: 0 0 1.2rem; display: grid; gap: .45rem; max-width: var(--mesure); }

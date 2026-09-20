@@ -12,6 +12,7 @@ import { chargerGraphe, estPerime, formaterDate } from '../src/modele/graphe.ts'
 import { construireGlossaire } from '../src/modele/glossaire.ts';
 import { construireReseau } from '../src/modele/reseau.ts';
 import { ATTENTE_EDITEUR } from '../src/modele/schemas.ts';
+import { nommeUnePersonne } from '../src/modele/civilites.ts';
 import { existsSync, readFileSync } from 'node:fs';
 
 const args = new Set(process.argv.slice(2));
@@ -175,12 +176,11 @@ for (const a of g.acteurs.values()) {
 // signale : le contenu n'a pas de date de rafraîchissement, les fichiers de
 // données en ont une.
 //
-// Contrôle grossier — une civilité suivie d'une majuscule — mais il attrape
-// l'écart le plus probable, et il ne remplace pas la relecture : il la rend
-// obligatoire.
-const CIVILITES = /\b(M\.|MM\.|Mme|Mmes|Monsieur|Madame|Maître)\s+[A-ZÉÈÀÂÎÔÛÇ]/;
+// Le motif vit dans `src/modele/civilites.ts` : l'ingestion des délibérations
+// s'en sert aussi, pour écarter celles qui statuent sur le cas d'une personne.
+// Deux copies auraient fini par diverger.
 for (const [ou, t] of textesVisibles) {
-  if (!CIVILITES.test(t)) continue;
+  if (!nommeUnePersonne(t)) continue;
   erreurs.push(
     `${ou} semble nommer une personne physique : « ${t.slice(0, 80)}… ». Le contenu décrit ` +
       `des fonctions ; le nom de leur titulaire est une donnée, pas un nœud (docs/07-risques.md).`,

@@ -205,6 +205,34 @@ export interface ComptesEchelon {
 }
 
 /**
+ * Ce qu'une collectivité a délibéré, tel que le panneau l'affiche.
+ *
+ * La couverture est partielle et le bloc ne vaut jamais zéro : il n'existe pas
+ * de consolidation nationale des délibérations, et une collectivité absente
+ * d'ici n'est pas une collectivité qui ne délibère pas — c'est une
+ * collectivité qui ne verse pas ses actes en données ouvertes. Le bloc
+ * n'apparaît donc que là où il y a quelque chose.
+ */
+export interface Deliberation {
+  date: string;
+  /** La famille de la nomenclature ACTES, ou null quand le code manque. */
+  famille: string | null;
+  objet: string;
+  /** L'acte chez la collectivité qui l'a publié : le site lie, il ne copie pas. */
+  url: string;
+}
+
+export interface CollectiviteDelibere {
+  nom: string;
+  natureLibelle: string | null;
+  /** Nombre total publié, avant troncature. */
+  total: number;
+  /** Les familles les plus fréquentes, pour dire de quoi il est question. */
+  familles: { nom: string; nombre: number }[];
+  liste: Deliberation[];
+}
+
+/**
  * Le dernier scrutin municipal, tel que le panneau l'affiche.
  *
  * Le site dit qui décide ; ceci dit dans quelles conditions ce décideur a été
@@ -349,6 +377,10 @@ export interface Territoire {
   risques: Risques | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
+  /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
+  deliberations: CollectiviteDelibere[];
+  /** L'exercice le plus ancien vu, et la date de lecture. */
+  delibDepuis: string | null;
   /** L'obligation SRU, quand la commune y est soumise. */
   sru: Sru | null;
   /** La date de l'inventaire SRU. */
@@ -508,6 +540,19 @@ type ElectionsDep = {
   >;
 };
 const electionsDep = new Map<string, ElectionsDep | null>();
+
+/** Les délibérations du département, indexées par SIREN comme les marchés. */
+type DelibDep = {
+  maj: string;
+  depuis: string;
+  familles: string[];
+  com: Record<string, string>;
+  h: Record<
+    string,
+    { n: number; f: number[]; d: { date: string; famille: number; objet: string; url: string }[] }
+  >;
+};
+const delibDep = new Map<string, DelibDep | null>();
 
 /**
  * Ce que rapportent les droits de mutation, et à qui.
@@ -713,7 +758,8 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del] =
+      await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -728,6 +774,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<SruDep>(`${BASE}/dep/${commune.dep}-sru.json`).catch(() => null),
       json<RisquesDep>(`${BASE}/dep/${commune.dep}-risques.json`).catch(() => null),
       json<ElectionsDep>(`${BASE}/dep/${commune.dep}-elections.json`).catch(() => null),
+      json<DelibDep>(`${BASE}/dep/${commune.dep}-deliberations.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -739,6 +786,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     sruDep.set(commune.dep, inv);
     risquesDep.set(commune.dep, risq);
     electionsDep.set(commune.dep, scr);
+    delibDep.set(commune.dep, del);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -799,6 +847,8 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     dmto: assemblerDmto(commune, ligne[2]),
     risques: assemblerRisques(commune),
     scrutin: assemblerScrutin(commune),
+    deliberations: assemblerDeliberations(commune, structures),
+    delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,
     sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
     sruMaj: sruDep.get(commune.dep)?.maj ?? null,
     marches: assemblerMarches(commune, structures),
@@ -837,6 +887,46 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
         date: m.date,
         procedure: d.procedures[m.procedure] ?? null,
         lots: m.lots,
+      })),
+    });
+  };
+  const sirenCommune = d.com[commune.code];
+  if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
+  for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
+  return out;
+}
+
+/**
+ * Ce que la commune et ses groupements ont délibéré.
+ *
+ * Même jointure que les marchés — par SIREN — et pour la même raison : une
+ * délibération de la communauté d'agglomération ou du syndicat d'eau engage la
+ * commune autant que la sienne, et personne ne pense à aller la chercher.
+ */
+function assemblerDeliberations(
+  commune: CommuneBreve,
+  structures: Structure[],
+): CollectiviteDelibere[] {
+  const d = delibDep.get(commune.dep);
+  if (!d) return [];
+  const out: CollectiviteDelibere[] = [];
+  const lire = (siren: string, nom: string, natureLibelle: string | null) => {
+    const e = d.h[siren];
+    if (!e || e.d.length === 0) return;
+    out.push({
+      nom,
+      natureLibelle,
+      total: e.n,
+      familles: (e.f ?? [])
+        .map((nombre, i) => ({ nom: d.familles[i] ?? '', nombre }))
+        .filter((f) => f.nombre > 0 && f.nom)
+        .sort((a, b) => b.nombre - a.nombre)
+        .slice(0, 3),
+      liste: e.d.map((x) => ({
+        date: x.date,
+        famille: d.familles[x.famille] ?? null,
+        objet: x.objet,
+        url: x.url,
       })),
     });
   };

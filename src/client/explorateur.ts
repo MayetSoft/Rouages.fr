@@ -761,6 +761,8 @@ function demarrer(reseau: Reseau) {
     if (obligation) bloc.append(obligation);
     const commandes = blocMarches();
     if (commandes) bloc.append(commandes);
+    const actes = blocDeliberations();
+    if (actes) bloc.append(actes);
     const equipements = blocServices();
     if (equipements) bloc.append(equipements);
 
@@ -1392,6 +1394,99 @@ function demarrer(reseau: Reseau) {
       else direRestant();
     });
     return bouton;
+  }
+
+  /**
+   * Ce qui a été délibéré.
+   *
+   * C'est ici que se décide ce que le reste du panneau décrit : une compétence
+   * transférée l'a été par une délibération, un budget voté l'est en séance.
+   * Le site montrait le résultat sans jamais montrer l'acte.
+   *
+   * **La couverture est partielle, et le bloc ne vaut jamais zéro.** Il
+   * n'existe aucune consolidation nationale : l'ordonnance de 2021 impose de
+   * publier les actes en ligne, sur le site de la collectivité, sans créer de
+   * dépôt central. Une collectivité absente d'ici n'est donc pas une
+   * collectivité qui ne délibère pas — c'est une collectivité qui ne verse pas
+   * ses actes en données ouvertes. Le bloc n'apparaît que là où il y a quelque
+   * chose, et la phrase de source le dit.
+   */
+  function blocDeliberations(): HTMLElement | null {
+    const liste = territoire?.deliberations;
+    if (!liste || liste.length === 0) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-marches p-delibs';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui a été délibéré'));
+
+    for (const [rang, c] of liste.entries()) {
+      // Même pli que les marchés : la commune ouverte, ses groupements repliés.
+      const replie = rang > 0;
+      const groupe = document.createElement(replie ? 'details' : 'div');
+      groupe.className = 'p-marche-acheteur';
+      const titre = document.createElement(replie ? 'summary' : 'p');
+      titre.className = 'p-marche-qui';
+      titre.append(glose('span', 'p-marche-nom', c.nom));
+      if (c.natureLibelle) titre.append(ligne('span', 'p-marche-nature', c.natureLibelle));
+      titre.append(
+        ligne(
+          'span',
+          'p-marche-total',
+          `${c.total.toLocaleString('fr-FR')} délibération${c.total > 1 ? 's' : ''}` +
+            (c.total > c.liste.length ? `, les ${c.liste.length} plus récentes` : ''),
+        ),
+      );
+      groupe.append(titre);
+
+      // De quoi il est question, avant le détail : trois familles suffisent à
+      // dire si une assemblée passe son temps sur ses finances ou sur son
+      // urbanisme.
+      if (c.familles.length > 0) {
+        groupe.append(
+          ligne(
+            'p',
+            'p-delib-familles',
+            c.familles.map((f) => `${f.nom.toLowerCase()} (${f.nombre})`).join(' · '),
+          ),
+        );
+      }
+
+      const ul = document.createElement('ul');
+      for (const d of c.liste) {
+        const li = document.createElement('li');
+        li.className = 'p-delib';
+        li.append(ligne('span', 'p-delib-date', moisAnnee(d.date) ?? d.date));
+        const droite = document.createElement('span');
+        // L'acte lui-même quand la collectivité en donne l'adresse : le site
+        // renvoie vers le document, il ne l'héberge pas.
+        if (d.url) {
+          const a = document.createElement('a');
+          a.className = 'p-marche-objet';
+          a.href = d.url;
+          a.rel = 'noopener';
+          a.textContent = d.objet;
+          droite.append(a);
+        } else droite.append(ligne('span', 'p-marche-objet', d.objet));
+        if (d.famille) droite.append(ligne('span', 'p-marche-detail', d.famille.toLowerCase()));
+        li.append(droite);
+        ul.append(li);
+      }
+      groupe.append(ul);
+      bloc.append(groupe);
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les délibérations versées en données ouvertes au schéma national` +
+          (territoire?.delibDepuis ? `, depuis ${territoire.delibDepuis.slice(0, 4)}` : '') +
+          `. Il n'existe pas de recensement national : une collectivité qui n'apparaît pas ici ` +
+          `publie ses actes sur son propre site, comme la loi l'y oblige depuis 2022, sans les ` +
+          `verser en données ouvertes. Les délibérations dont l'objet nomme une personne ne sont ` +
+          `pas reprises.`,
+      ),
+    );
+    return bloc;
   }
 
   /**

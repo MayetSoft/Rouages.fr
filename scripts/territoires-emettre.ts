@@ -27,6 +27,7 @@ import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
 import { ecrireRisques, type Risques } from './risques-emettre.ts';
 import { ecrireElections, type Elections } from './elections-emettre.ts';
+import { ecrireDeliberations, type Deliberations } from './deliberations-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -94,6 +95,7 @@ export function emettre(o: {
   echelons: Echelons | null;
   risques: Risques | null;
   elections: Elections | null;
+  deliberations: Deliberations | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -264,6 +266,7 @@ export function emettre(o: {
   let sruEcrits = 0;
   let risquesEcrits = 0;
   let electionsEcrites = 0;
+  let delibEcrites = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -296,6 +299,9 @@ export function emettre(o: {
         liste.filter((c) => c.siren).map((c) => [c.code, c.siren!] as const),
       );
       marchesEcrits += ecrireMarches(sortie, dep, sirens, sirenDeCommune, o.marches);
+      if (o.deliberations) {
+        delibEcrites += ecrireDeliberations(sortie, dep, sirens, sirenDeCommune, o.deliberations);
+      }
     }
 
     const refs = new Map<string, number>();
@@ -514,6 +520,11 @@ export function emettre(o: {
   if (o.elections) {
     dire(
       `${GRIS}Élections : ${electionsEcrites.toLocaleString('fr-FR')} communes chiffrées.${RAZ}`,
+    );
+  }
+  if (o.deliberations) {
+    dire(
+      `${GRIS}Délibérations : ${delibEcrites.toLocaleString('fr-FR')} collectivités qui publient.${RAZ}`,
     );
   }
   if (o.marches) {

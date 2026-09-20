@@ -283,3 +283,15 @@ sigles:
     developpe: "État des risques réglementés pour l'information des acquéreurs et des locataires"
     definition: "Le service de l'État qui pré-remplit l'état des risques à partir d'une adresse."
     liens: [errial, decret-ial]
+
+  - id: sigle-scdl
+    sigle: SCDL
+    developpe: "Socle commun des données locales"
+    definition: "Les formats communs que les collectivités emploient pour publier leurs délibérations, leurs subventions ou leurs marchés en données ouvertes."
+    liens: [scdl-deliberations]
+
+  - id: sigle-actes
+    sigle: ACTES
+    developpe: "Aide au contrôle de légalité dématérialisé"
+    definition: "Le système par lequel les collectivités transmettent leurs actes au préfet ; sa nomenclature en neuf familles classe chaque délibération."
+    liens: [ordonnance-publicite-actes, scdl-deliberations]

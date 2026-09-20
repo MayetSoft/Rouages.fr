@@ -167,6 +167,17 @@ surveillances:
     ressource: "resultats-communes"
     lien: od-municipales-2026
 
+  - id: deliberations-megalis
+    nom: "Délibérations — agrégateur Mégalis Bretagne"
+    alimente: "les délibérations des collectivités qui les versent en données ouvertes"
+    # Le plus gros agrégateur à ce jour, et le seul que la découverte par
+    # schéma ne voit pas : il publie au format sans le déclarer sur ses
+    # ressources. S'il s'arrête, la couverture fond de 90 %.
+    type: datagouv-ressource
+    url: "deliberations-des-organismes-adherents-de-megalis-bretagne"
+    ressource: "deliberation-"
+    lien: od-deliberations-megalis
+
 decouverte:
   mots_cles:
     - "intercommunalité compétences"
@@ -181,6 +192,9 @@ decouverte:
     # Reconstituer un total sur quelques centaines de communes laisserait croire
     # que les 34 000 autres ne subventionnent rien.
     - "subventions associations collectivités"
+    # Ingérées depuis les jeux conformes au schéma SCDL, mais sans
+    # consolidation nationale : on guette celle-ci, qui ferait passer la
+    # couverture de quelques milliers de collectivités à toutes.
     - "délibérations conseils municipaux"
     - "plan local d'urbanisme"
   # Publiées après cette date seulement : inutile de reproposer l'existant.

@@ -409,6 +409,20 @@ async function principal() {
     ),
   );
 
+  // Les délibérations publiées en données ouvertes. Même filtre de SIREN que
+  // les marchés : le site n'ingère que ce qu'il sait rattacher.
+  const { collecterDeliberations } = await import('./deliberations-emettre.ts');
+  const deliberations = await tenter('Délibérations', () =>
+    collecterDeliberations(
+      // Des octets, pas du texte : tous les producteurs n'écrivent pas en
+      // UTF-8, et c'est le module qui sait le reconnaître.
+      async (url: string) => new Uint8Array(await (await obstine(url)).arrayBuffer()),
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      sirensSuivis,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   // Le dernier scrutin municipal : la participation, le refus exprimé par un
   // bulletin blanc ou nul, et le nombre de listes en présence.
   const { collecterElections } = await import('./elections-emettre.ts');
@@ -446,6 +460,7 @@ async function principal() {
     echelons,
     risques,
     elections,
+    deliberations,
   );
 }
 
@@ -558,6 +573,9 @@ async function ecrire(
   echelons: Awaited<ReturnType<typeof import('./echelons-emettre.ts')['collecterEchelons']>>,
   risques: Awaited<ReturnType<typeof import('./risques-emettre.ts')['collecterRisques']>>,
   elections: Awaited<ReturnType<typeof import('./elections-emettre.ts')['collecterElections']>>,
+  deliberations: Awaited<
+    ReturnType<typeof import('./deliberations-emettre.ts')['collecterDeliberations']>
+  >,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -579,6 +597,7 @@ async function ecrire(
     echelons,
     risques,
     elections,
+    deliberations,
     sortie: SORTIE,
     dire,
     VERT,

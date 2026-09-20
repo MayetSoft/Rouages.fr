@@ -674,6 +674,63 @@ scrutin de liste paritaire : la loi du 21 mai 2025 l'a étendu aux communes de
 moins de 1 000 habitants, sept sur dix, et le panachage a disparu. Le processus
 d'inscription électorale le dit.
 
+### Les délibérations, sans recensement national ✔
+
+C'est là que se décide ce que tout le reste du site décrit : une compétence
+transférée l'a été par une délibération, un budget voté l'est en séance, un
+marché est autorisé par une autorisation de signature. Le site montrait le
+résultat sans jamais montrer l'acte.
+
+**Il n'existe aucune consolidation nationale**, et la raison est juridique :
+l'ordonnance n° 2021-1310 impose depuis le 1er juillet 2022 de publier les
+actes en ligne — mais **sur le site de la collectivité**. Elle a dématérialisé
+la publicité sans créer de dépôt central, et l'open data reste facultatif.
+
+Ce qui existe, en revanche, c'est un **format commun** : le schéma SCDL
+« délibérations ». Le collecteur s'y adosse, et se remplit par deux robinets :
+
+- **la découverte**, par l'attribut de schéma que data.gouv expose — 211
+  ressources aujourd'hui, ingérées sans qu'on ait à les connaître, et la
+  couverture grossit d'elle-même ;
+- **une liste déclarée**, pour les agrégateurs qui publient au format sans le
+  déclarer sur leurs ressources. Mégalis Bretagne est le plus gros — la
+  découverte seule le manquerait, et avec lui l'essentiel du volume.
+
+Résultat : **570 916 délibérations depuis 2014, pour 1 260 collectivités** —
+communes, intercommunalités, syndicats, un département et une région. Le
+rattachement se fait par SIREN, exactement comme les marchés, si bien qu'une
+délibération de la communauté d'agglomération ou du syndicat d'eau apparaît
+sous la commune qu'elle engage.
+
+**Le bloc ne vaut jamais zéro.** Une collectivité absente n'est pas une
+collectivité qui ne délibère pas : c'est une collectivité qui ne verse pas ses
+actes en données ouvertes, et la phrase de source le dit en toutes lettres. Ce
+n'est pas la même chose que les subventions, où un total partiel aurait été un
+chiffre faux ; ici, une liste absente est une liste absente.
+
+**3 294 délibérations sont écartées** parce que leur objet nomme quelqu'un —
+« cession de la parcelle AC 0151 à Madame X », « aide sociale à M. Y ». Ce sont
+précisément celles qui statuent sur le cas d'une personne. Le filtre réutilise
+le motif qui interdit déjà un nom dans `contenu/`, désormais dans
+`src/modele/civilites.ts` pour que les deux usages ne divergent pas. Il est
+grossier — un nom sans civilité lui échappe — et il ne remplace pas la
+précaution qui vaut pour tout le bloc : **le site relaie un intitulé et un
+lien, jamais le document**, qui reste chez la collectivité qui l'a publié.
+C'était la réserve de `07-risques.md` sur les délibérations : elle visait
+« republier et indexer », et lier ne fait ni l'un ni l'autre.
+
+Deux défauts que le premier essai a révélés, et qu'aucune relecture de code
+n'aurait attrapés : un producteur écrit en point-virgule et un autre en
+virgule — le délimiteur se tranche sur l'en-tête ; et un fichier est en
+Windows-1252 quand tous les autres sont en UTF-8 — le décodage strict échoue
+sur ces octets, et c'est ce qui les signale, sans avoir à deviner.
+
+Un troisième est resté tel quel, après vérification de la source : un
+producteur retire les apostrophes de ses intitulés — « en application de
+larticle L2122-22 ». Le réparer demanderait de distinguer « larticle » de
+« larve », donc un dictionnaire. Le site rend l'intitulé tel qu'il a été
+publié, comme il rend les majuscules sans accents des marchés publics.
+
 ### Les subventions aux associations : cherché, pas trouvé
 
 Les « données essentielles des subventions » sont publiées **collectivité par
