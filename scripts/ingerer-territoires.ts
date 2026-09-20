@@ -409,6 +409,16 @@ async function principal() {
     ),
   );
 
+  // Le dernier scrutin municipal : la participation, le refus exprimé par un
+  // bulletin blanc ou nul, et le nombre de listes en présence.
+  const { collecterElections } = await import('./elections-emettre.ts');
+  const elections = await tenter('Élections municipales', () =>
+    collecterElections(
+      async (url: string) => (await obstine(url)).text(),
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   // Les risques majeurs : une archive de 8 Mo qui porte les risques recensés,
   // les arrêtés de catastrophe naturelle, les plans de prévention et les
   // documents d'information communaux.
@@ -435,6 +445,7 @@ async function principal() {
     dmto,
     echelons,
     risques,
+    elections,
   );
 }
 
@@ -546,6 +557,7 @@ async function ecrire(
   dmto: Awaited<ReturnType<typeof import('./dmto-emettre.ts')['collecterDmto']>>,
   echelons: Awaited<ReturnType<typeof import('./echelons-emettre.ts')['collecterEchelons']>>,
   risques: Awaited<ReturnType<typeof import('./risques-emettre.ts')['collecterRisques']>>,
+  elections: Awaited<ReturnType<typeof import('./elections-emettre.ts')['collecterElections']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -566,6 +578,7 @@ async function ecrire(
     dmto,
     echelons,
     risques,
+    elections,
     sortie: SORTIE,
     dire,
     VERT,

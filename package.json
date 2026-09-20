@@ -13,7 +13,8 @@
     "verifier-types": "astro check",
     "territoires": "tsx scripts/ingerer-territoires.ts",
     "verifier-recherche": "tsx scripts/verifier-recherche.ts",
-    "veille": "tsx scripts/veille.ts"
+    "veille": "tsx scripts/veille.ts",
+    "publier": "tsx scripts/valider.ts --publication && npm run verifier-recherche && astro build"
   },
   "dependencies": {
     "astro": "^5.14.1",

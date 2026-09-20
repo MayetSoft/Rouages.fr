@@ -26,6 +26,7 @@ import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
 import { ecrireRisques, type Risques } from './risques-emettre.ts';
+import { ecrireElections, type Elections } from './elections-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -92,6 +93,7 @@ export function emettre(o: {
   dmto: Dmto | null;
   echelons: Echelons | null;
   risques: Risques | null;
+  elections: Elections | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -261,6 +263,7 @@ export function emettre(o: {
   let marchesEcrits = 0;
   let sruEcrits = 0;
   let risquesEcrits = 0;
+  let electionsEcrites = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -273,6 +276,10 @@ export function emettre(o: {
 
     if (o.risques) {
       risquesEcrits += ecrireRisques(sortie, dep, liste.map((c) => c.code), o.risques);
+    }
+
+    if (o.elections) {
+      electionsEcrites += ecrireElections(sortie, dep, liste.map((c) => c.code), o.elections);
     }
 
     // Les marchés sont indexés par SIREN d'acheteur : ceux des communes du
@@ -502,6 +509,11 @@ export function emettre(o: {
   if (o.risques) {
     dire(
       `${GRIS}Risques majeurs : ${risquesEcrits.toLocaleString('fr-FR')} communes documentées.${RAZ}`,
+    );
+  }
+  if (o.elections) {
+    dire(
+      `${GRIS}Élections : ${electionsEcrites.toLocaleString('fr-FR')} communes chiffrées.${RAZ}`,
     );
   }
   if (o.marches) {

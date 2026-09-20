@@ -17,6 +17,7 @@ import {
   type Flux,
   type Processus,
   type Decouverte,
+  type Editeur,
   type Repere,
   type Sigle,
   type Surveillance,
@@ -44,6 +45,8 @@ export interface Graphe {
   reperes: Map<string, Repere>;
   surveillances: Map<string, Surveillance>;
   decouverte?: Decouverte;
+  /** Les mentions légales, déclarées dans `contenu/editeur.yaml`. */
+  editeur?: Editeur;
   anomalies: Anomalie[];
 }
 
@@ -145,6 +148,7 @@ export function chargerGraphe(): Graphe {
     ranger(contenu.reperes, g.reperes, 'reperes');
     ranger(contenu.surveillances, g.surveillances, 'surveillances');
     if (contenu.decouverte) g.decouverte = contenu.decouverte;
+    if (contenu.editeur) g.editeur = contenu.editeur;
   }
 
   verifierReferences(g);

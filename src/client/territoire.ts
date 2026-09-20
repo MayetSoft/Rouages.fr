@@ -205,6 +205,38 @@ export interface ComptesEchelon {
 }
 
 /**
+ * Le dernier scrutin municipal, tel que le panneau l'affiche.
+ *
+ * Le site dit qui décide ; ceci dit dans quelles conditions ce décideur a été
+ * désigné. Aucune nuance politique, aucun nom de candidat : `docs/07-risques.md`
+ * interdit de relier une personne à une opinion, et le fichier des résultats
+ * par commune ne porte de toute façon aucun nom.
+ */
+export interface Scrutin {
+  /** « municipales 2026 ». */
+  nom: string;
+  tours: {
+    numero: number;
+    inscrits: number;
+    votants: number;
+    /** Blancs et nuls confondus : venir sans choisir est une réponse unique. */
+    refus: number;
+    listes: number;
+    /** Participation médiane nationale de ce tour-là. */
+    medianeParticipation: number;
+    /** Part médiane de blancs et nuls, sur les votants. */
+    medianeRefus: number;
+  }[];
+  /** Sièges au conseil municipal. */
+  sieges: number;
+  /** Sièges de la commune au conseil communautaire : son poids dans l'intercommunalité. */
+  siegesCc: number;
+  /** Part des communes où une seule liste se présentait, en pour cent. */
+  partListeUnique: number;
+  maj: string;
+}
+
+/**
  * Les risques majeurs d'une commune, prêts à afficher.
  *
  * Deux listes, et elles ne se recouvrent pas. `recenses` dit ce à quoi l'État
@@ -315,6 +347,8 @@ export interface Territoire {
   dmto: Dmto | null;
   /** Ce à quoi l'endroit est exposé, et ce qui y est déjà arrivé. */
   risques: Risques | null;
+  /** Le dernier scrutin municipal, quand le ministère l'a publié. */
+  scrutin: Scrutin | null;
   /** L'obligation SRU, quand la commune y est soumise. */
   sru: Sru | null;
   /** La date de l'inventaire SRU. */
@@ -456,6 +490,24 @@ type RisquesDep = {
   >;
 };
 const risquesDep = new Map<string, RisquesDep | null>();
+
+/** Le dernier scrutin municipal du département. */
+type ElectionsDep = {
+  scrutin: string;
+  maj: string;
+  medianes: { participation: number; refus: number }[];
+  listeUnique: number;
+  c: Record<
+    string,
+    {
+      t1: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number };
+      t2?: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number };
+      cm: number;
+      cc: number;
+    }
+  >;
+};
+const electionsDep = new Map<string, ElectionsDep | null>();
 
 /**
  * Ce que rapportent les droits de mutation, et à qui.
@@ -661,7 +713,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -675,6 +727,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<MarchesDep>(`${BASE}/dep/${commune.dep}-marches.json`).catch(() => null),
       json<SruDep>(`${BASE}/dep/${commune.dep}-sru.json`).catch(() => null),
       json<RisquesDep>(`${BASE}/dep/${commune.dep}-risques.json`).catch(() => null),
+      json<ElectionsDep>(`${BASE}/dep/${commune.dep}-elections.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -685,6 +738,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     marchesDep.set(commune.dep, mar);
     sruDep.set(commune.dep, inv);
     risquesDep.set(commune.dep, risq);
+    electionsDep.set(commune.dep, scr);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -744,6 +798,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     echelonsMaj: echelons?.maj ?? null,
     dmto: assemblerDmto(commune, ligne[2]),
     risques: assemblerRisques(commune),
+    scrutin: assemblerScrutin(commune),
     sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
     sruMaj: sruDep.get(commune.dep)?.maj ?? null,
     marches: assemblerMarches(commune, structures),
@@ -789,6 +844,43 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
   if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
   for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
   return out;
+}
+
+/**
+ * Le dernier scrutin municipal de la commune.
+ *
+ * Les deux tours quand il y en a eu deux ; dans 1 526 communes seulement. Les
+ * médianes nationales voyagent avec, parce qu'un taux de participation seul ne
+ * se discute pas — 57 % n'est ni bon ni mauvais tant qu'on ignore que la
+ * médiane est à 63 %.
+ */
+function assemblerScrutin(commune: CommuneBreve): Scrutin | null {
+  const d = electionsDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const tour = (numero: number, t: (typeof f)['t1'] | undefined) => {
+    if (!t) return null;
+    const m = d.medianes[numero - 1];
+    return {
+      numero,
+      inscrits: t.inscrits,
+      votants: t.votants,
+      refus: t.refus,
+      listes: t.listes,
+      medianeParticipation: m?.participation ?? 0,
+      medianeRefus: m?.refus ?? 0,
+    };
+  };
+  const tours = [tour(1, f.t1), tour(2, f.t2)].filter((t): t is NonNullable<typeof t> => !!t);
+  if (tours.length === 0) return null;
+  return {
+    nom: d.scrutin,
+    tours,
+    sieges: f.cm,
+    siegesCc: f.cc,
+    partListeUnique: d.listeUnique,
+    maj: d.maj,
+  };
 }
 
 /**

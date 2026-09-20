@@ -713,6 +713,8 @@ function demarrer(reseau: Reseau) {
     bloc.append(permalienCommune);
     const qui = blocMaire();
     if (qui) bloc.append(qui);
+    const vote = blocScrutin();
+    if (vote) bloc.append(vote);
     const resolvables = reseau.noeuds.filter((n) => n.banatic && n.banatic.length > 0);
     const dl = document.createElement('dl');
     dl.className = 'p-resolution';
@@ -1405,6 +1407,114 @@ function demarrer(reseau: Reseau) {
     }
     if (Math.abs(v) >= 1_000) return `${Math.round(v / 1000).toLocaleString('fr-FR')} k\u20ac`;
     return `${Math.round(v).toLocaleString('fr-FR')} \u20ac`;
+  }
+
+  /**
+   * Comment le conseil municipal a été élu.
+   *
+   * Le bloc précédent nomme le maire ; celui-ci dit dans quelles conditions il
+   * a été désigné. Trois chiffres, chacun rapporté à sa médiane nationale —
+   * 57 % de participation n'est ni bon ni mauvais tant qu'on ignore que la
+   * médiane est à 63 %.
+   *
+   * **Aucune nuance politique, aucun nom de candidat.** Le site nomme le maire
+   * parce qu'un annuaire le publie et qu'il faut savoir à qui écrire ; relier
+   * une personne à une opinion est une autre affaire, et reste interdit.
+   */
+  function blocScrutin(): HTMLElement | null {
+    const sc = territoire?.scrutin;
+    if (!sc) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-scrutin';
+    bloc.append(ligne('h4', 'p-titre-bloc', `Comment le conseil a été élu — ${sc.nom}`));
+
+    for (const t of sc.tours) {
+      if (t.inscrits === 0) continue;
+      const d = document.createElement('div');
+      d.className = 'p-scrutin-tour';
+      if (sc.tours.length > 1) {
+        d.append(ligne('span', 'p-service-famille', t.numero === 1 ? 'Premier tour' : 'Second tour'));
+      }
+      const dl = document.createElement('dl');
+      dl.className = 'p-reperes';
+
+      const taux = (valeur: number, total: number) => (total > 0 ? (valeur / total) * 100 : 0);
+      const lignes: { nom: string; valeur: number; mediane: number; detail: string }[] = [
+        {
+          nom: 'Participation',
+          valeur: taux(t.votants, t.inscrits),
+          mediane: t.medianeParticipation,
+          detail: `${t.votants.toLocaleString('fr-FR')} votants sur ${t.inscrits.toLocaleString('fr-FR')} inscrits`,
+        },
+        {
+          nom: 'Bulletins blancs ou nuls',
+          valeur: taux(t.refus, t.votants),
+          mediane: t.medianeRefus,
+          detail: `${t.refus.toLocaleString('fr-FR')} sur ${t.votants.toLocaleString('fr-FR')} votants`,
+        },
+      ];
+      for (const l of lignes) {
+        const div = document.createElement('div');
+        const dt = document.createElement('dt');
+        dt.textContent = l.nom;
+        const dd = document.createElement('dd');
+        dd.append(
+          ligne(
+            'span',
+            'p-montant',
+            `${l.valeur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %`,
+          ),
+        );
+        if (l.mediane > 0) {
+          dd.append(reglette(l.valeur, l.mediane, 'la médiane nationale'));
+          dd.append(
+            ligne(
+              'span',
+              'p-mediane',
+              `médiane ${l.mediane.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %`,
+            ),
+          );
+        }
+        dd.append(ligne('span', 'p-scrutin-detail', l.detail));
+        div.append(dt, dd);
+        dl.append(div);
+      }
+      d.append(dl);
+
+      // Le nombre de listes dit s'il y avait un choix. Deux communes sur trois
+      // n'en avaient qu'une : c'est le chiffre qui donne sa mesure au cas local.
+      if (t.listes > 0) {
+        d.append(
+          ligne(
+            'p',
+            'p-scrutin-listes',
+            t.listes === 1
+              ? `Une seule liste se présentait, comme dans ${sc.partListeUnique} % des communes.`
+              : `${t.listes} listes se présentaient. Dans ${sc.partListeUnique} % des communes, ` +
+                `il n'y en avait qu'une.`,
+          ),
+        );
+      }
+      bloc.append(d);
+    }
+
+    // Les sièges au conseil communautaire : le poids de la commune là où se
+    // décident les compétences transférées, que tout le reste du panneau décrit.
+    const sieges: string[] = [];
+    if (sc.sieges > 0) sieges.push(`${sc.sieges} sièges au conseil municipal`);
+    if (sc.siegesCc > 0) sieges.push(`${sc.siegesCc} au conseil communautaire`);
+    if (sieges.length > 0) bloc.append(ligne('p', 'p-scrutin-sieges', `${sieges.join(', ')}.`));
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les résultats publiés par le ministère de l'Intérieur (${sc.maj}). ` +
+          `Les nuances politiques ne sont pas reprises : le site nomme des fonctions et des ` +
+          `chiffres, pas des opinions.`,
+      ),
+    );
+    return bloc;
   }
 
   /**

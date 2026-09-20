@@ -308,3 +308,9 @@ sources:
   - { id: decret-ial, type: droit, titre: "Décret n° 2022-1289 du 1er octobre 2022 — information des acquéreurs et des locataires sur les risques", url: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000046362782", consulte_le: 2026-09-20 }
   - { id: wp-ppr, type: wikipedia, titre: "Plan de prévention des risques", url: "https://fr.wikipedia.org/wiki/Plan_de_pr%C3%A9vention_des_risques", consulte_le: 2026-09-20 }
   - { id: wp-catnat, type: wikipedia, titre: "Catastrophe naturelle", url: "https://fr.wikipedia.org/wiki/Catastrophe_naturelle", consulte_le: 2026-09-20 }
+
+  # --- Le scrutin municipal --------------------------------------------------
+  - { id: od-municipales-2026, type: donnees_ouvertes, titre: "Élections municipales 2026 — résultats du premier tour, commune par commune", url: "https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-premier-tour", consulte_le: 2026-09-20 }
+  - { id: loi-scrutin-liste, type: droit, titre: "Loi n° 2025-444 du 21 mai 2025 — harmonisation du mode de scrutin aux élections municipales", url: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000051643176", consulte_le: 2026-09-20 }
+  - { id: vp-scrutin-liste, type: page_officielle, titre: "Le scrutin de liste paritaire étendu à toutes les communes — vie-publique.fr", url: "https://www.vie-publique.fr/loi/297678-scrutin-liste-elections-municipales-parite-loi-organique-21-mai-2025", consulte_le: 2026-09-20 }
+  - { id: wp-municipales, type: wikipedia, titre: "Élections municipales en France", url: "https://fr.wikipedia.org/wiki/%C3%89lections_municipales_en_France", consulte_le: 2026-09-20 }

@@ -53,11 +53,16 @@ refuse les requêtes automatisées, si bien qu'un article se vérifie par
 recherche web et jamais de mémoire. Un identifiant `LEGIARTI` écrit de tête a
 déjà été faux une fois.
 
-## Phase 2 bis — Mettre en ligne
+## Phase 2 bis — Mettre en ligne *(presque)*
 
-Déploiement, domaine, mentions légales, licence, sitemap. À faire dès que les
-attributions sont relues : rien n'est réel tant que personne d'extérieur n'a
-touché le site.
+Déploiement ✔, sitemap ✔, licences ✔, mentions légales ✔ — à ceci près que le
+nom de l'éditeur, son contact, le directeur de la publication et l'hébergeur
+restent à déclarer dans `contenu/editeur.yaml` : ce sont les seules
+informations du site que personne ne peut déduire d'une source. Le déploiement
+refuse de publier tant qu'elles manquent.
+
+Reste le domaine, et la relecture des attributions : rien n'est réel tant que
+personne d'extérieur n'a touché le site.
 
 ## Phase 2 ter — « Chez moi » ✔ *(en place)*
 
@@ -631,6 +636,86 @@ officiel et non depuis le sinistre, et il est passé de dix à trente jours en
 2023 ; et un particulier ne peut pas demander lui-même la reconnaissance —
 seule la commune peut saisir le préfet, si bien que sans démarche du maire
 aucun sinistré n'est couvert.
+
+### Comment le conseil a été élu ✔
+
+Le site nomme le maire. Il ne disait pas dans quelles conditions ce maire avait
+été désigné — ce qui est la même question, posée en amont.
+
+Les résultats du ministère de l'Intérieur, commune par commune, donnent trois
+chiffres et **34 801 communes** couvertes : la participation, la part de
+bulletins blancs ou nuls, et le nombre de listes en présence. Chacun rapporté à
+sa médiane nationale, parce qu'un taux seul ne se discute pas — 57 % n'est ni
+bon ni mauvais tant qu'on ignore que la médiane est à 63,2 %.
+
+**Ce que le module ne collecte pas, et c'est la décision principale : les
+nuances politiques.** Le fichier les porte, liste par liste. `07-risques.md`
+est explicite : « relier une personne à une opinion, à un financement, à un
+réseau » reste interdit, et la règle n'a pas été levée quand le site s'est mis
+à nommer les maires — elle a été précisée. Le nom d'un titulaire est une donnée
+d'annuaire ; sa couleur politique est autre chose. Le fichier des résultats par
+commune ne porte d'ailleurs aucun nom de candidat : ils sont dans un fichier
+séparé, que le site n'ouvre pas.
+
+Ce qui reste est structurel, et parle de soi. Au Mayet-de-Montagne :
+**56,8 % de participation, et 28,2 % de bulletins blancs ou nuls** — trois fois
+la médiane nationale de 9,3 % — pour **une seule liste**. À Vichy, trois
+listes : 50,5 % de participation et 3,2 % de blancs et nuls. Le rapprochement
+se fait tout seul, et sans que le site ait à conclure quoi que ce soit.
+
+Deux repères nationaux accompagnent chaque fiche : **23 681 communes sur
+34 836 n'avaient qu'une seule liste au premier tour**, soit 68 % ; et 1 526
+communes seulement ont connu un second tour. S'y ajoutent les sièges au conseil
+municipal et **au conseil communautaire** — le poids de la commune là où se
+décident les compétences transférées, que tout le reste du panneau décrit.
+
+Le scrutin de 2026 est aussi le premier où toutes les communes votent au
+scrutin de liste paritaire : la loi du 21 mai 2025 l'a étendu aux communes de
+moins de 1 000 habitants, sept sur dix, et le panachage a disparu. Le processus
+d'inscription électorale le dit.
+
+### Les subventions aux associations : cherché, pas trouvé
+
+Les « données essentielles des subventions » sont publiées **collectivité par
+collectivité**, sans agrégat national — une centaine de jeux hétérogènes, là où
+les élections et le répertoire des associations ont, eux, leur version agrégée
+par data.gouv. Reconstituer un total sur quelques centaines de communes
+laisserait croire que les 34 000 autres ne subventionnent rien, ce qui est
+exactement le piège déjà refusé pour le total des marchés publics et pour la
+médiane de la taxe d'enlèvement.
+
+Le mot-clé reste dans la veille, avec la raison écrite à côté : le jour où un
+agrégat national paraît, il se signalera.
+
+### Les obligations de publication ✔
+
+La phase 2 bis listait « mentions légales, licence » sans que rien n'existe :
+le pied de page affirmait un contenu « sous licence CC BY-SA 4.0 » qu'aucun
+fichier du dépôt n'adoptait, et le README la donnait comme une « proposition ».
+
+Ce qui est en place :
+
+- **`LICENSE` (MIT) pour le code, `LICENSE-CONTENU.md` (CC BY-SA 4.0) pour le
+  contenu éditorial.** Le second est la licence de Wikipédia, ce qui est
+  cohérent avec un projet qui relie plutôt qu'il ne réécrit.
+- **La licence de chaque jeu réutilisé, vérifiée une par une** plutôt que
+  supposée : OFGL et DECP en Licence Ouverte v2.0, GASPAR et le répertoire des
+  associations en Licence Ouverte, le découpage Etalab en Licence Ouverte
+  également — ses codes postaux, autrefois sous ODbL, ne le sont plus.
+  **Aucun ODbL**, donc aucun partage à l'identique qui entrerait en conflit
+  avec le CC BY-SA du reste. La seule obligation est de citer la source et sa
+  date : chaque bloc de chiffres le fait déjà.
+- **Une page `/mentions`** qui dit ce que le site sait de son lecteur — un
+  site statique, aucune mesure d'audience, aucun cookie, une seule clé de
+  stockage local pour la commune choisie — et qui **construit la liste des
+  jeux réutilisés depuis la veille** plutôt que de la recopier : une liste
+  écrite à la main vieillirait dès la source suivante.
+- **L'identité de l'éditeur est du contenu, donc vérifiée par le build.**
+  `contenu/editeur.yaml` la déclare, et `npm run publier` — ce que lance le
+  déploiement — refuse de générer tant qu'un champ porte sa valeur d'attente.
+  `npm run build` se contente d'un avertissement : l'obligation de l'article 6
+  de la loi pour la confiance dans l'économie numérique naît de la mise à
+  disposition du public, pas de l'écriture d'une fiche.
 
 ### Une ingestion qui ne se perd plus en route
 

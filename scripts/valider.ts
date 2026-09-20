@@ -11,11 +11,14 @@
 import { chargerGraphe, estPerime, formaterDate } from '../src/modele/graphe.ts';
 import { construireGlossaire } from '../src/modele/glossaire.ts';
 import { construireReseau } from '../src/modele/reseau.ts';
+import { ATTENTE_EDITEUR } from '../src/modele/schemas.ts';
 import { existsSync, readFileSync } from 'node:fs';
 
 const args = new Set(process.argv.slice(2));
 const verifierLiens = args.has('--liens');
 const fraicheurBloquante = args.has('--fraicheur');
+/** Le déploiement le passe : c'est la mise à disposition du public qui oblige. */
+const publication = args.has('--publication');
 
 const ROUGE = '\x1b[31m';
 const JAUNE = '\x1b[33m';
@@ -266,6 +269,31 @@ if (verifierLiens) {
         }
       }),
     );
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Les mentions légales
+ *
+ * L'article 6 de la loi pour la confiance dans l'économie numérique impose à
+ * tout site accessible au public de dire qui l'édite et qui l'héberge. Ces
+ * informations ne se déduisent d'aucune donnée : elles sont déclarées dans
+ * `contenu/editeur.yaml`.
+ *
+ * L'obligation naît de la mise à disposition du public, pas de l'écriture du
+ * contenu : le manque est donc un avertissement ici, et une erreur avec
+ * `--publication`, que le déploiement passe. Travailler sur le site reste
+ * possible ; le publier avec des mentions vides ne l'est pas.
+ * ------------------------------------------------------------------ */
+
+const signaler = (m: string) => (publication ? erreurs : avertissements).push(m);
+if (!g.editeur) {
+  signaler('contenu/editeur.yaml est absent — un site public doit nommer son éditeur et son hébergeur');
+} else {
+  for (const [champ, valeur] of Object.entries(g.editeur)) {
+    if (valeur.trim() === ATTENTE_EDITEUR) {
+      signaler(`mentions légales : « ${champ} » est encore à compléter dans contenu/editeur.yaml`);
+    }
   }
 }
 

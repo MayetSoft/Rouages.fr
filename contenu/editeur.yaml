@@ -1,0 +1,20 @@
+# Qui édite ce site.
+#
+# Un site accessible au public doit dire qui le publie et qui l'héberge
+# (article 6 de la loi pour la confiance dans l'économie numérique). Ces
+# informations ne se devinent pas depuis le dépôt : elles sont déclarées ici,
+# et `npm run valider` refuse de publier tant qu'elles portent encore leur
+# valeur d'attente. C'est la même règle que pour le reste du contenu — ce qui
+# doit être vrai est vérifié par le build, pas par la mémoire de quelqu'un.
+#
+# Remplacer « À COMPLÉTER » par les valeurs réelles avant la mise en ligne.
+editeur:
+  # Une personne physique peut se limiter à son nom et à un moyen de contact ;
+  # une association ou une société déclare sa raison sociale et son siège.
+  nom: "À COMPLÉTER"
+  # Un courriel, un formulaire ou une adresse : ce qui permet de vous joindre.
+  contact: "À COMPLÉTER"
+  # La personne responsable de ce qui est publié. Souvent la même que l'éditeur.
+  directeur_publication: "À COMPLÉTER"
+  # Nom et adresse de l'hébergeur, tels qu'il les publie lui-même.
+  hebergeur: "À COMPLÉTER"

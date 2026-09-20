@@ -944,7 +944,7 @@ competences:
     acteur: maire
     resume: "Depuis 2019, le maire décide seul des inscriptions et des radiations, sous le contrôle a posteriori d'une commission ; l'Insee tient le répertoire national."
     partagee_avec: [etat, commission-controle-listes, citoyen]
-    liens: [code-electoral, insee-reu, sp-listes-electorales, wp-procedures-electorales]
+    liens: [code-electoral, insee-reu, sp-listes-electorales, wp-procedures-electorales, od-municipales-2026]
     verifie_le: 2026-09-19
     confiance: a_confirmer
 

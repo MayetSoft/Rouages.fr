@@ -57,6 +57,12 @@ processus:
         liens: [code-electoral, wp-procedures-electorales]
         confiance: a_confirmer
       - ordre: 5
+        acteur: conseil-municipal
+        action: "Élection au scrutin de liste paritaire"
+        note: "Depuis la loi du 21 mai 2025, toutes les communes votent au scrutin de liste à deux tours, sur des listes alternant femmes et hommes. Le panachage a disparu : on ne peut plus rayer ni ajouter un nom. Sept communes sur dix étaient jusque-là au scrutin majoritaire."
+        liens: [loi-scrutin-liste, vp-scrutin-liste, wp-municipales]
+        confiance: a_confirmer
+      - ordre: 6
         acteur: tribunal-judiciaire
         action: "Contentieux de l'inscription"
         conditionnelle: true

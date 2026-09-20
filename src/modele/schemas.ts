@@ -394,6 +394,25 @@ export const Decouverte = z.object({
   depuis: z.coerce.date(),
 });
 
+/**
+ * Qui édite le site, et qui l'héberge.
+ *
+ * L'article 6 de la loi pour la confiance dans l'économie numérique impose ces
+ * mentions à tout site accessible au public. Elles ne se devinent pas depuis le
+ * dépôt : elles sont déclarées dans `contenu/editeur.yaml`, et la validation
+ * refuse de publier tant qu'un champ porte encore sa valeur d'attente. C'est la
+ * même logique que le reste du contenu — ce qui doit être vrai est vérifié par
+ * le build plutôt que par la mémoire de quelqu'un.
+ */
+export const ATTENTE_EDITEUR = 'À COMPLÉTER';
+
+export const Editeur = z.object({
+  nom: z.string().min(2),
+  contact: z.string().min(2),
+  directeur_publication: z.string().min(2),
+  hebergeur: z.string().min(2),
+});
+
 /** Un fichier de contenu : toutes les entités d'un même rouage. */
 export const FichierContenu = z.object({
   acteurs: z.array(Acteur).default([]),
@@ -406,9 +425,11 @@ export const FichierContenu = z.object({
   reperes: z.array(Repere).default([]),
   surveillances: z.array(Surveillance).default([]),
   decouverte: Decouverte.optional(),
+  editeur: Editeur.optional(),
 });
 
 export type Decouverte = z.infer<typeof Decouverte>;
+export type Editeur = z.infer<typeof Editeur>;
 export type Repere = z.infer<typeof Repere>;
 export type Surveillance = z.infer<typeof Surveillance>;
 export type Sigle = z.infer<typeof Sigle>;

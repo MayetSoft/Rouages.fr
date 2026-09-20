@@ -83,7 +83,24 @@ Le contenu vit dans `contenu/`&nbsp;: acteurs, compétences, flux, processus,
 sources et **glossaire**. Tout sigle employé doit y avoir son entrée, sans quoi
 le build échoue.
 
-## Licence (proposition)
+## Licence
 
-Contenu : CC BY-SA 4.0, compatible avec la réutilisation depuis et vers
-Wikipédia. Code : MIT.
+**Code** : MIT — voir [`LICENSE`](LICENSE).
+
+**Contenu éditorial** (`contenu/`) : CC BY-SA 4.0, la licence de Wikipédia,
+donc réutilisable depuis et vers elle sans friction. Voir
+[`LICENSE-CONTENU.md`](LICENSE-CONTENU.md).
+
+**Données republiées** (`public/territoires/`) : elles restent sous la licence
+de leur producteur. Tous les jeux réutilisés sont sous **Licence Ouverte**
+(Etalab), vérifié jeu par jeu — aucun ODbL, dont le partage à l'identique
+serait incompatible avec le CC BY-SA du reste. La seule obligation est de citer
+la source et sa date, ce que chaque bloc de chiffres fait déjà.
+
+## Mentions légales
+
+`contenu/editeur.yaml` déclare qui édite et qui héberge le site.
+`npm run publier` — ce que lance le déploiement — refuse de générer tant qu'un
+champ y porte encore sa valeur d'attente. `npm run build` se contente d'un
+avertissement : l'obligation naît de la mise à disposition du public, pas de
+l'écriture d'une fiche.

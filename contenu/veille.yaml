@@ -148,6 +148,25 @@ surveillances:
 
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
+  - id: gaspar-risques
+    nom: "GASPAR — risques majeurs, commune par commune"
+    alimente: "les risques recensés, les catastrophes naturelles et les plans de prévention"
+    # L'archive porte un nom fixe, mais les fichiers qu'elle contient sont
+    # datés : c'est le jeu de données qu'on surveille, pas le fichier.
+    type: disponibilite
+    url: "http://files.georisques.fr/GASPAR/gaspar.zip"
+    lien: od-gaspar
+
+  - id: municipales-resultats
+    nom: "Élections municipales — résultats par commune"
+    alimente: "la participation, les bulletins blancs et nuls, et le nombre de listes"
+    # L'adresse du fichier porte l'horodatage de sa publication : elle changera
+    # au prochain scrutin, et c'est le jeu de données qui doit se voir bouger.
+    type: datagouv-ressource
+    url: "elections-municipales-2026-resultats-du-premier-tour"
+    ressource: "resultats-communes"
+    lien: od-municipales-2026
+
 decouverte:
   mots_cles:
     - "intercommunalité compétences"
@@ -157,6 +176,10 @@ decouverte:
     - "établissements de santé FINESS"
     - "France Services"
     - "casernes services d'incendie et de secours"
+    # Cherché, et introuvable au national : les « données essentielles des
+    # subventions » sont publiées collectivité par collectivité, sans agrégat.
+    # Reconstituer un total sur quelques centaines de communes laisserait croire
+    # que les 34 000 autres ne subventionnent rien.
     - "subventions associations collectivités"
     - "délibérations conseils municipaux"
     - "plan local d'urbanisme"

@@ -40,10 +40,13 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # `npm run build` valide le contenu avant de générer : un réseau
-      # incohérent ne peut pas être mis en ligne.
+      # `npm run publier` valide le contenu avant de générer : un réseau
+      # incohérent ne peut pas être mis en ligne. Il exige en outre les
+      # mentions légales, que l'article 6 de la loi pour la confiance dans
+      # l'économie numérique impose à tout site accessible au public — c'est
+      # ici, et pas au moment d'écrire une fiche, que l'obligation naît.
       - name: Construire
-        run: npm run build
+        run: npm run publier
 
       - name: Vérifier que le serveur est configuré
         id: config

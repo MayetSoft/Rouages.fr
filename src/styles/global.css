@@ -441,6 +441,28 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
   .p-marche-montant { text-align: left; }
   .p-marche-suite { margin-left: 0; }
 }
+/* Les mentions légales : deux colonnes tant que la place le permet, une seule
+   au téléphone — un intitulé et sa valeur ne se coupent pas. */
+.mentions { margin: 0 0 1.2rem; display: grid; gap: .45rem; max-width: var(--mesure); }
+.mentions > div { display: grid; grid-template-columns: 14rem 1fr; gap: .8rem; align-items: baseline; }
+.mentions dt { font-size: .82rem; color: var(--encre-douce); }
+.mentions dd { margin: 0; }
+.mentions-jeux { list-style: none; margin: 0 0 1.2rem; padding: 0; display: grid; gap: .4rem; max-width: var(--mesure); }
+.mentions-jeux li { display: grid; gap: .05rem; }
+.mentions-usage { font-size: .78rem; color: var(--encre-tres-douce); }
+@media (max-width: 540px) { .mentions > div { grid-template-columns: 1fr; gap: .05rem; } }
+
+/* Le scrutin. Deux taux posés sur la même réglette que les comptes : la
+   position du point vaut mieux qu'un écart en points de pourcentage, qui
+   demande un calcul mental à chaque ligne. */
+.p-scrutin { margin-top: 1.1rem; }
+.p-scrutin-tour { margin: 0 0 .6rem; }
+.p-scrutin-tour .p-service-famille { margin-bottom: .3rem; }
+.p-scrutin-detail { display: block; width: 100%; font-size: .74rem; color: var(--encre-tres-douce); }
+.p-scrutin-listes, .p-scrutin-sieges {
+  font-size: .78rem; color: var(--encre-douce); line-height: 1.45; margin: .35rem 0 0;
+}
+
 /* Les risques. Deux listes qui ne disent pas la même chose, séparées par leur
    en-tête : la première est un inventaire, la seconde un décompte, et la
    colonne de chiffres de la seconde suffit à les distinguer d'un coup d'œil. */
