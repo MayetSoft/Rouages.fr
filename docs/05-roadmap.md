@@ -37,16 +37,21 @@ Reste :
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
 
-### Une contrainte d'outillage à lever
+### Une contrainte d'outillage levée ✔
 
-Les sessions de développement passent par une politique réseau qui refuse les
-hôtes d'open data (`geo.api.gouv.fr`, `banatic`, `data.gouv.fr`, `data.ofgl.fr`,
-`services.eaufrance.fr`, `transport.data.gouv.fr`, `data.enedis.fr`). Tant
-qu'elle n'est pas ouverte, ou que les jeux de données ne sont pas déposés dans
-le dépôt, tout ce qui ingère de la donnée ne peut être écrit qu'à l'aveugle —
-et deviner des noms de champs produit du code qui casse au premier vrai appel.
-Le contrôle hebdomadaire des liens, lui, tourne dans l'intégration continue et
-n'est pas concerné.
+Cette section décrivait une politique réseau qui refusait les hôtes d'open
+data, et qui obligeait à écrire l'ingestion à l'aveugle. Ce n'est plus le cas :
+BANATIC, l'OFGL, les portails Opendatasoft, `files.georisques.fr` et
+`tabular-api.data.gouv.fr` répondent tous, et les huit sources sont ingérées
+depuis cet environnement.
+
+Ce qui reste fermé est consigné dans `CLAUDE.md` plutôt qu'ici, parce que c'est
+une contrainte de travail et non une étape de la feuille de route : les grosses
+réponses de `www.data.gouv.fr` font tomber le tunnel au bout de sept secondes —
+on passe donc par l'API v2 de recherche ou par `tabular-api` — et Légifrance
+refuse les requêtes automatisées, si bien qu'un article se vérifie par
+recherche web et jamais de mémoire. Un identifiant `LEGIARTI` écrit de tête a
+déjà été faux une fois.
 
 ## Phase 2 bis — Mettre en ligne
 
@@ -575,6 +580,57 @@ BANATIC, donc absente de la résolution territoriale et présente dans le résea
 
 Les fiches `service-public.fr` sont enregistrées sous `service-public.gouv.fr` :
 le portail a migré, les anciennes adresses redirigent.
+
+### À quoi l'endroit est exposé ✔
+
+Tout le reste du site dit qui décide. Ce bloc-là dit ce qui arrive — et c'est
+la première question qu'on se pose en arrivant quelque part, bien avant de
+savoir qui exerce la compétence voirie.
+
+GASPAR, la base du ministère de la Transition écologique, tient en **une
+archive de 8 Mo** : les risques recensés au dossier départemental, les
+**247 141 arrêtés de catastrophe naturelle depuis 1982**, les 32 789 procédures
+de plan de prévention et les documents d'information communaux. Un seul
+téléchargement, là où l'interface par commune de Géorisques imposerait 34 875
+appels.
+
+**Deux listes, et le site refuse de les fondre.** Le dossier départemental
+recense ce à quoi l'État estime la commune exposée ; les arrêtés disent ce qui
+est arrivé. Au Mayet-de-Montagne, le premier retient le séisme et le feu de
+forêt ; le second compte trois inondations, une sécheresse, une tempête et un
+mouvement de terrain — aucun des deux risques recensés. Ce sont deux
+instruments, l'un prospectif et l'autre constaté ; les rapprocher serait
+tentant et faux. Le site les affiche côte à côte et dit qu'ils ne se recouvrent
+pas.
+
+Trois autres décisions :
+
+- **Le nombre d'arrêtés ne vaut que comparé.** 34 699 communes sur 34 875 en
+  ont au moins un : le chiffre brut ne distingue personne. La médiane
+  nationale est de 6, et c'est elle qui donne son sens au chiffre local — Le
+  Mayet-de-Montagne en compte exactement 6.
+- **Les plans caducs sont écartés.** Seuls `Opposable` et `Prescrit` sont
+  montrés : un plan caduc ne s'impose plus à personne, et l'afficher laisserait
+  croire le contraire. « Opposable » est le mot qui compte — le plan vaut alors
+  servitude d'utilité publique et s'impose aux permis, y compris à l'État
+  (art. L562-4 du code de l'environnement).
+- **L'absence de document d'information communal se dit, sans conclure.**
+  9 744 communes sur 34 875 en ont publié un. Son absence ne dit rien des
+  risques eux-mêmes, seulement que l'information n'a pas été faite — et le
+  site distingue les deux cas, puisque l'obligation d'informer la population
+  tous les deux ans ne pèse que là où un plan est prescrit ou approuvé.
+
+Avec ce bloc viennent deux compétences que le graphe séparait mal : **l'État
+prescrit la contrainte, le maire doit la faire connaître.** Un habitant qui
+ignore laquelle est en jeu s'adresse presque toujours au mauvais des deux. Et
+un processus, `s-informer-sur-les-risques`, dont les leviers portent les pièges
+de forme habituels : l'état des risques doit dater de moins de six mois et
+figurer dès l'annonce immobilière depuis 2023 ; le délai de déclaration après
+un arrêté de catastrophe naturelle court depuis sa publication au Journal
+officiel et non depuis le sinistre, et il est passé de dix à trente jours en
+2023 ; et un particulier ne peut pas demander lui-même la reconnaissance —
+seule la commune peut saisir le préfet, si bien que sans démarche du maire
+aucun sinistré n'est couvert.
 
 ### Une ingestion qui ne se perd plus en route
 

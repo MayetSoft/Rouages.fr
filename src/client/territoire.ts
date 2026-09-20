@@ -204,6 +204,34 @@ export interface ComptesEchelon {
   })[];
 }
 
+/**
+ * Les risques majeurs d'une commune, prêts à afficher.
+ *
+ * Deux listes, et elles ne se recouvrent pas. `recenses` dit ce à quoi l'État
+ * estime la commune exposée ; `catnat` dit ce qui est arrivé. Au
+ * Mayet-de-Montagne la première retient le séisme et le feu de forêt, la
+ * seconde compte trois inondations, une sécheresse, une tempête et un mouvement
+ * de terrain. Les fondre en une seule liste serait plus simple et faux.
+ */
+export interface Risques {
+  /**
+   * Les risques du dossier départemental, tels que le préfet les recense :
+   * la famille, puis ses sous-types quand le dossier les précise.
+   */
+  recenses: { nom: string; sous: string[] }[];
+  /** Ce qui a été reconnu, par nature : le libellé, le nombre, le plus récent. */
+  catnat: { nom: string; nombre: number; dernier: string }[];
+  /** Le total, pour le comparer à la médiane nationale. */
+  totalCatnat: number;
+  /** Nombre médian d'arrêtés par commune : 34 699 sur 34 875 en ont au moins un. */
+  medianeCatnat: number;
+  /** Les plans de prévention qui produisent un effet. */
+  plans: { modele: string; nom: string; etat: string; date: string }[];
+  /** L'année du document d'information communal, ou null s'il n'y en a pas. */
+  dicrim: string | null;
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -285,6 +313,8 @@ export interface Territoire {
   echelonsMaj: string | null;
   /** Ce que rapportent les droits de mutation dans le département. */
   dmto: Dmto | null;
+  /** Ce à quoi l'endroit est exposé, et ce qui y est déjà arrivé. */
+  risques: Risques | null;
   /** L'obligation SRU, quand la commune y est soumise. */
   sru: Sru | null;
   /** La date de l'inventaire SRU. */
@@ -403,6 +433,29 @@ export interface Sru {
 }
 type SruDep = { maj: string; c: Record<string, Sru> };
 const sruDep = new Map<string, SruDep | null>();
+
+/**
+ * Les risques du département. Les tables de libellés y sont recopiées — une
+ * quarantaine d'entrées — pour que le fichier se suffise à lui-même.
+ */
+type RisquesDep = {
+  maj: string;
+  risques: string[];
+  jo: string[];
+  modeles: string[];
+  etats: string[];
+  mediane: number;
+  c: Record<
+    string,
+    {
+      ddrm: [number, number[]][];
+      catnat: [number, number, string][];
+      ppr: { m: number; nom: string; e: number; date: string }[];
+      dicrim?: string;
+    }
+  >;
+};
+const risquesDep = new Map<string, RisquesDep | null>();
 
 /**
  * Ce que rapportent les droits de mutation, et à qui.
@@ -608,7 +661,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv] = await Promise.all([
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq] = await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
@@ -621,6 +674,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<ElusDep>(`${BASE}/dep/${commune.dep}-elus.json`).catch(() => null),
       json<MarchesDep>(`${BASE}/dep/${commune.dep}-marches.json`).catch(() => null),
       json<SruDep>(`${BASE}/dep/${commune.dep}-sru.json`).catch(() => null),
+      json<RisquesDep>(`${BASE}/dep/${commune.dep}-risques.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -630,6 +684,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     elusDep.set(commune.dep, elus);
     marchesDep.set(commune.dep, mar);
     sruDep.set(commune.dep, inv);
+    risquesDep.set(commune.dep, risq);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -688,6 +743,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     comptesEchelons: assemblerEchelons(commune),
     echelonsMaj: echelons?.maj ?? null,
     dmto: assemblerDmto(commune, ligne[2]),
+    risques: assemblerRisques(commune),
     sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
     sruMaj: sruDep.get(commune.dep)?.maj ?? null,
     marches: assemblerMarches(commune, structures),
@@ -733,6 +789,43 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
   if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
   for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
   return out;
+}
+
+/**
+ * Les risques majeurs de la commune.
+ *
+ * Rien n'est assemblé quand le fichier ne dit rien d'elle : une commune sans
+ * risque recensé, sans arrêté et sans plan n'a pas de bloc — mieux vaut ne
+ * rien écrire que « aucun risque », que le site n'est pas en mesure d'affirmer.
+ */
+function assemblerRisques(commune: CommuneBreve): Risques | null {
+  const d = risquesDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const catnat = f.catnat.map(([i, n, date]) => ({
+    nom: d.jo[i] ?? '',
+    nombre: n,
+    dernier: date,
+  }));
+  return {
+    recenses: f.ddrm
+      .map(([i, sous]) => ({
+        nom: d.risques[i] ?? '',
+        sous: sous.map((j) => d.risques[j] ?? '').filter(Boolean),
+      }))
+      .filter((r) => r.nom),
+    catnat,
+    totalCatnat: catnat.reduce((a, b) => a + b.nombre, 0),
+    medianeCatnat: d.mediane,
+    plans: f.ppr.map((p) => ({
+      modele: d.modeles[p.m] ?? '',
+      nom: p.nom,
+      etat: d.etats[p.e] ?? '',
+      date: p.date,
+    })),
+    dicrim: f.dicrim ?? null,
+    maj: d.maj,
+  };
 }
 
 /**

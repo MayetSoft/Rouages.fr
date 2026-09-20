@@ -25,6 +25,7 @@ import { ecrireMarches, ecrireSuitesMarches, type Marches } from './marches-emet
 import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
+import { ecrireRisques, type Risques } from './risques-emettre.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -90,6 +91,7 @@ export function emettre(o: {
   sru: InventaireSru | null;
   dmto: Dmto | null;
   echelons: Echelons | null;
+  risques: Risques | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -258,6 +260,7 @@ export function emettre(o: {
   let elusEcrits = 0;
   let marchesEcrits = 0;
   let sruEcrits = 0;
+  let risquesEcrits = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -267,6 +270,10 @@ export function emettre(o: {
     if (o.elus) elusEcrits += ecrireElus(sortie, dep, liste.map((c) => c.code), o.elus);
 
     if (o.sru) sruEcrits += ecrireSru(sortie, dep, liste.map((c) => c.code), o.sru);
+
+    if (o.risques) {
+      risquesEcrits += ecrireRisques(sortie, dep, liste.map((c) => c.code), o.risques);
+    }
 
     // Les marchés sont indexés par SIREN d'acheteur : ceux des communes du
     // département, et ceux de tous les groupements auxquels elles adhèrent.
@@ -491,6 +498,11 @@ export function emettre(o: {
   }
   if (o.sru) {
     dire(`${GRIS}Inventaire SRU : ${sruEcrits.toLocaleString('fr-FR')} communes soumises.${RAZ}`);
+  }
+  if (o.risques) {
+    dire(
+      `${GRIS}Risques majeurs : ${risquesEcrits.toLocaleString('fr-FR')} communes documentées.${RAZ}`,
+    );
   }
   if (o.marches) {
     // La suite des listes, un fichier par acheteur, écrite une fois pour tout

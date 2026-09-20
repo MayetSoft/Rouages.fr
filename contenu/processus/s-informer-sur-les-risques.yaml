@@ -1,0 +1,139 @@
+# S'informer sur les risques, et s'en servir.
+# Le seul endroit du site où l'on parle de ce qui arrive plutôt que de qui
+# décide. Deux obligations se font face et personne ne les distingue : l'État
+# impose la contrainte, le maire doit la faire connaître. L'habitant qui ignore
+# laquelle est en jeu s'adresse presque toujours au mauvais des deux.
+documents:
+  - id: dicrim
+    nom: "Le document d'information communal sur les risques majeurs"
+    resume: "Les risques encourus dans la commune, l'alerte et les consignes. Établi par le maire, consultable en mairie."
+    ou_le_trouver: "Mairie, et souvent le site de la commune."
+    liens: [ce-l125-2, georisques-obligations]
+  - id: plan-prevention-risques
+    nom: "Le plan de prévention des risques"
+    resume: "Le zonage et le règlement établis par le préfet. Approuvé, il vaut servitude et s'impose aux permis."
+    ou_le_trouver: "Préfecture, annexes du plan local d'urbanisme, et Géorisques."
+    liens: [ce-l562-4, wp-ppr, georisques]
+  - id: etat-des-risques
+    nom: "L'état des risques"
+    resume: "Le document que le vendeur ou le bailleur doit fournir, valable six mois, exigible dès l'annonce."
+    ou_le_trouver: "Le vendeur ou le bailleur ; se pré-remplit sur ERRIAL."
+    liens: [decret-ial, errial]
+
+processus:
+  # « etat-des-risques » nomme déjà le document que le vendeur doit fournir. Le
+  # processus porte donc le nom de ce qu'on y fait.
+  - id: s-informer-sur-les-risques
+    nom: "S'informer sur les risques de son adresse"
+    famille: quotidien
+    resume: "Qui établit la contrainte, qui doit la faire connaître, ce qu'un vendeur doit dire, et ce qui s'ouvre après un arrêté de catastrophe naturelle."
+    declencheur: "Un achat, une location, un permis refusé, ou un sinistre"
+    sortie: "Un état des risques opposable, ou une indemnisation au titre de la garantie catastrophe naturelle"
+    decideur: prefet
+    competences: [prevention-risques, information-risques, delivrance-autorisation-urbanisme, redaction-plu]
+    liens: [georisques, ce-l562-4, od-gaspar]
+    verifie_le: 2026-09-20
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: prefet
+        action: "Recensement des risques au dossier départemental"
+        note: "Le préfet arrête la liste des risques auxquels chaque commune est exposée. Elle ne recouvre pas la liste des arrêtés de catastrophe naturelle : la première est prospective, la seconde constate ce qui est arrivé."
+        liens: [georisques-obligations, code-environnement]
+        confiance: a_confirmer
+      - ordre: 2
+        acteur: prefet
+        action: "Prescription puis approbation du plan de prévention"
+        produit: [plan-prevention-risques]
+        note: "Instruit par la direction départementale des territoires, soumis à enquête publique, puis approuvé. Entre les deux, le préfet peut déjà le rendre applicable par anticipation."
+        liens: [ce-l562-4, wp-ppr, code-environnement]
+        confiance: a_confirmer
+      - ordre: 3
+        acteur: commune
+        action: "Annexion du plan approuvé au plan local d'urbanisme"
+        note: "Le plan approuvé vaut servitude d'utilité publique. Il s'impose à tous, y compris à l'État, et notamment lors de la délivrance des permis de construire — sans ouvrir droit à indemnisation."
+        liens: [ce-l562-4, code-urbanisme]
+        confiance: a_confirmer
+      - ordre: 4
+        acteur: maire
+        action: "Établissement du document d'information communal et information de la population"
+        produit: [dicrim]
+        note: "Dans les communes où un plan de prévention est prescrit ou approuvé, le maire informe la population au moins tous les deux ans. Ailleurs, le document reste recommandé mais cette périodicité ne s'impose pas."
+        liens: [ce-l125-2, georisques-obligations]
+        confiance: a_confirmer
+      - ordre: 5
+        acteur: citoyen
+        action: "Remise de l'état des risques à l'acquéreur ou au locataire"
+        produit: [etat-des-risques]
+        delai: { valeur: 6, unite: mois, nature: maximum_legal }
+        note: "Depuis le 1er janvier 2023, les risques doivent figurer dans l'annonce elle-même ; l'état des risques est remis dès la première visite, daté de moins de six mois, puis annexé à la promesse et à l'acte ou au bail."
+        liens: [decret-ial, errial]
+        confiance: a_confirmer
+      - ordre: 6
+        acteur: etat
+        action: "Arrêté interministériel de reconnaissance de l'état de catastrophe naturelle"
+        conditionnelle: true
+        note: "Pris après demande de la commune, il ouvre la garantie d'assurance. C'est sa publication au Journal officiel qui fait courir le délai de déclaration, pas la date du sinistre."
+        liens: [ca-l125-2, wp-catnat, georisques]
+        confiance: a_confirmer
+
+    leviers:
+      - id: consulter-georisques
+        quoi: "Regarder ce à quoi son adresse est exposée"
+        quand: "Avant d'acheter, de louer ou de déposer un permis"
+        aupres_de: "Géorisques, puis la mairie pour le détail du zonage"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Les risques recensés et les catastrophes reconnues sont deux listes différentes, et la première ne contient pas toujours la seconde. Les regarder toutes les deux."
+        liens: [georisques, od-gaspar, errial]
+        confiance: etabli
+      - id: lire-le-zonage-ppr
+        quoi: "Lire le règlement de la zone où se trouve le terrain"
+        quand: "Avant d'acheter un terrain ou de faire établir des plans"
+        aupres_de: "La préfecture, ou les annexes du plan local d'urbanisme en mairie"
+        difficulte: moyenne
+        ancre_etape: 3
+        recours_si_refus: "Saisir la CADA"
+        piege: "C'est le règlement qui interdit ou conditionne, pas la couleur sur la carte. Un terrain constructible au plan local d'urbanisme peut être inconstructible au plan de prévention, qui l'emporte."
+        liens: [ce-l562-4, code-urbanisme, cada]
+        confiance: a_confirmer
+      - id: demander-le-dicrim
+        quoi: "Demander le document d'information communal sur les risques majeurs"
+        quand: "À tout moment"
+        aupres_de: "La mairie"
+        difficulte: faible
+        ancre_etape: 4
+        recours_si_refus: "Saisir la CADA"
+        piege: "Moins d'une commune sur trois en a publié un. Son absence n'est pas une réponse sur les risques : elle dit seulement que l'information n'a pas été faite."
+        liens: [ce-l125-2, georisques-obligations, cada]
+        confiance: a_confirmer
+      - id: exiger-l-etat-des-risques
+        quoi: "Exiger l'état des risques avant de signer"
+        quand: "Dès la première visite, et avant la promesse ou le bail"
+        aupres_de: "Le vendeur, le bailleur ou l'agence"
+        difficulte: faible
+        ancre_etape: 5
+        recours_si_refus: "Demander au juge la résolution du contrat ou une baisse du prix"
+        piege: "Le document doit dater de moins de six mois. Un état des risques ancien ne vaut rien : le zonage a pu changer entre-temps."
+        liens: [decret-ial, errial]
+        confiance: a_confirmer
+      - id: declarer-apres-catnat
+        quoi: "Déclarer le sinistre après un arrêté de catastrophe naturelle"
+        quand: "Au plus tard trente jours après la publication de l'arrêté au Journal officiel"
+        aupres_de: "Son assureur"
+        difficulte: faible
+        ancre_etape: 6
+        piege: "Le délai court depuis la publication de l'arrêté, pas depuis le sinistre — et un arrêté peut paraître des mois après l'événement. Il est passé de dix à trente jours en 2023."
+        liens: [ca-l125-2, wp-catnat]
+        confiance: a_confirmer
+      - id: demander-la-reconnaissance-catnat
+        quoi: "Demander à la commune de solliciter la reconnaissance de catastrophe naturelle"
+        quand: "Dans les semaines qui suivent l'événement"
+        aupres_de: "La mairie, qui seule peut saisir le préfet"
+        difficulte: moyenne
+        ancre_etape: 6
+        piege: "Un particulier ne peut pas déposer la demande : c'est la commune qui la porte. Sans démarche du maire, aucun sinistré de la commune n'est couvert."
+        liens: [ca-l125-2, georisques, wp-catnat]
+        confiance: a_confirmer

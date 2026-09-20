@@ -241,6 +241,49 @@ function moisAnnee(iso: string): string | null {
       </section>
     )}
 
+    {fiche?.risques && (fiche.risques.recenses.length > 0 || fiche.risques.catnat.length > 0) && (
+      <section>
+        <h2 class="badge">À quoi la commune est exposée</h2>
+        {fiche.risques.recenses.length > 0 && (
+          <p class="mesure">
+            <strong>Recensés au dossier départemental</strong>&nbsp;:
+            {' '}{fiche.risques.recenses
+              .map((r) => (r.sous.length > 0 ? `${r.nom} (${r.sous.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join(', ')})` : r.nom))
+              .join(', ')}.
+          </p>
+        )}
+        {fiche.risques.catnat.length > 0 && (
+          <p class="mesure">
+            <strong>Reconnaissances de catastrophe naturelle depuis 1982</strong>&nbsp;:
+            {' '}{fiche.risques.catnat
+              .map((c) => {
+                // « dernier en » n'a de sens qu'au-delà d'un arrêté : sinon
+                // c'est le seul, et « dernier » laisserait croire à une série.
+                const quand = c.dernier ? `${c.nombre > 1 ? ', dernier en ' : ', en '}${c.dernier.slice(0, 4)}` : '';
+                return `${c.nom.toLowerCase()} (${c.nombre}${quand})`;
+              })
+              .join(', ')}.
+          </p>
+        )}
+        {fiche.risques.plans.length > 0 && (
+          <p class="mesure">
+            <strong>Plans de prévention</strong>&nbsp;:
+            {' '}{fiche.risques.plans
+              .map((p) => `${p.nom}${p.etat ? ` (${p.etat.toLowerCase()}${p.date ? `, ${p.date.slice(0, 4)}` : ''})` : ''}`)
+              .join(' ; ')}.
+          </p>
+        )}
+        <p class="p-source-territoire">
+          D’après GASPAR, la base du ministère de la Transition écologique ({fiche.risques.maj}).
+          Les risques recensés et les catastrophes reconnues sont deux listes distinctes&nbsp;: la
+          première dit ce à quoi l’État estime la commune exposée, la seconde ce qui est arrivé.
+          {fiche.risques.dicrim
+            ? ` Document d’information communal publié en ${fiche.risques.dicrim}.`
+            : ' Aucun document d’information communal recensé.'}
+        </p>
+      </section>
+    )}
+
     <h2 class="badge">Aller plus loin</h2>
     <ul>
       <li>
@@ -249,6 +292,10 @@ function moisAnnee(iso: string): string | null {
       </li>
       {fiche?.soumiseSru && (
         <li><a href="/n/logement-social">L’obligation de logements sociaux</a> s’applique ici.</li>
+      )}
+      {fiche?.risques && (
+        <li><a href="/n/s-informer-sur-les-risques">S’informer sur les risques de son adresse</a> — ce
+        qu’un vendeur doit dire, et ce qui s’ouvre après un arrêté de catastrophe naturelle.</li>
       )}
       <li><a href="/methode">Comment ces réponses sont construites</a></li>
       <li><a href={urlSignaler(undefined, commune.code, `/commune/${commune.code}`)}>Signaler une erreur sur cette commune</a></li>

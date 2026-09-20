@@ -947,3 +947,27 @@ competences:
     liens: [code-electoral, insee-reu, sp-listes-electorales, wp-procedures-electorales]
     verifie_le: 2026-09-19
     confiance: a_confirmer
+
+  # --- Les risques majeurs ---------------------------------------------------
+  # Deux compétences distinctes, et c'est tout l'intérêt de les séparer : l'État
+  # décide de la contrainte, le maire doit la faire connaître. Un habitant qui
+  # ignore de quoi il relève s'adresse presque toujours au mauvais des deux.
+  - id: prevention-risques
+    nom: "Prévention des risques naturels et technologiques"
+    nom_court: "Prévention des risques"
+    acteur: prefet
+    resume: "Le préfet prescrit et approuve le plan de prévention ; une fois approuvé, il vaut servitude d'utilité publique et s'impose aux permis de construire."
+    partagee_avec: [etat, ddt, dreal, commune, citoyen]
+    liens: [ce-l562-4, georisques, wp-ppr, code-environnement]
+    verifie_le: 2026-09-20
+    confiance: a_confirmer
+
+  - id: information-risques
+    nom: "Information de la population sur les risques majeurs"
+    nom_court: "Information des risques"
+    acteur: maire
+    resume: "Le document d'information communal et, dans les communes dotées d'un plan de prévention, une information de la population au moins tous les deux ans."
+    partagee_avec: [commune, prefet, citoyen]
+    liens: [ce-l125-2, georisques-obligations, code-environnement]
+    verifie_le: 2026-09-20
+    confiance: a_confirmer

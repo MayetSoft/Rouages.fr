@@ -409,6 +409,14 @@ async function principal() {
     ),
   );
 
+  // Les risques majeurs : une archive de 8 Mo qui porte les risques recensés,
+  // les arrêtés de catastrophe naturelle, les plans de prévention et les
+  // documents d'information communaux.
+  const { collecterRisques } = await import('./risques-emettre.ts');
+  const risques = await tenter('Risques majeurs', () =>
+    collecterRisques(telecharger, CACHE, (m) => dire(`${GRIS}${m}${RAZ}`)),
+  );
+
   ecrire(
     graphe,
     groupements,
@@ -426,6 +434,7 @@ async function principal() {
     sru,
     dmto,
     echelons,
+    risques,
   );
 }
 
@@ -536,6 +545,7 @@ async function ecrire(
   sru: Awaited<ReturnType<typeof import('./sru-emettre.ts')['collecterSru']>>,
   dmto: Awaited<ReturnType<typeof import('./dmto-emettre.ts')['collecterDmto']>>,
   echelons: Awaited<ReturnType<typeof import('./echelons-emettre.ts')['collecterEchelons']>>,
+  risques: Awaited<ReturnType<typeof import('./risques-emettre.ts')['collecterRisques']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -555,6 +565,7 @@ async function ecrire(
     sru,
     dmto,
     echelons,
+    risques,
     sortie: SORTIE,
     dire,
     VERT,

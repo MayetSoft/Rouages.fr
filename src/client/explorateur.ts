@@ -753,6 +753,8 @@ function demarrer(reseau: Reseau) {
     if (echelons) bloc.append(echelons);
     const mutation = blocDmto();
     if (mutation) bloc.append(mutation);
+    const exposition = blocRisques();
+    if (exposition) bloc.append(exposition);
     const obligation = blocSru();
     if (obligation) bloc.append(obligation);
     const commandes = blocMarches();
@@ -1403,6 +1405,139 @@ function demarrer(reseau: Reseau) {
     }
     if (Math.abs(v) >= 1_000) return `${Math.round(v / 1000).toLocaleString('fr-FR')} k\u20ac`;
     return `${Math.round(v).toLocaleString('fr-FR')} \u20ac`;
+  }
+
+  /**
+   * À quoi l'endroit est exposé, et ce qui y est déjà arrivé.
+   *
+   * Le reste du panneau dit qui décide ; celui-ci dit ce qui arrive. C'est la
+   * première question qu'on se pose en arrivant quelque part, bien avant de
+   * savoir qui exerce la compétence voirie.
+   *
+   * **Deux listes, et elles ne se recouvrent pas.** Le dossier départemental
+   * recense ce à quoi l'État estime la commune exposée ; les arrêtés disent ce
+   * qui est arrivé. Au Mayet-de-Montagne, le premier retient le séisme et le
+   * feu de forêt, le second compte trois inondations, une sécheresse, une
+   * tempête et un mouvement de terrain. Les fondre serait plus simple et faux :
+   * ce sont deux instruments, l'un prospectif et l'autre constaté.
+   */
+  function blocRisques(): HTMLElement | null {
+    const r = territoire?.risques;
+    if (!r) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-risques';
+    bloc.append(ligne('h3', 'p-titre-section', 'À quoi la commune est exposée'));
+
+    if (r.recenses.length > 0) {
+      const d = document.createElement('div');
+      d.className = 'p-risque-groupe';
+      d.append(ligne('span', 'p-service-famille', 'Recensés au dossier départemental'));
+      const ul = document.createElement('ul');
+      for (const e of r.recenses) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-risque-nom', e.nom));
+        // Le sous-type sous sa famille : « Inondation » puis « par une crue à
+        // débordement lent ». GASPAR les met au même niveau, ce qui les ferait
+        // lire comme deux risques distincts.
+        if (e.sous.length > 0) {
+          li.append(
+            ligne(
+              'span',
+              'p-risque-detail',
+              e.sous.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join(' · '),
+            ),
+          );
+        }
+        ul.append(li);
+      }
+      d.append(ul);
+      bloc.append(d);
+    }
+
+    if (r.catnat.length > 0) {
+      const d = document.createElement('div');
+      d.className = 'p-risque-groupe';
+      // Le nombre médian tient lieu de référence : presque toutes les communes
+      // ont au moins un arrêté, donc le chiffre brut ne distingue personne.
+      d.append(
+        ligne(
+          'span',
+          'p-service-famille',
+          `Reconnaissances de catastrophe naturelle depuis 1982 — ` +
+            `${r.totalCatnat.toLocaleString('fr-FR')}, médiane nationale ${r.medianeCatnat}`,
+        ),
+      );
+      const ul = document.createElement('ul');
+      for (const c of r.catnat) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-risque-nombre', String(c.nombre)));
+        const droite = document.createElement('span');
+        droite.append(ligne('span', 'p-risque-nom', c.nom));
+        const annee = c.dernier.slice(0, 4);
+        if (annee) {
+          droite.append(
+            ligne('span', 'p-risque-detail', c.nombre > 1 ? `dernier en ${annee}` : `en ${annee}`),
+          );
+        }
+        li.append(droite);
+        ul.append(li);
+      }
+      d.append(ul);
+      bloc.append(d);
+    }
+
+    if (r.plans.length > 0) {
+      const d = document.createElement('div');
+      d.className = 'p-risque-groupe';
+      d.append(ligne('span', 'p-service-famille', 'Plans de prévention'));
+      const ul = document.createElement('ul');
+      for (const p of r.plans) {
+        const li = document.createElement('li');
+        li.className = 'p-risque-plan';
+        li.append(ligne('span', 'p-risque-nom', p.nom || p.modele));
+        const sous: string[] = [];
+        if (p.nom && p.modele) sous.push(p.modele);
+        // « Opposable » est le mot qui compte : le plan s'impose alors aux
+        // permis, et le dire autrement le ferait passer pour un avis.
+        if (p.etat) sous.push(p.etat.toLowerCase());
+        const annee = p.date.slice(0, 4);
+        if (annee) sous.push(annee);
+        li.append(ligne('span', 'p-risque-detail', sous.join(' · ')));
+        ul.append(li);
+      }
+      d.append(ul);
+      bloc.append(d);
+    }
+
+    // Le document d'information communal : l'un des rares endroits où le site
+    // peut dire qu'une obligation n'est pas remplie. La nuance compte : la
+    // périodicité biennale ne s'impose que là où un plan est prescrit ou
+    // approuvé, et le site sait lequel des deux cas s'applique.
+    const soumise = r.plans.length > 0;
+    bloc.append(
+      ligne(
+        'p',
+        r.dicrim ? 'p-risque-dicrim' : 'p-risque-dicrim p-risque-dicrim--absent',
+        r.dicrim
+          ? `Document d'information communal publié en ${r.dicrim}. Il se demande en mairie.`
+          : soumise
+            ? `Aucun document d'information communal recensé. La commune ayant un plan de ` +
+              `prévention, le maire doit en établir un et informer la population tous les deux ans.`
+            : `Aucun document d'information communal recensé. Son absence ne dit rien des ` +
+              `risques eux-mêmes — seulement que cette information n'a pas été faite.`,
+      ),
+    );
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après GASPAR, la base du ministère de la Transition écologique (${r.maj}). ` +
+          `Les risques recensés et les catastrophes reconnues sont deux listes distinctes : ` +
+          `la première dit ce à quoi l'État estime la commune exposée, la seconde ce qui est arrivé.`,
+      ),
+    );
+    return bloc;
   }
 
   /**

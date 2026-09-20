@@ -245,3 +245,41 @@ sigles:
     developpe: "Mutualité sociale agricole"
     definition: "Le régime de protection sociale des exploitants et salariés agricoles : elle instruit et verse ce que la caisse d'allocations familiales verse ailleurs."
     liens: [sp-rsa, code-action-sociale]
+
+  - id: sigle-ppr
+    sigle: PPR
+    developpe: "Plan de prévention des risques"
+    definition: "Établi par le préfet ; une fois approuvé, il vaut servitude et interdit ou conditionne la construction dans les zones qu'il délimite."
+    noeud: prevention-risques
+    liens: [ce-l562-4, wp-ppr]
+
+  - id: sigle-dicrim
+    sigle: DICRIM
+    developpe: "Document d'information communal sur les risques majeurs"
+    definition: "Ce que le maire doit établir et porter à la connaissance des habitants : les risques encourus, l'alerte et les consignes."
+    noeud: information-risques
+    liens: [ce-l125-2, georisques-obligations]
+
+  - id: sigle-ddrm
+    sigle: DDRM
+    developpe: "Dossier départemental sur les risques majeurs"
+    definition: "L'inventaire, établi par le préfet, des risques auxquels chaque commune du département est exposée."
+    liens: [georisques-obligations, code-environnement]
+
+  - id: sigle-ial
+    sigle: IAL
+    developpe: "Information des acquéreurs et des locataires"
+    definition: "L'état des risques que le vendeur ou le bailleur doit fournir, désormais dès l'annonce immobilière."
+    liens: [decret-ial, errial]
+
+  - id: sigle-gaspar
+    sigle: GASPAR
+    developpe: "Gestion assistée des procédures administratives relatives aux risques"
+    definition: "La base du ministère qui recense, commune par commune, les risques, les arrêtés de catastrophe naturelle et les plans de prévention."
+    liens: [od-gaspar, georisques]
+
+  - id: sigle-errial
+    sigle: ERRIAL
+    developpe: "État des risques réglementés pour l'information des acquéreurs et des locataires"
+    definition: "Le service de l'État qui pré-remplit l'état des risques à partir d'une adresse."
+    liens: [errial, decret-ial]

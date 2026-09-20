@@ -54,6 +54,22 @@ type ServicesDep = {
 type ElusDep = { maj: string; c: Record<string, [string, string, string]> };
 type EcolesDep = { rentrees: number[]; h: Record<string, [(number | null)[], (number | null)[]]> };
 type SruDep = { maj: string; c: Record<string, Record<string, unknown>> };
+type RisquesDep = {
+  maj: string;
+  risques: string[];
+  jo: string[];
+  modeles: string[];
+  etats: string[];
+  c: Record<
+    string,
+    {
+      ddrm: [number, number[]][];
+      catnat: [number, number, string][];
+      ppr: { m: number; nom: string; e: number; date: string }[];
+      dicrim?: string;
+    }
+  >;
+};
 
 function lire<T>(chemin: string): T | null {
   const p = join(BASE, chemin);
@@ -88,6 +104,7 @@ const cacheServices = new Map<string, ServicesDep | null>();
 const cacheElus = new Map<string, ElusDep | null>();
 const cacheEcoles = new Map<string, EcolesDep | null>();
 const cacheSru = new Map<string, SruDep | null>();
+const cacheRisques = new Map<string, RisquesDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -106,6 +123,20 @@ export interface Fiche {
   /** Ce qui n'est pas dans la commune mais dans son intercommunalité. */
   voisines: Record<string, { n: number; l: string[] }>;
   sdis: string | null;
+  /**
+   * À quoi l'endroit est exposé, et ce qui y est déjà arrivé.
+   *
+   * Deux listes distinctes, et c'est voulu : `recenses` dit ce à quoi l'État
+   * estime la commune exposée, `catnat` ce qui a été reconnu. Elles ne se
+   * recouvrent pas, et les fondre serait plus simple et faux.
+   */
+  risques: {
+    recenses: { nom: string; sous: string[] }[];
+    catnat: { nom: string; nombre: number; dernier: string }[];
+    plans: { nom: string; etat: string; date: string }[];
+    dicrim: string | null;
+    maj: string;
+  } | null;
   soumiseSru: boolean;
   maj: string;
 }
@@ -172,6 +203,9 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
 
   const sru = enCache(cacheSru, c.dep, `dep/${c.dep}-sru.json`);
 
+  const risq = enCache(cacheRisques, c.dep, `dep/${c.dep}-risques.json`);
+  const fr = risq?.c[c.code];
+
   return {
     commune: c,
     structures,
@@ -181,6 +215,29 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
     services,
     voisines: servs?.v?.[c.code] ?? {},
     sdis: servs?.sdis ?? m.services?.sdis?.[c.dep] ?? null,
+    risques:
+      risq && fr
+        ? {
+            recenses: fr.ddrm
+              .map(([i, sous]) => ({
+                nom: risq.risques[i] ?? '',
+                sous: sous.map((j) => risq.risques[j] ?? '').filter(Boolean),
+              }))
+              .filter((r) => r.nom),
+            catnat: fr.catnat.map(([i, n, date]) => ({
+              nom: risq.jo[i] ?? '',
+              nombre: n,
+              dernier: date,
+            })),
+            plans: fr.ppr.map((p) => ({
+              nom: p.nom || risq.modeles[p.m] || '',
+              etat: risq.etats[p.e] ?? '',
+              date: p.date,
+            })),
+            dicrim: fr.dicrim ?? null,
+            maj: risq.maj,
+          }
+        : null,
     soumiseSru: !!sru?.c[c.code],
     maj: dep.maj,
   };

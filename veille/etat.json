@@ -1,5 +1,5 @@
 {
-  "dernier_controle": "2026-09-19",
+  "dernier_controle": "2026-09-20",
   "constats": {
     "banatic-referentiel": {
       "empreinte": "a9d1b65dfa4eea62",
@@ -32,7 +32,7 @@
       "gravite": "ok"
     },
     "decp-marches": {
-      "millesime": 704853,
+      "millesime": 707787,
       "gravite": "ok"
     },
     "effectifs-ecoles": {

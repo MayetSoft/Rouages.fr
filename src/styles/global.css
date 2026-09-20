@@ -441,6 +441,20 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
   .p-marche-montant { text-align: left; }
   .p-marche-suite { margin-left: 0; }
 }
+/* Les risques. Deux listes qui ne disent pas la même chose, séparées par leur
+   en-tête : la première est un inventaire, la seconde un décompte, et la
+   colonne de chiffres de la seconde suffit à les distinguer d'un coup d'œil. */
+.p-risques { margin-top: 1.2rem; }
+.p-risque-groupe { margin: 0 0 .7rem; }
+.p-risques ul { list-style: none; margin: .1rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.p-risques li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .55rem; align-items: baseline; }
+.p-risques li.p-risque-plan, .p-risque-groupe:first-of-type li { grid-template-columns: 1fr; gap: .05rem; }
+.p-risque-nombre { font-variant-numeric: tabular-nums; font-weight: 650; text-align: right; }
+.p-risque-nom { display: block; font-size: .86rem; }
+.p-risque-detail { display: block; font-size: .74rem; color: var(--encre-tres-douce); }
+.p-risque-dicrim { font-size: .78rem; color: var(--encre-douce); line-height: 1.45; margin: .6rem 0 0; }
+.p-risque-dicrim--absent { color: var(--alerte); }
+
 .p-prix-eau { margin: .7rem 0 0; display: grid; gap: .1rem; }
 .p-prix { font-size: 1.15rem; font-weight: 650; font-variant-numeric: tabular-nums; }
 .p-prix-detail { font-size: .76rem; color: var(--encre-douce); line-height: 1.45; }
