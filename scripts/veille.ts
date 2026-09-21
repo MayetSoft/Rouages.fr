@@ -74,11 +74,12 @@ interface Etat {
  * coûte cher : une alerte hebdomadaire qui crie au loup finit par ne plus être
  * lue, et c'est précisément ce que cette veille existe pour éviter.
  */
-async function obstine(url: string, essais = 8): Promise<Response> {
+async function obstine(url: string, essais = 8, methode = 'GET'): Promise<Response> {
   let derniere: unknown;
   for (let i = 0; i < essais; i++) {
     try {
       const r = await fetch(url, {
+        method: methode,
         headers: { 'accept-language': 'fre' },
         signal: AbortSignal.timeout(90_000),
       });
@@ -126,6 +127,45 @@ const controles: Record<
   async disponibilite(s) {
     await obstine(s.url);
     return { gravite: 'ok', message: 'disponible' };
+  },
+
+  /**
+   * Un fichier republié sous la même adresse : c'est sa date qui dit s'il vit.
+   *
+   * Le répertoire des associations est réécrit au même nom à chaque millésime.
+   * Un « 200 » n'y prouve donc rien, et c'est exactement le ping que cette
+   * veille refuse : seule la date de dernière modification distingue un
+   * fichier tenu à jour d'un fichier oublié en place. Une requête d'en-tête
+   * suffit — on ne rapatrie pas 1,2 Go pour lire une date.
+   */
+  async 'fichier-date'(s) {
+    const r = await obstine(s.url, 8, 'HEAD');
+    const quand = r.headers.get('last-modified');
+    const taille = Number(r.headers.get('content-length') ?? 0);
+    const mo = taille > 0 ? `, ${(taille / 1e6).toFixed(0)} Mo` : '';
+    if (!quand) {
+      return {
+        gravite: 'a-regarder',
+        message: `le serveur ne date plus le fichier — impossible de savoir s'il est tenu à jour${mo}`,
+      };
+    }
+    const date = new Date(quand);
+    const jours = Math.round((Date.now() - date.getTime()) / 86_400_000);
+    const lisible = date.toISOString().slice(0, 10);
+    // Le répertoire est réécrit tous les mois. Six mois de silence ne sont pas
+    // une publication tardive : c'est une chaîne qui s'est arrêtée.
+    if (jours > 180) {
+      return {
+        gravite: 'alerte',
+        message: `plus republié depuis le ${lisible}, soit ${jours} jours${mo}`,
+        empreinte: lisible,
+      };
+    }
+    return {
+      gravite: jours > 90 ? 'a-regarder' : 'ok',
+      message: `republié le ${lisible}, il y a ${jours} jours${mo}`,
+      empreinte: lisible,
+    };
   },
 
   /**

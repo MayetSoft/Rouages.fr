@@ -189,6 +189,16 @@ surveillances:
     ressource: "subvention"
     lien: scdl-subventions
 
+  - id: rna-waldec
+    nom: "Répertoire national des associations — fichier Waldec"
+    alimente: "les créations d'associations, commune par commune"
+    # Le fichier est réécrit au même nom à chaque millésime mensuel : un « 200 »
+    # ne prouverait rien. C'est sa date de dernière modification qu'on regarde,
+    # par une requête d'en-tête — on ne rapatrie pas 1,2 Go pour lire une date.
+    type: fichier-date
+    url: "https://data-pipeline-open.s3.sbg.io.cloud.ovh.net/rna/waldec.csv"
+    lien: od-rna
+
 decouverte:
   mots_cles:
     - "intercommunalité compétences"

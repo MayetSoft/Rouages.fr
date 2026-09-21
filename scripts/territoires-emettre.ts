@@ -25,6 +25,7 @@ import { ecrireMarches, ecrireSuitesMarches, type Marches } from './marches-emet
 import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
+import { ecrireAssociations, type Associations } from './associations-emettre.ts';
 import { ecrireRisques, type Risques } from './risques-emettre.ts';
 import { ecrireElections, type Elections } from './elections-emettre.ts';
 import { ecrireDeliberations, type Deliberations } from './deliberations-emettre.ts';
@@ -96,6 +97,7 @@ export function emettre(o: {
   dmto: Dmto | null;
   echelons: Echelons | null;
   risques: Risques | null;
+  associations: Associations | null;
   elections: Elections | null;
   deliberations: Deliberations | null;
   subventions: Subventions | null;
@@ -282,6 +284,7 @@ export function emettre(o: {
   let marchesEcrits = 0;
   let sruEcrits = 0;
   let risquesEcrits = 0;
+  let assoEcrites = 0;
   let electionsEcrites = 0;
   let delibEcrites = 0;
   let subvEcrites = 0;
@@ -297,6 +300,10 @@ export function emettre(o: {
 
     if (o.risques) {
       risquesEcrits += ecrireRisques(sortie, dep, liste.map((c) => c.code), o.risques);
+    }
+
+    if (o.associations) {
+      assoEcrites += ecrireAssociations(sortie, dep, liste.map((c) => c.code), o.associations);
     }
 
     if (o.elections) {
@@ -556,6 +563,11 @@ export function emettre(o: {
   }
   if (o.sru) {
     dire(`${GRIS}Inventaire SRU : ${sruEcrits.toLocaleString('fr-FR')} communes soumises.${RAZ}`);
+  }
+  if (o.associations) {
+    dire(
+      `${GRIS}Associations : ${assoEcrites.toLocaleString('fr-FR')} communes où il s'en est créé.${RAZ}`,
+    );
   }
   if (o.risques) {
     dire(

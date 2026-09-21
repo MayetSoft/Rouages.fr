@@ -522,9 +522,17 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
    colonne de chiffres de la seconde suffit à les distinguer d'un coup d'œil. */
 .p-risques { margin-top: 1.2rem; }
 .p-risque-groupe { margin: 0 0 .7rem; }
-.p-risques ul { list-style: none; margin: .1rem 0 0; padding: 0; display: grid; gap: .3rem; }
-.p-risques li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .55rem; align-items: baseline; }
-.p-risques li.p-risque-plan, .p-risque-groupe:first-of-type li { grid-template-columns: 1fr; gap: .05rem; }
+.p-risques ul, .p-assos ul { list-style: none; margin: .1rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.p-risques li, .p-assos li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .55rem; align-items: baseline; }
+.p-risques li.p-risque-plan, .p-assos li.p-risque-plan, .p-risques .p-risque-groupe:first-of-type li {
+  grid-template-columns: 1fr; gap: .05rem;
+}
+
+/* --- ce qui se crée en associations ---
+   Le reste du panneau dit ce que les institutions décident ; ce bloc dit ce qui
+   se monte sans qu'aucune d'elles ait eu à le décider. */
+.p-assos { margin-top: 1.2rem; }
+.p-assos .p-reperes { margin-bottom: .8rem; }
 .p-risque-nombre { font-variant-numeric: tabular-nums; font-weight: 650; text-align: right; }
 .p-risque-nom { display: block; font-size: .86rem; }
 .p-risque-detail { display: block; font-size: .74rem; color: var(--encre-tres-douce); }

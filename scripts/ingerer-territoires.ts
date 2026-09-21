@@ -29,6 +29,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { chargerGraphe, RACINE } from '../src/modele/graphe.ts';
 
@@ -191,6 +192,29 @@ async function* lignesCsv(chemin: string): AsyncIterable<Record<string, string>>
     const champs = decouper(reste);
     if (champs.length > 1) yield Object.fromEntries(entetes.map((h, i) => [h, champs[i] ?? '']));
   }
+}
+
+/**
+ * La population de chaque commune actuelle, depuis le découpage.
+ *
+ * Le collecteur des associations en a besoin pour rapporter les créations à
+ * mille habitants : une commune de cinq cents âmes et une de cinquante mille
+ * n'en montent pas le même nombre, et le nombre brut ne se compare à rien.
+ */
+function populationParCommune(): Map<string, number> {
+  const chemin = createRequire(import.meta.url).resolve(
+    '@etalab/decoupage-administratif/data/communes.json',
+  );
+  const communes = JSON.parse(readFileSync(chemin, 'utf8')) as {
+    code: string;
+    type: string;
+    population?: number;
+  }[];
+  const out = new Map<string, number>();
+  for (const c of communes) {
+    if (c.type === 'commune-actuelle') out.set(c.code, c.population ?? 0);
+  }
+  return out;
 }
 
 /** Une fin de ligne hors guillemets : un champ peut contenir un saut de ligne. */
@@ -478,6 +502,24 @@ async function principal() {
     collecterRisques(telecharger, CACHE, (m) => dire(`${GRIS}${m}${RAZ}`)),
   );
 
+  // Ce qui se monte ici sans qu'aucune collectivité l'ait décidé : les
+  // créations d'associations. Un fichier de 1,2 Go, lu en flux comme FINESS,
+  // et une fenêtre récente — le répertoire dit ce qui se crée, jamais ce qui
+  // vit encore.
+  const { collecterAssociations } = await import('./associations-emettre.ts');
+  const associations = await tenter('Associations', () =>
+    collecterAssociations(
+      // Le fichier pèse 1,2 Go : il passe par le cache, comme FINESS, sinon
+      // chaque essai d'ingestion le retéléchargerait pour rien.
+      (url, vers) =>
+        telechargerEnCache(url, vers, reutiliser, 'Répertoire national des associations (environ 1,2 Go)'),
+      CACHE,
+      lignesCsv,
+      populationParCommune(),
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   ecrire(
     graphe,
     groupements,
@@ -499,6 +541,7 @@ async function principal() {
     elections,
     deliberations,
     subventions,
+    associations,
   );
 }
 
@@ -617,6 +660,9 @@ async function ecrire(
   subventions: Awaited<
     ReturnType<typeof import('./subventions-emettre.ts')['collecterSubventions']>
   >,
+  associations: Awaited<
+    ReturnType<typeof import('./associations-emettre.ts')['collecterAssociations']>
+  >,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -640,6 +686,7 @@ async function ecrire(
     elections,
     deliberations,
     subventions,
+    associations,
     sortie: SORTIE,
     dire,
     VERT,

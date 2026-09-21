@@ -354,6 +354,7 @@ export const Surveillance = z.object({
   alimente: z.string().min(5).max(160),
   type: z.enum([
     'disponibilite',
+    'fichier-date',
     'banatic-competences',
     'ofgl-millesime',
     'sispea-millesime',

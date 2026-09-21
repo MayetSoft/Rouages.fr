@@ -862,6 +862,78 @@ qu'on ne peut pas refermer redevient un mur.
 Mesuré au navigateur à 420 pixels de large, comme le reste : c'est la hauteur
 réelle rendue, pas une estimation.
 
+### Ce qui se crée en associations ✔
+
+Le site disait ce que les institutions décident, dépensent, commandent et
+versent. Il ne disait rien de ce qui se monte sans qu'aucune d'elles ait eu à
+le décider — et c'est la forme d'organisation collective la plus répandue du
+pays. Le répertoire national des associations le sait : **420 475 créations de
+2020 à 2025, dans 27 541 communes**, dix au Mayet-de-Montagne.
+
+**Un compte d'associations aurait été faux, et le site n'en publie pas.** Le
+répertoire se lit en deux fichiers, et le ministère dit lui-même comment ils se
+partagent : `waldec` porte les associations créées ou ayant déclaré un
+changement depuis 2009, `import` celles créées depuis 1901 qui n'ont rien
+déclaré depuis. Or `import` ne porte **aucun code INSEE** — seulement un code
+postal, qui couvre plusieurs communes — et sa colonne de position marque encore
+« active » des associations déclarées en 1903. Additionner les deux donnerait un
+total faux dans les deux sens à la fois : trop haut par les dormantes, mal placé
+par le code postal.
+
+Une date de création, elle, est un fait daté. Les données le confirment : les
+créations de `import` s'arrêtent en 2009 — 1 415 cette année-là, puis une
+poignée de dates manifestement fautives, jusqu'à 2029. **Waldec est donc
+complet pour tout ce qui se crée depuis 2010.** Le site compte des créations sur
+une fenêtre de six années civiles complètes, les rapporte à mille habitants
+(médiane nationale **5,3**, calculée sur toutes les communes peuplées, celles
+sans création comprises), les répartit par domaine déclaré et nomme les quatre
+dernières.
+
+Trois choses qu'il ne reprend pas :
+
+- **l'adresse.** Le siège d'une petite association est souvent le domicile de
+  celui qui l'a déclarée. Le site en retient la commune, rien d'autre — ni la
+  voie, ni le numéro, ni la civilité du dirigeant, que le répertoire publie
+  pourtant ;
+- **le jugement sur la vie de l'association.** Une dissolution se déclare, elle
+  ne se constate pas ; le bloc dit qu'il compte ce qui s'ouvre ;
+- **les intitulés qui nomment quelqu'un** — 334 écartés par le même motif qui
+  interdit un nom dans `contenu/`.
+
+Deux détails de rattachement ont demandé une décision. Paris, Lyon et Marseille
+déclarent par arrondissement, que le découpage ne connaît pas : sans repli sur
+la commune, 82 % de ce qui ne se rattachait pas était parisien, lyonnais ou
+marseillais. Le repli fait tomber la perte de 11,2 % à **0,2 %** — ce qui reste
+est l'outre-mer hors découpage et quelque neuf cents codes de communes
+fusionnées, que le site ne sait pas encore rapprocher de leur commune nouvelle.
+
+**Trois départements n'ont aucun fichier, et ce n'est pas un trou.** Le
+Bas-Rhin pèse vingt et une lignes dans tout le répertoire, la Moselle onze, le
+Haut-Rhin deux — contre vingt-deux mille pour la Meurthe-et-Moselle voisine. En
+Alsace-Moselle une association ne se déclare pas en préfecture : elle s'inscrit
+au registre des associations tenu par le greffe du tribunal judiciaire, sous le
+code civil local. Laisser le bloc absent se serait lu comme « on ne sait pas » ;
+le panneau y affiche donc la phrase qui nomme l'institution qui tient le
+registre. C'est exactement ce que ce site existe pour faire.
+
+Le domaine vient de la nomenclature WALDEC, et **c'est le préfixe du code qui
+fait foi, pas le rattachement déclaré** : sur ses 297 entrées, vingt se
+contredisent — « cantines, restaurants d'entreprises » y est rangé sous la
+représentation d'intérêts économiques, « amicale de sapeurs pompiers » sous un
+parent que la table des parents ne nomme même pas. Le préfixe les range sous la
+conduite d'activités économiques et sous la sécurité civile ; il tombe juste
+dans les vingt cas.
+
+La veille a gagné une nature de signal pour l'occasion. Le fichier est réécrit
+au même nom à chaque millésime mensuel : un « 200 » n'y prouve rien, et c'est
+exactement le ping que ce projet refuse. `fichier-date` lit la date de dernière
+modification par une requête d'en-tête — on ne rapatrie pas 1,2 Go pour lire une
+date — et alerte au-delà de six mois de silence.
+
+Une visite au Mayet-de-Montagne passe de 826 à 885 Ko. Les triplets plutôt que
+des objets, le mois plutôt que le jour et six domaines au lieu de tous ont ramené
+le fichier du département de 77 à 54 Ko avant de l'ajouter.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

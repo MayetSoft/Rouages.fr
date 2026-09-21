@@ -734,6 +734,9 @@ function demarrer(reseau: Reseau) {
     ajouter('Les marchés', blocMarches());
     ajouter('Les délibérations', blocDeliberations());
     ajouter('Les subventions', blocSubventions());
+    // Après ce que la commune verse aux associations : ce qui s'y crée sans
+    // qu'elle ait rien eu à décider.
+    ajouter('Les associations', blocAssociations());
     ajouter('Les services', blocServices());
     // Un sommaire d'une seule entrée ne guide rien : il ferait double emploi
     // avec le titre du bloc, juste en dessous.
@@ -1932,6 +1935,149 @@ function demarrer(reseau: Reseau) {
         `D'après GASPAR, la base du ministère de la Transition écologique (${r.maj}). ` +
           `Les risques recensés et les catastrophes reconnues sont deux listes distinctes : ` +
           `la première dit ce à quoi l'État estime la commune exposée, la seconde ce qui est arrivé.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * Les trois départements où le répertoire national ne dit rien.
+   *
+   * En Alsace-Moselle, une association ne se déclare pas en préfecture : elle
+   * s'inscrit au registre des associations tenu par le greffe du tribunal
+   * judiciaire, sous le code civil local. Le répertoire national ne les porte
+   * donc pas — vingt et une lignes pour le Bas-Rhin, onze pour la Moselle et
+   * deux pour le Haut-Rhin, contre vingt-deux mille pour la Meurthe-et-Moselle
+   * voisine.
+   *
+   * Laisser le bloc absent se lirait comme « on ne sait pas ». Le dire, c'est
+   * précisément ce que ce site existe pour faire : nommer l'institution qui
+   * tient le registre.
+   */
+  const DROIT_LOCAL = new Set(['57', '67', '68']);
+
+  function droitLocal(): HTMLElement | null {
+    const dep = territoire?.commune.dep;
+    if (!dep || !DROIT_LOCAL.has(dep)) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-assos';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui se crée en associations'));
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        `Ici, le répertoire national ne sait rien. En Alsace-Moselle, une association ne se ` +
+          `déclare pas en préfecture : elle s'inscrit au registre des associations tenu par le ` +
+          `greffe du tribunal judiciaire, sous le code civil local. C'est là que se consulte ce ` +
+          `qui s'est créé — et non dans le fichier dont le reste du pays relève.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * Ce qui se crée en associations.
+   *
+   * Le reste du panneau dit ce que les institutions décident, dépensent et
+   * commandent. Ce bloc dit ce qui se monte sans qu'aucune d'elles ait eu à le
+   * décider — et c'est la forme d'organisation collective la plus répandue du
+   * pays.
+   *
+   * **Des créations, pas des associations vivantes**, et le bloc le dit en
+   * toutes lettres : le répertoire national n'enregistre pas la dissolution
+   * qu'on ne lui déclare pas, et son fichier d'avant Waldec ne porte aucun code
+   * de commune. Une date de création, elle, est un fait daté.
+   */
+  function blocAssociations(): HTMLElement | null {
+    const a = territoire?.associations;
+    if (!a || a.total === 0) return droitLocal();
+    const bloc = document.createElement('section');
+    bloc.className = 'p-assos';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui se crée en associations'));
+    const debut = a.annees[0];
+    const fin = a.annees[a.annees.length - 1];
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        `Créations déclarées de ${debut} à ${fin}. Le répertoire ne dit pas si une ` +
+          `association fonctionne encore — une dissolution se déclare, elle ne se constate pas — ` +
+          `et le site ne compte donc que ce qui s'ouvre.`,
+      ),
+    );
+
+    // Le nombre brut ne se compare à rien : cinq créations dans un village et
+    // cinq dans une ville ne disent pas la même chose.
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const d = document.createElement('div');
+    d.append(ligne('dt', '', `Créations en ${a.annees.length} ans`));
+    const dd = document.createElement('dd');
+    dd.append(ligne('span', 'p-montant', a.total.toLocaleString('fr-FR')));
+    dd.append(reglette(a.taux, a.medianeTaux, 'la médiane des communes'));
+    // La virgule, pas le point : tout le reste du site compte en français.
+    const dixieme = (v: number) =>
+      v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    dd.append(
+      ligne(
+        'span',
+        'p-mediane',
+        `${dixieme(a.taux)} pour 1 000 habitants — médiane ${dixieme(a.medianeTaux)}`,
+      ),
+    );
+    const courbe = tendance(a.parAnnee, a.annees, (v) => `${v} création${v > 1 ? 's' : ''}`);
+    if (courbe) {
+      const l = document.createElement('span');
+      l.className = 'p-tendance-ligne';
+      l.append(courbe);
+      dd.append(l);
+    }
+    d.append(dd);
+    dl.append(d);
+    bloc.append(dl);
+
+    if (a.domaines.length > 0) {
+      const g = document.createElement('div');
+      g.className = 'p-risque-groupe';
+      // Déclaré par celui qui crée l'association, et jamais contrôlé : le dire
+      // évite de lire cette répartition comme un classement officiel.
+      g.append(ligne('span', 'p-service-famille', 'Par domaine, tel qu’il a été déclaré'));
+      const ul = document.createElement('ul');
+      for (const dom of a.domaines.slice(0, 6)) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-risque-nombre', String(dom.nombre)));
+        li.append(ligne('span', 'p-risque-nom', dom.nom));
+        ul.append(li);
+      }
+      g.append(ul);
+      bloc.append(g);
+    }
+
+    if (a.recentes.length > 0) {
+      const g = document.createElement('div');
+      g.className = 'p-risque-groupe';
+      g.append(ligne('span', 'p-service-famille', 'Les dernières déclarées'));
+      const ul = document.createElement('ul');
+      for (const r of a.recentes) {
+        const li = document.createElement('li');
+        li.className = 'p-risque-plan';
+        li.append(ligne('span', 'p-risque-nom', r.titre));
+        const sous = [moisAnnee(`${r.mois}-01`) ?? r.mois.slice(0, 4)];
+        if (r.domaine) sous.push(r.domaine.charAt(0).toLowerCase() + r.domaine.slice(1));
+        li.append(ligne('span', 'p-risque-detail', sous.join(' · ')));
+        ul.append(li);
+      }
+      g.append(ul);
+      bloc.append(g);
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après le répertoire national des associations (${a.maj}). Le site en retient la ` +
+          `commune du siège, jamais l'adresse : celui d'une petite association est souvent un ` +
+          `domicile. Une association déclarée ici peut agir ailleurs, et réciproquement.`,
       ),
     );
     return bloc;

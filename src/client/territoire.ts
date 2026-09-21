@@ -319,6 +319,30 @@ export interface Risques {
   maj: string;
 }
 
+/**
+ * Ce qui se crée en associations dans la commune.
+ *
+ * Des créations, pas des associations vivantes : le répertoire national ne dit
+ * pas si une association fonctionne encore, et son fichier d'avant Waldec ne
+ * porte aucun code de commune. Une date de création, elle, est un fait daté —
+ * et Waldec est complet pour tout ce qui se crée depuis 2010.
+ */
+export interface Associations {
+  /** Créations sur la fenêtre. */
+  total: number;
+  /** Les années de la fenêtre, et ce qui s'y est créé. */
+  annees: number[];
+  parAnnee: number[];
+  /** Par domaine déclaré, du plus fourni au moins fourni. */
+  domaines: { nom: string; nombre: number }[];
+  /** Les plus récentes, avec leur mois. */
+  recentes: { mois: string; titre: string; domaine: string | null }[];
+  /** Créations pour mille habitants sur la fenêtre, ici et à la médiane. */
+  taux: number;
+  medianeTaux: number;
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -402,6 +426,8 @@ export interface Territoire {
   dmto: Dmto | null;
   /** Ce à quoi l'endroit est exposé, et ce qui y est déjà arrivé. */
   risques: Risques | null;
+  /** Ce qui s'y crée en associations, quand il s'en est créé. */
+  associations: Associations | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -570,6 +596,28 @@ type RisquesDep = {
   >;
 };
 const risquesDep = new Map<string, RisquesDep | null>();
+
+/**
+ * Les créations d'associations du département. La table des domaines y est
+ * recopiée — vingt-neuf entrées — pour que le fichier se suffise à lui-même.
+ */
+type AssoDep = {
+  maj: string;
+  annees: number[];
+  domaines: string[];
+  mediane: number;
+  effectif: number;
+  c: Record<
+    string,
+    {
+      n: number;
+      a: number[];
+      d: [number, number][];
+      r: [string, string, number][];
+    }
+  >;
+};
+const assoDep = new Map<string, AssoDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -867,7 +915,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -885,6 +933,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<ElectionsDep>(`${BASE}/dep/${commune.dep}-elections.json`).catch(() => null),
       json<DelibDep>(`${BASE}/dep/${commune.dep}-deliberations.json`).catch(() => null),
       json<SubvDep>(`${BASE}/dep/${commune.dep}-subventions.json`).catch(() => null),
+      json<AssoDep>(`${BASE}/dep/${commune.dep}-associations.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -898,6 +947,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     electionsDep.set(commune.dep, scr);
     delibDep.set(commune.dep, del);
     subvDep.set(commune.dep, sub);
+    assoDep.set(commune.dep, asso);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -953,6 +1003,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     echelonsMaj: echelons?.maj ?? null,
     dmto: assemblerDmto(commune, ligne[2]),
     risques: assemblerRisques(commune),
+    associations: assemblerAssociations(commune, ligne[2]),
     scrutin: assemblerScrutin(commune),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,
@@ -1165,6 +1216,34 @@ function assemblerRisques(commune: CommuneBreve): Risques | null {
       date: p.date,
     })),
     dicrim: f.dicrim ?? null,
+    maj: d.maj,
+  };
+}
+
+/**
+ * Ce qui se crée en associations dans la commune.
+ *
+ * Rien n'est assemblé là où il ne s'est rien créé sur la fenêtre : « zéro »
+ * serait exact mais illisible — c'est le cas de près d'une commune sur cinq, et
+ * le plus souvent d'une commune de deux cents habitants. La médiane, elle, les
+ * compte : elle porte sur toutes les communes peuplées, silences compris.
+ */
+function assemblerAssociations(commune: CommuneBreve, population: number): Associations | null {
+  const d = assoDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  return {
+    total: f.n,
+    annees: d.annees,
+    parAnnee: f.a,
+    domaines: f.d.map(([i, n]) => ({ nom: d.domaines[i] ?? '', nombre: n })).filter((x) => x.nom),
+    recentes: f.r.map(([mois, titre, dom]) => ({
+      mois,
+      titre,
+      domaine: dom >= 0 ? (d.domaines[dom] ?? null) : null,
+    })),
+    taux: population > 0 ? (f.n / population) * 1000 : 0,
+    medianeTaux: d.mediane,
     maj: d.maj,
   };
 }
