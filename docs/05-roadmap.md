@@ -801,6 +801,41 @@ Ce qui est en place :
   de la loi pour la confiance dans l'économie numérique naît de la mise à
   disposition du public, pas de l'écriture d'une fiche.
 
+### Ce qu'une visite pesait vraiment ✔
+
+Six blocs de données ont été ajoutés en quelques jours — risques, élections,
+délibérations, subventions, comptes des échelons, marchés complets — sans que
+personne mesure le cumul. La mesure, faite au navigateur sur
+Le Mayet-de-Montagne, a donné **2 265 Ko pour une commune**, dont
+**1 444 Ko pour le seul `index.json`** : les deux tiers du poids total.
+
+Cet index est le catalogue des 34 875 communes, et il ne sert qu'à **chercher
+par nom**. Or `trouverParCode` le chargeait entier pour résoudre un seul code
+— c'est-à-dire à chaque arrivée sur une commune déjà choisie, par un lien
+partagé ou par le choix mémorisé. Le catalogue de la France pour trois champs.
+
+Le fichier du département porte déjà le nom et la population, et `resoudre`
+allait le chercher juste après de toute façon. Il lui manquait les codes
+postaux — trois kilo-octets par département — et le nom du département, sorti
+dans un `deps.json` de deux kilo-octets. Le code INSEE donne le département
+sans ambiguïté : vérifié sur les 34 875 communes avant d'écrire la règle.
+
+**2 265 Ko → 826 Ko, soit 64 % de moins**, sans rien retirer du panneau.
+L'index ne descend plus que si l'on ouvre la recherche.
+
+**Un bug introduit et attrapé par la même mesure.** Ranger la structure du
+département dès `trouverParCode` faisait passer la garde de `resoudre` pour
+satisfaite, et les onze autres fichiers — finances, services, marchés,
+risques — n'étaient plus chargés du tout. Le panneau s'affichait à moitié sans
+rien signaler : 482 Ko et quatre blocs au lieu de neuf. Une relecture de code
+ne l'aurait pas vu ; le compteur d'octets, si. La garde est désormais un
+ensemble distinct, et son commentaire dit pourquoi.
+
+Reste un chiffre qu'on ne corrige pas aujourd'hui : le panneau fait
+**7 032 pixels de haut**, soit sept mètres de défilement sur un téléphone.
+C'est le prix de neuf blocs, et cela demandera une navigation plutôt qu'un
+allègement.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

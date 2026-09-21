@@ -41,7 +41,8 @@ interface Meta {
 interface DepStructure {
   maj: string;
   g: [string, string, string, string[]][];
-  c: [string, string, number, number[]][];
+  /** Par commune : code, nom, population, groupements, codes postaux. */
+  c: [string, string, number, number[], string?][];
   couverture?: Record<string, number>;
 }
 

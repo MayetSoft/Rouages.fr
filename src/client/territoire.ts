@@ -485,7 +485,24 @@ let meta: {
   };
   maj: string;
 } | null = null;
+/** Le fichier d'un département : ses groupements, puis ses communes. */
+type DepStructure = {
+  maj: string;
+  g: [string, string, string, string[]][];
+  /** Par commune : code, nom, population, groupements, codes postaux. */
+  c: [string, string, number, number[], string?][];
+  couverture?: Record<string, number>;
+};
 const departements = new Map<string, unknown>();
+/**
+ * Les départements dont *tous* les fichiers ont été chargés.
+ *
+ * `departements` ne porte que la structure, et `trouverParCode` la remplit
+ * seul pour éviter un second téléchargement. S'en servir comme garde
+ * sauterait les onze autres fichiers — finances, services, marchés, risques —
+ * et le panneau s'afficherait à moitié sans rien signaler.
+ */
+const depComplets = new Set<string>();
 const financesDep = new Map<
   string,
   { annee: number; annees: number[]; h: Record<string, (number | null)[][]> } | null
@@ -795,8 +812,49 @@ export function classer(liste: CommuneBreve[], requete: string, limite = 8): Com
  * à un nom — et tous ne sont pas numériques (2A004, en Corse).
  */
 export async function trouverParCode(code: string): Promise<CommuneBreve | null> {
-  const liste = await chargerIndex();
-  return liste.find((c) => c.code === code) ?? null;
+  const deja = index?.find((c) => c.code === code);
+  if (deja) return deja;
+  // L'index national pèse 1,4 Mo — les deux tiers de tout ce qu'une visite
+  // télécharge — et il n'est utile qu'à la recherche par nom. Pour un code
+  // déjà connu, le fichier du département suffit : il porte le nom, la
+  // population et les codes postaux, et `resoudre` va le charger juste après
+  // de toute façon. Reste le nom du département, deux kilo-octets à part.
+  const dep = code.startsWith('97') || code.startsWith('98') ? code.slice(0, 3) : code.slice(0, 2);
+  const [fichier, noms] = await Promise.all([
+    (departements.get(dep) as DepStructure | undefined) ??
+      json<DepStructure>(`${BASE}/dep/${dep}.json`)
+        .then((d) => {
+          // Rangé tout de suite : `resoudre` le demande juste après, et le
+          // télécharger deux fois annulerait une part de ce qu'on vient de
+          // gagner.
+          departements.set(dep, d);
+          return d;
+        })
+        .catch(() => null),
+    chargerNomsDep(),
+  ]);
+  const ligne = fichier?.c.find((c) => c[0] === code);
+  if (!ligne) {
+    // Une commune fusionnée, ou un code inventé : l'index tranche, et lui seul.
+    return (await chargerIndex()).find((c) => c.code === code) ?? null;
+  }
+  const cps = (ligne[4] ?? '').split(' ').filter(Boolean);
+  return {
+    code: ligne[0],
+    nom: ligne[1],
+    cp: cps[0] ?? '',
+    cps,
+    dep,
+    depNom: noms[dep] ?? dep,
+    population: ligne[2],
+  };
+}
+
+/** Les noms de département, deux kilo-octets, chargés une fois. */
+let nomsDep: Record<string, string> | null = null;
+async function chargerNomsDep(): Promise<Record<string, string>> {
+  nomsDep ??= await json<Record<string, string>>(`${BASE}/deps.json`).catch(() => ({}));
+  return nomsDep;
 }
 
 export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
@@ -806,12 +864,12 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   fluxGfp ??= await json<FichierFlux>(`${BASE}/flux.json`).catch(() => null);
   dmtoNational ??= await json<DmtoNational>(`${BASE}/dmto.json`).catch(() => null);
   echelons ??= await json<EchelonsFichier>(`${BASE}/echelons.json`).catch(() => null);
-  if (!departements.has(commune.dep)) {
+  if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
     const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub] =
       await Promise.all([
-      json(`${BASE}/dep/${commune.dep}.json`),
+      departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
         `${BASE}/dep/${commune.dep}-finances.json`,
       ).catch(() => null),
@@ -840,13 +898,9 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     electionsDep.set(commune.dep, scr);
     delibDep.set(commune.dep, del);
     subvDep.set(commune.dep, sub);
+    depComplets.add(commune.dep);
   }
-  const dep = departements.get(commune.dep) as {
-    maj: string;
-    g: [string, string, string, string[]][];
-    c: [string, string, number, number[]][];
-    couverture: Record<string, number>;
-  };
+  const dep = departements.get(commune.dep) as DepStructure;
   const ligne = dep.c.find((c) => c[0] === commune.code);
   if (!ligne) throw new Error(`commune absente du département : ${commune.code}`);
 

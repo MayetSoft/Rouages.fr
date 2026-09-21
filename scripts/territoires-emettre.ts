@@ -216,6 +216,10 @@ export function emettre(o: {
     deps: Object.fromEntries(nomsDep),
     c: index,
   });
+  // Les noms de département seuls : deux kilo-octets, là où l'index entier en
+  // pèse 1 400. Arriver sur une commune déjà choisie ne doit pas coûter le
+  // catalogue de la France.
+  ecrireJson(join(sortie, 'deps.json'), Object.fromEntries(nomsDep));
 
   // --- un fichier par département ---------------------------------------
   mkdirSync(join(sortie, 'dep'), { recursive: true });
@@ -356,7 +360,10 @@ export function emettre(o: {
         }
         return refs.get(siren)!;
       });
-      return [c.code, c.nom, c.population ?? 0, indices];
+      // Les codes postaux voyagent ici aussi, pour trois kilo-octets par
+      // département : c'est ce qui permet de résoudre une commune connue sans
+      // charger l'index national, qui pèse 1,4 Mo (voir `trouverParCode`).
+      return [c.code, c.nom, c.population ?? 0, indices, (c.codesPostaux ?? []).join(' ')];
     });
 
     // Une commune « couverte » pour une compétence est une commune dont l'un des
