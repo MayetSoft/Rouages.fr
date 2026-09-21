@@ -155,6 +155,50 @@ export async function ressourcesDuSchema(
 }
 
 /**
+ * Les ressources d'un jeu de données nommé, retrouvées par son identifiant.
+ *
+ * La découverte par schéma ne voit pas tout : un agrégateur peut publier au
+ * format sans le déclarer sur ses ressources, et il faut alors le nommer. Mais
+ * **le nommer par l'adresse de ses fichiers ne tient pas**. Mégalis Bretagne
+ * republie chaque jour, sous un chemin qui porte l'horodatage de la
+ * publication : une adresse recopiée la veille rend déjà 404, et le collecteur
+ * perd en silence l'agrégateur qui porte l'essentiel du volume — le site a
+ * ainsi montré pendant un temps des délibérations qui s'arrêtaient au
+ * 31 décembre, pendant que la source publiait tous les jours.
+ *
+ * On nomme donc le jeu, jamais le fichier, et on demande ses ressources au
+ * moment de l'ingestion. L'API v2 plutôt que la v1 : sa réponse est plus
+ * légère, et c'est la seule des deux qui réponde depuis l'environnement de
+ * développement.
+ */
+export async function ressourcesDuJeu(
+  jeu: string,
+  motif: string,
+  json: <T>(url: string) => Promise<T>,
+  dire: (m: string) => void,
+): Promise<string[]> {
+  type Ressource = { title?: string; url?: string };
+  try {
+    const d = await json<{ data?: Ressource[] }>(
+      `https://www.data.gouv.fr/api/2/datasets/${encodeURIComponent(jeu)}/resources/?page_size=100`,
+    );
+    const cherche = motif.toLowerCase();
+    const urls = (d.data ?? [])
+      .filter((r) => r.url && (r.title ?? r.url ?? '').toLowerCase().includes(cherche))
+      .map((r) => r.url!);
+    if (urls.length === 0) {
+      dire(`  le jeu « ${jeu} » ne porte aucune ressource « ${motif} » : il a changé de forme.`);
+    }
+    return urls;
+  } catch {
+    // Comme la découverte : un agrégateur manquant ampute la couverture, il ne
+    // doit pas emporter le reste.
+    dire(`  le jeu « ${jeu} » n’a pas répondu — ses fichiers manqueront à cette ingestion.`);
+    return [];
+  }
+}
+
+/**
  * Le préfixe de SIREN d'un département, puis de sa région.
  *
  * Les collectivités territoriales portent un SIREN construit : `21` puis un

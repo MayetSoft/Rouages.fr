@@ -44,7 +44,7 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { nommeUnePersonne } from '../src/modele/civilites.ts';
 import { debutFenetre, GENRES, type Evenement } from '../src/modele/journal.ts';
-import { lireCsvOuvert, ressourcesDuSchema } from './donnees-ouvertes.ts';
+import { lireCsvOuvert, ressourcesDuJeu, ressourcesDuSchema } from './donnees-ouvertes.ts';
 
 /**
  * Les neuf familles de la nomenclature ACTES, celle que les collectivités
@@ -70,11 +70,13 @@ export const FAMILLES_ACTES = [
  * Les agrégateurs qui publient au schéma sans le déclarer sur leurs
  * ressources. Sans cette liste, la découverte les manquerait — et avec eux la
  * quasi-totalité du volume.
+ *
+ * On les nomme par leur jeu de données, jamais par l'adresse de leurs
+ * fichiers : Mégalis republie chaque jour sous un chemin horodaté, et une
+ * adresse recopiée la veille rend déjà 404 (voir `ressourcesDuJeu`).
  */
-const DECLAREES = [
-  'https://static.data.gouv.fr/resources/deliberations-des-organismes-adherents-de-megalis-bretagne/20260920-001343/deliberation-2026.csv',
-  'https://static.data.gouv.fr/resources/deliberations-des-organismes-adherents-de-megalis-bretagne/20260905-001350/deliberation-2025.csv',
-  'https://static.data.gouv.fr/resources/deliberations-des-organismes-adherents-de-megalis-bretagne/20260904-001352/deliberation-2024.csv',
+const DECLARES = [
+  { jeu: 'deliberations-des-organismes-adherents-de-megalis-bretagne', motif: 'deliberation-' },
 ];
 
 /** Combien de délibérations le fichier du département porte, par collectivité. */
@@ -122,9 +124,11 @@ export async function collecterDeliberations(
   dire: (m: string) => void,
 ): Promise<Deliberations | null> {
   const decouvertes = await ressourcesDuSchema('deliberations', json, dire);
-  const sources = [...new Set([...DECLAREES, ...decouvertes])];
+  const declarees: string[] = [];
+  for (const d of DECLARES) declarees.push(...(await ressourcesDuJeu(d.jeu, d.motif, json, dire)));
+  const sources = [...new Set([...declarees, ...decouvertes])];
   dire(
-    `Délibérations : ${sources.length} fichiers (${DECLAREES.length} déclarés, ` +
+    `Délibérations : ${sources.length} fichiers (${declarees.length} déclarés, ` +
       `${decouvertes.length} découverts par le schéma).`,
   );
 
