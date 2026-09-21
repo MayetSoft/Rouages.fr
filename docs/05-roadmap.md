@@ -831,10 +831,36 @@ rien signaler : 482 Ko et quatre blocs au lieu de neuf. Une relecture de code
 ne l'aurait pas vu ; le compteur d'octets, si. La garde est désormais un
 ensemble distinct, et son commentaire dit pourquoi.
 
-Reste un chiffre qu'on ne corrige pas aujourd'hui : le panneau fait
-**7 032 pixels de haut**, soit sept mètres de défilement sur un téléphone.
-C'est le prix de neuf blocs, et cela demandera une navigation plutôt qu'un
-allègement.
+Restait un chiffre que l'allègement ne pouvait pas corriger : le panneau
+faisait **7 032 pixels de haut**, sept mètres de défilement sur un téléphone.
+Ce n'était pas un poids, c'était une absence de navigation — traitée ci-dessous.
+
+### Sept mètres de défilement, ramenés à un écran ✔
+
+Jusqu'à douze blocs empilés, aucune hiérarchie, aucun moyen d'aller au dernier
+sans passer par tous les autres. Au Mayet-de-Montagne, où neuf s'affichent, le
+bloc « chez vous » mesurait **6 849 pixels** ; à Plouézec, qui publie en plus
+ses délibérations et ses subventions, davantage encore.
+
+Le remède n'est pas d'en retirer. Chaque bloc est désormais **replié derrière
+son propre titre** — un `<details>` dont le résumé est le titre qui s'y
+trouvait déjà, donc rien d'ajouté, rien de répété. Un **sommaire** de
+pastilles, au-dessus, ouvre n'importe lequel et l'amène en haut de l'écran ;
+le focus clavier suit, sans quoi la touche suivante repartirait du sommaire.
+
+Un seul bloc reste ouvert : **qui exerce quoi**. C'est la réponse que le reste
+du site ne sait pas donner sans connaître la commune, et la replier reviendrait
+à cacher ce pour quoi on est venu. Il se referme comme les autres — un bloc
+qu'on ne peut pas refermer redevient un mur.
+
+| | Le Mayet-de-Montagne | Plouézec (12 blocs) |
+| --- | --- | --- |
+| Avant | 6 849 px | — |
+| Après, à l'ouverture | 1 747 px | 2 242 px |
+| Après, tout replié | 581 px | 641 px |
+
+Mesuré au navigateur à 420 pixels de large, comme le reste : c'est la hauteur
+réelle rendue, pas une estimation.
 
 ### Une ingestion qui ne se perd plus en route
 

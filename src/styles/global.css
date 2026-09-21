@@ -374,6 +374,47 @@ button.rond { width: 1.9rem; padding: .1rem 0; font-size: 1rem; line-height: 1.3
 .p-structures li { display: grid; gap: .05rem; font-size: .9rem; }
 .p-nature-jur { color: var(--encre-douce); font-size: .78rem; }
 
+/* --- le sommaire, et les blocs repliés ---
+   Le panneau d'une commune approchait les sept mille pixels. Le remède n'est
+   pas d'en retirer : c'est de ne déplier que ce qu'on est venu lire. Les
+   pastilles disent ce qu'il y a, les titres repliés forment ensuite la même
+   liste, à sa place dans la page — une fois descendu, on n'a plus à remonter. */
+.p-sommaire {
+  display: flex; flex-wrap: wrap; gap: .3rem; margin: 0 0 1rem;
+}
+.p-sommaire-lien {
+  font: inherit; font-size: .76rem; line-height: 1.3; cursor: pointer;
+  background: var(--fond-doux); color: var(--encre-douce);
+  border: 1px solid var(--trait); border-radius: 999px; padding: .2rem .6rem;
+}
+.p-sommaire-lien:hover, .p-sommaire-lien:focus-visible {
+  color: var(--accent); border-color: var(--accent);
+}
+
+/* Le titre du bloc est son propre résumé : rien n'est ajouté pour replier,
+   sinon le signe qui dit que ça s'ouvre. */
+details.p-pli { margin-top: 0; border-top: 1px solid var(--trait); }
+details.p-pli > summary {
+  cursor: pointer; list-style: none; display: flex; align-items: baseline;
+  gap: .5rem; padding: .6rem 0; margin: 0;
+}
+details.p-pli > summary::-webkit-details-marker { display: none; }
+.p-territoire details.p-pli > summary { color: var(--accent); }
+details.p-pli > summary::after {
+  content: '+'; margin-left: auto; font-size: .95rem; line-height: 1;
+  color: var(--encre-tres-douce);
+}
+details.p-pli[open] > summary::after { content: '\2212'; }
+details.p-pli[open] > summary { padding-bottom: .5rem; }
+details.p-pli[open] { padding-bottom: .8rem; }
+/* Le premier enfant d'un bloc déplié porte souvent sa propre marge haute,
+   prévue pour suivre un titre de section : sous un résumé, elle fait un trou. */
+details.p-pli[open] > :nth-child(2) { margin-top: 0; }
+
+/* Le dernier bloc referme la liste : sans ce trait, la source qui suit
+   paraîtrait lui appartenir. */
+.p-territoire details.p-pli:last-of-type { border-bottom: 1px solid var(--trait); }
+
 /* --- qui est le maire ---
    La fonction en étiquette, le nom en encre pleine, la date en dessous :
    c'est le nom qu'on cherche, mais c'est la date qui dit s'il est à jour. */

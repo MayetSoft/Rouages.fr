@@ -713,13 +713,156 @@ function demarrer(reseau: Reseau) {
     bloc.append(permalienCommune);
     const qui = blocMaire();
     if (qui) bloc.append(qui);
-    const vote = blocScrutin();
-    if (vote) bloc.append(vote);
+
+    // Le panneau d'une commune approchait les sept mille pixels : sept mètres
+    // de défilement sur un téléphone, sans rien qui dise ce qui restait à
+    // venir. Chaque bloc est maintenant replié derrière son titre, et un
+    // sommaire y conduit d'un geste. Un seul reste ouvert — celui pour lequel
+    // on est venu.
+    const blocs: Repli[] = [];
+    const ajouter = (etiquette: string, section: HTMLElement | null, ouvert = false) => {
+      if (section) blocs.push({ etiquette, section, ouvert });
+    };
+    ajouter('L’élection', blocScrutin());
+    ajouter('Qui exerce quoi', blocResolution(), true);
+    ajouter('Ses comptes', blocFinances());
+    ajouter('L’intercommunalité', blocFluxPercus());
+    ajouter('Les échelons', blocEchelons());
+    ajouter('Une vente immobilière', blocDmto());
+    ajouter('Les risques', blocRisques());
+    ajouter('Le logement social', blocSru());
+    ajouter('Les marchés', blocMarches());
+    ajouter('Les délibérations', blocDeliberations());
+    ajouter('Les subventions', blocSubventions());
+    ajouter('Les services', blocServices());
+    // Un sommaire d'une seule entrée ne guide rien : il ferait double emploi
+    // avec le titre du bloc, juste en dessous.
+    if (blocs.length > 1) bloc.append(sommaire(blocs));
+    for (const r of blocs) {
+      r.rendu = replier(r);
+      bloc.append(r.rendu);
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les transferts de compétences déclarés à BANATIC (${territoire.maj}). ` +
+          `Une compétence exercée sans transfert déclaré — par convention, par exemple — n'y figure pas.` +
+          (territoire.majElus
+            ? ` Le maire vient du répertoire national des élus (${territoire.majElus}).`
+            : ''),
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * Un bloc du panneau, et le nom court sous lequel le sommaire y renvoie.
+   *
+   * L'étiquette n'est pas le titre du bloc : « Une vente immobilière » tient
+   * dans une pastille, « Ce que rapporte une vente immobilière » non.
+   */
+  interface Repli {
+    etiquette: string;
+    section: HTMLElement;
+    /**
+     * Déplié d'emblée. Un seul l'est : le repli reste possible pour lui aussi,
+     * parce qu'un bloc qu'on ne peut pas refermer redevient un mur.
+     */
+    ouvert: boolean;
+    /**
+     * Le <details> qui a repris le contenu du bloc. Le sommaire est construit
+     * avant les blocs — il doit les précéder — et ne peut donc pas le savoir
+     * au moment où on lui pose ses pastilles.
+     */
+    rendu?: HTMLDetailsElement;
+  }
+
+  /**
+   * Replier un bloc derrière son propre titre.
+   *
+   * Le titre du bloc devient le résumé du <details> : rien n'est ajouté, rien
+   * n'est répété. Le repli est celui du navigateur, comme pour les acheteurs
+   * d'un marché ou les familles de services — un bloc replié reste imprimable
+   * et reste trouvable par la recherche du navigateur dans les moteurs qui
+   * déplient <details>.
+   */
+  function replier(r: Repli): HTMLDetailsElement {
+    const d = document.createElement('details');
+    d.className = `${r.section.className} p-pli`;
+    d.open = r.ouvert;
+    const resume = document.createElement('summary');
+    // Le titre porte la classe du bloc d'origine — celle des titres de section
+    // ou celle des titres de bloc, selon l'âge du code. Le repli les uniformise :
+    // une fois refermés, ils forment une liste, et une liste se lit d'un trait.
+    resume.className = 'p-titre-section';
+    const entete = r.section.firstElementChild;
+    if (entete && /^H[1-6]$/.test(entete.tagName)) {
+      while (entete.firstChild) resume.append(entete.firstChild);
+      entete.remove();
+    } else {
+      resume.textContent = r.etiquette;
+    }
+    d.append(resume);
+    while (r.section.firstChild) d.append(r.section.firstChild);
+    return d;
+  }
+
+  /**
+   * Le sommaire : ce que cette commune a à dire, en une douzaine de mots.
+   *
+   * Il ne remplace pas le défilement, il le rend facultatif. Chaque pastille
+   * ouvre son bloc et l'amène en haut de l'écran ; le clavier suit, puisque le
+   * résumé prend le focus.
+   */
+  function sommaire(blocs: Repli[]): HTMLElement {
+    const nav = document.createElement('nav');
+    nav.className = 'p-sommaire';
+    nav.setAttribute('aria-label', 'Les blocs de cette commune');
+    for (const r of blocs) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'p-sommaire-lien';
+      b.textContent = r.etiquette;
+      b.addEventListener('click', () => {
+        const cible = r.rendu;
+        if (!cible) return;
+        cible.open = true;
+        // Le clavier suit le regard : sans cela, la touche suivante repart du
+        // sommaire, et le bloc qu'on vient d'ouvrir est resté derrière.
+        cible.querySelector('summary')?.focus({ preventScroll: true });
+        cible.scrollIntoView({ behavior: defilementDoux() ? 'smooth' : 'auto', block: 'start' });
+      });
+      nav.append(b);
+    }
+    return nav;
+  }
+
+  /** Le défilement animé n'est pas neutre pour qui l'a désactivé. */
+  function defilementDoux(): boolean {
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  /**
+   * Qui exerce quoi, compétence par compétence.
+   *
+   * C'est le seul bloc que le panneau laisse ouvert : ailleurs le site répond
+   * « variable selon le territoire », et c'est ici qu'il nomme la structure.
+   * Replier cette réponse-là reviendrait à cacher ce pour quoi on est venu.
+   */
+  function blocResolution(): HTMLElement | null {
+    const t = territoire;
+    if (!t) return null;
     const resolvables = reseau.noeuds.filter((n) => n.banatic && n.banatic.length > 0);
+    if (resolvables.length === 0) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-bloc-resolution';
+    bloc.append(ligne('h3', 'p-titre-section', 'Qui exerce quoi'));
     const dl = document.createElement('dl');
     dl.className = 'p-resolution';
     for (const n of resolvables.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'))) {
-      const v = territoire.verdict(n.id);
+      const v = t.verdict(n.id);
       const d = document.createElement('div');
       const dt = document.createElement('dt');
       const b = document.createElement('button');
@@ -733,7 +876,7 @@ function demarrer(reseau: Reseau) {
         if (v.etat === 'transferee-par-loi') {
           dd.append(ligne('span', 'p-incise-loi', 'transfert prévu par la loi'));
         }
-        const e = territoire.eau;
+        const e = t.eau;
         if (e && e.competence === n.id && e.prix !== null) {
           dd.append(ligne('span', 'p-prix-incise', `${e.prix.toLocaleString('fr-FR')} €/m³`));
         }
@@ -747,38 +890,6 @@ function demarrer(reseau: Reseau) {
       dl.append(d);
     }
     bloc.append(dl);
-    const argent = blocFinances();
-    if (argent) bloc.append(argent);
-    const percus = blocFluxPercus();
-    if (percus) bloc.append(percus);
-    const echelons = blocEchelons();
-    if (echelons) bloc.append(echelons);
-    const mutation = blocDmto();
-    if (mutation) bloc.append(mutation);
-    const exposition = blocRisques();
-    if (exposition) bloc.append(exposition);
-    const obligation = blocSru();
-    if (obligation) bloc.append(obligation);
-    const commandes = blocMarches();
-    if (commandes) bloc.append(commandes);
-    const actes = blocDeliberations();
-    if (actes) bloc.append(actes);
-    const aides = blocSubventions();
-    if (aides) bloc.append(aides);
-    const equipements = blocServices();
-    if (equipements) bloc.append(equipements);
-
-    bloc.append(
-      ligne(
-        'p',
-        'p-source-territoire',
-        `D'après les transferts de compétences déclarés à BANATIC (${territoire.maj}). ` +
-          `Une compétence exercée sans transfert déclaré — par convention, par exemple — n'y figure pas.` +
-          (territoire.majElus
-            ? ` Le maire vient du répertoire national des élus (${territoire.majElus}).`
-            : ''),
-      ),
-    );
     return bloc;
   }
 
