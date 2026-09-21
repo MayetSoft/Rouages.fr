@@ -1,5 +1,5 @@
 {
-  "dernier_controle": "2026-09-20",
+  "dernier_controle": "2026-09-21",
   "constats": {
     "banatic-referentiel": {
       "empreinte": "a9d1b65dfa4eea62",
@@ -24,7 +24,7 @@
       "gravite": "ok"
     },
     "annuaire-education": {
-      "millesime": 68583,
+      "millesime": 68584,
       "gravite": "ok"
     },
     "dmto-recettes": {
@@ -40,7 +40,7 @@
       "gravite": "ok"
     },
     "annuaire-administration": {
-      "millesime": 93753,
+      "millesime": 93780,
       "gravite": "ok"
     },
     "sru-inventaire": {
@@ -53,6 +53,20 @@
     },
     "finess-referentiel": {
       "empreinte": "0b463da3a172c9f8",
+      "gravite": "ok"
+    },
+    "gaspar-risques": {
+      "gravite": "ok"
+    },
+    "municipales-resultats": {
+      "gravite": "alerte"
+    },
+    "deliberations-megalis": {
+      "empreinte": "243c462663070aaa",
+      "gravite": "ok"
+    },
+    "subventions-schema": {
+      "empreinte": "aa909f1676bbfe8b",
       "gravite": "ok"
     }
   },
