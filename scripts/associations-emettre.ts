@@ -49,6 +49,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { nommeUnePersonne } from '../src/modele/civilites.ts';
+import { debutFenetre, GENRES, type Evenement } from '../src/modele/journal.ts';
 
 /**
  * Le fichier Waldec, en CSV consolidé.
@@ -154,6 +155,14 @@ export interface Associations {
   /** Les années civiles de la fenêtre. */
   annees: number[];
   communes: Map<string, AssociationsCommune>;
+  /**
+   * Les créations des derniers mois, pour le journal.
+   *
+   * Elles tombent hors de la fenêtre de comptage, qui s'arrête à la dernière
+   * année civile complète : ce sont précisément celles qu'un habitant veut
+   * voir passer, et le décompte ne les verra qu'au premier janvier.
+   */
+  evenements: Evenement[];
   /** Créations pour mille habitants sur la fenêtre : la médiane nationale. */
   mediane: number;
   /** Sur combien de communes cette médiane est calculée. */
@@ -207,14 +216,24 @@ export async function collecterAssociations(
   let horsDecoupage = 0;
   let ecartees = 0;
 
+  // Le journal regarde plus près que le décompte : les créations des derniers
+  // mois sont celles qu'on veut voir passer, et le comptage par année civile
+  // close ne les verra qu'au premier janvier.
+  const debutJournal = debutFenetre();
+  const evenements: Evenement[] = [];
+  const GENRE = GENRES.indexOf('Association créée');
+
   for await (const l of lignes(fichier)) {
-    const annee = Number.parseInt((l['date_creat'] ?? '').slice(0, 4), 10);
-    if (!Number.isFinite(annee) || annee < premiere || annee > derniere) continue;
+    const jour = (l['date_creat'] ?? '').slice(0, 10);
+    const annee = Number.parseInt(jour.slice(0, 4), 10);
+    const pourCompte = Number.isFinite(annee) && annee >= premiere && annee <= derniere;
+    const pourJournal = jour >= debutJournal;
+    if (!pourCompte && !pourJournal) continue;
     const brut = (l['adrs_codeinsee'] ?? '').trim();
     const code = reports.get(brut) ?? brut;
-    total++;
+    if (pourCompte) total++;
     if (!populations.has(code)) {
-      horsDecoupage++;
+      if (pourCompte) horsDecoupage++;
       continue;
     }
     const titre = (l['titre'] ?? '').trim();
@@ -223,10 +242,20 @@ export async function collecterAssociations(
     // le reste du site s'applique quand même : un intitulé qui commence par une
     // civilité désigne quelqu'un, pas un groupement.
     if (nommeUnePersonne(titre)) {
-      ecartees++;
+      if (pourCompte) ecartees++;
       continue;
     }
     const domaine = RANG_DOMAINE.get((l['objet_social1'] ?? '').slice(0, 3)) ?? -1;
+    if (pourJournal) {
+      evenements.push({
+        genre: GENRE,
+        date: jour,
+        quoi: titre.length > MAX_TITRE ? `${titre.slice(0, MAX_TITRE - 1)}…` : titre,
+        detail: domaine >= 0 ? DOMAINES[domaine][1] : undefined,
+        commune: code,
+      });
+    }
+    if (!pourCompte) continue;
 
     let c = communes.get(code);
     if (!c) {
@@ -279,13 +308,15 @@ export async function collecterAssociations(
           `(${((horsDecoupage / total) * 100).toFixed(2)} %)`
         : '') +
       (ecartees > 0 ? `, ${ecartees.toLocaleString('fr-FR')} écartées (intitulé nommant une personne)` : '') +
-      `. Médiane ${mediane.toFixed(1)} pour mille habitants sur ${ANNEES} ans.`,
+      `. Médiane ${mediane.toFixed(1)} pour mille habitants sur ${ANNEES} ans, ` +
+      `${evenements.length.toLocaleString('fr-FR')} créations pour le journal.`,
   );
 
   return {
     maj: new Date().toISOString().slice(0, 10),
     annees,
     communes,
+    evenements,
     mediane,
     effectif: taux.length,
     horsDecoupage,

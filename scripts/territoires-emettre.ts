@@ -26,6 +26,7 @@ import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
 import { ecrireAssociations, type Associations } from './associations-emettre.ts';
+import { ecrireJournal, rassembler } from './journal-emettre.ts';
 import { ecrireRisques, type Risques } from './risques-emettre.ts';
 import { ecrireElections, type Elections } from './elections-emettre.ts';
 import { ecrireDeliberations, type Deliberations } from './deliberations-emettre.ts';
@@ -285,9 +286,22 @@ export function emettre(o: {
   let sruEcrits = 0;
   let risquesEcrits = 0;
   let assoEcrites = 0;
+  let journalEcrit = 0;
   let electionsEcrites = 0;
   let delibEcrites = 0;
   let subvEcrites = 0;
+
+  // Rassemblé une fois pour toute la France : chaque département n'en prend
+  // ensuite que ce qui le concerne.
+  const journal = rassembler({
+    marches: o.marches,
+    risques: o.risques,
+    elus: o.elus,
+    deliberations: o.deliberations,
+    subventions: o.subventions,
+    associations: o.associations,
+  });
+  const majJournal = new Date().toISOString().slice(0, 10);
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -310,47 +324,65 @@ export function emettre(o: {
       electionsEcrites += ecrireElections(sortie, dep, liste.map((c) => c.code), o.elections);
     }
 
-    // Les marchés sont indexés par SIREN d'acheteur : ceux des communes du
-    // département, et ceux de tous les groupements auxquels elles adhèrent.
+    // Les structures dont dépend ce département, indexées par SIREN : les
+    // communes elles-mêmes, et tous les groupements auxquels elles adhèrent.
+    // Les mêmes que le panneau sait nommer, et pas d'autres — écrire les
+    // marchés d'un groupement que le client n'affiche jamais alourdirait le
+    // fichier sans que personne ne les voie.
+    const sirens = [
+      ...liste.map((c) => c.siren).filter((x): x is string => !!x),
+      ...liste.flatMap((c) => (c.siren ? utiles(closure(c.siren)) : [])),
+    ];
+    const sirenDeCommune = new Map(
+      liste.filter((c) => c.siren).map((c) => [c.code, c.siren!] as const),
+    );
+    // Le département et sa région versent et délibèrent aussi, et c'est là que
+    // se décide l'essentiel de ce que le site décrit par ailleurs. Leur SIREN
+    // n'est dans aucune liste : il se reconnaît à son préfixe, et on ne retient
+    // que ceux qui figurent réellement dans la donnée.
+    const prefixes = prefixesEchelon(dep, chefLieuDeRegion.get(dep));
+    const echelonsDelib = o.deliberations
+      ? sirensParPrefixe(prefixes, o.deliberations.parCollectivite.keys())
+      : [];
+    const echelonsSubv = o.subventions
+      ? sirensParPrefixe(prefixes, o.subventions.parCollectivite.keys())
+      : [];
+
     if (o.marches) {
-      // Les mêmes structures que le panneau sait nommer, et pas d'autres :
-      // écrire les marchés d'un groupement que le client n'affiche jamais
-      // alourdirait le fichier sans que personne ne les voie.
-      const sirens = [
-        ...liste.map((c) => c.siren).filter((x): x is string => !!x),
-        ...liste.flatMap((c) => (c.siren ? utiles(closure(c.siren)) : [])),
-      ];
-      const sirenDeCommune = new Map(
-        liste.filter((c) => c.siren).map((c) => [c.code, c.siren!] as const),
-      );
       marchesEcrits += ecrireMarches(sortie, dep, sirens, sirenDeCommune, o.marches);
-      // Le département et sa région versent et délibèrent aussi, et c'est là
-      // que se décide l'essentiel de ce que le site décrit par ailleurs. Leur
-      // SIREN n'est dans aucune liste : il se reconnaît à son préfixe, et on
-      // ne retient que ceux qui figurent réellement dans la donnée.
-      const prefixes = prefixesEchelon(dep, chefLieuDeRegion.get(dep));
       if (o.deliberations) {
-        const echelons = sirensParPrefixe(prefixes, o.deliberations.parCollectivite.keys());
         delibEcrites += ecrireDeliberations(
           sortie,
           dep,
-          [...sirens, ...echelons],
+          [...sirens, ...echelonsDelib],
           sirenDeCommune,
           o.deliberations,
-          echelons,
+          echelonsDelib,
         );
       }
       if (o.subventions) {
-        const echelons = sirensParPrefixe(prefixes, o.subventions.parCollectivite.keys());
         subvEcrites += ecrireSubventions(
           sortie,
           dep,
-          [...sirens, ...echelons],
+          [...sirens, ...echelonsSubv],
           sirenDeCommune,
           o.subventions,
-          echelons,
+          echelonsSubv,
         );
       }
+    }
+
+    // Le journal réunit ce que les autres écrivent séparément : il ne
+    // s'attache à aucune source, seulement à ce qui est daté.
+    if (journal.length > 0) {
+      journalEcrit += ecrireJournal(
+        sortie,
+        dep,
+        liste.map((c) => c.code),
+        [...sirens, ...echelonsDelib, ...echelonsSubv],
+        journal,
+        majJournal,
+      );
     }
 
     const refs = new Map<string, number>();
@@ -567,6 +599,12 @@ export function emettre(o: {
   if (o.associations) {
     dire(
       `${GRIS}Associations : ${assoEcrites.toLocaleString('fr-FR')} communes où il s'en est créé.${RAZ}`,
+    );
+  }
+  if (journal.length > 0) {
+    dire(
+      `${GRIS}Journal : ${journal.length.toLocaleString('fr-FR')} événements retenus sur la fenêtre, ` +
+        `${journalEcrit.toLocaleString('fr-FR')} écrits dans les fichiers de département.${RAZ}`,
     );
   }
   if (o.risques) {

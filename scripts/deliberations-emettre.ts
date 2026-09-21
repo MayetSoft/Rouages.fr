@@ -43,6 +43,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { nommeUnePersonne } from '../src/modele/civilites.ts';
+import { debutFenetre, GENRES, type Evenement } from '../src/modele/journal.ts';
 import { lireCsvOuvert, ressourcesDuSchema } from './donnees-ouvertes.ts';
 
 /**
@@ -105,6 +106,8 @@ export interface Deliberations {
   collectivites: number;
   /** Combien d'objets ont été écartés parce qu'ils nommaient quelqu'un. */
   ecartees: number;
+  /** Les délibérations des derniers mois, pour le journal. */
+  evenements: Evenement[];
 }
 
 export async function collecterDeliberations(
@@ -124,6 +127,10 @@ export async function collecterDeliberations(
     `Délibérations : ${sources.length} fichiers (${DECLAREES.length} déclarés, ` +
       `${decouvertes.length} découverts par le schéma).`,
   );
+
+  const debutJournal = debutFenetre();
+  const evenements: Evenement[] = [];
+  const GENRE = GENRES.indexOf('Délibération');
 
   const brut = new Map<string, Map<string, Deliberation>>();
   const totaux = new Map<string, number>();
@@ -169,12 +176,22 @@ export async function collecterDeliberations(
       // l'objet : un même acte est parfois republié d'un millésime à l'autre.
       const cle = (l['DELIB_ID'] ?? '').trim() || `${date}|${objet}`;
       if (m.has(cle)) continue;
-      m.set(cle, {
-        date,
-        famille,
-        objet: objet.length > MAX_OBJET ? `${objet.slice(0, MAX_OBJET - 1)}…` : objet,
-        url: (l['DELIB_URL'] ?? '').trim(),
-      });
+      const tronque = objet.length > MAX_OBJET ? `${objet.slice(0, MAX_OBJET - 1)}…` : objet;
+      const url = (l['DELIB_URL'] ?? '').trim();
+      m.set(cle, { date, famille, objet: tronque, url });
+      // Ici plutôt qu'en tête de boucle : la carte de déduplication vient de
+      // l'accepter, donc un acte republié d'un millésime à l'autre n'entre pas
+      // deux fois dans le journal.
+      if (date >= debutJournal) {
+        evenements.push({
+          genre: GENRE,
+          date,
+          quoi: tronque,
+          detail: famille >= 0 ? FAMILLES_ACTES[famille] : undefined,
+          url: url || undefined,
+          siren,
+        });
+      }
       totaux.set(siren, (totaux.get(siren) ?? 0) + 1);
       if (famille >= 0) {
         let f = parFamille.get(siren);
@@ -217,6 +234,7 @@ export async function collecterDeliberations(
     parFamille,
     collectivites: brut.size,
     ecartees,
+    evenements,
   };
 }
 

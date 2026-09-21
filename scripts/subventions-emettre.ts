@@ -34,6 +34,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { nommeUnePersonne } from '../src/modele/civilites.ts';
+import { debutFenetre, GENRES, type Evenement } from '../src/modele/journal.ts';
 import { lireCsvOuvert, ressourcesDuSchema } from './donnees-ouvertes.ts';
 
 /** Combien de subventions le fichier du département porte, par collectivité. */
@@ -66,6 +67,8 @@ export interface Subventions {
   exercices: Map<string, [string, string]>;
   collectivites: number;
   ecartees: number;
+  /** Les conventions des derniers mois, pour le journal. */
+  evenements: Evenement[];
 }
 
 /**
@@ -96,6 +99,22 @@ function champ(l: Record<string, string>, ...motifs: string[]): string {
   return '';
 }
 
+/**
+ * La date d'une convention, ramenée en AAAA-MM-JJ.
+ *
+ * Le schéma la veut en ISO ; les producteurs l'écrivent aussi à la française,
+ * et parfois ils ne donnent que l'année. Le journal a besoin d'un jour : une
+ * convention qu'on ne sait dater qu'à l'année n'y entre pas, plutôt que d'y
+ * entrer au premier janvier.
+ */
+function jourDe(brut: string): string | null {
+  const iso = /(\d{4})-(\d{2})-(\d{2})/.exec(brut);
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  const fr = /(\d{2})\/(\d{2})\/(\d{4})/.exec(brut);
+  if (fr) return `${fr[3]}-${fr[2]}-${fr[1]}`;
+  return null;
+}
+
 export async function collecterSubventions(
   octetsDe: (url: string) => Promise<Uint8Array>,
   json: <T>(url: string) => Promise<T>,
@@ -113,6 +132,10 @@ export async function collecterSubventions(
     return null;
   }
   dire(`Subventions : ${sources.length} fichiers découverts par le schéma.`);
+
+  const debutJournal = debutFenetre();
+  const evenements: Evenement[] = [];
+  const GENRE = GENRES.indexOf('Subvention votée');
 
   const brut = new Map<string, Map<string, Subvention>>();
   const totaux = new Map<string, number>();
@@ -154,13 +177,25 @@ export async function collecterSubventions(
       }
       const cle = `${qui}|${objet}|${montant}|${annee}`;
       if (m.has(cle)) continue;
+      const tronque = objet.length > MAX_OBJET ? `${objet.slice(0, MAX_OBJET - 1)}…` : objet;
       m.set(cle, {
         qui,
         montant,
         annee,
-        objet: objet.length > MAX_OBJET ? `${objet.slice(0, MAX_OBJET - 1)}…` : objet,
+        objet: tronque,
         rna: champ(l, 'rnabeneficiaire').trim(),
       });
+      // Après la déduplication, comme pour les délibérations.
+      const jour = jourDe(date);
+      if (jour && jour >= debutJournal) {
+        evenements.push({
+          genre: GENRE,
+          date: jour,
+          quoi: tronque ? `${qui} — ${tronque}` : qui,
+          detail: montant !== null ? `${montant.toLocaleString('fr-FR')} €` : undefined,
+          siren,
+        });
+      }
       totaux.set(siren, (totaux.get(siren) ?? 0) + 1);
       const bornes = exercices.get(siren);
       if (!bornes) exercices.set(siren, [annee, annee]);
@@ -204,6 +239,7 @@ export async function collecterSubventions(
     exercices,
     collectivites: brut.size,
     ecartees,
+    evenements,
   };
 }
 

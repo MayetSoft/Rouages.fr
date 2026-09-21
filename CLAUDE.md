@@ -23,6 +23,7 @@ de moins à la rentrée 2021), commune non soumise à l'article 55 de la loi SRU
 ```
 npm run valider              structure, références, règles éditoriales
 npm run verifier-recherche   le classement des communes homonymes
+npm run verifier-journal     la fenêtre et les plafonds du journal
 npm run build                valide puis génère (le build refuse un contenu invalide)
 npm run veille               l'état des sources surveillées
 npm run territoires -- --cache   réingère tout en réutilisant les gros fichiers

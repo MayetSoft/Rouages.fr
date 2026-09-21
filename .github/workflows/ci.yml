@@ -23,6 +23,8 @@ jobs:
         run: npm run valider
       - name: Classement de la recherche de communes
         run: npm run verifier-recherche
+      - name: Fenêtre et plafonds du journal
+        run: npm run verifier-journal
       - name: Types
         run: npm run verifier-types
       - name: Build
