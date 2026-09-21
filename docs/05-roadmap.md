@@ -731,18 +731,45 @@ larticle L2122-22 ». Le réparer demanderait de distinguer « larticle » de
 « larve », donc un dictionnaire. Le site rend l'intitulé tel qu'il a été
 publié, comme il rend les majuscules sans accents des marchés publics.
 
-### Les subventions aux associations : cherché, pas trouvé
+### Les subventions aux associations ✔ *(revenues par une autre porte)*
 
-Les « données essentielles des subventions » sont publiées **collectivité par
-collectivité**, sans agrégat national — une centaine de jeux hétérogènes, là où
-les élections et le répertoire des associations ont, eux, leur version agrégée
-par data.gouv. Reconstituer un total sur quelques centaines de communes
-laisserait croire que les 34 000 autres ne subventionnent rien, ce qui est
-exactement le piège déjà refusé pour le total des marchés publics et pour la
-médiane de la taxe d'enlèvement.
+Elles avaient été écartées : publiées collectivité par collectivité, sans
+agrégat national, elles ne permettaient pas de reconstituer un total qui ne
+soit pas trompeur. Le collecteur écrit pour les délibérations a changé la
+donne — il ingère **tout jeu conforme à un schéma du socle commun**, sans
+qu'on ait à connaître les producteurs, et le schéma « subventions » existe au
+même titre que celui des délibérations.
 
-Le mot-clé reste dans la veille, avec la raison écrite à côté : le jour où un
-agrégat national paraît, il se signalera.
+La mécanique commune est sortie dans `scripts/donnees-ouvertes.ts` : détection
+du délimiteur, détection de l'encodage, découverte par attribut de schéma.
+Trois précautions qu'un fichier réel a exigées chacune, et qui servent
+désormais deux collecteurs au lieu d'un.
+
+**Aucun total n'est affiché, et cette fois la raison est dans le texte.** Le
+décret n° 2017-779 n'impose la publication qu'au-dessus de **23 000 €**, et
+seulement pour les collectivités de plus de 3 500 habitants employant plus de
+cinquante agents. Certains producteurs publient tout, d'autres s'en tiennent
+au seuil — le titre de leurs jeux le dit souvent : « subventions de
+fonctionnement supérieures à 23 000 € ». Sommer les deux donnerait un chiffre
+sous-estimé d'un facteur inconnu, variable d'une commune à l'autre. Le site
+montre les lignes, les plus grosses d'abord, et dit pourquoi il ne les
+additionne pas.
+
+Deux découvertes en chemin :
+
+- **Les trois quarts des lignes venaient de départements et de régions que le
+  site ne savait pas rattacher.** Les collectivités territoriales portent un
+  SIREN construit — `22` puis le code du département, `23` puis celui du
+  département chef-lieu pour une région — et la règle a été vérifiée sur huit
+  cas observés avant d'être écrite. Les collecteurs prennent désormais un
+  prédicat plutôt qu'une liste figée, ce qui profite aussi aux délibérations :
+  les assemblées départementales et régionales y entrent du même coup.
+- **9 971 lignes sont perdues sans recours** : leur SIRET a été enregistré par
+  un tableur en notation scientifique — `2,256E+13`. La précision est partie
+  avec, et aucun traitement ne la rend. On le constate, on ne le devine pas.
+
+Le mot-clé reste dans la veille : le jour où un agrégat national paraît, la
+couverture cesse d'être une affaire de bonne volonté.
 
 ### Les obligations de publication ✔
 

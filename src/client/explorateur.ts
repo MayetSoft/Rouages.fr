@@ -763,6 +763,8 @@ function demarrer(reseau: Reseau) {
     if (commandes) bloc.append(commandes);
     const actes = blocDeliberations();
     if (actes) bloc.append(actes);
+    const aides = blocSubventions();
+    if (aides) bloc.append(aides);
     const equipements = blocServices();
     if (equipements) bloc.append(equipements);
 
@@ -1394,6 +1396,85 @@ function demarrer(reseau: Reseau) {
       else direRestant();
     });
     return bouton;
+  }
+
+  /**
+   * Ce qui est versé aux associations.
+   *
+   * Le troisième canal par lequel l'argent public sort d'une commune, après
+   * ses dépenses propres et ses marchés — et le plus visible dans un village :
+   * le club de foot, l'école de musique, le comité des fêtes.
+   *
+   * **Aucun total, et cette fois la raison est dans le texte.** L'obligation de
+   * publier ne porte que sur les conventions de plus de 23 000 €. Certaines
+   * collectivités publient tout, d'autres s'en tiennent au seuil, et sommer les
+   * deux donnerait un chiffre sous-estimé d'un facteur inconnu, variable d'une
+   * commune à l'autre. Les lignes, elles, restent vraies une à une.
+   */
+  function blocSubventions(): HTMLElement | null {
+    const liste = territoire?.subventions;
+    if (!liste || liste.length === 0) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-marches p-subventions';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui est versé aux associations'));
+
+    for (const [rang, c] of liste.entries()) {
+      const replie = rang > 0;
+      const groupe = document.createElement(replie ? 'details' : 'div');
+      groupe.className = 'p-marche-acheteur';
+      const titre = document.createElement(replie ? 'summary' : 'p');
+      titre.className = 'p-marche-qui';
+      titre.append(glose('span', 'p-marche-nom', c.nom));
+      if (c.natureLibelle) titre.append(ligne('span', 'p-marche-nature', c.natureLibelle));
+      const [debut, fin] = c.exercices;
+      titre.append(
+        ligne(
+          'span',
+          'p-marche-total',
+          `${c.total.toLocaleString('fr-FR')} subvention${c.total > 1 ? 's' : ''} publiée${c.total > 1 ? 's' : ''}` +
+            (debut && fin ? (debut === fin ? `, ${debut}` : `, ${debut}‑${fin}`) : '') +
+            (c.total > c.liste.length ? `, les ${c.liste.length} plus grosses` : ''),
+        ),
+      );
+      groupe.append(titre);
+
+      const ul = document.createElement('ul');
+      for (const sv of c.liste) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-marche-montant', montantCourt(sv.montant)));
+        const droite = document.createElement('span');
+        droite.append(ligne('span', 'p-marche-objet', sv.qui));
+        const sous: string[] = [sv.annee];
+        // L'objet ne répète pas toujours le nom du bénéficiaire : quand il le
+        // fait, l'afficher deux fois ne dit rien de plus.
+        const memeChose = sv.objet.toLowerCase().includes(sv.qui.toLowerCase().slice(0, 18));
+        if (sv.objet && !memeChose) sous.push(sv.objet);
+        droite.append(ligne('span', 'p-marche-detail', sous.join(' · ')));
+        li.append(droite);
+        ul.append(li);
+      }
+      groupe.append(ul);
+      bloc.append(groupe);
+    }
+
+    const seuil = territoire?.subventionsSeuil;
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les données essentielles des subventions, versées au schéma national. ` +
+          `Les montants ne sont pas additionnés` +
+          (seuil
+            ? ` : l'obligation de publier ne porte que sur les conventions de plus de ` +
+              `${seuil.toLocaleString('fr-FR')} €, et chaque collectivité choisit d'en publier ` +
+              `davantage ou non. Un total serait sous-estimé d'une part qu'on ne connaît pas`
+            : '') +
+          `. Une collectivité qui n'apparaît pas ici publie ses subventions sur son propre ` +
+          `site, sans les verser en données ouvertes. Les aides versées à une personne ne sont ` +
+          `pas reprises.`,
+      ),
+    );
+    return bloc;
   }
 
   /**

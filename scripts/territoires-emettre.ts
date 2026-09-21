@@ -28,6 +28,8 @@ import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emett
 import { ecrireRisques, type Risques } from './risques-emettre.ts';
 import { ecrireElections, type Elections } from './elections-emettre.ts';
 import { ecrireDeliberations, type Deliberations } from './deliberations-emettre.ts';
+import { ecrireSubventions, type Subventions } from './subventions-emettre.ts';
+import { prefixesEchelon, sirensParPrefixe } from './donnees-ouvertes.ts';
 import { ecrireEau, serviceDe, type Eau, type ServiceEau } from './eau-emettre.ts';
 import {
   ecrireServices,
@@ -96,6 +98,7 @@ export function emettre(o: {
   risques: Risques | null;
   elections: Elections | null;
   deliberations: Deliberations | null;
+  subventions: Subventions | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -155,6 +158,16 @@ export function emettre(o: {
   // région, et un nom ne retrouve pas une ligne de compte.
   const codeRegionDeDep = new Map(
     departements.filter((d) => d.region).map((d) => [d.code, d.region!]),
+  );
+  // Le chef-lieu de la région : c'est son code de département qui compose le
+  // SIREN de la collectivité régionale.
+  const chefLieuxRegion = new Map(
+    lire<(RegionEtalab & { chefLieu?: string })[]>('regions.json').map((r) => [r.code, r.chefLieu]),
+  );
+  const chefLieuDeRegion = new Map(
+    departements
+      .filter((d) => d.region)
+      .map((d) => [d.code, chefLieuxRegion.get(d.region!)] as const),
   );
   dire(`${GRIS}${communes.length.toLocaleString('fr-FR')} communes au découpage Etalab.${RAZ}`);
 
@@ -267,6 +280,7 @@ export function emettre(o: {
   let risquesEcrits = 0;
   let electionsEcrites = 0;
   let delibEcrites = 0;
+  let subvEcrites = 0;
 
   let couvertes = 0;
   let sansRattachement = 0;
@@ -299,8 +313,32 @@ export function emettre(o: {
         liste.filter((c) => c.siren).map((c) => [c.code, c.siren!] as const),
       );
       marchesEcrits += ecrireMarches(sortie, dep, sirens, sirenDeCommune, o.marches);
+      // Le département et sa région versent et délibèrent aussi, et c'est là
+      // que se décide l'essentiel de ce que le site décrit par ailleurs. Leur
+      // SIREN n'est dans aucune liste : il se reconnaît à son préfixe, et on
+      // ne retient que ceux qui figurent réellement dans la donnée.
+      const prefixes = prefixesEchelon(dep, chefLieuDeRegion.get(dep));
       if (o.deliberations) {
-        delibEcrites += ecrireDeliberations(sortie, dep, sirens, sirenDeCommune, o.deliberations);
+        const echelons = sirensParPrefixe(prefixes, o.deliberations.parCollectivite.keys());
+        delibEcrites += ecrireDeliberations(
+          sortie,
+          dep,
+          [...sirens, ...echelons],
+          sirenDeCommune,
+          o.deliberations,
+          echelons,
+        );
+      }
+      if (o.subventions) {
+        const echelons = sirensParPrefixe(prefixes, o.subventions.parCollectivite.keys());
+        subvEcrites += ecrireSubventions(
+          sortie,
+          dep,
+          [...sirens, ...echelons],
+          sirenDeCommune,
+          o.subventions,
+          echelons,
+        );
       }
     }
 
@@ -525,6 +563,11 @@ export function emettre(o: {
   if (o.deliberations) {
     dire(
       `${GRIS}Délibérations : ${delibEcrites.toLocaleString('fr-FR')} collectivités qui publient.${RAZ}`,
+    );
+  }
+  if (o.subventions) {
+    dire(
+      `${GRIS}Subventions : ${subvEcrites.toLocaleString('fr-FR')} collectivités qui publient.${RAZ}`,
     );
   }
   if (o.marches) {

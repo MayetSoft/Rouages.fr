@@ -205,6 +205,33 @@ export interface ComptesEchelon {
 }
 
 /**
+ * Ce qu'une collectivité verse aux associations.
+ *
+ * Aucun total, et la raison est dans le texte : l'obligation de publier ne
+ * porte que sur les conventions de plus de 23 000 €. Certaines collectivités
+ * publient tout, d'autres s'en tiennent au seuil, et sommer les deux donnerait
+ * un chiffre sous-estimé d'un facteur inconnu, variable d'une commune à
+ * l'autre. Les lignes, elles, restent vraies une à une.
+ */
+export interface Subvention {
+  /** Le bénéficiaire — une association, jamais une personne. */
+  qui: string;
+  montant: number | null;
+  annee: string;
+  objet: string;
+}
+
+export interface CollectiviteSubventionne {
+  nom: string;
+  natureLibelle: string | null;
+  /** Nombre de lignes publiées, avant troncature. */
+  total: number;
+  /** Le plus ancien et le plus récent exercice publiés. */
+  exercices: [string, string];
+  liste: Subvention[];
+}
+
+/**
  * Ce qu'une collectivité a délibéré, tel que le panneau l'affiche.
  *
  * La couverture est partielle et le bloc ne vaut jamais zéro : il n'existe pas
@@ -381,6 +408,10 @@ export interface Territoire {
   deliberations: CollectiviteDelibere[];
   /** L'exercice le plus ancien vu, et la date de lecture. */
   delibDepuis: string | null;
+  /** Ce qui est versé aux associations, là où la collectivité le publie. */
+  subventions: CollectiviteSubventionne[];
+  /** Le seuil légal de publication, pour dire ce qui manque forcément. */
+  subventionsSeuil: number | null;
   /** L'obligation SRU, quand la commune y est soumise. */
   sru: Sru | null;
   /** La date de l'inventaire SRU. */
@@ -547,12 +578,32 @@ type DelibDep = {
   depuis: string;
   familles: string[];
   com: Record<string, string>;
+  /** SIREN du département puis de sa région, quand ils publient. */
+  echelons?: string[];
   h: Record<
     string,
     { n: number; f: number[]; d: { date: string; famille: number; objet: string; url: string }[] }
   >;
 };
 const delibDep = new Map<string, DelibDep | null>();
+
+/** Les subventions du département, indexées par SIREN comme les marchés. */
+type SubvDep = {
+  maj: string;
+  seuil: number;
+  com: Record<string, string>;
+  /** SIREN du département puis de sa région, quand ils publient. */
+  echelons?: string[];
+  h: Record<
+    string,
+    {
+      n: number;
+      e: [string, string];
+      s: { qui: string; montant: number | null; annee: string; objet: string; rna: string }[];
+    }
+  >;
+};
+const subvDep = new Map<string, SubvDep | null>();
 
 /**
  * Ce que rapportent les droits de mutation, et à qui.
@@ -758,7 +809,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!departements.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub] =
       await Promise.all([
       json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -775,6 +826,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<RisquesDep>(`${BASE}/dep/${commune.dep}-risques.json`).catch(() => null),
       json<ElectionsDep>(`${BASE}/dep/${commune.dep}-elections.json`).catch(() => null),
       json<DelibDep>(`${BASE}/dep/${commune.dep}-deliberations.json`).catch(() => null),
+      json<SubvDep>(`${BASE}/dep/${commune.dep}-subventions.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -787,6 +839,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     risquesDep.set(commune.dep, risq);
     electionsDep.set(commune.dep, scr);
     delibDep.set(commune.dep, del);
+    subvDep.set(commune.dep, sub);
   }
   const dep = departements.get(commune.dep) as {
     maj: string;
@@ -849,6 +902,8 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     scrutin: assemblerScrutin(commune),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,
+    subventions: assemblerSubventions(commune, structures),
+    subventionsSeuil: subvDep.get(commune.dep)?.seuil ?? null,
     sru: sruDep.get(commune.dep)?.c[commune.code] ?? null,
     sruMaj: sruDep.get(commune.dep)?.maj ?? null,
     marches: assemblerMarches(commune, structures),
@@ -896,6 +951,53 @@ function assemblerMarches(commune: CommuneBreve, structures: Structure[]): Achet
   return out;
 }
 
+/** « La région — Centre-Val de Loire » : `meta.json` la nomme par département. */
+function nomRegion(commune: CommuneBreve): string {
+  const nom = meta?.regions?.[commune.dep];
+  return nom ? `La région — ${nom}` : 'La région';
+}
+
+/**
+ * Ce que la commune et ses groupements versent aux associations.
+ *
+ * Même jointure par SIREN que les marchés et les délibérations : le club
+ * subventionné par l'agglomération l'est autant que celui subventionné par la
+ * commune, et personne ne pense à aller le chercher là-bas.
+ */
+function assemblerSubventions(
+  commune: CommuneBreve,
+  structures: Structure[],
+): CollectiviteSubventionne[] {
+  const d = subvDep.get(commune.dep);
+  if (!d) return [];
+  const out: CollectiviteSubventionne[] = [];
+  const lire = (siren: string, nom: string, natureLibelle: string | null) => {
+    const e = d.h[siren];
+    if (!e || e.s.length === 0) return;
+    out.push({
+      nom,
+      natureLibelle,
+      total: e.n,
+      exercices: e.e,
+      liste: e.s.map((x) => ({
+        qui: x.qui,
+        montant: x.montant,
+        annee: x.annee,
+        objet: x.objet,
+      })),
+    });
+  };
+  const sirenCommune = d.com[commune.code];
+  if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
+  for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
+  // Le département et sa région viennent en dernier : ils versent le plus, et
+  // ce n'est pas d'eux qu'on part quand on cherche sa commune.
+  for (const [i, siren] of (d.echelons ?? []).entries()) {
+    lire(siren, i === 0 ? `Le département — ${commune.depNom}` : nomRegion(commune), null);
+  }
+  return out;
+}
+
 /**
  * Ce que la commune et ses groupements ont délibéré.
  *
@@ -933,6 +1035,9 @@ function assemblerDeliberations(
   const sirenCommune = d.com[commune.code];
   if (sirenCommune) lire(sirenCommune, commune.nom, 'la commune');
   for (const s of structures) lire(s.siren, s.nom, s.natureLibelle);
+  for (const [i, siren] of (d.echelons ?? []).entries()) {
+    lire(siren, i === 0 ? `Le département — ${commune.depNom}` : nomRegion(commune), null);
+  }
   return out;
 }
 

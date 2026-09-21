@@ -441,6 +441,9 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
   .p-marche-montant { text-align: left; }
   .p-marche-suite { margin-left: 0; }
 }
+/* Les subventions reprennent telle quelle la grille des marchés : un montant à
+   droite, un bénéficiaire et son contexte à gauche. Rien à redéfinir. */
+
 /* Les délibérations réutilisent la grille des marchés : même forme de liste,
    même pli des groupements. La colonne de gauche porte une date et non un
    montant — plus large, et pas de chiffres alignés à droite. */

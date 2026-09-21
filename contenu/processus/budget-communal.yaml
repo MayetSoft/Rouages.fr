@@ -72,6 +72,16 @@ processus:
         piege: "Au moment du vote, tout est arbitré. Le seul moment où les choix sont encore ouverts, c'est le débat d'orientation."
         liens: [cgct, vp-budget-local]
         confiance: a_confirmer
+      - id: lire-les-subventions
+        quoi: "Regarder à quelles associations la commune verse des subventions"
+        quand: "À tout moment ; les conventions sont publiées dans les trois mois de leur signature"
+        aupres_de: "Le site de la commune, ou les données ouvertes quand elle en verse"
+        difficulte: faible
+        ancre_etape: 2
+        recours_si_refus: "Saisir la CADA"
+        piege: "L'obligation de publier ne porte que sur les conventions de plus de 23 000 €, et seulement au-dessus de 3 500 habitants : ce qui est publié ne fait pas le total."
+        liens: [decret-subventions, scdl-subventions, cada]
+        confiance: a_confirmer
       - id: comparer-sur-ofgl
         quoi: "Comparer les finances de sa commune à celles de communes semblables"
         quand: "À tout moment"

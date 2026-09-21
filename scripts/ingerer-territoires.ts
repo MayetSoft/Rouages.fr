@@ -409,6 +409,30 @@ async function principal() {
     ),
   );
 
+  // Ce que le site sait rattacher. Les communes et les groupements sont connus
+  // nommément ; les départements et les régions se reconnaissent au préfixe de
+  // leur SIREN, que le découpage suffit à construire.
+  const { prefixesEchelon } = await import('./donnees-ouvertes.ts');
+  const prefixesSuivis: string[] = [];
+  {
+    const { createRequire } = await import('node:module');
+    const lire = <T,>(f: string): T =>
+      JSON.parse(
+        readFileSync(
+          createRequire(import.meta.url).resolve(`@etalab/decoupage-administratif/data/${f}`),
+          'utf8',
+        ),
+      ) as T;
+    const chefLieux = new Map(
+      lire<{ code: string; chefLieu: string }[]>('regions.json').map((r) => [r.code, r.chefLieu]),
+    );
+    for (const d of lire<{ code: string; region?: string }[]>('departements.json')) {
+      prefixesSuivis.push(...prefixesEchelon(d.code, d.region ? chefLieux.get(d.region) : undefined));
+    }
+  }
+  const estSuivi = (siren: string) =>
+    sirensSuivis.has(siren) || prefixesSuivis.some((p) => siren.startsWith(p));
+
   // Les délibérations publiées en données ouvertes. Même filtre de SIREN que
   // les marchés : le site n'ingère que ce qu'il sait rattacher.
   const { collecterDeliberations } = await import('./deliberations-emettre.ts');
@@ -418,7 +442,20 @@ async function principal() {
       // UTF-8, et c'est le module qui sait le reconnaître.
       async (url: string) => new Uint8Array(await (await obstine(url)).arrayBuffer()),
       async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
-      sirensSuivis,
+      estSuivi,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
+
+  // Les subventions aux associations : même schéma commun, même découverte,
+  // et le même refus d'additionner — le seuil de publication est à 23 000 €.
+  const { collecterSubventions } = await import('./subventions-emettre.ts');
+  const subventions = await tenter('Subventions', () =>
+    collecterSubventions(
+      async (url: string) => new Uint8Array(await (await obstine(url)).arrayBuffer()),
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      estSuivi,
       (m) => dire(`${GRIS}${m}${RAZ}`),
     ),
   );
@@ -461,6 +498,7 @@ async function principal() {
     risques,
     elections,
     deliberations,
+    subventions,
   );
 }
 
@@ -576,6 +614,9 @@ async function ecrire(
   deliberations: Awaited<
     ReturnType<typeof import('./deliberations-emettre.ts')['collecterDeliberations']>
   >,
+  subventions: Awaited<
+    ReturnType<typeof import('./subventions-emettre.ts')['collecterSubventions']>
+  >,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -598,6 +639,7 @@ async function ecrire(
     risques,
     elections,
     deliberations,
+    subventions,
     sortie: SORTIE,
     dire,
     VERT,

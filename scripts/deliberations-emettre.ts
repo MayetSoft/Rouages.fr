@@ -43,6 +43,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { nommeUnePersonne } from '../src/modele/civilites.ts';
+import { lireCsvOuvert, ressourcesDuSchema } from './donnees-ouvertes.ts';
 
 /**
  * Les neuf familles de la nomenclature ACTES, celle que les collectivités
@@ -106,133 +107,18 @@ export interface Deliberations {
   ecartees: number;
 }
 
-/**
- * Le délimiteur change d'un producteur à l'autre : Mégalis écrit en
- * point-virgule, la mairie de Bouloc en virgule. On tranche sur l'en-tête,
- * qui porte les mêmes noms de colonnes dans les deux cas.
- */
-function delimiteur(entete: string): string {
-  return (entete.match(/;/g)?.length ?? 0) > (entete.match(/,/g)?.length ?? 0) ? ';' : ',';
-}
-
-function decouper(ligne: string, sep: string): string[] {
-  const champs: string[] = [];
-  let courant = '';
-  let dansGuillemets = false;
-  for (let i = 0; i < ligne.length; i++) {
-    const c = ligne[i];
-    if (c === '"') {
-      if (dansGuillemets && ligne[i + 1] === '"') {
-        courant += '"';
-        i++;
-      } else dansGuillemets = !dansGuillemets;
-    } else if (c === sep && !dansGuillemets) {
-      champs.push(courant);
-      courant = '';
-    } else courant += c;
-  }
-  champs.push(courant);
-  return champs;
-}
-
-/** Une ligne peut contenir un saut de ligne dans un champ entre guillemets. */
-function* lignesDe(texte: string): Iterable<string> {
-  let courant = '';
-  let dansGuillemets = false;
-  for (const c of texte) {
-    if (c === '"') dansGuillemets = !dansGuillemets;
-    if (c === '\n' && !dansGuillemets) {
-      yield courant.replace(/\r$/, '');
-      courant = '';
-    } else courant += c;
-  }
-  if (courant.trim()) yield courant.replace(/\r$/, '');
-}
-
-/**
- * Tous les producteurs n'écrivent pas en UTF-8.
- *
- * Un fichier breton rendait « Délégation » en caractères de remplacement : il
- * est en Windows-1252, comme souvent ce qui sort d'un tableur. Le décodage
- * strict échoue sur ces octets — c'est précisément ce qui les signale, sans
- * avoir à deviner. Aucun en-tête ne l'annonce, et se fier au nom du producteur
- * ne tiendrait pas une saison.
- */
-function decoder(octets: Uint8Array): string {
-  try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(octets);
-  } catch {
-    return new TextDecoder('windows-1252').decode(octets);
-  }
-}
-
-function lireCsv(texte: string): Record<string, string>[] {
-  const it = lignesDe(texte)[Symbol.iterator]();
-  const premiere = it.next();
-  if (premiere.done) return [];
-  const sep = delimiteur(premiere.value);
-  const entetes = decouper(premiere.value, sep).map((h) => h.trim().replace(/^﻿/, ''));
-  const out: Record<string, string>[] = [];
-  for (let l = it.next(); !l.done; l = it.next()) {
-    const champs = decouper(l.value, sep);
-    if (champs.length < 4) continue;
-    const r: Record<string, string> = {};
-    for (const [i, h] of entetes.entries()) r[h] = (champs[i] ?? '').trim();
-    out.push(r);
-  }
-  return out;
-}
-
-const TAILLE_PAGE = 50;
-
-/** Les jeux que data.gouv déclare conformes au schéma. */
-async function decouvrir(
-  json: <T>(url: string) => Promise<T>,
-  dire: (m: string) => void,
-): Promise<string[]> {
-  const urls: string[] = [];
-  let pagesLues = 0;
-  try {
-    type Jeu = { resources?: { url?: string; schema?: { name?: string } | null }[] };
-    for (let page = 1; page <= 5; page++) {
-      const d = await json<{ data?: Jeu[] }>(
-        `https://www.data.gouv.fr/api/1/datasets/?schema=scdl%2Fdeliberations` +
-          `&page_size=${TAILLE_PAGE}&page=${page}`,
-      );
-      const jeux = d.data ?? [];
-      if (jeux.length === 0) break;
-      pagesLues++;
-      for (const j of jeux) {
-        for (const r of j.resources ?? []) {
-          if (r.url && (r.schema?.name ?? '').includes('deliberations')) urls.push(r.url);
-        }
-      }
-      // Une page incomplète est la dernière : demander la suivante ferait
-      // remonter une erreur de pagination qu'on signalerait comme un incident.
-      if (jeux.length < TAILLE_PAGE) break;
-    }
-  } catch {
-    // La découverte est un supplément : son échec ne doit pas emporter les
-    // agrégateurs déclarés, qui portent l'essentiel du volume. Une page
-    // manquante n'est pas un échec — le catalogue s'arrête là où il s'arrête,
-    // et annoncer « pas de réponse » après en avoir lu deux serait faux.
-    dire(
-      pagesLues === 0
-        ? '  la découverte par schéma n’a pas répondu, on s’en tient aux sources déclarées.'
-        : `  la découverte s’est arrêtée après ${pagesLues} page(s) du catalogue.`,
-    );
-  }
-  return urls;
-}
-
 export async function collecterDeliberations(
   octetsDe: (url: string) => Promise<Uint8Array>,
   json: <T>(url: string) => Promise<T>,
-  /** Les SIREN que le site sait rattacher : communes et groupements suivis. */
-  sirensSuivis: Set<string>,
+  /**
+   * Ce que le site sait rattacher. Un prédicat plutôt qu'un ensemble : les
+   * départements et les régions se reconnaissent à un préfixe de SIREN, pas à
+   * une liste qu'il faudrait dresser à l'avance.
+   */
+  estSuivi: (siren: string) => boolean,
   dire: (m: string) => void,
 ): Promise<Deliberations | null> {
-  const decouvertes = await decouvrir(json, dire);
+  const decouvertes = await ressourcesDuSchema('deliberations', json, dire);
   const sources = [...new Set([...DECLAREES, ...decouvertes])];
   dire(
     `Délibérations : ${sources.length} fichiers (${DECLAREES.length} déclarés, ` +
@@ -250,14 +136,14 @@ export async function collecterDeliberations(
   for (const url of sources) {
     let lignes: Record<string, string>[];
     try {
-      lignes = lireCsv(decoder(await octetsDe(url)));
+      lignes = lireCsvOuvert(await octetsDe(url));
     } catch {
       echecs++;
       continue;
     }
     for (const l of lignes) {
       const siren = (l['COLL_SIRET'] ?? '').replace(/\s/g, '').slice(0, 9);
-      if (siren.length !== 9 || !sirensSuivis.has(siren)) continue;
+      if (siren.length !== 9 || !estSuivi(siren)) continue;
       const objet = (l['DELIB_OBJET'] ?? '').trim();
       const date = (l['DELIB_DATE'] ?? '').slice(0, 10);
       if (!objet || !/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
@@ -345,6 +231,12 @@ export function ecrireDeliberations(
   sirens: string[],
   sirenDeCommune: Map<string, string>,
   d: Deliberations,
+  /**
+   * Le SIREN du département puis celui de sa région, quand ils publient. Le
+   * client n'a aucun moyen de les deviner : ils ne sont ni dans le découpage
+   * ni dans BANATIC, et c'est ici qu'on les lui nomme.
+   */
+  echelons: string[] = [],
 ): number {
   const h: Record<string, { n: number; f: number[]; d: Deliberation[] }> = {};
   let n = 0;
@@ -370,6 +262,7 @@ export function ecrireDeliberations(
       depuis: d.depuis,
       familles: FAMILLES_ACTES,
       com,
+      echelons: echelons.filter((x) => h[x]),
       h,
     }),
   );
