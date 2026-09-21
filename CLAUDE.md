@@ -28,9 +28,15 @@ npm run veille               l'état des sources surveillées
 npm run territoires -- --cache   réingère tout en réutilisant les gros fichiers
 ```
 
-`npm run territoires` dure une dizaine de minutes et touche huit sources. Les
-collectes facultatives sont isolées : celle qui échoue laisse en place les
-fichiers de l'ingestion précédente plutôt que de tout emporter.
+`npm run territoires` dure une trentaine de minutes et touche une quinzaine de
+sources — dont onze collectes facultatives, isolées : celle qui échoue laisse en
+place les fichiers de l'ingestion précédente plutôt que de tout emporter. Ce qui
+reste fatal, ce sont les référentiels dont dépend la structure du réseau,
+BANATIC et le découpage.
+
+Deux sources pèsent l'essentiel du temps : le répertoire national des
+associations (1,2 Go) et le référentiel FINESS (244 Mo). `--cache` les réutilise,
+et sans lui il faut compter le téléchargement en plus.
 
 ## Ce que l'environnement de développement ne joint pas
 

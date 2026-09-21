@@ -35,6 +35,12 @@
  * départements, et le panneau y dit où se consulte le registre plutôt que de
  * rester muet.
  *
+ * **Le code de commune déclaré n'est pas toujours celui d'une commune
+ * actuelle**, et le découpage sait le reporter : `commune` pour un
+ * arrondissement municipal, `chefLieu` pour une commune déléguée ou associée.
+ * Sans ce report, onze pour cent des créations ne tombaient sur rien ; avec
+ * lui, deux centièmes de pour cent.
+ *
  * **L'adresse déclarée n'est pas reprise.** Le siège d'une petite association
  * est souvent le domicile de celui qui l'a déclarée. Le site en retient la
  * commune, rien d'autre : ni la voie, ni le numéro, ni la civilité du
@@ -110,17 +116,6 @@ export const DOMAINES: [string, string][] = [
 
 const RANG_DOMAINE = new Map(DOMAINES.map(([code], i) => [code, i]));
 
-/**
- * Paris, Lyon et Marseille déclarent par arrondissement ; le découpage ne
- * connaît que la commune. Sans ce repli, quatre-vingt-deux pour cent de ce qui
- * ne se rattache pas serait parisien, lyonnais ou marseillais.
- */
-const ARRONDISSEMENTS = new Map<string, string>([
-  ...Array.from({ length: 20 }, (_, i) => [`751${String(i + 1).padStart(2, '0')}`, '75056'] as const),
-  ...Array.from({ length: 9 }, (_, i) => [`6938${i + 1}`, '69123'] as const),
-  ...Array.from({ length: 16 }, (_, i) => [`132${String(i + 1).padStart(2, '0')}`, '13055'] as const),
-]);
-
 /** Combien d'années civiles complètes la fenêtre couvre. */
 const ANNEES = 6;
 
@@ -180,6 +175,17 @@ export async function collecterAssociations(
   lignes: (chemin: string) => AsyncIterable<Record<string, string>>,
   /** Population par commune : la comparaison se fait pour mille habitants. */
   populations: Map<string, number>,
+  /**
+   * Le report d'un code qui n'est plus celui d'une commune actuelle vers celle
+   * qui l'a repris : un arrondissement vers sa commune, une commune déléguée ou
+   * associée vers sa commune nouvelle.
+   *
+   * Sans lui, onze pour cent des créations ne se rattachaient à rien — quatre
+   * cinquièmes parce que Paris, Lyon et Marseille déclarent par arrondissement,
+   * et le reste parce qu'une association déclarée à Annecy-le-Vieux porte
+   * encore le code d'avant la fusion.
+   */
+  reports: Map<string, string>,
   dire: (m: string) => void,
 ): Promise<Associations | null> {
   const fichier = join(cache, 'rna-waldec.csv');
@@ -205,7 +211,7 @@ export async function collecterAssociations(
     const annee = Number.parseInt((l['date_creat'] ?? '').slice(0, 4), 10);
     if (!Number.isFinite(annee) || annee < premiere || annee > derniere) continue;
     const brut = (l['adrs_codeinsee'] ?? '').trim();
-    const code = ARRONDISSEMENTS.get(brut) ?? brut;
+    const code = reports.get(brut) ?? brut;
     total++;
     if (!populations.has(code)) {
       horsDecoupage++;
@@ -270,7 +276,7 @@ export async function collecterAssociations(
       `${communes.size.toLocaleString('fr-FR')} communes` +
       (horsDecoupage > 0
         ? `, ${horsDecoupage.toLocaleString('fr-FR')} sur un code hors découpage ` +
-          `(${((horsDecoupage / total) * 100).toFixed(1)} % : outre-mer non découpé, communes fusionnées)`
+          `(${((horsDecoupage / total) * 100).toFixed(2)} %)`
         : '') +
       (ecartees > 0 ? `, ${ecartees.toLocaleString('fr-FR')} écartées (intitulé nommant une personne)` : '') +
       `. Médiane ${mediane.toFixed(1)} pour mille habitants sur ${ANNEES} ans.`,

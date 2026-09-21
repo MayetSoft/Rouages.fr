@@ -900,12 +900,15 @@ Trois choses qu'il ne reprend pas :
 - **les intitulés qui nomment quelqu'un** — 334 écartés par le même motif qui
   interdit un nom dans `contenu/`.
 
-Deux détails de rattachement ont demandé une décision. Paris, Lyon et Marseille
-déclarent par arrondissement, que le découpage ne connaît pas : sans repli sur
-la commune, 82 % de ce qui ne se rattachait pas était parisien, lyonnais ou
-marseillais. Le repli fait tomber la perte de 11,2 % à **0,2 %** — ce qui reste
-est l'outre-mer hors découpage et quelque neuf cents codes de communes
-fusionnées, que le site ne sait pas encore rapprocher de leur commune nouvelle.
+Le rattachement a demandé une table, et le découpage la portait déjà. Onze pour
+cent des créations ne tombaient sur aucune commune connue : quatre cinquièmes
+parce que Paris, Lyon et Marseille déclarent par arrondissement, le reste parce
+qu'une association déclarée à Annecy-le-Vieux porte encore le code d'avant la
+fusion. Le fichier des communes d'Etalab nomme les deux — `commune` pour un
+arrondissement municipal, `chefLieu` pour une commune déléguée ou associée — soit
+**2 037 codes à reporter**. La perte tombe de 11,2 % à **0,02 %** : soixante-six
+créations sur quatre cent vingt mille, dont onze sans code du tout. Écrire cette
+table à la main aurait couvert les arrondissements et manqué les fusions.
 
 **Trois départements n'ont aucun fichier, et ce n'est pas un trou.** Le
 Bas-Rhin pèse vingt et une lignes dans tout le répertoire, la Moselle onze, le

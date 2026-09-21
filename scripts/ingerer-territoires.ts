@@ -195,13 +195,20 @@ async function* lignesCsv(chemin: string): AsyncIterable<Record<string, string>>
 }
 
 /**
- * La population de chaque commune actuelle, depuis le découpage.
+ * Ce que le découpage sait des communes, pour le collecteur des associations.
  *
- * Le collecteur des associations en a besoin pour rapporter les créations à
- * mille habitants : une commune de cinq cents âmes et une de cinquante mille
- * n'en montent pas le même nombre, et le nombre brut ne se compare à rien.
+ * Deux tables, tirées du même fichier :
+ *
+ *   — la **population** de chaque commune actuelle, parce qu'une commune de
+ *     cinq cents âmes et une de cinquante mille ne montent pas le même nombre
+ *     d'associations, et que le nombre brut ne se compare à rien ;
+ *   — le **report** d'un code qui n'est plus celui d'une commune actuelle vers
+ *     celle qui l'a repris. Le découpage porte les arrondissements municipaux
+ *     (`commune`) et les communes déléguées ou associées (`chefLieu`) : deux
+ *     mille codes que le répertoire des associations emploie encore, et qui
+ *     sans cela ne se rattacheraient à rien.
  */
-function populationParCommune(): Map<string, number> {
+function tablesDuDecoupage(): { populations: Map<string, number>; reports: Map<string, string> } {
   const chemin = createRequire(import.meta.url).resolve(
     '@etalab/decoupage-administratif/data/communes.json',
   );
@@ -209,12 +216,22 @@ function populationParCommune(): Map<string, number> {
     code: string;
     type: string;
     population?: number;
+    chefLieu?: string;
+    commune?: string;
   }[];
-  const out = new Map<string, number>();
+  const populations = new Map<string, number>();
   for (const c of communes) {
-    if (c.type === 'commune-actuelle') out.set(c.code, c.population ?? 0);
+    if (c.type === 'commune-actuelle') populations.set(c.code, c.population ?? 0);
   }
-  return out;
+  const reports = new Map<string, string>();
+  for (const c of communes) {
+    if (c.type === 'commune-actuelle') continue;
+    const vers = c.chefLieu ?? c.commune;
+    // Un code qui est déjà celui d'une commune actuelle n'a rien à reporter :
+    // une commune déléguée porte souvent le code de la commune nouvelle.
+    if (vers && populations.has(vers) && !populations.has(c.code)) reports.set(c.code, vers);
+  }
+  return { populations, reports };
 }
 
 /** Une fin de ligne hors guillemets : un champ peut contenir un saut de ligne. */
@@ -507,6 +524,7 @@ async function principal() {
   // et une fenêtre récente — le répertoire dit ce qui se crée, jamais ce qui
   // vit encore.
   const { collecterAssociations } = await import('./associations-emettre.ts');
+  const decoupage = tablesDuDecoupage();
   const associations = await tenter('Associations', () =>
     collecterAssociations(
       // Le fichier pèse 1,2 Go : il passe par le cache, comme FINESS, sinon
@@ -515,7 +533,8 @@ async function principal() {
         telechargerEnCache(url, vers, reutiliser, 'Répertoire national des associations (environ 1,2 Go)'),
       CACHE,
       lignesCsv,
-      populationParCommune(),
+      decoupage.populations,
+      decoupage.reports,
       (m) => dire(`${GRIS}${m}${RAZ}`),
     ),
   );
