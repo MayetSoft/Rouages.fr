@@ -57,6 +57,15 @@ Légifrance refuse les requêtes automatisées depuis cet environnement (403) : 
 vérifie un article par recherche web, jamais de mémoire. Un identifiant
 `LEGIARTI` écrit de tête a déjà été faux une fois.
 
+**`npm run veille` ment depuis ici, et il écrit ce mensonge dans un fichier
+suivi.** Les sources lourdes décrochent à 6,5 secondes — trois essais sur le
+répertoire national des élus ont donné exactement 6,53 s, ce qui est le tunnel
+et non la source ; le même jour, l'inventaire SRU répondait en 0,6 s et l'INSEE
+en tête seule. Le contrôle qui fait autorité est celui du lundi matin en
+intégration continue, qui tourne sur un réseau qui joint ces sources. Si on
+lance la veille ici pour voir, on **jette `veille/etat.json`** au lieu de le
+committer : sinon le dépôt garde des pannes qui n'ont pas eu lieu.
+
 ## Deux règles qui ne se négocient pas
 
 - **Le contenu ne nomme aucune personne physique.** Le graphe décrit des
