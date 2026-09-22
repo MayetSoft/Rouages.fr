@@ -117,6 +117,19 @@ processus:
         piege: "Le prix se compare pour la consommation de référence de 120 m³, sinon la part fixe fausse la comparaison."
         liens: [od-sispea, eaufrance]
         confiance: etabli
+      # Distinct du rapport sur le prix et la qualité du service, juste en
+      # dessous : celui-ci est produit par l'entreprise et porte ses comptes,
+      # quand l'autre est produit par la collectivité et porte le service.
+      - id: demander-le-rapport-du-delegataire
+        quoi: "Demander le rapport annuel du délégataire, qui porte ses comptes"
+        quand: "Après le 1er juin, date à laquelle le délégataire doit l'avoir remis"
+        aupres_de: "La collectivité qui a délégué le service"
+        difficulte: moyenne
+        ancre_etape: 1
+        recours_si_refus: "Saisir la CADA"
+        piege: "L'assemblée délibérante en « prend acte » : elle ne l'approuve pas, et ne pas le voir passer au conseil ne veut pas dire qu'il n'existe pas. Il est communicable, mais après occultation de ce qui relève du secret des affaires."
+        liens: [cgct-l1411-3, cada-rapport-delegataire, crpa, cada]
+        confiance: etabli
       - id: lire-le-rapport-eau
         quoi: "Lire le rapport annuel sur le prix et la qualité du service"
         quand: "Après sa présentation à l'assemblée délibérante, en fin d'année"

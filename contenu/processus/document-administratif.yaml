@@ -68,6 +68,18 @@ processus:
         piege: "Relancer ne repousse pas le délai, mais brouille la date de départ. Garder l'accusé d'envoi initial."
         liens: [crpa]
         confiance: a_confirmer
+      # Un exemple concret, parce que ce processus reste abstrait tant qu'on ne
+      # sait pas quoi demander : le compte rendu annuel de la concession
+      # d'électricité, que presque personne ne sait pouvoir lire.
+      - id: demander-le-crac-electricite
+        quoi: "Demander le compte rendu annuel de la concession d'électricité de sa commune"
+        quand: "Après le 1er juin, date limite de remise à l'autorité concédante"
+        aupres_de: "Le syndicat d'énergie, ou la commune quand elle est restée autorité concédante"
+        difficulte: moyenne
+        recours_si_refus: "Saisir la CADA"
+        piege: "Il est remis à l'autorité concédante, qui n'est pas la commune quand celle-ci a transféré la compétence : demander à la mairie d'un territoire syndiqué, c'est s'adresser à qui ne l'a pas. Beaucoup de syndicats le publient d'eux-mêmes."
+        liens: [cgct-d2224-34, crpa, cada]
+        confiance: etabli
       - id: saisir-la-cada
         quoi: "Saisir la CADA, gratuitement"
         quand: "Dans les 2 mois suivant le refus, explicite ou implicite"

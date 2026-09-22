@@ -208,14 +208,16 @@ competences:
     confiance: etabli
 
   - id: secours-incendie
+    # Même correction que sur la fiche du SDIS : « autorité opérationnelle du
+    # préfet » était faux d'une moitié des interventions (art. L1424-3 et L1424-4).
     nom: "Secours et incendie"
     acteur: sdis
-    resume: "Financé par le département et les communes, mais placé sous l'autorité opérationnelle du préfet."
+    resume: "Financé par le département et les communes ; le service intervient sous l’autorité du maire ou du préfet, selon le pouvoir de police en cause."
     partagee_avec: [departement, commune, prefet]
     banatic: ["7510"]
-    liens: [wp-sdis, code-securite-interieure]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-sdis, code-securite-interieure, cgct-l1424-3, cgct-l1424-35]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Région -----------------------------------------------------------
   - id: lycees
@@ -293,9 +295,9 @@ competences:
     acteur: union-europeenne
     resume: "Qualité de l'eau, de l'air, traitement des déchets : les seuils appliqués localement viennent largement de directives européennes."
     partagee_avec: [etat, agence-eau]
-    liens: [europa, code-environnement, eaufrance]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [europa, code-environnement, eaufrance, eurlex-dechets]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: acces-documents
     nom: "Accès aux documents administratifs"
@@ -324,9 +326,9 @@ competences:
     acteur: prefet
     resume: "Enquêtes publiques et concertations préalables aux projets ayant un impact sur l'environnement."
     partagee_avec: [commune, epci, commissaire-enqueteur, etat]
-    liens: [code-environnement, vp-enquete-publique, od-projets-environnement]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-environnement, vp-enquete-publique, od-projets-environnement, ce-l123-15]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: controle-des-comptes
     nom: "Contrôler les comptes et la gestion"
@@ -355,9 +357,9 @@ competences:
     resume: "Secours d'urgence, domiciliation, accompagnement : l'échelon communal de l'action sociale."
     partagee_avec: [commune, departement]
     banatic: ["3025"]
-    liens: [wp-ccas, code-action-sociale, unccas]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-ccas, code-action-sociale, unccas, casf-l123-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: mediation-service-public
     nom: "Médiation avec un service public"
@@ -370,14 +372,16 @@ competences:
     confiance: etabli
 
   - id: avis-vie-ecole
+    # Même correction que sur la fiche du conseil d'école : il ne fait pas que
+    # donner un avis, il vote son règlement intérieur (art. D411-2).
     nom: "Donner un avis sur la vie de l'école"
     nom_court: "Avis sur l'école"
     acteur: conseil-ecole
-    resume: "Le conseil d'école est consulté, mais les moyens et la carte scolaire restent décidés par l'État."
+    resume: "Le conseil d’école vote le règlement intérieur et donne son avis sur la vie de l’école ; les moyens et la carte scolaire restent décidés par l’État."
     partagee_avec: [commune, rectorat]
-    liens: [wp-conseil-ecole, code-education]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-conseil-ecole, code-education, ce-d411-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Réseaux, mobilité, planification -----------------------------------
   - id: distribution-electricite
@@ -387,9 +391,9 @@ competences:
     resume: "Le réseau appartient aux collectivités, qui en concèdent l'exploitation. La commune n'est donc pas seule maîtresse de ses poteaux."
     partagee_avec: [enedis, commune, etat]
     banatic: ["1005"]
-    liens: [code-energie, wp-concession-electricite, fnccr, od-reseaux-energies]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-energie, wp-concession-electricite, fnccr, od-reseaux-energies, cen-l322-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: organisation-mobilite
     nom: "Organisation de la mobilité"
@@ -414,15 +418,18 @@ competences:
     confiance: etabli
 
   - id: planification-scot
+    # Même correction que sur la fiche du syndicat de SCoT : compatibilité, non
+    # conformité (art. L131-4). Le PLU peut s'écarter du schéma tant qu'il n'en
+    # remet pas en cause les orientations générales.
     nom: "Planification à l'échelle du bassin de vie"
     nom_court: "SCoT"
     acteur: syndicat-scot
-    resume: "Le SCoT fixe le cadre auquel les PLU doivent se conformer : la règle communale n'est jamais écrite seule."
+    resume: "Le SCoT fixe le cadre avec lequel les PLU doivent être compatibles : la règle communale n’est jamais écrite seule."
     partagee_avec: [epci, commune, region, etat]
     banatic: ["5500"]
-    liens: [wp-scot, code-urbanisme, od-gpu, vp-competences]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-scot, code-urbanisme, od-gpu, vp-competences, cu-l131-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: ingenierie-territoriale
     nom: "Ingénierie et études territoriales"
@@ -430,9 +437,9 @@ competences:
     acteur: agence-urbanisme
     resume: "Les études qui préparent les décisions. Sans elles, une petite collectivité décide à l'aveugle ou s'en remet à un bureau d'études privé."
     partagee_avec: [epci, commune, etat, region]
-    liens: [wp-agence-urbanisme, fnau, code-urbanisme]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-agence-urbanisme, fnau, code-urbanisme, cu-l132-6]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Les branches du pouvoir --------------------------------------------
   # Ces compétences existent d'abord pour que les entités de l'État ne soient
@@ -631,24 +638,28 @@ competences:
     confiance: etabli
 
   - id: instruction-etat-permis
+    # Même correction que sur la fiche de la DDT : le critère est la population,
+    # non l'absence de document d'urbanisme (art. L422-8).
     nom: "Instruction des permis par l'État"
     nom_court: "Instruction par l'État"
     acteur: ddt
-    resume: "Les communes sans document d'urbanisme font instruire gratuitement leurs permis par les services de l'État ; celles qui en ont un doivent s'organiser autrement."
+    resume: "Sous dix mille habitants, une commune peut faire instruire gratuitement ses permis par les services de l’État ; au-dessus, elle doit s’organiser autrement."
     partagee_avec: [commune, maire, prefet, service-instructeur]
-    liens: [wp-ddt, annuaire-ddt, code-urbanisme, cu-l422-1]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-ddt, annuaire-ddt, code-urbanisme, cu-l422-1, cu-l422-8]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: installations-classees
+    # Contrairement à la fiche de la DREAL, celle-ci disait juste : c'est l'État
+    # qui autorise. Le préfet signe, la DREAL instruit et inspecte.
     nom: "Autorisation des installations classées"
     nom_court: "Installations classées"
     acteur: dreal
     resume: "Élevages, carrières, industries, méthaniseurs : c'est l'État qui autorise et contrôle, le maire n'ayant qu'un avis — souvent une surprise pour les riverains."
     partagee_avec: [prefet, commune, citoyen, commissaire-enqueteur]
-    liens: [wp-dreal, annuaire-dreal, code-environnement]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-dreal, annuaire-dreal, code-environnement, ce-icpe-autorisation]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: comptable-public
     nom: "Recouvrement de l'impôt et tenue des comptes"
@@ -656,9 +667,9 @@ competences:
     acteur: dgfip
     resume: "Le maire engage la dépense, le comptable public la paie et la contrôle : la séparation de l'ordonnateur et du comptable est ce qui rend le détournement difficile."
     partagee_avec: [commune, maire, citoyen, chambre-regionale-comptes]
-    liens: [wp-dgfip, impots-gouv, cgct]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-dgfip, impots-gouv, cgct, decret-gbcp]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # L'acteur retenu est le tribunal judiciaire parce que le conseil
   # départemental de l'accès au droit est un groupement d'intérêt public présidé
