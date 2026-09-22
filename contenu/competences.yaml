@@ -773,7 +773,7 @@ competences:
     resume: "Gymnase, piscine, médiathèque, salle polyvalente : les bâtir est une décision, les faire fonctionner est une dépense annuelle — et c'est la seconde qui pèse."
     partagee_avec: [epci, departement, region]
     banatic: ["5000"]
-    liens: [wp-equipement-sportif, od-equipements-sportifs, cgct-l1111-4]
+    liens: [wp-equipement-sportif, od-equipements-sportifs, cgct-l1111-4, od-bpe]
     verifie_le: 2026-09-12
     confiance: etabli
 
