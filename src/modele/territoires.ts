@@ -72,6 +72,18 @@ type RisquesDep = {
   >;
 };
 
+/**
+ * Le journal d'un département : ce qui a bougé sur la fenêtre, une fois par
+ * événement. Un marché d'agglomération y figure sous son SIREN, pas sous
+ * chacune des communes qu'il concerne — c'est ici qu'on fait l'éventail.
+ */
+type JournalDep = {
+  maj: string;
+  fenetre: number;
+  genres: string[];
+  e: { g: number; d: string; q: string; p?: string; u?: string; s?: string; c?: string }[];
+};
+
 function lire<T>(chemin: string): T | null {
   const p = join(BASE, chemin);
   if (!existsSync(p)) return null;
@@ -106,10 +118,100 @@ const cacheElus = new Map<string, ElusDep | null>();
 const cacheEcoles = new Map<string, EcolesDep | null>();
 const cacheSru = new Map<string, SruDep | null>();
 const cacheRisques = new Map<string, RisquesDep | null>();
+const cacheJournal = new Map<string, JournalDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
   return c.get(dep) ?? null;
+}
+
+export interface EvenementCommune {
+  /** Le genre, en clair : « Marché notifié », « Délibération »… */
+  genre: string;
+  date: string;
+  quoi: string;
+  detail: string | null;
+  url: string | null;
+  /**
+   * Qui en est l'auteur, quand ce n'est pas la commune elle-même : le nom du
+   * groupement. C'est souvent lui qui agit, et c'est pour cela qu'on le nomme.
+   */
+  par: string | null;
+  /** Une identité stable, pour l'`id` d'une entrée de flux. */
+  cle: string;
+}
+
+/**
+ * Ce qui a bougé dans une commune, du plus récent au plus ancien.
+ *
+ * L'éventail se fait ici : aux événements qui portent son code s'ajoutent ceux
+ * de son propre SIREN et de chacun de ses groupements. C'est l'essentiel du
+ * volume — une commune de mille habitants ne commande presque rien, son
+ * agglomération et ses syndicats commandent pour elle.
+ */
+export function journalCommune(c: CommuneIndex, maximum = 40): EvenementCommune[] {
+  // Trois appels par commune — le chemin du flux, le flux, la page — et
+  // chacun reparcourrait les cinq mille événements de son département.
+  const deja = cacheCommune.get(c.code);
+  if (deja) return deja.slice(0, maximum);
+  const liste = rassemblerJournal(c);
+  cacheCommune.set(c.code, liste);
+  return liste.slice(0, maximum);
+}
+
+const cacheCommune = new Map<string, EvenementCommune[]>();
+
+/** Le plafond au-delà duquel rien n'est lu : la page en montre douze. */
+const JOURNAL_MAX = 40;
+
+function rassemblerJournal(c: CommuneIndex): EvenementCommune[] {
+  const j = enCache(cacheJournal, c.dep, `dep/${c.dep}-journal.json`);
+  const dep = enCache(cacheDep, c.dep, `dep/${c.dep}.json`);
+  if (!j || !dep) return [];
+  const ligne = dep.c.find((x) => x[0] === c.code);
+  if (!ligne) return [];
+  // Le nom de chaque structure, pour dire qui agit ; la commune elle-même n'a
+  // pas à être nommée, on est déjà sur sa page.
+  const nomDe = new Map<string, string>();
+  for (const i of ligne[3]) nomDe.set(dep.g[i][0], dep.g[i][1]);
+  // Un événement de la commune elle-même porte son code, pas son SIREN :
+  // l'ingestion l'a converti, elle seule connaît la correspondance.
+  const retenus = j.e.filter((e) => (e.c ? e.c === c.code : nomDe.has(e.s ?? '')));
+  return retenus
+    .sort((a, b) => b.d.localeCompare(a.d) || a.q.localeCompare(b.q, 'fr'))
+    .slice(0, JOURNAL_MAX)
+    .map((e) => ({
+      genre: j.genres[e.g] ?? '',
+      date: e.d,
+      quoi: e.q,
+      detail: e.p ?? null,
+      url: e.u ?? null,
+      par: e.s ? (nomDe.get(e.s) ?? null) : null,
+      // Le genre, la date, l'acteur et l'intitulé : ce qui distingue un
+      // événement de tout autre, et qui ne bouge pas d'une ingestion à la
+      // suivante. Un agrégateur s'en sert pour savoir ce qu'il a déjà montré.
+      cle: `${e.g}-${e.d}-${e.s ?? e.c ?? ''}-${empreinte(e.q)}`,
+    }));
+}
+
+/** La date du fait le plus récent, ou null quand la commune n'a rien vu bouger. */
+export function journalMaj(c: CommuneIndex): string | null {
+  return journalCommune(c, 1)[0]?.date ?? null;
+}
+
+/**
+ * Une empreinte courte et stable d'un intitulé, pour l'identité d'une entrée.
+ *
+ * Le titre lui-même ferait un identifiant valide mais illisible et fragile :
+ * il contient des espaces, des accents et jusqu'à cent trente caractères.
+ */
+function empreinte(texte: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < texte.length; i++) {
+    h ^= texte.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
 }
 
 export interface Fiche {

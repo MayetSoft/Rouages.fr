@@ -653,6 +653,28 @@ abbr[title] {
 .legende-fixe svg { flex: 0 0 auto; overflow: visible; }
 .legende-fixe strong { font-weight: 600; }
 
+/* --- ce qui a bougé, sur la page d'une commune ---
+   La date à gauche, en chiffres alignés : c'est par elle qu'on balaie une
+   liste chronologique, et le genre en petites capitales dit de quoi il s'agit
+   avant qu'on ait lu l'intitulé. */
+.journal { list-style: none; margin: .9rem 0 0; padding: 0; display: grid; gap: .55rem; }
+.journal li {
+  display: grid; grid-template-columns: 5.6rem 1fr; gap: .8rem; align-items: baseline;
+}
+.journal-date {
+  font-size: .78rem; color: var(--encre-tres-douce); font-variant-numeric: tabular-nums;
+}
+.journal-fait { display: grid; gap: .1rem; }
+.journal-genre {
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--encre-douce);
+}
+.journal-fait > a, .journal-fait > span:nth-child(2) { font-size: .92rem; line-height: 1.4; }
+.journal-detail { font-size: .78rem; color: var(--encre-douce); line-height: 1.4; }
+@media (max-width: 560px) {
+  .journal li { grid-template-columns: 1fr; gap: .05rem; }
+}
+
 /* Rappel en clair des sigles d'une page : le survol ne sert ni à l'impression
    ni sur un écran tactile. */
 .sigles, .glossaire { margin: 0 0 2rem; }

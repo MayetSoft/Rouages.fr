@@ -1026,6 +1026,72 @@ elle surveillait le jeu de données, pas la validité des adresses que le
 collecteur en avait recopiées. Ne plus rien recopier est le seul remède qui
 tienne.
 
+### Un flux par commune ✔
+
+« Préviens-moi quand quelque chose bouge chez moi » est la seule demande
+d'abonnement qui ait un sens ici. La réponse n'est pas le courriel : une
+adresse est une donnée personnelle, elle veut un registre de traitement, un
+double opt-in, un désabonnement, un responsable nommé — les quatre champs de
+`contenu/editeur.yaml` sont encore à compléter — un expéditeur tiers, et
+quelque chose qui tourne, là où le déploiement est un `lftp mirror` vers un
+mutualisé. Elle renierait en une fois tout ce que les mentions légales
+promettent.
+
+Un site statique sait publier un **flux Atom**. Aucune adresse collectée, aucun
+consentement à recueillir, aucun tiers, rien à faire tourner : le lecteur
+s'abonne dans son agrégateur, qui va chercher le fichier comme il irait
+chercher une page. **33 219 flux** — les communes où rien n'a bougé sur la
+fenêtre n'en ont pas, parce qu'un flux vide ne s'abonne pas.
+
+**Deux précautions décident si c'est déployable.** La première : `<updated>`
+porte la date du fait le plus récent, jamais celle de la génération. Sinon les
+trente-trois mille fichiers changeraient à chaque ingestion et l'envoi par FTP
+repasserait de quelques minutes à plus d'une demi-heure — `mirror` ne transfère
+que ce qui a changé, encore faut-il que l'inchangé reste identique à l'octet
+près. La seconde : l'`id` d'une entrée est stable, et c'est lui qui dit à un
+agrégateur ce qu'il a déjà montré. C'est ce qui permet au journal de n'avoir
+aucune mémoire à tenir, et à un marché notifié en juin mais publié en septembre
+d'apparaître comme nouveau tout en se rangeant à sa date.
+
+**Le format a été resserré deux fois, sur mesure et non sur impression.**
+Vingt entrées par flux et un lien répété dans chacune donnaient 287 Mo ;
+quinze entrées et pas de lien quand l'entrée n'en a pas de propre — RFC 4287
+l'autorise dès lors qu'elle porte un `content`, et le lien de tête y conduit
+déjà — ramènent à 161 Mo. Puis le premier build complet a donné **1,1 Go et
+76 552 fichiers**, pour un déploiement FTPS qui mettait déjà une demi-heure à
+43 000. Deux causes :
+
+- `/commune/03165/flux.xml` créait **33 219 dossiers**, soit 133 Mo de blocs et
+  autant de commandes `MKD` en FTP, pour un chemin à peine plus joli.
+  `/commune/03165-flux.xml` en crée zéro — `dist/` compte sept répertoires en
+  tout — et le site nomme déjà ses plans de site ainsi ;
+- la section de la page de commune pesait **4,4 Ko sur 16,1**, multipliés par
+  34 875. C'est le raisonnement que cette page s'applique déjà à elle-même
+  lorsqu'elle écarte les marchés et les courbes. Six lignes au lieu de douze :
+  2,2 Ko, et la suite est dans le flux vers lequel la section conduit.
+
+| | Avant | Après |
+| --- | --- | --- |
+| Poids de `dist/` | ~684 Mo | 889 Mo |
+| Fichiers | ~43 300 | 76 552 |
+| Répertoires | 7 | 7 |
+| Durée du build | ~2 min 30 | 2 min 47 |
+
+Les flux pèsent 161 Mo pour 33 219 fichiers, les sections de page 44 Mo. Un
+envoi complet passe d'une demi-heure à environ une heure ; les suivants restent
+de quelques minutes, puisqu'un flux dont la commune n'a rien vu bouger reste
+identique à l'octet près.
+
+La page de commune gagne la même liste, « ce qui a bougé récemment », et
+déclare le flux dans son en-tête pour qu'un navigateur le trouve seul. Le
+`.htaccess` sert ces fichiers en `application/atom+xml` plutôt qu'en XML
+quelconque, sans toucher aux plans de site.
+
+Au Mayet-de-Montagne, le flux ouvre sur l'aménagement de la place de la Mairie,
+les compteurs d'eau télérelevés du SMEA et le gardiennage des bâtiments de
+Vichy Communauté. Presque tout y est intercommunal — et c'est précisément ce
+que personne ne regarde.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

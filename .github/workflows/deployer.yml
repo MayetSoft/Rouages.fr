@@ -106,15 +106,21 @@ jobs:
 
           # Le site est passé de 975 à 36 000 fichiers le jour où chaque commune
           # a eu sa page, puis à près de 43 000 quand la liste complète des
-          # marchés de chaque acheteur a eu la sienne. C'est le nombre de
-          # fichiers qui domine désormais la durée, plus que le volume : en
-          # FTP, chacun coûte une connexion de données. D'où le parallélisme
-          # relevé à 8, qui reste sous ce qu'un hébergement mutualisé accepte —
-          # au-delà, le compte se fait limiter, et l'envoi échoue au lieu
-          # d'aller plus vite.
+          # marchés de chaque acheteur a eu la sienne, et à 76 552 quand chaque
+          # commune a eu son flux. C'est le nombre de fichiers qui domine
+          # désormais la durée, plus que le volume : en FTP, chacun coûte une
+          # connexion de données. D'où le parallélisme relevé à 8, qui reste
+          # sous ce qu'un hébergement mutualisé accepte — au-delà, le compte se
+          # fait limiter, et l'envoi échoue au lieu d'aller plus vite.
           #
-          # Compter une demi-heure environ pour un envoi complet, quelques
-          # minutes ensuite : `mirror` ne transfère que ce qui a changé.
+          # Les flux sont nommés `03165-flux.xml` et non `03165/flux.xml` pour
+          # cette raison : un dossier par commune, ce serait trente-trois mille
+          # créations de répertoire en plus. `dist/` en compte sept en tout.
+          #
+          # Compter une heure environ pour un envoi complet, quelques minutes
+          # ensuite : `mirror` ne transfère que ce qui a changé, et un flux dont
+          # la commune n'a rien vu bouger reste identique à l'octet près — son
+          # `<updated>` porte la date du dernier fait, pas celle du build.
           lftp -c "$reglages
                    open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
                    mirror --reverse --verbose=1 --parallel=8 \

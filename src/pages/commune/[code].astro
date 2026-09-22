@@ -20,7 +20,7 @@
  */
 import Base from '../../layouts/Base.astro';
 import { construireReseau } from '../../modele/reseau.ts';
-import { communes, ficheCommune, metaTerritoires } from '../../modele/territoires.ts';
+import { communes, ficheCommune, journalCommune, metaTerritoires } from '../../modele/territoires.ts';
 import type { Verdict } from '../../modele/verdict.ts';
 import { urlSignaler } from '../../modele/signalement.ts';
 import Glose from '../../composants/Glose.astro';
@@ -129,6 +129,17 @@ for (const s of fiche?.services ?? []) {
   parFamille.get(s.famille)!.push({ nom: s.nom, prive: s.prive, chiffres: chiffresEcole(s.ecole) });
 }
 
+/**
+ * Ce qui a bougé, en six lignes.
+ *
+ * Six et non douze, pour la raison qui écarte déjà les marchés et les courbes
+ * de cette page : ce qu'on y ajoute se multiplie par 34 875. La section pèse
+ * alors deux kilo-octets au lieu de quatre, soit soixante-dix méga-octets de
+ * moins sur le site entier — et la suite est dans le flux, vers lequel elle
+ * conduit.
+ */
+const journal = journalCommune(commune, 6);
+
 const region = meta?.regions?.[commune.dep];
 const titre = `${commune.nom} — qui décide quoi`;
 const description = fiche
@@ -145,7 +156,11 @@ function moisAnnee(iso: string): string | null {
 }
 ---
 
-<Base titre={titre} description={description}>
+<Base
+  titre={titre}
+  description={description}
+  flux={journal.length > 0 ? `/commune/${commune.code}-flux.xml` : undefined}
+>
   <div class="page page--etroite">
     <p class="badge">Commune · {commune.depNom}{region ? ` · ${region}` : ''}</p>
     <h1>{commune.nom}</h1>
@@ -280,6 +295,37 @@ function moisAnnee(iso: string): string | null {
           {fiche.risques.dicrim
             ? ` Document d’information communal publié en ${fiche.risques.dicrim}.`
             : ' Aucun document d’information communal recensé.'}
+        </p>
+      </section>
+    )}
+
+    {journal.length > 0 && (
+      <section class="releve">
+        <h2 class="badge">Ce qui a bougé récemment</h2>
+        <p class="mesure">
+          Les six derniers faits datés — ici et dans les structures dont la commune dépend,
+          qui agissent le plus souvent pour elle.
+          {' '}<a href={`/commune/${commune.code}-flux.xml`}>S’abonner au flux</a>, pour le
+          recevoir dans un agrégateur. Le site ne demande aucune adresse et n’en conserve aucune.
+        </p>
+        <ul class="journal">
+          {journal.map((e) => (
+            <li>
+              <span class="journal-date">{e.date}</span>
+              <span class="journal-fait">
+                <span class="journal-genre">{e.genre}</span>
+                {e.url ? <a href={e.url}>{e.quoi}</a> : <span>{e.quoi}</span>}
+                {(e.par || e.detail) && (
+                  <span class="journal-detail">{[e.par, e.detail].filter(Boolean).join(' · ')}</span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p class="p-source-territoire">
+          Le journal ne dit pas tout&nbsp;: un transfert de compétence n’y figure pas, parce que
+          le registre BANATIC ne le date pas. Un acte publié tardivement s’y range à sa date, pas
+          à celle de sa publication.
         </p>
       </section>
     )}

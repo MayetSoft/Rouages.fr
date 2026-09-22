@@ -6,8 +6,16 @@ interface Props {
   description: string;
   /** L'explorateur occupe tout l'écran ; les pages de nœud sont des pages. */
   plein?: boolean;
+  /**
+   * L'adresse d'un flux Atom que cette page accompagne.
+   *
+   * Déclarée dans l'en-tête plutôt que seulement dans le corps : c'est ainsi
+   * qu'un navigateur et qu'un agrégateur le trouvent sans qu'on ait à coller
+   * l'adresse à la main.
+   */
+  flux?: string;
 }
-const { titre, description, plein = false } = Astro.props;
+const { titre, description, plein = false, flux } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,6 +28,9 @@ const { titre, description, plein = false } = Astro.props;
     <meta property="og:title" content={titre} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content="fr_FR" />
+    {flux && (
+      <link rel="alternate" type="application/atom+xml" title={titre} href={flux} />
+    )}
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%231e5f74' stroke-width='2.5'%3E%3Ccircle cx='11' cy='12' r='6'/%3E%3Ccircle cx='22' cy='21' r='5'/%3E%3Cpath d='M15 16l3 2'/%3E%3C/g%3E%3C/svg%3E"

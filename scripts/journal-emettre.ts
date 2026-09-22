@@ -121,12 +121,24 @@ export function ecrireJournal(
   dep: string,
   codes: string[],
   sirens: string[],
+  /**
+   * Le SIREN de chaque commune. Un marché passé par la commune elle-même est
+   * réécrit sous son code : le lecteur du fichier ne connaît que les SIREN des
+   * groupements — le fichier de département n'a pas de colonne pour celui de la
+   * commune — et il manquerait sinon ce qu'elle commande en propre.
+   */
+  sirenDeCommune: Map<string, string>,
   evenements: Evenement[],
   maj: string,
 ): number {
   const communes = new Set(codes);
   const acteurs = new Set(sirens);
+  const codeDuSiren = new Map([...sirenDeCommune].map(([code, siren]) => [siren, code] as const));
   const retenus = evenements
+    .map((e) => {
+      const propre = e.siren ? codeDuSiren.get(e.siren) : undefined;
+      return propre ? { ...e, siren: undefined, commune: propre } : e;
+    })
     .filter((e) => (e.commune ? communes.has(e.commune) : e.siren ? acteurs.has(e.siren) : false))
     .sort((a, b) => b.date.localeCompare(a.date) || a.quoi.localeCompare(b.quoi, 'fr'));
   if (retenus.length === 0) return 0;

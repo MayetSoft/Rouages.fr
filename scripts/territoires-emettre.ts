@@ -380,6 +380,7 @@ export function emettre(o: {
         dep,
         liste.map((c) => c.code),
         [...sirens, ...echelonsDelib, ...echelonsSubv],
+        sirenDeCommune,
         journal,
         majJournal,
       );

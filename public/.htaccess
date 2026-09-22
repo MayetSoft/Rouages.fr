@@ -68,6 +68,7 @@
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/css text/plain
   AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/atom+xml application/xml
   AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
@@ -75,6 +76,15 @@
   AddType application/json .json
   AddType image/svg+xml .svg
 </IfModule>
+
+# Le flux d'une commune est un document Atom, pas un XML quelconque. La plupart
+# des agrégateurs s'en accommoderaient — ils reniflent la racine du document —
+# mais certains refusent un type qu'ils n'attendaient pas, et le plan de site
+# doit rester, lui, un `application/xml` ordinaire : d'où une règle qui ne vise
+# que ces fichiers-là.
+<FilesMatch "-flux\.xml$">
+  ForceType application/atom+xml
+</FilesMatch>
 
 # Le HTML déclare déjà son encodage dans une balise `meta`, mais l'en-tête HTTP
 # fait autorité sur elle : sans cette ligne, un serveur configuré autrement
