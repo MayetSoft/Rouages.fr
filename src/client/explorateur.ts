@@ -725,6 +725,7 @@ function demarrer(reseau: Reseau) {
     };
     ajouter('Les habitants', blocPopulation());
     ajouter('L’élection', blocScrutin());
+    ajouter('Le conseil', blocConseil());
     ajouter('Qui exerce quoi', blocResolution(), true);
     ajouter('Ses comptes', blocFinances());
     ajouter('L’intercommunalité', blocFluxPercus());
@@ -1999,6 +2000,90 @@ function demarrer(reseau: Reseau) {
           `déclare pas en préfecture : elle s'inscrit au registre des associations tenu par le ` +
           `greffe du tribunal judiciaire, sous le code civil local. C'est là que se consulte ce ` +
           `qui s'est créé — et non dans le fichier dont le reste du pays relève.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * De quoi le conseil est fait.
+   *
+   * **Aucun nom.** Les cinq cent onze mille conseillers que le répertoire
+   * publie, avec leur profession et leur date de naissance, n'entrent pas ici :
+   * republier un annuaire indexable de cette taille n'est pas le projet. Ce qui
+   * entre est ce qu'aucune liste de noms ne dirait — de quoi l'assemblée est
+   * faite, et en quoi elle diffère de toutes les autres.
+   */
+  function blocConseil(): HTMLElement | null {
+    const k = territoire?.conseil;
+    if (!k) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-conseil';
+    bloc.append(ligne('h3', 'p-titre-section', 'De quoi le conseil est fait'));
+
+    const sieges = territoire?.scrutin?.sieges ?? 0;
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        `${k.elus} conseillers en fonction` +
+          // Le répertoire décrit le conseil tel qu'il est, pas tel qu'il a été
+          // élu : un siège vacant se voit ici, et nulle part ailleurs.
+          (sieges > 0 && sieges !== k.elus ? ` sur ${sieges} sièges à pourvoir` : '') +
+          (k.communautaires > 0
+            ? `, dont ${k.communautaires} au conseil communautaire`
+            : '') +
+          '.',
+      ),
+    );
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const part = Math.round((k.femmes / k.elus) * 100);
+    for (const [nom, valeur, texte, mediane] of [
+      ['Femmes', part, `${part} %`, k.partFemmesNationale],
+      ['Âge médian', k.ageMedian, `${k.ageMedian} ans`, k.ageMedianNational],
+    ] as [string, number, string, number][]) {
+      const d = document.createElement('div');
+      d.append(ligne('dt', '', nom));
+      const dd = document.createElement('dd');
+      dd.append(ligne('span', 'p-montant', texte));
+      dd.append(reglette(valeur, mediane, 'l’ensemble des conseils'));
+      dd.append(
+        ligne(
+          'span',
+          'p-mediane',
+          `${mediane.toLocaleString('fr-FR')}${nom === 'Femmes' ? ' %' : ' ans'} dans l’ensemble des conseils`,
+        ),
+      );
+      d.append(dd);
+      dl.append(d);
+    }
+    bloc.append(dl);
+
+    if (k.groupes.length > 0) {
+      const g = document.createElement('div');
+      g.className = 'p-risque-groupe';
+      g.append(ligne('span', 'p-service-famille', 'Par groupe socioprofessionnel'));
+      const ul = document.createElement('ul');
+      for (const x of k.groupes) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-risque-nombre', String(x.nombre)));
+        li.append(ligne('span', 'p-risque-nom', x.nom));
+        ul.append(li);
+      }
+      g.append(ul);
+      bloc.append(g);
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après le répertoire national des élus (${k.maj}), agrégé par le site : aucun nom, ` +
+          `aucune date de naissance, aucune profession individuelle n'en est reprise. Les huit ` +
+          `groupes sont ceux de la nomenclature PCS de l'INSEE. La liste nominative des ` +
+          `conseillers est affichée en mairie, qui la publie souvent aussi sur son site.`,
       ),
     );
     return bloc;

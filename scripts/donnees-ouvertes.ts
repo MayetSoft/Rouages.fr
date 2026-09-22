@@ -103,6 +103,78 @@ export function lireCsvOuvert(octets: Uint8Array, colonnesMin = 4): Record<strin
   return out;
 }
 
+/**
+ * Un CSV du cache, lu en flux et ligne à ligne.
+ *
+ * `lireCsvOuvert` charge tout : très bien pour les quelques centaines de
+ * kilo-octets d'un jeu SCDL, intenable pour les soixante-cinq méga-octets du
+ * répertoire des élus, qui feraient cinq cent mille objets en mémoire. Mêmes
+ * précautions que la version en mémoire — délimiteur tranché sur l'en-tête,
+ * décodage qui bascule en Windows-1252 quand l'UTF-8 strict échoue — mais sur
+ * un flux, et sans jamais garder plus d'une ligne.
+ */
+export async function* lignesCsvOuvert(
+  chemin: string,
+  lire: (chemin: string) => AsyncIterable<Uint8Array>,
+): AsyncIterable<Record<string, string>> {
+  let reste = '';
+  let entetes: string[] | null = null;
+  let sep = ',';
+  let decode: ((o: Uint8Array) => string) | null = null;
+  for await (const bloc of lire(chemin)) {
+    // Le décodage se décide sur le premier bloc. En mode « stream », un
+    // décodeur strict tolère une séquence incomplète en fin de morceau — c'est
+    // précisément ce qu'il faut : lui couper arbitrairement quelques octets
+    // pour éviter une coupure au milieu d'un caractère en recrée une ailleurs,
+    // et le fichier entier repart alors en Windows-1252 alors qu'il est en
+    // UTF-8.
+    if (!decode) {
+      let strict = true;
+      try {
+        new TextDecoder('utf-8', { fatal: true }).decode(bloc, { stream: true });
+      } catch {
+        strict = false;
+      }
+      const d = new TextDecoder(strict ? 'utf-8' : 'windows-1252');
+      decode = (o) => d.decode(o, { stream: true });
+    }
+    reste += decode(bloc);
+    let coupe: number;
+    while ((coupe = finDeLigne(reste)) !== -1) {
+      const ligne = reste.slice(0, coupe).replace(/\r$/, '');
+      reste = reste.slice(coupe + 1);
+      if (!entetes) {
+        sep = delimiteur(ligne);
+        entetes = decouper(ligne, sep).map((h) => h.trim().replace(/^\ufeff/, ''));
+        continue;
+      }
+      const champs = decouper(ligne, sep);
+      if (champs.length < 2) continue;
+      const r: Record<string, string> = {};
+      for (const [i, h] of entetes.entries()) r[h] = (champs[i] ?? '').trim();
+      yield r;
+    }
+  }
+  if (entetes && reste.trim() !== '') {
+    const champs = decouper(reste, sep);
+    if (champs.length >= 2) {
+      const r: Record<string, string> = {};
+      for (const [i, h] of entetes.entries()) r[h] = (champs[i] ?? '').trim();
+      yield r;
+    }
+  }
+}
+
+/** Une fin de ligne hors guillemets : un champ peut en contenir une. */
+function finDeLigne(s: string): number {
+  let dansGuillemets = false;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '"') dansGuillemets = !dansGuillemets;
+    else if (s[i] === '\n' && !dansGuillemets) return i;
+  }
+  return -1;
+}
+
 const TAILLE_PAGE = 50;
 
 /**

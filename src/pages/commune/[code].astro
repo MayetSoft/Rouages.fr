@@ -202,6 +202,22 @@ function moisAnnee(iso: string): string | null {
             : <>communautaire</>}</>
         )}.{' '}
         <span class="c-conseil-source">D’après les résultats des {fiche.conseil.scrutin}.</span>
+        {fiche.conseil.elus > 0 && (
+          <span class="c-conseil-compo">
+            {'Le conseil compte aujourd’hui '}<strong>{fiche.conseil.elus} élus</strong>{
+              fiche.conseil.elus < fiche.conseil.sieges
+                ? ` — ${fiche.conseil.sieges - fiche.conseil.elus} siège${fiche.conseil.sieges - fiche.conseil.elus > 1 ? 's' : ''} vacant${fiche.conseil.sieges - fiche.conseil.elus > 1 ? 's' : ''}`
+                : ''
+            }{', dont '}<strong>{Math.round((fiche.conseil.femmes / fiche.conseil.elus) * 100)} % de femmes</strong>{
+              ` (contre ${fiche.conseil.femmesPartout.toLocaleString('fr-FR')} % dans l’ensemble des conseils), d’un âge médian de `
+            }<strong>{fiche.conseil.ageMedian} ans</strong>{` (contre ${fiche.conseil.agePartout}).`}
+            {fiche.conseil.groupes.length > 0 && (
+              <>{' Par groupe socioprofessionnel : '}{fiche.conseil.groupes
+                .map((g) => `${g.nombre} ${g.nom.toLowerCase()}`)
+                .join(', ')}.</>
+            )}
+          </span>
+        )}
         {fiche.conseil.designes && fiche.conseil.ou && (
           <span class="c-conseil-designes">
             Au conseil de <Glose texte={fiche.conseil.ou} />, la commune n’élit pas ses

@@ -523,6 +523,20 @@ async function principal() {
   // créations d'associations. Un fichier de 1,2 Go, lu en flux comme FINESS,
   // et une fenêtre récente — le répertoire dit ce qui se crée, jamais ce qui
   // vit encore.
+  // De quoi le conseil municipal est fait : un effectif, une part de femmes,
+  // un âge médian, huit compteurs. Aucun nom — voir l'en-tête du collecteur.
+  const { collecterConseils } = await import('./conseils-emettre.ts');
+  const conseils = await tenter('Conseils municipaux', () =>
+    collecterConseils(
+      (url, vers) =>
+        telechargerEnCache(url, vers, reutiliser, 'Répertoire des élus — conseillers (75 Mo)'),
+      CACHE,
+      (chemin) => createReadStream(chemin) as unknown as AsyncIterable<Uint8Array>,
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   // La population dans le temps : le dénominateur de tous les autres chiffres
   // du site méritait sa propre histoire.
   const { collecterPopulations } = await import('./population-emettre.ts');
@@ -575,6 +589,7 @@ async function principal() {
     subventions,
     associations,
     populations,
+    conseils,
   );
 }
 
@@ -701,6 +716,7 @@ async function ecrire(
   populations: Awaited<
     ReturnType<typeof import('./population-emettre.ts')['collecterPopulations']>
   >,
+  conseils: Awaited<ReturnType<typeof import('./conseils-emettre.ts')['collecterConseils']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -727,6 +743,7 @@ async function ecrire(
     subventions,
     associations,
     populations,
+    conseils,
     sortie: SORTIE,
     dire,
     VERT,

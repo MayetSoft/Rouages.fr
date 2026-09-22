@@ -522,6 +522,11 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
    colonne de chiffres de la seconde suffit à les distinguer d'un coup d'œil. */
 .p-risques { margin-top: 1.2rem; }
 .p-risque-groupe { margin: 0 0 .7rem; }
+.p-conseil { margin-top: 1.2rem; }
+.p-conseil ul { list-style: none; margin: .1rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.p-conseil li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .55rem; align-items: baseline; }
+.p-conseil .p-reperes { margin-bottom: .8rem; }
+
 .p-risques ul, .p-assos ul { list-style: none; margin: .1rem 0 0; padding: 0; display: grid; gap: .3rem; }
 .p-risques li, .p-assos li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .55rem; align-items: baseline; }
 .p-risques li.p-risque-plan, .p-assos li.p-risque-plan, .p-risques .p-risque-groupe:first-of-type li {
@@ -663,6 +668,7 @@ abbr[title] {
 .c-sommet strong { color: var(--encre); }
 .c-conseil { font-size: .95rem; line-height: 1.5; margin: 0 0 1.2rem; color: var(--encre); }
 .c-conseil-source { color: var(--encre-tres-douce); font-size: .82rem; }
+.c-conseil-compo { display: block; margin-top: .4rem; font-size: .9rem; color: var(--encre); line-height: 1.55; }
 .c-conseil-designes { display: block; margin-top: .4rem; font-size: .86rem; color: var(--encre-douce); line-height: 1.5; }
 .p-scrutin-designes { font-size: .78rem; color: var(--encre-douce); line-height: 1.45; margin: .5rem 0 0; }
 

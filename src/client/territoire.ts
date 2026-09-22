@@ -341,6 +341,22 @@ export interface Risques {
   maj: string;
 }
 
+function assemblerConseil(commune: CommuneBreve): Conseil | null {
+  const d = conseilsDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f || f.n === 0) return null;
+  return {
+    elus: f.n,
+    femmes: f.f,
+    ageMedian: f.age,
+    groupes: f.p.map(([i, n]) => ({ nom: d.groupes[i] ?? '', nombre: n })).filter((g) => g.nom),
+    communautaires: f.cc,
+    partFemmesNationale: d.femmes,
+    ageMedianNational: d.age,
+    maj: d.maj,
+  };
+}
+
 /**
  * La population de la commune, recensement après recensement.
  *
@@ -411,6 +427,30 @@ export interface Population {
   sommet: [number, number];
   /** L'écart au sommet, en pour cent — négatif quand la commune a décru. */
   ecart: number;
+  maj: string;
+}
+
+/**
+ * De quoi le conseil municipal est fait — sans nommer personne.
+ *
+ * Le site nomme le maire et s'arrête là. Ce qui est repris ici ne permet de
+ * revenir à personne : un effectif, une part de femmes, un âge médian, huit
+ * compteurs. C'est pourtant une information politique de premier ordre — neuf
+ * retraités et aucun ouvrier dans une commune ouvrière se voit d'un coup
+ * d'œil, et aucune liste de noms ne le dirait.
+ */
+export interface Conseil {
+  /** Conseillers en fonction, qui n'est pas toujours le nombre de sièges. */
+  elus: number;
+  femmes: number;
+  ageMedian: number;
+  /** Par groupe socioprofessionnel, du plus fourni au moins fourni. */
+  groupes: { nom: string; nombre: number }[];
+  /** Représentants de la commune au conseil communautaire. */
+  communautaires: number;
+  /** Les mêmes chiffres pour l'ensemble des conseils du pays. */
+  partFemmesNationale: number;
+  ageMedianNational: number;
   maj: string;
 }
 
@@ -501,6 +541,8 @@ export interface Territoire {
   associations: Associations | null;
   /** Combien d'habitants, et depuis quand. */
   histoire: Population | null;
+  /** De quoi le conseil municipal est fait. */
+  conseil: Conseil | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -695,6 +737,16 @@ const assoDep = new Map<string, AssoDep | null>();
 /** Les séries de population du département. */
 type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
 const popDep = new Map<string, PopDep | null>();
+
+/** La composition des conseils du département. */
+type ConseilsDep = {
+  maj: string;
+  groupes: string[];
+  femmes: number;
+  age: number;
+  c: Record<string, { n: number; f: number; age: number; p: [number, number][]; cc: number }>;
+};
+const conseilsDep = new Map<string, ConseilsDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -992,7 +1044,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -1012,6 +1064,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<SubvDep>(`${BASE}/dep/${commune.dep}-subventions.json`).catch(() => null),
       json<AssoDep>(`${BASE}/dep/${commune.dep}-associations.json`).catch(() => null),
       json<PopDep>(`${BASE}/dep/${commune.dep}-population.json`).catch(() => null),
+      json<ConseilsDep>(`${BASE}/dep/${commune.dep}-conseils.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -1027,6 +1080,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     subvDep.set(commune.dep, sub);
     assoDep.set(commune.dep, asso);
     popDep.set(commune.dep, pop);
+    conseilsDep.set(commune.dep, cons);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -1084,6 +1138,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     risques: assemblerRisques(commune),
     associations: assemblerAssociations(commune, ligne[2]),
     histoire: assemblerPopulation(commune),
+    conseil: assemblerConseil(commune),
     scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,

@@ -1169,6 +1169,55 @@ que 2020→2023, écrasant un siècle pour étirer trois ans. Pour les séries
 annuelles — les comptes, les droits de mutation — les deux coïncident et rien
 ne change.
 
+### De quoi un conseil est fait — sans nommer personne ✔
+
+La question posée était bonne&nbsp;: la composition sociale d'une assemblée est
+une information politique de premier ordre. La réponse ne demandait aucun nom.
+
+Le répertoire national des élus publie **511 225 conseillers municipaux** avec
+leur nom, leur date de naissance et leur profession. **Rien de tout cela
+n'entre ici**&nbsp;: republier un annuaire indexable de cette taille n'est pas
+le projet, et les mentions légales promettent le contraire. Ce qui entre est ce
+qu'aucune liste de noms ne dirait — un effectif, une part de femmes, un âge
+médian, huit compteurs&nbsp;:
+
+> **Le Mayet-de-Montagne** — 15 élus, 47 % de femmes, âge médian 57 ans&nbsp;:
+> 5 professions intermédiaires, 4 retraités, 2 artisans, 2 cadres, 1 employé,
+> 1 ouvrier.
+>
+> **Vichy** — 35 élus, 49 % de femmes, âge médian 51 ans&nbsp;: **17 cadres**,
+> 7 artisans, 7 retraités, 2 employés — **aucun ouvrier, aucun agriculteur**.
+
+Les huit groupes sont ceux de la **PCS 2003** de l'INSEE, pris au premier
+chiffre du code comme les familles d'actes le sont au leur. Les quarante-deux
+catégories du répertoire correspondent exactement aux quarante-deux de la
+nomenclature, ce qui confirme le rattachement.
+
+**Le répertoire décrit le conseil tel qu'il est, pas tel qu'il a été élu**, et
+c'est une information en soi. Comparé au nombre de sièges à pourvoir du
+scrutin&nbsp;: **32 767 conseils coïncident, 2 016 diffèrent**, et l'écart est
+presque toujours négatif — un siège vacant qu'une démission ou un décès a
+laissé. La page affiche donc l'effectif réel et nomme les sièges vacants.
+
+Gain de côté&nbsp;: le répertoire porte les conseillers communautaires de
+**toutes** les communes, y compris celles de moins de mille habitants dont le
+fichier des résultats ne portait aucun siège. Espinasse-Vozelle affiche
+désormais son représentant **et** l'explication de pourquoi il n'est pas élu.
+
+**Ce qu'on refuse encore&nbsp;: le nombre total de sièges d'une
+intercommunalité.** Compter les lignes du répertoire donne 81 pour CA Vichy
+Communauté, qui en publie 77, et ne rattache ses élus qu'à 38 de ses 39
+communes. Le nombre de représentants d'une commune, lui, est une donnée de
+ligne et non un agrégat&nbsp;: il est repris tel quel.
+
+Un défaut de lecture corrigé au passage. Le lecteur de CSV en flux décidait de
+l'encodage en décodant le premier bloc amputé de quatre octets, pour éviter une
+coupure au milieu d'un caractère — ce qui en recrée une ailleurs. Les
+soixante-cinq méga-octets du répertoire, pourtant en UTF-8, repartaient donc en
+Windows-1252 et toutes les colonnes accentuées devenaient introuvables. Le mode
+«&nbsp;stream&nbsp;» d'un décodeur strict tolère une séquence incomplète en fin
+de morceau&nbsp;: c'est exactement ce qu'il fallait.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

@@ -290,6 +290,12 @@ sigles:
     definition: "Les formats communs que les collectivités emploient pour publier leurs délibérations, leurs subventions ou leurs marchés en données ouvertes."
     liens: [scdl-deliberations]
 
+  - id: sigle-pcs
+    sigle: PCS
+    developpe: "Professions et catégories socioprofessionnelles"
+    definition: "La nomenclature de l'INSEE qui classe les professions. Son premier chiffre donne huit grands groupes, des agriculteurs aux retraités."
+    liens: [od-pcs-insee]
+
   - id: sigle-insee
     sigle: INSEE
     developpe: "Institut national de la statistique et des études économiques"

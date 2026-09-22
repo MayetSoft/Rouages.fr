@@ -91,6 +91,15 @@ type ElectionsDep = {
 /** Les séries de population du département : [série, année du sommet, sommet]. */
 type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
 
+/** La composition des conseils du département, sans aucun nom. */
+type ConseilsDep = {
+  maj: string;
+  groupes: string[];
+  femmes: number;
+  age: number;
+  c: Record<string, { n: number; f: number; age: number; p: [number, number][]; cc: number }>;
+};
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -135,6 +144,7 @@ const cacheRisques = new Map<string, RisquesDep | null>();
 const cacheJournal = new Map<string, JournalDep | null>();
 const cacheElections = new Map<string, ElectionsDep | null>();
 const cachePop = new Map<string, PopDep | null>();
+const cacheConseils = new Map<string, ConseilsDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -275,6 +285,17 @@ export interface Fiche {
     siegesCc: number;
     /** L'intercommunalité à fiscalité propre où la commune siège. */
     ou: string | null;
+    /**
+     * De quoi le conseil est fait : aucun nom, un effectif, une part de
+     * femmes, un âge médian et huit compteurs.
+     */
+    elus: number;
+    femmes: number;
+    ageMedian: number;
+    groupes: { nom: string; nombre: number }[];
+    /** Les mêmes chiffres pour l'ensemble des conseils du pays. */
+    femmesPartout: number;
+    agePartout: number;
     /**
      * Représentée sans que ses sièges soient élus.
      *
@@ -420,11 +441,25 @@ function assemblerConseil(
   const f = e?.c[c.code];
   if (!e || !f) return null;
   const conseil = structures.find((st) => FISCALITE_PROPRE.has(st.nature));
+  // Le répertoire des élus couvre toutes les communes, y compris celles de
+  // moins de mille habitants dont le fichier des résultats ne porte aucun
+  // siège : c'est lui qui fait foi sur le nombre de représentants.
+  const k = enCache(cacheConseils, c.dep, `dep/${c.dep}-conseils.json`);
+  const comp = k?.c[c.code];
+  const cc = comp?.cc ?? f.cc;
   return {
     sieges: f.cm,
-    siegesCc: f.cc,
+    siegesCc: cc,
     ou: conseil?.nom ?? null,
-    designes: f.cc === 0 && !!conseil,
+    elus: comp?.n ?? 0,
+    femmes: comp?.f ?? 0,
+    ageMedian: comp?.age ?? 0,
+    groupes: (comp?.p ?? [])
+      .map(([i, n]) => ({ nom: k?.groupes[i] ?? '', nombre: n }))
+      .filter((g) => g.nom),
+    femmesPartout: k?.femmes ?? 0,
+    agePartout: k?.age ?? 0,
+    designes: f.cc === 0 && cc > 0 && !!conseil,
     scrutin: e.scrutin,
   };
 }
