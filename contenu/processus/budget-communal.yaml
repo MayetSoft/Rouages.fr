@@ -22,45 +22,60 @@ processus:
     sortie: "Un budget voté, puis un compte administratif arrêté l'année suivante"
     decideur: conseil-municipal
     competences: [vote-du-budget, controle-des-comptes, controle-legalite]
-    liens: [cgct, vp-budget-local, od-ofgl]
-    verifie_le: 2026-09-05
+    liens: [cgct, vp-budget-local, od-ofgl, cgct-l2312-1, cgct-l1612-2]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les cinq étapes et les cinq leviers sont vérifiés. Trois délais ont été
+    # chiffrés — seuil de 3 500 habitants pour le débat d'orientation, 15 avril
+    # pour le vote — et deux conséquences manquaient : le débat est une
+    # formalité substantielle, donc un budget adopté sans lui est illégal ; et
+    # dès la saisine de la chambre régionale des comptes, le conseil ne peut
+    # plus délibérer sur ce budget, que le préfet arrête à sa place.
+    confiance: etabli
 
     etapes:
       - ordre: 1
+        # Le seuil est chiffré — 3 500 habitants — et une conséquence manquait : le
+        # débat est une formalité substantielle, si bien qu'un budget adopté sans lui
+        # est illégal. C'est un moyen de recours, pas seulement une bonne pratique.
+        # Le Mayet-de-Montagne, 1 383 habitants, n'y est pas tenu.
         acteur: maire
         action: "Débat d'orientation budgétaire devant le conseil"
-        note: "Obligatoire au-delà d'un seuil de population. C'est là que les arbitrages se discutent, pas au vote."
-        liens: [cgct, vp-budget-local]
-        confiance: a_confirmer
+        note: "Obligatoire à partir de 3 500 habitants, dans les deux mois précédant l'examen du budget. C'est là que les arbitrages se discutent, pas au vote — et c'est une formalité substantielle : un budget adopté sans ce débat préalable est illégal."
+        liens: [cgct, vp-budget-local, cgct-l2312-1]
+        confiance: etabli
       - ordre: 2
+        # « Une date limite fixée par la loi, en principe au printemps » est devenue
+        # la date : le 15 avril, le 30 avril l'année du renouvellement du conseil.
         acteur: conseil-municipal
         action: "Vote du budget primitif"
         produit: [budget-primitif]
-        delai: { valeur: 2, unite: mois, nature: indicatif }
-        note: "Le budget doit être voté avant une date limite fixée par la loi, en principe au printemps."
-        liens: [cgct]
-        confiance: a_confirmer
+        note: "Le budget doit être voté avant le 15 avril de l'exercice auquel il s'applique — le 30 avril l'année du renouvellement du conseil."
+        liens: [cgct, cgct-l1612-2]
+        confiance: etabli
       - ordre: 3
+        # Ajout vérifié : dès la saisine de la chambre et jusqu'au règlement, le
+        # conseil ne peut plus délibérer sur ce budget. C'est le préfet qui l'arrête,
+        # en motivant s'il s'écarte des propositions de la chambre. La commune perd
+        # donc la main, ce que « le préfet saisit la chambre » ne laissait pas voir.
         acteur: prefet
         action: "Contrôle budgétaire et de légalité"
-        note: "En cas de budget déséquilibré ou voté hors délai, le préfet saisit la chambre régionale des comptes."
-        liens: [cgct, code-juridictions-financieres]
-        confiance: a_confirmer
+        note: "En cas de budget déséquilibré ou voté hors délai, le préfet saisit la chambre régionale des comptes, qui propose des mesures. À partir de cette saisine et jusqu'au règlement du budget, le conseil ne peut plus délibérer dessus : c'est le préfet qui l'arrête, en motivant s'il s'écarte des propositions de la chambre."
+        liens: [cgct, code-juridictions-financieres, cgct-l1612-2]
+        confiance: etabli
       - ordre: 4
         acteur: conseil-municipal
         action: "Arrêté du compte administratif de l'année écoulée"
         produit: [compte-administratif]
-        liens: [cgct]
-        confiance: a_confirmer
+        liens: [cgct, cgct-l1612-2]
+        confiance: etabli
       - ordre: 5
         acteur: chambre-regionale-comptes
         action: "Contrôle des comptes et de la gestion"
         conditionnelle: true
         note: "Périodique, non systématique. Le rapport d'observations est public et souvent très lisible."
-        liens: [code-juridictions-financieres, ccomptes, od-comptes-crc]
-        confiance: a_confirmer
+        liens: [code-juridictions-financieres, ccomptes, od-comptes-crc, cgct-l1612-2]
+        confiance: etabli
 
     leviers:
       - id: assister-au-dob
@@ -69,9 +84,9 @@ processus:
         aupres_de: "Personne : la séance est publique"
         difficulte: faible
         ancre_etape: 1
-        piege: "Au moment du vote, tout est arbitré. Le seul moment où les choix sont encore ouverts, c'est le débat d'orientation."
-        liens: [cgct, vp-budget-local]
-        confiance: a_confirmer
+        piege: "Au moment du vote, tout est arbitré : le seul moment où les choix sont encore ouverts est le débat d'orientation. Sous 3 500 habitants, il n'est pas obligatoire — et beaucoup de petites communes ne le tiennent pas."
+        liens: [cgct, vp-budget-local, cgct-l2312-1]
+        confiance: etabli
       - id: lire-les-subventions
         quoi: "Regarder à quelles associations la commune verse des subventions"
         quand: "À tout moment ; les conventions sont publiées dans les trois mois de leur signature"
@@ -80,8 +95,8 @@ processus:
         ancre_etape: 2
         recours_si_refus: "Saisir la CADA"
         piege: "L'obligation de publier ne porte que sur les conventions de plus de 23 000 €, et seulement au-dessus de 3 500 habitants : ce qui est publié ne fait pas le total."
-        liens: [decret-subventions, scdl-subventions, cada]
-        confiance: a_confirmer
+        liens: [decret-subventions, scdl-subventions, cada, cada-saisine]
+        confiance: etabli
       - id: comparer-sur-ofgl
         quoi: "Comparer les finances de sa commune à celles de communes semblables"
         quand: "À tout moment"
@@ -98,8 +113,8 @@ processus:
         recours_si_refus: "Saisir la CADA"
         ancre_etape: 4
         piege: "C'est l'écart entre les deux qui est intéressant, pas le budget seul : il dit ce qui a été annoncé et pas fait."
-        liens: [cgct, od-ofgl, cada]
-        confiance: a_confirmer
+        liens: [cgct, od-ofgl, cada, cgct-l1612-2, cada-saisine]
+        confiance: etabli
       - id: lire-le-rapport-crc
         quoi: "Lire le rapport d'observations de la chambre régionale des comptes"
         quand: "À sa publication ; les rapports antérieurs restent en ligne"
@@ -107,5 +122,5 @@ processus:
         difficulte: faible
         ancre_etape: 5
         piege: "Le rapport doit être présenté au conseil et devient public ; c'est la source la plus solide sur la gestion d'une commune."
-        liens: [ccomptes, od-comptes-crc, code-juridictions-financieres]
-        confiance: a_confirmer
+        liens: [ccomptes, od-comptes-crc, code-juridictions-financieres, cgct-l1612-2]
+        confiance: etabli
