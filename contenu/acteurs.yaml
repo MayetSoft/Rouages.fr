@@ -211,15 +211,18 @@ acteurs:
     confiance: etabli
 
   - id: caf
+    # Le partage est net et vaut d'être dit : le département décide et finance le
+    # revenu de solidarité active, la caisse le verse pour son compte. C'est à la
+    # caisse qu'on écrit pour un versement, au département pour un droit.
     nom: "La CAF"
     nom_court: "CAF"
     type: service_administratif
     echelon: etat
     pouvoirs: [executif]
     resume: "Verse les prestations familiales et sociales, dont le RSA financé par le département."
-    liens: [wp-caf, caf-fr, code-action-sociale]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-caf, caf-fr, code-action-sociale, caf-rsa]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: agence-eau
     nom: "L'agence de l'eau"
@@ -318,9 +321,9 @@ acteurs:
     echelon: etat
     pouvoirs: [executif]
     resume: "Les directions des ministères : elles préparent les textes, répartissent les crédits et pilotent les services déconcentrés qui appliquent la règle sur le terrain."
-    liens: [wp-gouvernement, gouvernement-fr, od-annuaire-administration]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [wp-gouvernement, gouvernement-fr, od-annuaire-administration, charte-deconcentration]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Judiciaire : qui tranche --------------------------------------------
   # La France a deux ordres de juridiction séparés. Un litige avec une
@@ -477,15 +480,19 @@ acteurs:
     confiance: etabli
 
   - id: dgfip
+    # La séparation de l'ordonnateur et du comptable n'est pas un usage mais une
+    # règle écrite : article 9 du décret du 7 novembre 2012, qui déclare les deux
+    # fonctions incompatibles. C'est elle qui fait qu'un maire ne peut pas payer
+    # lui-même ce qu'il a décidé.
     nom: "Les finances publiques"
     nom_court: "Finances publiques"
     type: service_deconcentre
     echelon: etat
     pouvoirs: [executif]
     resume: "Calcule et recouvre l'impôt, et tient les comptes de la commune : le maire engage la dépense, le comptable public la paie — la séparation est la règle."
-    liens: [wp-dgfip, impots-gouv, cgct]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-dgfip, impots-gouv, cgct, decret-gbcp]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Régler un litige sans aller au tribunal -------------------------------
   - id: conciliateur-justice
@@ -517,9 +524,9 @@ acteurs:
     echelon: etat
     pouvoirs: [executif]
     resume: "Finance la rénovation des logements privés — énergie, adaptation au grand âge, habitat dégradé — sous conditions de ressources."
-    liens: [wp-anah, anah-fr, code-construction]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-anah, anah-fr, code-construction, anah-aides]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: anct
     nom: "L'Agence nationale de la cohésion des territoires"
@@ -528,9 +535,9 @@ acteurs:
     echelon: etat
     pouvoirs: [executif]
     resume: "Apporte de l'ingénierie aux collectivités qui n'en ont pas les moyens : c'est l'interlocuteur des petites communes sans bureau d'études."
-    liens: [wp-anct, anct-fr]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-anct, anct-fr, anct-ingenierie]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: ademe
     nom: "L'ADEME"
@@ -539,9 +546,9 @@ acteurs:
     echelon: etat
     pouvoirs: [executif]
     resume: "Subventionne et conseille les projets de transition écologique, des collectivités comme des entreprises."
-    liens: [wp-ademe, ademe-fr, code-environnement]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-ademe, ademe-fr, code-environnement, ademe-aides]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: caue
     nom: "Le CAUE"
@@ -558,35 +565,44 @@ acteurs:
 
   # --- Union européenne -------------------------------------------------
   - id: union-europeenne
+    # Les deux moitiés de la phrase ont été vérifiées séparément : les directives
+    # eau, déchets et air sont bien transposées en droit français, et ce sont les
+    # conseils régionaux qui gèrent le FEDER — 68 % des fonds sur 2021-2027.
     nom: "L'Union européenne"
     nom_court: "Union européenne"
     type: collectivite
     echelon: union_europeenne
     resume: "Fixe une partie des normes appliquées localement — eau, déchets, air — et cofinance des projets régionaux."
-    liens: [wp-union-europeenne, europa, code-environnement]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-union-europeenne, europa, code-environnement, eurlex-dechets, europe-en-france]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Acteurs privés ---------------------------------------------------
   - id: delegataire-eau
+    # Le contrôle sur le délégataire a un support écrit et annuel : le rapport du
+    # délégataire, que le code de la commande publique lui impose de produire et
+    # que la collectivité examine. C'est par lui qu'on sait ce que coûte le service.
     nom: "Le délégataire (eau, déchets)"
     nom_court: "Délégataire"
     type: entreprise
     echelon: prive
     resume: "Entreprise à qui une collectivité confie l'exploitation d'un service public, par contrat de délégation."
-    liens: [od-decp, od-decp-bercy, od-sispea, cgct]
-    verifie_le: 2026-09-18
-    confiance: a_confirmer
+    liens: [od-decp, od-decp-bercy, od-sispea, cgct, cgct-l1411-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: bailleur-social
+    # « Sur des terrains largement publics » n'a pas été vérifié et sort donc de la
+    # fiche : un bailleur achète aussi à des particuliers. Les aides, elles, sont
+    # documentées, et les nommer vaut mieux que de dire « largement publics ».
     nom: "Le bailleur social"
     nom_court: "Bailleur social"
     type: entreprise
     echelon: prive
-    resume: "Organisme qui construit et gère les logements sociaux, sur des terrains et avec des financements largement publics."
-    liens: [wp-hlm, anct-hlm]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Organisme qui construit et gère les logements sociaux, avec des aides publiques : subventions à la pierre, prêts de la Banque des Territoires, TVA réduite et exonération de taxe foncière."
+    liens: [wp-hlm, anct-hlm, cch-l411-2]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: petitionnaire
     nom: "Le demandeur d'un permis"
@@ -683,9 +699,9 @@ acteurs:
     type: entreprise
     echelon: prive
     resume: "Exploite le réseau de distribution d'électricité sous concession, pour le compte des collectivités qui en sont propriétaires."
-    liens: [wp-enedis, enedis-fr, od-enedis, code-energie]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-enedis, enedis-fr, od-enedis, code-energie, enedis-concession]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: aom
     nom: "L'autorité organisatrice de la mobilité"
@@ -703,9 +719,9 @@ acteurs:
     type: entreprise
     echelon: prive
     resume: "Fait rouler les bus et les trams, sous contrat avec l'autorité organisatrice, qui reste maîtresse de l'offre."
-    liens: [code-transports, od-transport, od-decp]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-transports, od-transport, od-decp, cgct-l1411-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: syndicat-scot
     nom: "Le syndicat de SCoT"
@@ -726,9 +742,9 @@ acteurs:
     type: association
     echelon: epci
     resume: "Ingénierie partagée entre collectivités et État : elle produit les études sur lesquelles s'appuient les décisions, sans en prendre aucune."
-    liens: [wp-agence-urbanisme, fnau, code-urbanisme]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-agence-urbanisme, fnau, code-urbanisme, cu-l132-6]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: employeur
     # Le seuil est chiffré plutôt que laissé à « un seuil d'effectif » : onze
@@ -753,9 +769,9 @@ acteurs:
     type: metier
     echelon: prive
     resume: "Officier public : il confère l'authenticité aux actes, et perçoit pour l'État, le département et les communes les droits dus sur les ventes et les successions."
-    liens: [wp-notaire, annuaire-notaires, cgi-1594d]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-notaire, annuaire-notaires, cgi-1594d, justice-notaire]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: commissaire-justice
     nom: "Le commissaire de justice"
@@ -792,19 +808,22 @@ acteurs:
     type: mandat_electif
     echelon: departement
     resume: "Élu par les conseillers départementaux, il dirige l'exécutif : c'est lui qui signe les décisions d'aide sociale et qui ordonne les dépenses."
-    liens: [wp-conseil-departemental, cgct, cl-gouv]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-conseil-departemental, cgct, cl-gouv, cgct-l3221-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: mdph
+    # Groupement d'intérêt public, sous tutelle administrative et financière du
+    # département : ce n'est ni un service de l'État ni un service départemental,
+    # et c'est pourquoi il figure comme un nœud à part.
     nom: "La maison départementale des personnes handicapées"
     nom_court: "MDPH"
     type: service_administratif
     echelon: departement
     resume: "Guichet unique du handicap : c'est là que se dépose une demande, et une commission y décide des droits et des orientations."
-    liens: [wp-mdph, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-mdph, code-action-sociale, casf-l146-3]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: pmi
     nom: "La protection maternelle et infantile"
@@ -812,9 +831,9 @@ acteurs:
     type: service_administratif
     echelon: departement
     resume: "Consultations gratuites pour les femmes enceintes et les enfants de moins de six ans, et contrôle des assistantes maternelles et des crèches."
-    liens: [wp-pmi, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-pmi, code-action-sociale, csp-l2112-2, casf-l421-3]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: president-region
     nom: "Le président du conseil régional"
@@ -822,29 +841,37 @@ acteurs:
     type: mandat_electif
     echelon: region
     resume: "Élu par les conseillers régionaux, il dirige l'exécutif de la région : lycées, trains régionaux, formation professionnelle, fonds européens."
-    liens: [wp-conseil-regional, cgct, cl-gouv]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-conseil-regional, cgct, cl-gouv, cgct-l4231-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: france-travail
+    # La fiche disait « en convention avec le département ». Depuis le 1er janvier
+    # 2025, le mécanisme est plus net : l'allocataire du RSA est inscrit à France
+    # Travail, puis orienté vers l'organisme qui l'accompagnera. Savoir qu'on peut
+    # être suivi ailleurs qu'à France Travail change à qui l'on s'adresse.
     nom: "France Travail"
     type: service_administratif
     echelon: etat
     pouvoirs: [executif]
-    resume: "Ex-Pôle emploi : inscription, indemnisation et accompagnement, en convention avec le département pour les allocataires du revenu de solidarité active."
-    liens: [wp-france-travail, france-travail-fr, code-travail]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    resume: "Ex-Pôle emploi : inscription, indemnisation et accompagnement. Depuis 2025, les allocataires du revenu de solidarité active y sont inscrits, puis orientés vers la structure qui les suivra — France Travail, le département ou la mission locale."
+    liens: [wp-france-travail, france-travail-fr, code-travail, ft-inscription-2025]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: mission-locale
+    # Le détail du financement — État, région, communes — n'a pas été retrouvé tel
+    # quel dans une source publique : la fiche s'en tient donc à « l'État et les
+    # collectivités territoriales », qui est ce que la source dit. La gratuité de
+    # l'accompagnement, elle, est confirmée et vaut d'être écrite.
     nom: "La mission locale"
     nom_court: "Mission locale"
     type: association
     echelon: epci
-    resume: "Pour les 16-25 ans sortis du système scolaire : emploi, formation, logement, santé, au même guichet. Financée par l'État, la région et les communes."
-    liens: [wp-mission-locale, code-travail]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    resume: "Pour les 16-25 ans sortis du système scolaire : emploi, formation, logement, santé, au même guichet, et gratuitement. Financée par l’État et les collectivités territoriales."
+    liens: [wp-mission-locale, code-travail, info-mission-locale]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Ceux que l'on ne rencontre qu'en cas de litige ou de démarche ---------
   - id: mediateur-eau
@@ -853,9 +880,9 @@ acteurs:
     type: association
     echelon: prive
     resume: "Médiateur de la consommation pour les litiges d'eau et d'assainissement, gratuit pour l'abonné, saisi après une réclamation écrite restée sans réponse satisfaisante."
-    liens: [mediation-eau-fr, sp-mediateur-eau, wp-mediation-consommation]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [mediation-eau-fr, sp-mediateur-eau, wp-mediation-consommation, sispea-mediation]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: commission-controle-listes
     nom: "La commission de contrôle des listes électorales"

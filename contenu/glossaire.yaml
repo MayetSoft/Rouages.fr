@@ -136,6 +136,18 @@ sigles:
     definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
     liens: [od-banatic]
 
+  - id: sigle-feder
+    sigle: FEDER
+    developpe: "Fonds européen de développement régional"
+    definition: "L'argent européen des projets locaux ; en France, ce sont les conseils régionaux qui le distribuent."
+    liens: [europe-en-france]
+
+  - id: sigle-tva
+    sigle: TVA
+    developpe: "Taxe sur la valeur ajoutée"
+    definition: "L'impôt payé sur presque tout achat ; son taux réduit est l'une des aides au logement social."
+    liens: [impots-tva]
+
   - id: sigle-rei
     sigle: REI
     developpe: "Recensement des éléments d'imposition à la fiscalité directe locale"

@@ -31,8 +31,11 @@ Fait :
 - 39 acteurs, 37 compétences, 18 flux, 215 relations, 86 pages de référence.
 
 Reste :
-- **la relecture par un praticien** des attributions marquées
-  `confiance: a_confirmer` — c'est le vrai reste à faire, pas le volume.
+- **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
+  vrai reste à faire, pas le volume. `npm run relire` en donne la file :
+  l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
+  fiche. Les 37 acteurs sont faits (voir plus bas) ; restent 166 fiches, pour
+  l'essentiel des étapes et des leviers de processus.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1366,6 +1369,43 @@ comptent donc par regroupement, et les 85 types suivis n'en forment que 74 —
 
 C'est la seule liste du site qui affiche explicitement **ce qui manque**. Une
 liste de ce qui existe ne dit pas pour quoi il faut prendre la voiture.
+
+### Les fiches « à confirmer » : les acteurs sont relus ✔
+
+Deux cent quatre attributions portaient `confiance: a_confirmer` — une
+affirmation écrite mais jamais contrôlée contre sa source. C'était un nombre
+dans cette feuille de route, et rien ne disait *lesquelles*.
+
+**Les 37 acteurs sont faits.** Sept étaient faux ou imprécis, et c'est le
+rendement de l'exercice&nbsp;:
+
+| Fiche | Ce qui était écrit | Ce que dit le texte |
+|---|---|---|
+| Syndicat de SCoT | les PLU doivent s'y **conformer** | ils doivent être **compatibles** (L131-4) — un PLU peut s'en écarter sans en remettre en cause les orientations |
+| DREAL | « c'est elle qui **autorise** » les installations classées | elle **instruit** et **inspecte** ; le préfet signe |
+| SDIS | « dirigé opérationnellement par le **préfet** » | sous l'autorité du **maire ou** du préfet, selon le pouvoir de police (L1424-3) |
+| DDT | instruit pour les communes **sans document d'urbanisme** | le critère est la **population**, dix mille habitants (L422-8) |
+| Conseil d'école | « il est **consulté** » | il **vote** le règlement intérieur (D411-2) |
+| Géomètre-expert | « le bornage **fait foi** » | c'est le **procès-verbal signé** par les voisins qui engage |
+| Bailleur social | « sur des terrains largement publics » | non vérifié — remplacé par la liste des aides, elle documentée |
+
+Trois précisions utiles au passage. Le **CCAS** est une personne morale
+distincte de la commune et n'est obligatoire qu'au-dessus de 1 500 habitants —
+Le Mayet-de-Montagne, 1 383, est en dessous. Le **versement mobilité** est dû à
+partir de onze salariés, et seulement là où l'autorité organisatrice l'a
+institué. Le **commissaire enquêteur** est désigné par le tribunal
+administratif, non par le porteur du projet, et son rapport est public de droit.
+
+Chaque fiche confirmée a gagné l'article qui la fonde&nbsp;: trente-deux pages
+de référence sont entrées au contenu à cette occasion. Et la validation a fait
+son travail pendant l'exercice — deux sigles employés sans entrée au glossaire,
+refusés à la publication.
+
+**`npm run relire`** transforme le reste en file de travail&nbsp;: pour chaque
+fiche, l'affirmation exacte et les pages qui devraient la fonder. Reste 166
+fiches, dont 57 étapes et 42 leviers de processus. Toutes ne finiront pas en
+`etabli` — un délai observé ou une pratique locale doit garder sa réserve, et
+le site l'affiche plutôt que de la taire.
 
 ### Une ingestion qui ne se perd plus en route
 
