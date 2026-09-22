@@ -49,6 +49,9 @@ const jeux = [...g.surveillances.values()]
         <div><dt>Contact</dt><dd>{editeur.contact}</dd></div>
         <div><dt>Directeur de la publication</dt><dd>{editeur.directeur_publication}</dd></div>
         <div><dt>Hébergeur</dt><dd>{editeur.hebergeur}</dd></div>
+        {editeur.realisation_technique && !incomplet(editeur.realisation_technique) && (
+          <div><dt>Réalisation technique</dt><dd>{editeur.realisation_technique}</dd></div>
+        )}
       </dl>
     ) : (
       <p class="mesure p-incertain">

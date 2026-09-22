@@ -413,6 +413,16 @@ export const Editeur = z.object({
   contact: z.string().min(2),
   directeur_publication: z.string().min(2),
   hebergeur: z.string().min(2),
+  /**
+   * Qui exploite techniquement le site, quand ce n'est pas l'éditeur.
+   *
+   * La loi ne l'exige pas : elle demande qui publie et qui héberge, et
+   * l'exploitant technique n'est ni l'un ni l'autre. Le champ est donc
+   * facultatif — un site tenu par une seule personne n'a rien à y mettre, et
+   * le rendre obligatoire bloquerait sa publication pour une mention que
+   * personne ne réclame.
+   */
+  realisation_technique: z.string().min(2).optional(),
 });
 
 /** Un fichier de contenu : toutes les entités d'un même rouage. */
