@@ -26,6 +26,7 @@ import { ecrireSru, type InventaireSru } from './sru-emettre.ts';
 import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
 import { ecrireAssociations, type Associations } from './associations-emettre.ts';
+import { ecrirePopulations, type Populations } from './population-emettre.ts';
 import { ecrireJournal, rassembler } from './journal-emettre.ts';
 import { comparerTransferts, type EtatDep } from './transferts-emettre.ts';
 import { retenir } from '../src/modele/journal.ts';
@@ -103,6 +104,7 @@ export function emettre(o: {
   echelons: Echelons | null;
   risques: Risques | null;
   associations: Associations | null;
+  populations: Populations | null;
   elections: Elections | null;
   deliberations: Deliberations | null;
   subventions: Subventions | null;
@@ -290,6 +292,7 @@ export function emettre(o: {
   let sruEcrits = 0;
   let risquesEcrits = 0;
   let assoEcrites = 0;
+  let popEcrites = 0;
   let journalEcrit = 0;
   let transfertsVus = 0;
   let electionsEcrites = 0;
@@ -323,6 +326,10 @@ export function emettre(o: {
 
     if (o.associations) {
       assoEcrites += ecrireAssociations(sortie, dep, liste.map((c) => c.code), o.associations);
+    }
+
+    if (o.populations) {
+      popEcrites += ecrirePopulations(sortie, dep, liste.map((c) => c.code), o.populations);
     }
 
     if (o.elections) {
@@ -613,6 +620,12 @@ export function emettre(o: {
   }
   if (o.sru) {
     dire(`${GRIS}Inventaire SRU : ${sruEcrits.toLocaleString('fr-FR')} communes soumises.${RAZ}`);
+  }
+  if (o.populations) {
+    dire(
+      `${GRIS}Séries de population : ${popEcrites.toLocaleString('fr-FR')} communes datées ` +
+        `depuis ${o.populations.annees[0]}.${RAZ}`,
+    );
   }
   if (o.associations) {
     dire(

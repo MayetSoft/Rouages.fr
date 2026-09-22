@@ -723,6 +723,7 @@ function demarrer(reseau: Reseau) {
     const ajouter = (etiquette: string, section: HTMLElement | null, ouvert = false) => {
       if (section) blocs.push({ etiquette, section, ouvert });
     };
+    ajouter('Les habitants', blocPopulation());
     ajouter('L’élection', blocScrutin());
     ajouter('Qui exerce quoi', blocResolution(), true);
     ajouter('Ses comptes', blocFinances());
@@ -2004,6 +2005,61 @@ function demarrer(reseau: Reseau) {
   }
 
   /**
+   * Combien d'habitants, et depuis quand.
+   *
+   * Le site affichait « 1 383 habitants » sans dire que la commune en comptait
+   * 2 320 en 1931. Or tous ses autres chiffres sont par habitant : sans cette
+   * série, une dotation qui baisse se lit comme une décision de l'État alors
+   * qu'elle suit souvent une population qui s'en va.
+   */
+  function blocPopulation(): HTMLElement | null {
+    const h = territoire?.histoire;
+    if (!h) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-habitants';
+    bloc.append(ligne('h3', 'p-titre-section', 'Combien d’habitants'));
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const d = document.createElement('div');
+    d.append(ligne('dt', '', `Population en ${h.anneeActuelle}`));
+    const dd = document.createElement('dd');
+    dd.append(ligne('span', 'p-montant', h.actuelle.toLocaleString('fr-FR')));
+    // Le sommet plutôt qu'une médiane : une commune ne se compare pas aux
+    // autres en nombre d'habitants, elle se compare à elle-même.
+    dd.append(
+      ligne(
+        'span',
+        'p-mediane',
+        `${h.ecart >= 0 ? '+' : ''}${h.ecart} % par rapport à son maximum, ` +
+          `${h.sommet[1].toLocaleString('fr-FR')} en ${h.sommet[0]}`,
+      ),
+    );
+    const courbe = tendance(h.serie, h.annees, (v) => `${v.toLocaleString('fr-FR')} habitants`);
+    if (courbe) {
+      const l = document.createElement('span');
+      l.className = 'p-tendance-ligne';
+      l.append(courbe);
+      dd.append(l);
+    }
+    d.append(dd);
+    dl.append(d);
+    bloc.append(dl);
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D'après les recensements de l'INSEE, de ${h.annees[0]} à ${h.annees[h.annees.length - 1]} ` +
+          `(${h.maj}). Trois définitions s'y succèdent — population totale jusqu'en 1954, sans ` +
+          `doubles comptes jusqu'en 1999, municipale depuis : l'INSEE les publie comme une seule ` +
+          `série, et comparer les deux extrémités reste une tendance, pas une soustraction exacte.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
    * Ce qui se crée en associations.
    *
    * Le reste du panneau dit ce que les institutions décident, dépensent et
@@ -2346,7 +2402,13 @@ function demarrer(reseau: Reseau) {
     const haut = Math.max(...points.map((p) => p.v), 0);
     const bas = Math.min(...points.map((p) => p.v), 0);
     const etendue = haut - bas || 1;
-    const x = (i: number) => 2 + (i / Math.max(1, serie.length - 1)) * (L - 4);
+    // L'abscisse suit l'année, pas le rang. Sans cela, une série de
+    // recensements — 1876, 1901, 1921… 2020, 2023 — écraserait un siècle et
+    // étirerait trois ans à la même largeur. Pour une série annuelle, où les
+    // deux coïncident, rien ne change.
+    const debut = annees[0] ?? 0;
+    const etendueAnnees = (annees[annees.length - 1] ?? debut) - debut || 1;
+    const x = (i: number) => 2 + (((annees[i] ?? debut) - debut) / etendueAnnees) * (L - 4);
     const y = (v: number) => H - 3 - ((v - bas) / etendue) * (H - 6);
     const d = points.map((p, k) => `${k === 0 ? 'M' : 'L'} ${x(p.i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' ');
 

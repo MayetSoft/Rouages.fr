@@ -523,6 +523,18 @@ async function principal() {
   // créations d'associations. Un fichier de 1,2 Go, lu en flux comme FINESS,
   // et une fenêtre récente — le répertoire dit ce qui se crée, jamais ce qui
   // vit encore.
+  // La population dans le temps : le dénominateur de tous les autres chiffres
+  // du site méritait sa propre histoire.
+  const { collecterPopulations } = await import('./population-emettre.ts');
+  const populations = await tenter('Séries de population', () =>
+    collecterPopulations(
+      (url, vers) =>
+        telechargerEnCache(url, vers, reutiliser, 'Séries de population INSEE (environ 7 Mo)'),
+      CACHE,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   const { collecterAssociations } = await import('./associations-emettre.ts');
   const decoupage = tablesDuDecoupage();
   const associations = await tenter('Associations', () =>
@@ -562,6 +574,7 @@ async function principal() {
     deliberations,
     subventions,
     associations,
+    populations,
   );
 }
 
@@ -685,6 +698,9 @@ async function ecrire(
   associations: Awaited<
     ReturnType<typeof import('./associations-emettre.ts')['collecterAssociations']>
   >,
+  populations: Awaited<
+    ReturnType<typeof import('./population-emettre.ts')['collecterPopulations']>
+  >,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -710,6 +726,7 @@ async function ecrire(
     deliberations,
     subventions,
     associations,
+    populations,
     sortie: SORTIE,
     dire,
     VERT,

@@ -290,6 +290,12 @@ sigles:
     definition: "Les formats communs que les collectivités emploient pour publier leurs délibérations, leurs subventions ou leurs marchés en données ouvertes."
     liens: [scdl-deliberations]
 
+  - id: sigle-insee
+    sigle: INSEE
+    developpe: "Institut national de la statistique et des études économiques"
+    definition: "Il produit le recensement, d'où viennent les populations légales, et tient le code officiel géographique qui nomme et numérote les communes."
+    liens: [od-insee-populations]
+
   - id: sigle-waldec
     sigle: WALDEC
     developpe: "Web des associations librement déclarées"

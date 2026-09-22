@@ -1140,6 +1140,35 @@ et le détail «&nbsp;prise de fonction&nbsp;» devient «&nbsp;début du
 mandat&nbsp;». L'identité des entrées de flux ne change pas&nbsp;: elle repose
 sur le rang du genre, pas sur son libellé.
 
+### Le dénominateur a enfin une histoire ✔
+
+Le site affichait «&nbsp;1 383 habitants&nbsp;» sans dire que la commune en
+comptait **2 320 en 1931**. Or **tous ses autres chiffres sont par habitant** —
+les comptes, les dotations, les créations d'associations, les droits de
+mutation. Sans cette série, une dotation qui baisse se lit comme une décision
+de l'État alors qu'elle suit souvent une population qui s'en va.
+
+La source est le recensement lui-même&nbsp;: l'INSEE publie en un fichier de
+sept méga-octets les populations communales **de 1876 à 2023**, ramenées à la
+géographie en vigueur — ce qui règle d'avance le problème des fusions, puisque
+c'est l'INSEE qui recompose les séries des communes nouvelles. **34 857 des
+34 875 communes** du site y figurent.
+
+Deux précisions que le bloc porte lui-même. **Trois définitions se succèdent
+dans la même ligne**&nbsp;: population totale jusqu'en 1954, sans doubles
+comptes jusqu'en 1999, municipale depuis. L'INSEE les publie comme une seule
+série et c'est ainsi qu'on la rend, mais comparer les deux extrémités reste une
+lecture de tendance, pas une soustraction exacte. Et le maximum est cherché sur
+les **trente-sept** recensements du fichier, alors que la courbe n'en montre que
+quatorze&nbsp;: le sommet du Mayet-de-Montagne est en 1931, une année que
+l'échantillon ne porte pas.
+
+La courbe a demandé une correction au tracé&nbsp;: **l'abscisse suit désormais
+l'année et non le rang**. Sans cela, 1876→1901 aurait occupé la même largeur
+que 2020→2023, écrasant un siècle pour étirer trois ans. Pour les séries
+annuelles — les comptes, les droits de mutation — les deux coïncident et rien
+ne change.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

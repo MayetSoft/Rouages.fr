@@ -168,6 +168,14 @@ function moisAnnee(iso: string): string | null {
       {commune.population.toLocaleString('fr-FR')} habitants · code postal {commune.cp} ·
       code INSEE {commune.code}
     </p>
+    {fiche?.sommet && fiche.sommet.ecart < 0 && (
+      <p class="c-sommet">
+        La commune a compté jusqu’à <strong>{fiche.sommet.valeur.toLocaleString('fr-FR')} habitants
+        en {fiche.sommet.annee}</strong> — elle en a {Math.abs(fiche.sommet.ecart)} % de moins
+        aujourd’hui. Tous les montants de cette page étant rapportés à l’habitant, c’est ce
+        dénominateur-là qui bouge sous eux.
+      </p>
+    )}
 
     {!fiche && (
       <p class="c-vide">

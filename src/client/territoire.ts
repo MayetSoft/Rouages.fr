@@ -342,6 +342,35 @@ export interface Risques {
 }
 
 /**
+ * La population de la commune, recensement après recensement.
+ *
+ * Les valeurs manquantes voyagent en zéro dans le fichier — un recensement
+ * antérieur à l'existence de la commune, l'outre-mer avant 1954 — et
+ * redeviennent `null` ici : zéro habitant tracerait une courbe qui plonge.
+ */
+function assemblerPopulation(commune: CommuneBreve): Population | null {
+  const d = popDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const [brut, anneeSommet, valeurSommet] = f;
+  const serie = brut.map((x) => (x > 0 ? x : null));
+  // La dernière année renseignée, qui n'est pas toujours la dernière colonne.
+  let dernier = -1;
+  for (const [i, v] of serie.entries()) if (v !== null) dernier = i;
+  if (dernier === -1 || valeurSommet === 0) return null;
+  const actuelle = serie[dernier]!;
+  return {
+    annees: d.annees,
+    serie,
+    actuelle,
+    anneeActuelle: d.annees[dernier],
+    sommet: [anneeSommet, valeurSommet],
+    ecart: Math.round(((actuelle - valeurSommet) / valeurSommet) * 100),
+    maj: d.maj,
+  };
+}
+
+/**
  * Ce qui se crée en associations dans la commune.
  *
  * Des créations, pas des associations vivantes : le répertoire national ne dit
@@ -362,6 +391,26 @@ export interface Associations {
   /** Créations pour mille habitants sur la fenêtre, ici et à la médiane. */
   taux: number;
   medianeTaux: number;
+  maj: string;
+}
+
+/**
+ * La population dans le temps, prête à afficher.
+ *
+ * Tous les autres chiffres du site sont par habitant : sans cette série, une
+ * dotation qui baisse se lit comme une décision de l'État alors qu'elle suit
+ * souvent une population qui s'en va.
+ */
+export interface Population {
+  annees: number[];
+  serie: (number | null)[];
+  /** La dernière valeur connue, et son année. */
+  actuelle: number;
+  anneeActuelle: number;
+  /** Le maximum de la série entière : l'année, puis la valeur. */
+  sommet: [number, number];
+  /** L'écart au sommet, en pour cent — négatif quand la commune a décru. */
+  ecart: number;
   maj: string;
 }
 
@@ -450,6 +499,8 @@ export interface Territoire {
   risques: Risques | null;
   /** Ce qui s'y crée en associations, quand il s'en est créé. */
   associations: Associations | null;
+  /** Combien d'habitants, et depuis quand. */
+  histoire: Population | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -640,6 +691,10 @@ type AssoDep = {
   >;
 };
 const assoDep = new Map<string, AssoDep | null>();
+
+/** Les séries de population du département. */
+type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
+const popDep = new Map<string, PopDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -937,7 +992,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -956,6 +1011,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<DelibDep>(`${BASE}/dep/${commune.dep}-deliberations.json`).catch(() => null),
       json<SubvDep>(`${BASE}/dep/${commune.dep}-subventions.json`).catch(() => null),
       json<AssoDep>(`${BASE}/dep/${commune.dep}-associations.json`).catch(() => null),
+      json<PopDep>(`${BASE}/dep/${commune.dep}-population.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -970,6 +1026,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     delibDep.set(commune.dep, del);
     subvDep.set(commune.dep, sub);
     assoDep.set(commune.dep, asso);
+    popDep.set(commune.dep, pop);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -1026,6 +1083,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     dmto: assemblerDmto(commune, ligne[2]),
     risques: assemblerRisques(commune),
     associations: assemblerAssociations(commune, ligne[2]),
+    histoire: assemblerPopulation(commune),
     scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,

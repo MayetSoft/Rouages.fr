@@ -189,6 +189,16 @@ surveillances:
     ressource: "subvention"
     lien: scdl-subventions
 
+  - id: insee-populations
+    nom: "INSEE — séries historiques de population communale"
+    alimente: "la population de chaque commune, recensement après recensement"
+    # L'adresse porte le millésime du fichier : « 1876-2023 ». Sa disparition
+    # est donc le signal qu'on cherche — un 404 veut dire qu'un millésime plus
+    # récent existe, et qu'il faut changer l'adresse dans le collecteur.
+    type: disponibilite
+    url: "https://www.insee.fr/fr/statistiques/fichier/3698339/base-pop-historiques-1876-2023.xlsx"
+    lien: od-insee-populations
+
   - id: rna-waldec
     nom: "Répertoire national des associations — fichier Waldec"
     alimente: "les créations d'associations, commune par commune"

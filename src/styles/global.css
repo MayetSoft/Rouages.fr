@@ -528,6 +528,10 @@ details.p-marche-acheteur[open] > summary { margin-bottom: .45rem; }
   grid-template-columns: 1fr; gap: .05rem;
 }
 
+/* --- combien d'habitants ---
+   Le dénominateur de tous les autres chiffres du site. */
+.p-habitants { margin-top: 1.2rem; }
+
 /* --- ce qui se crée en associations ---
    Le reste du panneau dit ce que les institutions décident ; ce bloc dit ce qui
    se monte sans qu'aucune d'elles ait eu à le décider. */
@@ -655,6 +659,8 @@ abbr[title] {
 
 /* Ce que la commune pèse dans les deux assemblées où elle siège. Une phrase,
    parce qu'un tableau de deux nombres se lit moins bien qu'une phrase. */
+.c-sommet { font-size: .9rem; line-height: 1.5; margin: 0 0 1.2rem; color: var(--encre-douce); max-width: var(--mesure); }
+.c-sommet strong { color: var(--encre); }
 .c-conseil { font-size: .95rem; line-height: 1.5; margin: 0 0 1.2rem; color: var(--encre); }
 .c-conseil-source { color: var(--encre-tres-douce); font-size: .82rem; }
 .c-conseil-designes { display: block; margin-top: .4rem; font-size: .86rem; color: var(--encre-douce); line-height: 1.5; }

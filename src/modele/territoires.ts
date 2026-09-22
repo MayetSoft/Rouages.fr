@@ -88,6 +88,9 @@ type ElectionsDep = {
   c: Record<string, { cm: number; cc: number }>;
 };
 
+/** Les séries de population du département : [série, année du sommet, sommet]. */
+type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -131,6 +134,7 @@ const cacheSru = new Map<string, SruDep | null>();
 const cacheRisques = new Map<string, RisquesDep | null>();
 const cacheJournal = new Map<string, JournalDep | null>();
 const cacheElections = new Map<string, ElectionsDep | null>();
+const cachePop = new Map<string, PopDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -253,6 +257,13 @@ export interface Fiche {
     maj: string;
   } | null;
   soumiseSru: boolean;
+  /**
+   * Le sommet de population, et l'écart d'aujourd'hui à ce sommet.
+   *
+   * Un nombre d'habitants seul ne dit rien : c'est l'écart à ce que la commune
+   * a été qui porte l'information, et c'est le dénominateur de tout le reste.
+   */
+  sommet: { annee: number; valeur: number; ecart: number } | null;
   /**
    * Ce que pèse la commune dans les deux assemblées où elle siège.
    *
@@ -379,6 +390,7 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
         : null,
     soumiseSru: !!sru?.c[c.code],
     conseil: assemblerConseil(c, structures),
+    sommet: assemblerSommet(c),
     maj: dep.maj,
   };
 }
@@ -389,6 +401,16 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
  * sièges à son propos serait faux.
  */
 const FISCALITE_PROPRE = new Set(['CC', 'CA', 'CU', 'METRO', 'MET69', 'SAN', 'EPT']);
+
+function assemblerSommet(c: CommuneIndex): Fiche['sommet'] {
+  const d = enCache(cachePop, c.dep, `dep/${c.dep}-population.json`);
+  const f = d?.c[c.code];
+  if (!d || !f) return null;
+  const [serie, annee, valeur] = f;
+  const actuelle = [...serie].reverse().find((x) => x > 0);
+  if (!actuelle || valeur === 0) return null;
+  return { annee, valeur, ecart: Math.round(((actuelle - valeur) / valeur) * 100) };
+}
 
 function assemblerConseil(
   c: CommuneIndex,
