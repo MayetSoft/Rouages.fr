@@ -937,6 +937,95 @@ Une visite au Mayet-de-Montagne passe de 826 à 885 Ko. Les triplets plutôt que
 des objets, le mois plutôt que le jour et six domaines au lieu de tous ont ramené
 le fichier du département de 77 à 54 Ko avant de l'ajouter.
 
+### Le moteur du journal ✔
+
+Le site répond « qui décide, combien, où ». Il ne répondait pas à « qu'est-ce
+qui a changé depuis la dernière fois ? » — la question de celui qui habite là,
+par opposition à celui qui découvre. Le journal est la matière de cette
+réponse : **67 651 événements sur six mois**, dont trente au
+Mayet-de-Montagne — cinq par mois, et presque tous intercommunaux.
+
+**Il ne garde aucune mémoire, et c'est le choix qui structure le reste.** On
+pourrait noter la date de première vue de chaque événement, pour classer un
+flux par ordre de découverte plutôt que par ordre des faits : ce serait un état
+à conserver entre deux ingestions, à faire grossir, et à réparer le jour où il
+se désynchronise. Or **c'est le lecteur qui fait déjà ce travail** — un
+agrégateur retient les identifiants d'entrée qu'il a montrés, si bien qu'un
+marché notifié en juin mais publié en septembre lui apparaît comme nouveau même
+daté de juin. Le journal reste donc une projection pure de la donnée du moment :
+idempotente, incapable d'inventer un changement, et qui ne s'effondre pas quand
+une source ne répond pas.
+
+**Ce n'est pas non plus un diff des fichiers publiés**, et la raison est
+mesurée : ce sont des vues tronquées — cinq marchés par acheteur, quatre
+créations d'association par commune, deux cents dans les listes dites
+complètes. Un diff signalerait comme nouveau ce qui vient d'entrer dans les cinq
+premiers et manquerait ce qui en est sorti entre deux passages. Chaque
+collecteur émet donc ses propres événements, puisque lui seul sait dater et
+attribuer.
+
+Fenêtre de six mois, plafond de douze par acteur **et par genre** — sans quoi
+les cent marchés annuels d'une agglomération chasseraient ses délibérations. Un
+événement d'acheteur est écrit une fois sous son SIREN : le marché d'une
+agglomération est celui de ses cent quatre communes, et c'est au lecteur du
+fichier de faire l'éventail. Les 68 495 lignes écrites pour 67 651 événements
+retenus ne sont pas une erreur — un syndicat à cheval sur une frontière figure
+dans les deux départements qu'il dessert.
+
+| | Événements sur six mois |
+| --- | --- |
+| Associations créées | 26 003 |
+| Marchés notifiés | 21 223 |
+| Délibérations | 15 560 |
+| Changements de maire | 5 708 |
+| Subventions votées | 1 |
+
+Dix méga-octets en tout, 1,4 Mo pour l'Ille-et-Vilaine, 398 événements pour
+l'Allier. **Le poids d'une visite ne bouge pas** — 885 Ko : rien ne charge le
+journal côté navigateur, il est là pour le flux et pour la page de commune, qui
+se construisent au build.
+
+`npm run verifier-journal` fixe les dix règles qui ne se voient pas : la
+fenêtre, les deux plafonds, l'ordre, et le refus des dates futures — le
+répertoire des associations porte onze créations datées de 2029, et une seule
+occuperait la tête d'un flux pendant trois ans.
+
+**Trois choses que le journal ne dit pas, et qui viennent des sources.** Une
+seule subvention y figure : les producteurs publient tard et beaucoup ne datent
+leur convention qu'à l'année, auquel cas elle n'entre pas plutôt que d'entrer au
+premier janvier. Aucune catastrophe naturelle : l'arrêté le plus récent de
+GASPAR date du 18 décembre 2025, l'archive du ministère a neuf mois de retard.
+Et surtout, **aucun transfert de compétence** : BANATIC ne les date pas. Le jour
+où une commune confie l'eau à son agglomération, rien dans la donnée ne dit
+quand — c'est pourtant le changement que ce site devrait annoncer le premier, et
+le repérer demandera un diff entre deux états du registre, justifié celui-là
+puisqu'il n'y a aucune date à projeter.
+
+### Une adresse recopiée la veille rendait déjà 404 ✔
+
+Le journal a fait remonter une panne que rien ne signalait : sur six mois,
+**soixante-douze délibérations dans toute la France**, pour mille trois cent
+quatre-vingt-six collectivités qui publient.
+
+La cause n'était pas le journal. Mégalis Bretagne — le plus gros agrégateur, et
+le seul que la découverte par schéma ne voit pas — republie **chaque jour**,
+sous un chemin qui porte l'horodatage de la publication. Les trois adresses
+recopiées dans le collecteur rendaient 404 pour le millésime en cours : le site
+montrait des délibérations qui s'arrêtaient au 31 décembre pendant que la source
+publiait quotidiennement.
+
+On nomme donc le jeu de données, jamais le fichier. `ressourcesDuJeu()` demande
+ses ressources au moment de l'ingestion, par l'API v2 — plus légère que la v1,
+et la seule des deux qui réponde depuis l'environnement de développement. Six
+ressources résolues au lieu des trois figées, les millésimes 2021 à 2026 :
+**586 022 délibérations au lieu de 496 110**, pour 1 400 collectivités, et
+15 560 dans le journal au lieu de 72.
+
+C'est le genre de panne pour lequel la veille existe, et qu'elle ne voyait pas :
+elle surveillait le jeu de données, pas la validité des adresses que le
+collecteur en avait recopiées. Ne plus rien recopier est le seul remède qui
+tienne.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.
