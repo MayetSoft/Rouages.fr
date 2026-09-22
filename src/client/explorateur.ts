@@ -743,6 +743,7 @@ function demarrer(reseau: Reseau) {
     // Après ce que la commune verse aux associations : ce qui s'y crée sans
     // qu'elle ait rien eu à décider.
     ajouter('Les associations', blocAssociations());
+    ajouter('Ce qu’on trouve sur place', blocEquipements());
     ajouter('Les services', blocServices());
     // Un sommaire d'une seule entrée ne guide rien : il ferait double emploi
     // avec le titre du bloc, juste en dessous.
@@ -2576,6 +2577,98 @@ function demarrer(reseau: Reseau) {
       ),
     );
     return bloc;
+  }
+
+  /**
+   * Ce qu'on trouve sur place, et ce pour quoi il faut partir.
+   *
+   * Le bloc « Les services » nomme les établissements publics ; celui-ci
+   * compte tout ce qui est ouvert au public, commerces compris. L'absence est
+   * ici aussi informative que la présence, et c'est la seule liste du site où
+   * l'on affiche explicitement ce qui manque.
+   */
+  function blocEquipements(): HTMLElement | null {
+    const e = territoire?.equipements;
+    if (!e) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-equipements';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qu’on trouve sur place'));
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const d = document.createElement('div');
+    d.append(ligne('dt', '', `Équipements de proximité ${e.millesime}`));
+    const dd = document.createElement('dd');
+    dd.append(ligne('span', 'p-montant', `${e.proximite} sur ${e.proximiteTotal}`));
+    dd.append(reglette(e.proximite, e.medianeProximite, 'la médiane des communes'));
+    dd.append(
+      ligne(
+        'span',
+        'p-mediane',
+        `médiane des communes : ${e.medianeProximite} sur ${e.proximiteTotal}`,
+      ),
+    );
+    d.append(dd);
+    dl.append(d);
+    bloc.append(dl);
+
+    for (const g of e.presents) {
+      const groupe = document.createElement('div');
+      groupe.className = 'p-risque-groupe';
+      groupe.append(ligne('span', 'p-service-famille', g.ou));
+      const ul = document.createElement('ul');
+      for (const x of g.liste) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-risque-nombre', String(x.nombre)));
+        li.append(ligne('span', 'p-risque-nom', x.nom));
+        ul.append(li);
+      }
+      groupe.append(ul);
+      bloc.append(groupe);
+    }
+
+    // L'absence dite explicitement : c'est ce pour quoi il faut prendre la
+    // voiture, et aucune liste de ce qui existe ne le montre. En liste plutôt
+    // qu'en phrase : les intitulés de l'INSEE énumèrent déjà leurs variantes,
+    // et vingt-six d'entre eux séparés par des virgules ne se lisent pas.
+    if (e.absents.length > 0) {
+      const g = document.createElement('div');
+      g.className = 'p-risque-groupe p-equipements-absents';
+      g.append(ligne('span', 'p-service-famille', 'Ce qui manque, dans la gamme de proximité'));
+      const ul = document.createElement('ul');
+      for (const nom of e.absents) {
+        ul.append(ligne('li', 'p-risque-nom', ouPlutotQue(nom)));
+      }
+      g.append(ul);
+      bloc.append(g);
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D’après la base permanente des équipements de l’INSEE, millésime ${e.millesime} ` +
+          `(${e.maj}). La gamme de proximité est celle que l’INSEE publie, non une liste ` +
+          `établie ici. Ce sont des équipements ouverts au public, marchands compris — le bloc ` +
+          `« Les services » nomme, lui, les seuls établissements publics. Une commune sans ` +
+          `équipement n’est pas une commune sans accès : le bourg voisin est parfois à trois ` +
+          `kilomètres, ce que ce fichier ne dit pas.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * « bureau de poste, relais poste, agence postale » devient
+   * « bureau de poste, relais poste ou agence postale ».
+   *
+   * L'INSEE énumère les variantes d'un regroupement par des virgules. Dans une
+   * liste d'absences, la dernière virgule se lit comme une séparation entre
+   * deux manques distincts alors qu'il s'agit d'un seul.
+   */
+  function ouPlutotQue(nom: string): string {
+    const i = nom.lastIndexOf(', ');
+    return i === -1 ? nom : `${nom.slice(0, i)} ou ${nom.slice(i + 2)}`;
   }
 
   function blocSru(): HTMLElement | null {

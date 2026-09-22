@@ -398,6 +398,38 @@ function assemblerUrbanisme(commune: CommuneBreve, structures: Structure[]): Urb
   };
 }
 
+function assemblerEquipements(commune: CommuneBreve): Equipements | null {
+  const d = equipementsDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const presence = new Map(f);
+  const parDomaine = new Map<string, { nom: string; nombre: number }[]>();
+  for (const [i, n] of f) {
+    const t = d.types[i];
+    if (!t) continue;
+    const ou = t[2] || 'Autres';
+    if (!parDomaine.has(ou)) parDomaine.set(ou, []);
+    parDomaine.get(ou)!.push({ nom: t[0], nombre: n });
+  }
+  for (const liste of parDomaine.values()) liste.sort((a, b) => b.nombre - a.nombre);
+  const proximite = d.groupes.filter(
+    ([, gamme, membres]) => gamme === 0 && membres.some((i) => presence.has(i)),
+  );
+  return {
+    millesime: d.millesime,
+    proximite: proximite.length,
+    proximiteTotal: d.nombreProximite,
+    medianeProximite: d.medianeProximite,
+    presents: [...parDomaine]
+      .map(([ou, liste]) => ({ ou, liste }))
+      .sort((a, b) => b.liste.length - a.liste.length || a.ou.localeCompare(b.ou)),
+    absents: d.groupes
+      .filter(([, gamme, membres]) => gamme === 0 && !membres.some((i) => presence.has(i)))
+      .map(([nom]) => nom),
+    maj: d.maj,
+  };
+}
+
 function assemblerFiscalite(commune: CommuneBreve): Fiscalite | null {
   const d = fiscaliteDep.get(commune.dep);
   const f = d?.c[commune.code];
@@ -625,6 +657,34 @@ export interface Fiscalite {
   maj: string;
 }
 
+/**
+ * Ce qu'on trouve sur place, et ce pour quoi il faut partir.
+ *
+ * Le site nommait les services publics d'une commune. Il ne disait rien de la
+ * boulangerie, de l'épicerie, du médecin — ce qui n'est pas du service public
+ * et reste la première chose qu'un habitant regarde. La gamme de proximité de
+ * l'INSEE est le classement repris ici : un objet statistique publié, plutôt
+ * qu'une liste maison de « ce qui compte ».
+ */
+export interface Equipements {
+  millesime: number;
+  /**
+   * Regroupements de proximité présents, sur combien, et la médiane.
+   *
+   * Par regroupement et non par type : une commune qui a une école primaire
+   * n'est pas une commune où manquent la maternelle et l'élémentaire, et
+   * l'INSEE range d'ailleurs les trois ensemble.
+   */
+  proximite: number;
+  proximiteTotal: number;
+  medianeProximite: number;
+  /** Ce qui est là, regroupé par domaine, du plus fourni au moins fourni. */
+  presents: { ou: string; liste: { nom: string; nombre: number }[] }[];
+  /** Ce qui manque, parmi la seule gamme de proximité. */
+  absents: string[];
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -720,6 +780,8 @@ export interface Territoire {
   logements: Logements | null;
   /** Ce qui est prélevé sur place, et par qui. */
   fiscalite: Fiscalite | null;
+  /** Ce qu'on trouve sur place, et ce pour quoi il faut partir. */
+  equipements: Equipements | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -964,6 +1026,20 @@ type FiscaliteDep = {
   >;
 };
 const fiscaliteDep = new Map<string, FiscaliteDep | null>();
+
+/** Les équipements du département, et la nomenclature qui les range. */
+type EquipementsDep = {
+  maj: string;
+  millesime: number;
+  /** Par type : son nom, sa gamme (0 proximité, 1 intermédiaire), son domaine. */
+  types: [string, 0 | 1, string][];
+  /** Par regroupement : son intitulé, sa gamme, et les index de ses types. */
+  groupes: [string, 0 | 1, number[]][];
+  medianeProximite: number;
+  nombreProximite: number;
+  c: Record<string, [number, number][]>;
+};
+const equipementsDep = new Map<string, EquipementsDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -1262,7 +1338,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
     // eslint-disable-next-line prettier/prettier
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb, logs, fisc] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb, logs, fisc, equ] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -1286,6 +1362,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<UrbanismeDep>(`${BASE}/dep/${commune.dep}-urbanisme.json`).catch(() => null),
       json<LogementsDep>(`${BASE}/dep/${commune.dep}-logements.json`).catch(() => null),
       json<FiscaliteDep>(`${BASE}/dep/${commune.dep}-fiscalite.json`).catch(() => null),
+      json<EquipementsDep>(`${BASE}/dep/${commune.dep}-equipements.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -1305,6 +1382,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     urbanismeDep.set(commune.dep, urb);
     logementsDep.set(commune.dep, logs);
     fiscaliteDep.set(commune.dep, fisc);
+    equipementsDep.set(commune.dep, equ);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -1366,6 +1444,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     urbanisme: assemblerUrbanisme(commune, structures),
     logements: assemblerLogements(commune, ligne[2]),
     fiscalite: assemblerFiscalite(commune),
+    equipements: assemblerEquipements(commune),
     scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,

@@ -80,6 +80,9 @@ sources:
   # Les taux d'imposition, commune par commune : le fichier que la DGFiP publie
   # chaque année, et dont la trace documente les sept cents colonnes.
   - { id: od-rei, type: donnees_ouvertes, titre: "REI — recensement des éléments d'imposition à la fiscalité directe locale (DGFiP)", url: "https://data.economie.gouv.fr/explore/dataset/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-dir/", consulte_le: 2026-09-22 }
+  # Ce qu'on trouve sur place, commerces compris, et les gammes qui disent ce
+  # qui relève de la proximité — un classement publié, pas une liste maison.
+  - { id: od-bpe, type: donnees_ouvertes, titre: "Base permanente des équipements (INSEE) — commerces, services, santé, sport, commune par commune", url: "https://www.insee.fr/fr/metadonnees/source/serie/s1161", consulte_le: 2026-09-22 }
   - { id: od-sispea, type: donnees_ouvertes, titre: "SISPEA — prix et performance des services d'eau, commune par commune", url: "https://services.eaufrance.fr/", consulte_le: 2026-09-05 }
   - { id: od-sinoe, type: donnees_ouvertes, titre: "SINOE — données sur les déchets ménagers (ADEME)", url: "https://www.sinoe.org/", consulte_le: 2026-09-05 }
   - { id: od-decp, type: donnees_ouvertes, titre: "Données essentielles de la commande publique", url: "https://www.data.gouv.fr/fr/datasets/donnees-essentielles-de-la-commande-publique-fichiers-consolides/", consulte_le: 2026-09-05 }

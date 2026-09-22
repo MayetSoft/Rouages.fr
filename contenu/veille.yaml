@@ -177,6 +177,15 @@ surveillances:
     ressource: "REI[-_](\\d{4})"
     lien: od-rei
 
+  - id: bpe-denombrement
+    nom: "Base permanente des équipements — dénombrement communal"
+    alimente: "ce qu'on trouve sur place : commerces, santé, écoles, sport"
+    # L'adresse porte l'identifiant de la publication, qui change à chaque
+    # millésime : c'est la date du fichier qu'on surveille, pas son existence.
+    type: fichier-date
+    url: "https://www.insee.fr/fr/statistiques/fichier/8217527/DS_BPE_CSV_FR.zip"
+    lien: od-bpe
+
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
   - id: gaspar-risques

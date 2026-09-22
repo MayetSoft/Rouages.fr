@@ -155,6 +155,16 @@ const phraseUrbanisme = !urb
             `votera la révision.`
           : 'Il est voté par le conseil municipal.');
 
+/**
+ * Ce qu'on trouve sur place, et ce pour quoi il faut partir.
+ *
+ * Les absences sont bornées : une commune de deux cents habitants en compte
+ * vingt-six, et une phrase de vingt-six éléments ne se lit pas. Le panneau,
+ * lui, les donne toutes — il a la place d'une liste.
+ */
+const ABSENTS_MONTRES = 10;
+const equ = fiche?.equipements ?? null;
+
 /** Ce qui est prélevé ici, et par qui. */
 const fisc = fiche?.fiscalite ?? null;
 const pourCent = (v: number) =>
@@ -404,6 +414,36 @@ function moisAnnee(iso: string): string | null {
               : '') +
             '. Le document lui-même — son règlement, son zonage, le plan de la parcelle — se ' +
             'consulte en mairie, et le plus souvent sur le Géoportail de l’urbanisme.'}
+        </p>
+      </section>
+    )}
+
+    {equ && (
+      <section>
+        <h2 class="badge">Ce qu’on trouve sur place</h2>
+        <p class="c-equipements">
+          <strong>{`${equ.proximite} des ${equ.proximiteTotal} équipements de proximité`}</strong>
+          {` que recense l’INSEE en ${equ.millesime} — médiane des communes : ` +
+            `${equ.medianeProximite}. Les plus nombreux : ` +
+            equ.principaux.map((x) => `${x.nom} (${x.nombre})`).join(', ') + '.'}
+          {equ.absents.length > 0 && (
+            <span class="c-equipements-absents">
+              {'Absents de la gamme de proximité : ' +
+                equ.absents
+                  .slice(0, ABSENTS_MONTRES)
+                  .map((n) => n.replace(/, ([^,]*)$/, ' ou $1'))
+                  .join(' ; ') +
+                (equ.absents.length > ABSENTS_MONTRES
+                  ? `, et ${equ.absents.length - ABSENTS_MONTRES} autres.`
+                  : '.')}
+            </span>
+          )}
+          <span class="c-equipements-source">
+            {`D’après la base permanente des équipements (${equ.maj}). La gamme de proximité est ` +
+              'celle que l’INSEE publie, non une liste établie ici ; ce sont des équipements ' +
+              'ouverts au public, marchands compris. Une commune sans équipement n’est pas une ' +
+              'commune sans accès : le bourg voisin est parfois à trois kilomètres.'}
+          </span>
         </p>
       </section>
     )}

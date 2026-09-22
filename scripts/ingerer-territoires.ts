@@ -594,6 +594,19 @@ async function principal() {
     ),
   );
 
+  // Ce qu'on trouve sur place, commerces compris : la gamme de proximité de
+  // l'INSEE, qui est un objet statistique publié et non une liste maison.
+  const { collecterEquipements } = await import('./equipements-emettre.ts');
+  const equipements = await tenter('Équipements', () =>
+    collecterEquipements(
+      (url, vers) =>
+        telechargerEnCache(url, vers, reutiliser, 'Base permanente des équipements (15 Mo)'),
+      CACHE,
+      (lire) => lignesCsvOuvert('bpe', lire),
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   const { collecterAssociations } = await import('./associations-emettre.ts');
   const associations = await tenter('Associations', () =>
     collecterAssociations(
@@ -637,6 +650,7 @@ async function principal() {
     urbanisme,
     logements,
     fiscalite,
+    equipements,
   );
 }
 
@@ -767,6 +781,9 @@ async function ecrire(
   urbanisme: Awaited<ReturnType<typeof import('./urbanisme-emettre.ts')['collecterUrbanisme']>>,
   logements: Awaited<ReturnType<typeof import('./logements-emettre.ts')['collecterLogements']>>,
   fiscalite: Awaited<ReturnType<typeof import('./fiscalite-emettre.ts')['collecterFiscalite']>>,
+  equipements: Awaited<
+    ReturnType<typeof import('./equipements-emettre.ts')['collecterEquipements']>
+  >,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -797,6 +814,7 @@ async function ecrire(
     urbanisme,
     logements,
     fiscalite,
+    equipements,
     sortie: SORTIE,
     dire,
     VERT,

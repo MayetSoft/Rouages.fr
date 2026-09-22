@@ -1334,6 +1334,39 @@ celui de 2020 n'a aucun sens, et la page le dit plutôt que de laisser conclure
 (`E12`, `H52gGEMAPI`, `F71`)&nbsp;; aucune n'a été devinée — la trace publiée
 avec le fichier les documente une à une, et c'est elle qui a servi.
 
+### Ce qu'on trouve sur place, et ce pour quoi il faut partir ✔
+
+Le site nommait les services publics d'une commune — ses écoles, ses
+établissements de santé, ses guichets. Il ne disait rien de la boulangerie, de
+l'épicerie, du médecin&nbsp;: ce n'est pas du service public, et c'est la
+première chose qu'un habitant regarde.
+
+La base permanente des équipements de l'INSEE recense 235 types d'équipements
+ouverts au public, marchands compris. Surtout, elle les range en **gammes** —
+proximité, intermédiaire, supérieure — et c'est ce classement-là que le site
+reprend plutôt que d'inventer sa liste de « ce qui compte »&nbsp;: la gamme de
+proximité est un objet statistique publié et daté, pas une opinion.
+
+> **Le Mayet-de-Montagne** — 24 des 26 équipements de proximité, quand la
+> médiane des communes est de 9&nbsp;: 9 infirmiers, 7 médecins généralistes,
+> 5 boulangeries, 2 pharmacies, un bureau de poste, une bibliothèque, un
+> collège. Manquent une agence immobilière et un boulodrome.
+>
+> **Agonges**, 250 habitants — 7 sur 26. Ni boulangerie, ni épicerie, ni
+> médecin, ni école.
+
+**Le piège qu'il a fallu écarter.** Compter par *type* faisait mentir la page&nbsp;:
+Le Mayet a une école primaire, et « école maternelle » comme « école
+élémentaire » apparaissaient alors comme absentes — deux écoles manquantes là
+où il n'en manque aucune. L'INSEE publie précisément, pour cela, une colonne de
+**regroupements**&nbsp;: les trois écoles n'en font qu'un, comme le bureau de
+poste, le relais poste et l'agence postale. La présence et l'absence se
+comptent donc par regroupement, et les 85 types suivis n'en forment que 74 —
+26 de proximité, non 33.
+
+C'est la seule liste du site qui affiche explicitement **ce qui manque**. Une
+liste de ce qui existe ne dit pas pour quoi il faut prendre la voiture.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

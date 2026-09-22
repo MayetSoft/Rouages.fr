@@ -137,6 +137,18 @@ type FiscaliteDep = {
   >;
 };
 
+/** Les équipements du département, et la nomenclature qui les range. */
+type EquipementsDep = {
+  maj: string;
+  millesime: number;
+  types: [string, 0 | 1, string][];
+  /** Par regroupement : son intitulé, sa gamme, et les index de ses types. */
+  groupes: [string, 0 | 1, number[]][];
+  medianeProximite: number;
+  nombreProximite: number;
+  c: Record<string, [number, number][]>;
+};
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -185,6 +197,7 @@ const cacheConseils = new Map<string, ConseilsDep | null>();
 const cacheUrbanisme = new Map<string, UrbanismeDep | null>();
 const cacheLogements = new Map<string, LogementsDep | null>();
 const cacheFiscalite = new Map<string, FiscaliteDep | null>();
+const cacheEquipements = new Map<string, EquipementsDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -400,6 +413,18 @@ export interface Fiche {
     fnbTotal: number;
     maj: string;
   } | null;
+  /** Ce qu'on trouve sur place, et ce pour quoi il faut partir. */
+  equipements: {
+    millesime: number;
+    proximite: number;
+    proximiteTotal: number;
+    medianeProximite: number;
+    /** Les plus nombreux, tous domaines confondus. */
+    principaux: { nom: string; nombre: number }[];
+    /** Ce qui manque, parmi la seule gamme de proximité. */
+    absents: string[];
+    maj: string;
+  } | null;
   /** Ce qui s'y construit réellement, une fois la règle écrite. */
   logements: {
     annees: number[];
@@ -518,6 +543,7 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
     urbanisme: assemblerUrbanisme(c, structures),
     logements: assemblerLogements(c),
     fiscalite: assemblerFiscalite(c),
+    equipements: assemblerEquipements(c),
     sommet: assemblerSommet(c),
     maj: dep.maj,
   };
@@ -569,6 +595,39 @@ function assemblerUrbanisme(
     totalPartout: u.total,
     jusquau: u.jusquau,
     maj: u.maj,
+  };
+}
+
+/**
+ * La page statique n'a pas la place d'une liste de cinquante entrées : elle
+ * donne le compte, les plus nombreux, et surtout ce qui manque — l'absence
+ * étant ici l'information qu'aucune liste de présences ne donne.
+ */
+const PRINCIPAUX = 8;
+
+function assemblerEquipements(c: CommuneIndex): Fiche['equipements'] {
+  const d = enCache(cacheEquipements, c.dep, `dep/${c.dep}-equipements.json`);
+  const f = d?.c[c.code];
+  if (!d || !f || f.length === 0) return null;
+  const presence = new Set(f.map(([i]) => i));
+  return {
+    millesime: d.millesime,
+    // Par regroupement, jamais par type : une école primaire ne laisse pas
+    // « manquer » la maternelle et l'élémentaire.
+    proximite: d.groupes.filter(
+      ([, gamme, membres]) => gamme === 0 && membres.some((i) => presence.has(i)),
+    ).length,
+    proximiteTotal: d.nombreProximite,
+    medianeProximite: d.medianeProximite,
+    principaux: f
+      .map(([i, n]) => ({ nom: d.types[i]?.[0] ?? '', nombre: n }))
+      .filter((x) => x.nom)
+      .sort((a, b) => b.nombre - a.nombre || a.nom.localeCompare(b.nom))
+      .slice(0, PRINCIPAUX),
+    absents: d.groupes
+      .filter(([, gamme, membres]) => gamme === 0 && !membres.some((i) => presence.has(i)))
+      .map(([nom]) => nom),
+    maj: d.maj,
   };
 }
 
