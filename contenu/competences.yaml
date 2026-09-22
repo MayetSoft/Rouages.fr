@@ -247,15 +247,6 @@ competences:
     verifie_le: 2026-09-19
     confiance: a_confirmer
 
-  - id: transports-regionaux
-    nom: "Transports régionaux"
-    acteur: region
-    resume: "Trains régionaux, cars interurbains et transport scolaire hors périmètre urbain."
-    partagee_avec: [epci, departement]
-    liens: [vp-competences, cgct]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
-
   - id: amenagement-territoire
     # Quatrième variante de la même erreur, après le SCoT, le SDIS et la DDT :
     # « s'impose » était faux deux fois. Le SRADDET est opposable de deux manières
@@ -290,13 +281,16 @@ competences:
     confiance: etabli
 
   - id: offre-de-soins
+    # Nommer l'autorité plutôt que l'institution : c'est le directeur général de
+    # l'agence qui signe l'autorisation, après avis d'une commission spécialisée.
+    # Une fermeture de maternité ne se plaide donc ni en mairie ni au département.
     nom: "Organisation des soins"
     acteur: ars
-    resume: "Autorisations d'activité, hôpitaux, maternités : ni le maire ni le département n'y ont la main."
+    resume: "Autorisations d’activité, hôpitaux, maternités : c’est le directeur général de l’agence régionale de santé qui décide, ni le maire ni le département n’y ayant la main."
     partagee_avec: [etat]
-    liens: [wp-ars, ars-gouv]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-ars, ars-gouv, ars-autorisations]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: normes-environnementales
     nom: "Normes environnementales"
@@ -899,14 +893,18 @@ competences:
     confiance: etabli
 
   - id: apa
+    # La précision ajoutée est celle qui décide d'un refus : l'allocation ne
+    # couvre que les groupes 1 à 4 de la grille nationale. Les degrés 5 et 6,
+    # c'est-à-dire une autonomie encore large, n'y ouvrent pas droit, et beaucoup
+    # de dossiers se heurtent là.
     nom: "Allocation personnalisée d'autonomie"
     nom_court: "Autonomie (APA)"
     acteur: departement
-    resume: "Pour rester chez soi ou payer une partie de l'hébergement après 60 ans : une équipe médico-sociale du département évalue le degré de perte d'autonomie."
+    resume: "Pour rester chez soi ou payer une partie de l’hébergement après 60 ans : une équipe médico-sociale du département évalue la perte d’autonomie, et l’aide s’arrête aux quatre premiers degrés sur six."
     partagee_avec: [citoyen, president-departement, ccas]
-    liens: [wp-apa, sp-apa, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-apa, sp-apa, code-action-sociale, solidarites-apa]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: handicap
     nom: "Droits liés au handicap"
@@ -924,9 +922,9 @@ competences:
     acteur: departement
     resume: "Information préoccupante, placement, suivi à domicile : le département agit, le juge des enfants tranche quand la famille n'y consent pas."
     partagee_avec: [tribunal-judiciaire, prefet, president-departement, pmi]
-    liens: [wp-ase, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-ase, code-action-sociale, justice-mineurs-danger]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: protection-maternelle
     nom: "Santé de la mère et du jeune enfant"
@@ -934,9 +932,9 @@ competences:
     acteur: pmi
     resume: "Gratuit et sans avance de frais jusqu'à six ans. C'est aussi la PMI qui agrée les assistantes maternelles et contrôle les crèches."
     partagee_avec: [citoyen, departement, commune, ars]
-    liens: [wp-pmi, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-pmi, code-action-sociale, csp-l2112-2, casf-l421-3]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- La région ------------------------------------------------------------
   - id: transport-regional
@@ -955,14 +953,18 @@ competences:
   # département. Une convention ne s'enregistre nulle part — comme pour
   # l'instruction des permis, la réponse exacte est trompeuse sans sa réserve.
   - id: transport-scolaire
+    # Les trois affirmations tiennent : transfert aux régions par la loi NOTRe en
+    # 2017, délégation possible au département ou à une commune par convention
+    # (art. L1111-8 du CGCT), et le transport des élèves handicapés reste à la
+    # charge du département de résidence.
     nom: "Transport scolaire"
     acteur: region
     resume: "Transféré aux régions en 2017. Beaucoup le reconfient au département par convention, et le transport des élèves handicapés lui reste de toute façon."
     partagee_avec: [departement, commune, aom, rectorat]
     reserve: "La région peut confier tout ou partie du transport scolaire au département, à une commune ou à un syndicat, par une convention qui ne figure dans aucun registre. Le transport des élèves handicapés, lui, relève du département."
-    liens: [ct-l3111-9, code-transports, wp-loi-notre-2]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [ct-l3111-9, code-transports, wp-loi-notre-2, ct-l3111-7]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: insertion-jeunes
     nom: "Accompagnement des 16-25 ans"
@@ -970,9 +972,9 @@ competences:
     acteur: mission-locale
     resume: "Un seul interlocuteur pour l'emploi, la formation, le logement et la santé d'un jeune sorti du système scolaire, quel que soit le sujet."
     partagee_avec: [citoyen, region, france-travail, commune, epci]
-    liens: [wp-mission-locale, code-travail]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-mission-locale, code-travail, info-mission-locale]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Ce que la commune fait au nom de l'État -------------------------------
   - id: listes-electorales
@@ -981,23 +983,28 @@ competences:
     acteur: maire
     resume: "Depuis 2019, le maire décide seul des inscriptions et des radiations, sous le contrôle a posteriori d'une commission ; l'Insee tient le répertoire national."
     partagee_avec: [etat, commission-controle-listes, citoyen]
-    liens: [code-electoral, insee-reu, sp-listes-electorales, wp-procedures-electorales, od-municipales-2026]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [code-electoral, insee-reu, sp-listes-electorales, wp-procedures-electorales, od-municipales-2026, cel-l19]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Les risques majeurs ---------------------------------------------------
   # Deux compétences distinctes, et c'est tout l'intérêt de les séparer : l'État
   # décide de la contrainte, le maire doit la faire connaître. Un habitant qui
   # ignore de quoi il relève s'adresse presque toujours au mauvais des deux.
   - id: prevention-risques
+    # Vérifié mot pour mot : « le plan de prévention des risques naturels
+    # prévisibles approuvé vaut servitude d'utilité publique » (art. L562-4), il
+    # est annexé au plan local d'urbanisme, et le Conseil d'État juge que ses
+    # prescriptions s'imposent directement aux autorisations de construire, sans
+    # que le maire ait à les reprendre dans son arrêté.
     nom: "Prévention des risques naturels et technologiques"
     nom_court: "Prévention des risques"
     acteur: prefet
     resume: "Le préfet prescrit et approuve le plan de prévention ; une fois approuvé, il vaut servitude d'utilité publique et s'impose aux permis de construire."
     partagee_avec: [etat, ddt, dreal, commune, citoyen]
     liens: [ce-l562-4, georisques, wp-ppr, code-environnement]
-    verifie_le: 2026-09-20
-    confiance: a_confirmer
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: information-risques
     nom: "Information de la population sur les risques majeurs"
@@ -1005,6 +1012,6 @@ competences:
     acteur: maire
     resume: "Le document d'information communal et, dans les communes dotées d'un plan de prévention, une information de la population au moins tous les deux ans."
     partagee_avec: [commune, prefet, citoyen]
-    liens: [ce-l125-2, georisques-obligations, code-environnement]
-    verifie_le: 2026-09-20
-    confiance: a_confirmer
+    liens: [ce-l125-2, georisques-obligations, code-environnement, georisques-information-preventive]
+    verifie_le: 2026-09-22
+    confiance: etabli
