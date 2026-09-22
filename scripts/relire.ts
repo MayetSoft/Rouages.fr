@@ -26,6 +26,10 @@ const GRIS = '\u001b[90m';
 const GRAS = '\u001b[1m';
 const RAZ = '\u001b[0m';
 
+// Les documents n'entrent pas dans cette file : ils ne portent pas de champ
+// `confiance`. C'est volontaire — un document est un objet qu'on cite, pas une
+// affirmation sur le monde ; ce qui s'y vérifie, c'est l'étape qui le produit.
+
 interface Fiche {
   famille: string;
   ou: string;
@@ -46,14 +50,23 @@ for (const a of g.acteurs.values()) {
 for (const c of g.competences.values()) {
   if (c.confiance === 'a_confirmer') ajouter('compétence', c.id, c.resume, c.liens);
 }
-for (const d of g.documents.values()) {
-  if (d.confiance === 'a_confirmer') ajouter('document', d.id, d.resume ?? d.nom, d.liens);
-}
 for (const f of g.flux.values()) {
   if (f.confiance === 'a_confirmer') ajouter('flux', f.id, f.resume, f.liens);
 }
 for (const p of g.processus.values()) {
-  if (p.confiance === 'a_confirmer') ajouter('processus', p.id, p.resume, p.liens);
+  // Un processus ne peut pas passer avant ses étapes : la validation le refuse
+  // désormais, et la file le dit plutôt que de le laisser découvrir.
+  if (p.confiance === 'a_confirmer') {
+    const restent =
+      p.etapes.filter((e) => e.confiance === 'a_confirmer').length +
+      p.leviers.filter((l) => l.confiance === 'a_confirmer').length;
+    ajouter(
+      'processus',
+      p.id,
+      `${p.resume}${restent > 0 ? ` [bloqué : ${restent} étape(s) ou levier(s) à confirmer d'abord]` : ''}`,
+      p.liens,
+    );
+  }
   for (const e of p.etapes) {
     if (e.confiance === 'a_confirmer') {
       ajouter('étape', `${p.id} #${e.ordre}`, `${e.action}${e.note ? ` — ${e.note}` : ''}`, e.liens);

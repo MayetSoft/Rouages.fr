@@ -196,6 +196,33 @@ for (const p of g.processus.values()) {
   }
 }
 
+// Un processus ne peut pas être plus sûr que ses étapes.
+//
+// La règle est venue de la relecture : les onze processus portaient
+// `confiance: etabli` ou `a_confirmer` indépendamment de leurs étapes, si bien
+// qu'un processus pouvait se déclarer établi pendant que cinq de ses six étapes
+// restaient à vérifier. Or c'est l'étape qui porte le délai, et le délai est ce
+// qu'un lecteur vient chercher : un processus « établi » dont les délais ne le
+// sont pas afficherait une assurance qu'il n'a pas.
+//
+// La réciproque n'est pas vraie : un processus dont toutes les étapes sont
+// vérifiées peut rester `a_confirmer` si son ordonnancement, lui, ne l'est pas.
+// On ne contraint donc que dans un sens.
+for (const p of g.processus.values()) {
+  if (p.confiance !== 'etabli') continue;
+  const restent = [
+    ...p.etapes.filter((e) => e.confiance === 'a_confirmer').map((e) => `étape ${e.ordre}`),
+    ...p.leviers.filter((l) => l.confiance === 'a_confirmer').map((l) => `levier ${l.id}`),
+  ];
+  if (restent.length > 0) {
+    erreurs.push(
+      `processus « ${p.id} » se déclare établi alors que ${restent.length} de ses ` +
+        `éléments restent à confirmer (${restent.slice(0, 3).join(', ')}` +
+        `${restent.length > 3 ? '…' : ''}) — un processus n'est pas plus sûr que ses étapes.`,
+    );
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Fraîcheur
  * ------------------------------------------------------------------ */
