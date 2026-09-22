@@ -23,10 +23,15 @@ processus:
     sortie: "Une décision d'attribution ou de refus du président du conseil départemental"
     decideur: president-departement
     competences: [rsa, action-sociale, aide-sociale-communale, insertion-jeunes]
-    liens: [wp-rsa, sp-rsa, code-action-sociale]
-    verifie_le: 2026-09-19
+    liens: [wp-rsa, sp-rsa, code-action-sociale, casf-l262-47, loi-plein-emploi]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les six étapes et les quatre leviers sont vérifiés. Deux précisions ont
+    # compté, et toutes deux changent ce qu'on fait : contester un indu a un
+    # effet suspensif — la récupération s'arrête le temps de l'examen — et la
+    # suspension de l'allocation est réversible, la reprise des engagements
+    # entraînant régularisation des sommes retenues.
+    confiance: etabli
 
     etapes:
       - ordre: 1
@@ -34,40 +39,45 @@ processus:
         action: "Dépôt de la demande auprès d'un organisme instructeur"
         produit: [dossier-rsa]
         note: "La caisse d'allocations familiales, la MSA, le CCAS ou le service social du département : le guichet est au choix, la décision non."
-        liens: [sp-rsa, caf-fr, code-action-sociale]
-        confiance: a_confirmer
+        liens: [sp-rsa, caf-fr, code-action-sociale, caf-rsa]
+        confiance: etabli
       - ordre: 2
         acteur: caf
         action: "Instruction du dossier et calcul du droit"
         note: "La caisse vérifie les conditions et calcule, mais n'attribue pas : elle transmet au département."
-        liens: [caf-fr, code-action-sociale]
-        confiance: a_confirmer
+        liens: [caf-fr, code-action-sociale, caf-rsa]
+        confiance: etabli
       - ordre: 3
         acteur: president-departement
         action: "Décision d'attribution ou de refus"
         note: "C'est le département qui attribue le RSA et qui le finance. Un recours se dirige donc vers lui, pas vers la caisse qui verse."
-        liens: [code-action-sociale, wp-rsa]
-        confiance: a_confirmer
+        liens: [code-action-sociale, wp-rsa, casf-l262-47]
+        confiance: etabli
       - ordre: 4
         acteur: france-travail
         action: "Inscription et orientation vers un référent unique"
         note: "Depuis janvier 2025, l'allocataire et son conjoint sont inscrits à France Travail sans démarche de leur part. L'orientation désigne ensuite qui accompagne : France Travail, le département ou un autre organisme."
-        liens: [france-travail-fr, wp-france-travail, code-action-sociale]
-        confiance: a_confirmer
+        liens: [france-travail-fr, wp-france-travail, code-action-sociale, ft-inscription-2025]
+        confiance: etabli
       - ordre: 5
         acteur: citoyen
         action: "Signature du contrat d'engagement"
         produit: [contrat-engagement]
         note: "Le contrat fixe les démarches et le volume d'activité hebdomadaire attendu, établi à partir du diagnostic et non identique pour tous."
-        liens: [code-action-sociale, france-travail-fr]
-        confiance: a_confirmer
+        liens: [code-action-sociale, france-travail-fr, loi-plein-emploi]
+        confiance: etabli
       - ordre: 6
+        # Précision ajoutée, et elle change ce qu'on fait d'une suspension : depuis la
+        # loi pour le plein emploi, la sanction est pensée comme réversible. Reprendre
+        # ses engagements la fait lever, avec régularisation des sommes retenues. Ce
+        # n'est donc pas une perte définitive, contrairement à ce qu'une notification
+        # laisse souvent croire.
         acteur: president-departement
         action: "Suspension ou radiation en cas de manquement"
         conditionnelle: true
-        note: "La sanction relève du département. Elle est précédée d'une procédure contradictoire, et c'est là que se joue l'essentiel."
-        liens: [code-action-sociale, wp-rsa]
-        confiance: a_confirmer
+        note: "La sanction relève du département et elle est précédée d'une procédure contradictoire : c'est là que se joue l'essentiel. Depuis la loi pour le plein emploi, la suspension est conçue comme réversible — reprendre ses engagements la fait lever, avec régularisation des sommes retenues."
+        liens: [code-action-sociale, wp-rsa, loi-plein-emploi]
+        confiance: etabli
 
     leviers:
       - id: faire-instruire-par-le-ccas
@@ -77,18 +87,21 @@ processus:
         difficulte: faible
         ancre_etape: 1
         piege: "Le CCAS est un organisme instructeur de plein droit et connaît les aides locales cumulables, que la caisse n'a pas à signaler."
-        liens: [unccas, code-action-sociale, sp-rsa]
-        confiance: a_confirmer
+        liens: [unccas, code-action-sociale, sp-rsa, casf-l123-4]
+        confiance: etabli
       - id: contester-un-refus-rsa
+        # L'effet suspensif sur un indu est la précision la plus utile : contester
+        # arrête la récupération le temps de l'examen, là où beaucoup subissent les
+        # retenues en croyant devoir payer d'abord.
         quoi: "Contester un refus, un indu ou une suspension"
         quand: "Dans les deux mois de la notification"
         aupres_de: "Le président du conseil départemental, par recours administratif préalable"
         difficulte: moyenne
         ancre_etape: 3
         recours_si_refus: "Tribunal administratif, après le recours préalable obligatoire"
-        piege: "Écrire à la caisse fait perdre le délai : elle verse, mais elle ne décide pas. Le recours se dirige vers le département."
-        liens: [code-action-sociale, wp-recours-administratif, code-justice-administrative]
-        confiance: a_confirmer
+        piege: "Écrire à la caisse fait perdre le délai : elle verse, mais elle ne décide pas. Le recours se dirige vers le département. Pour un indu, il a un effet suspensif : la récupération s'arrête tant qu'il est examiné."
+        liens: [code-action-sociale, wp-recours-administratif, code-justice-administrative, casf-l262-47]
+        confiance: etabli
       - id: demander-le-diagnostic
         quoi: "Demander communication du diagnostic qui a fondé l'orientation"
         quand: "Avant de signer le contrat d'engagement"
@@ -97,8 +110,8 @@ processus:
         ancre_etape: 5
         recours_si_refus: "Saisir la CADA"
         piege: "C'est le diagnostic qui fixe le volume d'activité attendu. Signer sans l'avoir lu revient à accepter un engagement dont on ignore la justification."
-        liens: [crpa, cada, code-action-sociale]
-        confiance: a_confirmer
+        liens: [crpa, cada, code-action-sociale, cada-saisine]
+        confiance: etabli
       - id: saisir-le-defenseur-des-droits-rsa
         quoi: "Saisir le Défenseur des droits en cas de blocage durable"
         quand: "Après un recours resté sans réponse"
@@ -106,5 +119,5 @@ processus:
         difficulte: faible
         ancre_etape: 6
         piege: "Gratuit, et compétent pour les litiges avec un service public. La saisine n'interrompt toutefois pas les délais de recours contentieux."
-        liens: [defenseur-droits, wp-defenseur-droits, france-services-gouv]
-        confiance: a_confirmer
+        liens: [defenseur-droits, wp-defenseur-droits, france-services-gouv, casf-l262-47]
+        confiance: etabli
