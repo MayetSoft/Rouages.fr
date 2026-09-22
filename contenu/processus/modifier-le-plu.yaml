@@ -1,0 +1,131 @@
+# Faire évoluer le plan local d'urbanisme.
+# Le document que tout le monde subit et que presque personne ne voit écrire.
+# Deux procédures existent, et le choix entre elles n'appartient pas à la
+# commune : il découle de ce qu'on veut changer. Confondre les deux, c'est se
+# présenter au mauvais moment — la fenêtre de la révision dure des années, celle
+# de la modification un mois.
+#
+# La loi du 26 novembre 2025 a supprimé la révision allégée et la modification
+# simplifiée. Ses dispositions de planification s'appliquent depuis le
+# 26 mai 2026, et non aux procédures engagées avant cette date : un plan approuvé
+# début 2026 a donc suivi des règles qui n'existent plus.
+documents:
+  - id: deliberation-prescription
+    nom: "La délibération de prescription"
+    resume: "Elle ouvre la révision, fixe ses objectifs et les modalités de la concertation. C'est elle qui dit où déposer un avis."
+    ou_le_trouver: "Mairie ou siège du groupement ; affichée et publiée comme toute délibération."
+    liens: [cu-l153-31, cu-l103-2, cgct]
+
+processus:
+  - id: modifier-le-plu
+    nom: "Faire évoluer le plan local d'urbanisme"
+    famille: quotidien
+    resume: "Une parcelle inconstructible, une hauteur refusée, une zone à changer : qui peut ouvrir la procédure, laquelle s'applique, et les deux seuls moments où l'avis d'un habitant entre au dossier."
+    declencheur: "Une règle du plan qui empêche un projet, ou une procédure ouverte par la collectivité"
+    sortie: "Un plan modifié et opposable, ou une demande restée sans suite"
+    decideur: conseil-municipal
+    competences: [redaction-plu, delivrance-autorisation-urbanisme]
+    liens: [cu-l153-31, cu-l153-36, loi-huwart, od-gpu]
+    verifie_le: 2026-09-22
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: conseil-municipal
+        action: "Choix de la procédure : révision ou modification"
+        note: "Le partage ne se négocie pas. Changer les orientations du projet d'aménagement et de développement durables impose la révision ; tout le reste relève de la modification. C'est donc l'objet visé qui décide de la lourdeur, pas la volonté de la collectivité. Sous plan intercommunal, la délibération appartient au conseil communautaire."
+        liens: [cu-l153-31, cu-l153-36, loi-huwart, cerema-evolution-plu]
+        confiance: etabli
+      - ordre: 2
+        acteur: conseil-municipal
+        action: "Délibération de prescription et modalités de la concertation"
+        produit: [deliberation-prescription]
+        note: "En révision, la délibération ouvre la procédure, énonce ses objectifs et fixe les modalités de la concertation. Ces modalités n'ont pas de forme imposée par la loi : réunion publique, registre, site internet, c'est la délibération qui le dit. La lire est le seul moyen de savoir où déposer un avis."
+        liens: [cu-l153-31, cu-l103-2]
+        confiance: etabli
+      - ordre: 3
+        acteur: commune
+        action: "Concertation, pendant toute la durée de l'élaboration"
+        note: "La concertation est obligatoire en révision et associe les habitants, les associations locales et les autres personnes concernées pendant toute l'élaboration du projet — pas à la fin. C'est la fenêtre la plus longue et la moins fréquentée."
+        liens: [cu-l103-2]
+        confiance: etabli
+      - ordre: 4
+        acteur: conseil-municipal
+        action: "Arrêt du projet et bilan de la concertation"
+        note: "Le conseil tire le bilan de la concertation et arrête le projet. Passé ce point, le texte ne bouge plus qu'à la marge : ce qui n'a pas été dit avant ne se rattrape qu'à l'enquête publique."
+        liens: [cu-l153-16, code-urbanisme]
+        confiance: etabli
+      - ordre: 5
+        # Le seul endroit du droit où l'avis d'un conseil municipal pèse contre
+        # son intercommunalité. Conditionnelle : elle ne joue que sous plan
+        # intercommunal.
+        acteur: conseil-communautaire
+        action: "Sous plan intercommunal : nouvelle délibération après l'avis défavorable d'une commune"
+        conditionnelle: true
+        note: "Quand une commune membre rend un avis défavorable sur les orientations d'aménagement et de programmation ou sur les règles qui la concernent directement, le conseil communautaire doit délibérer à nouveau. S'il maintient son projet sans tenir compte de l'avis, il ne peut l'approuver qu'à la majorité des deux tiers."
+        liens: [cu-l153-15, cu-l153-21]
+        confiance: etabli
+      - ordre: 6
+        acteur: prefet
+        action: "Avis des personnes publiques associées"
+        delai: { valeur: 3, unite: mois, nature: maximum_legal }
+        note: "Le projet arrêté est soumis à l'État, à la région, au département, au syndicat de schéma de cohérence territoriale et aux chambres consulaires, ainsi qu'à la commission départementale de préservation des espaces naturels, agricoles et forestiers. Sans réponse dans les trois mois, l'avis est réputé favorable — le silence ne bloque rien."
+        liens: [cu-l153-16, cu-r153-4]
+        confiance: etabli
+      - ordre: 7
+        acteur: commissaire-enqueteur
+        action: "Enquête publique, ou mise à disposition du public"
+        delai: { valeur: 1, unite: mois, nature: minimum_legal }
+        note: "En révision, le projet passe à l'enquête publique — le processus « participer à une enquête publique » en décrit le détail. En modification, le projet, l'exposé de ses motifs et les avis reçus sont mis à disposition du public pendant un mois au moins, et les observations sont enregistrées et conservées. Les modalités sont portées à connaissance au moins huit jours avant."
+        liens: [cu-l153-41, code-environnement]
+        confiance: etabli
+      - ordre: 8
+        acteur: conseil-municipal
+        action: "Approbation du plan par délibération"
+        produit: [plu]
+        note: "Le plan approuvé devient opposable une fois la délibération transmise au préfet et publiée. C'est à partir de cette prise d'effet que courent les délais de contestation."
+        liens: [cu-l153-21, cgct]
+        confiance: etabli
+
+    leviers:
+      - id: lire-la-prescription
+        quoi: "Lire la délibération qui ouvre la procédure"
+        quand: "Dès sa publication — elle précède de plusieurs mois tout le reste"
+        aupres_de: "La mairie, ou le siège du groupement sous plan intercommunal"
+        difficulte: faible
+        recours_si_refus: "Saisir la CADA : une délibération est communicable de droit"
+        ancre_etape: 2
+        piege: "Elle fixe à la fois les objectifs de la révision et les modalités de la concertation. Un objectif qui n'y figure pas ne sera pas traité, et une observation déposée ailleurs que là où elle l'indique peut n'être jamais enregistrée."
+        liens: [cu-l153-31, cu-l103-2, cada]
+        confiance: etabli
+      - id: participer-concertation-plu
+        quoi: "Déposer un avis pendant la concertation"
+        quand: "Pendant toute la durée de l'élaboration, avant l'arrêt du projet"
+        aupres_de: "Selon les modalités fixées par la délibération de prescription"
+        difficulte: faible
+        ancre_etape: 3
+        piege: "C'est la fenêtre la plus longue, et celle où le texte peut encore changer en profondeur. Après l'arrêt du projet, il ne bouge plus qu'à la marge."
+        liens: [cu-l103-2]
+        confiance: etabli
+      - id: saisir-son-conseil-municipal
+        # Le levier que personne ne connaît : sous plan intercommunal, un
+        # habitant n'a pas de prise directe sur le conseil communautaire, mais
+        # son conseil municipal en a une, et elle est chiffrée.
+        quoi: "Faire porter son objection par son conseil municipal, sous plan intercommunal"
+        quand: "Après l'arrêt du projet, quand le conseil municipal est appelé à rendre son avis"
+        aupres_de: "Les élus de sa commune, avant la séance"
+        difficulte: moyenne
+        ancre_etape: 5
+        piege: "L'avis ne pèse que sur les orientations d'aménagement et de programmation ou les règles qui concernent directement la commune — pas sur le plan entier. Mais dans ce périmètre, un avis défavorable oblige le conseil communautaire à redélibérer, et à réunir les deux tiers des voix pour passer outre."
+        liens: [cu-l153-15, cu-l153-21]
+        confiance: etabli
+      - id: contester-le-plu
+        quoi: "Contester la délibération qui approuve le plan"
+        quand: "2 mois à compter de la publication, et six mois pour les vices de procédure"
+        aupres_de: "Le tribunal administratif du ressort"
+        difficulte: elevee
+        ancre_etape: 8
+        piege: "Passé six mois à compter de la prise d'effet du plan, un vice de forme ou de procédure ne peut plus être soulevé par voie d'exception contre un permis. Deux défauts échappent à cette forclusion : l'absence de mise à disposition du public, et la violation des règles de l'enquête publique."
+        liens: [cu-l600-1, code-justice-administrative, wp-tribunal-administratif]
+        confiance: etabli

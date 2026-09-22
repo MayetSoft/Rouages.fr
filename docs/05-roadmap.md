@@ -36,8 +36,10 @@ Reste :
   Les 204 fiches sont relues contre leur source : 37 acteurs, 41 compétences,
   15 flux, 11 processus et tout ce qu'ils portent. `npm run relire` affiche
   désormais « aucune fiche à confirmer », et le détail est plus bas.
-- **la densité du réseau elle-même** : le plan local d'urbanisme reste le seul
-  document que rien ne relie, faute du processus qui le produit.
+- ~~le plan local d'urbanisme, seul document que rien ne reliait~~ — fait&nbsp;:
+  le douzième processus l'écrit, et `npm run valider` ne signale plus rien.
+- **l'ingestion du Géoportail de l'urbanisme**, qui dirait le zonage et la
+  fraîcheur réelle du document opposable (voir plus bas).
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1645,6 +1647,46 @@ Ce qui reste vrai après coup&nbsp;: `npm run relire` ne repartira pas de zéro.
 Chaque fiche porte un `perime_apres_mois`, et la file se remplira d'elle-même
 au fil des péremptions. C'est le but — une relecture qui revient, pas une
 campagne qu'on termine.
+
+### Le douzième processus : faire évoluer le PLU ✔
+
+Le plan local d'urbanisme était le seul document du site que rien ne reliait.
+Un document ne s'attache au graphe que par le processus qui le produit, et
+celui-là n'existait pas&nbsp;: le site montrait le permis qui applique la règle,
+jamais l'écriture de la règle.
+
+Il a fallu commencer par vérifier le droit en vigueur, et bien en prendre&nbsp;:
+la **loi du 26 novembre 2025** a supprimé la révision allégée et la modification
+simplifiée, ses dispositions de planification s'appliquent depuis le
+**26 mai 2026**, et **pas** aux procédures engagées avant cette date. Une fiche
+écrite de mémoire aurait décrit quatre procédures là où il en reste deux — la
+même erreur que « contester une délibération » portait sur l'ordonnance de 2021.
+
+Ce que la fiche apporte, et qu'aucune page officielle ne met côte à côte&nbsp;:
+
+- **le choix de la procédure n'appartient pas à la collectivité.** Changer les
+  orientations du projet d'aménagement et de développement durables impose la
+  révision&nbsp;; tout le reste relève de la modification. C'est l'objet visé qui
+  décide de la lourdeur — et donc de la longueur de la fenêtre offerte au
+  public&nbsp;: des années pour l'une, **un mois** pour l'autre ;
+- **la délibération de prescription est le document à lire en premier.** Elle
+  fixe les objectifs de la révision *et* les modalités de la concertation, qui
+  n'ont aucune forme imposée par la loi. Un objectif qui n'y figure pas ne sera
+  pas traité&nbsp;; une observation déposée ailleurs que là où elle l'indique peut
+  n'être jamais enregistrée ;
+- **sous plan intercommunal, le conseil municipal a une prise chiffrée.** Son
+  avis défavorable sur les orientations d'aménagement et de programmation ou sur
+  les règles qui concernent directement la commune oblige le conseil
+  communautaire à délibérer de nouveau, et à réunir **les deux tiers** des voix
+  pour passer outre. C'est le seul endroit du droit de l'urbanisme où une
+  commune pèse contre son groupement, et un habitant qui n'a pas de prise sur le
+  conseil communautaire en a une sur le sien ;
+- **le silence des personnes publiques associées ne bloque rien**&nbsp;: trois
+  mois, puis avis réputé favorable ;
+- et le piège qui ferme tout&nbsp;: passé **six mois** à compter de la prise
+  d'effet du plan, un vice de forme ou de procédure ne peut plus être soulevé par
+  voie d'exception contre un permis. Deux défauts y échappent — l'absence de mise
+  à disposition du public, et la violation des règles de l'enquête publique.
 
 ### Une ingestion qui ne se perd plus en route
 
