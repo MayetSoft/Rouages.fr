@@ -140,20 +140,30 @@ const phraseUrbanisme = !urb
       'de la commune (article L111-3 du code de l’urbanisme), et le maire ne peut délivrer un ' +
       'permis qu’avec l’accord du préfet — un avis conforme, c’est-à-dire qu’un avis défavorable ' +
       'l’interdit (article L422-5).'
-    : `La commune est couverte par ${ARTICLE_DOCUMENT[urb.document] ?? 'un'} ` +
-      `${NOM_DOCUMENT[urb.document] ?? urb.document}` +
-      (urb.approuve ? `, approuvé le ${enFrancais(urb.approuve)}` : '') +
-      '. ' +
-      (urb.qui === 'groupement'
-        ? urb.porteur
-          ? `Il est porté par ${urb.porteur} : ses règles sont votées par le conseil de ce ` +
-            `groupement, non par le conseil municipal.`
-          : 'Il est porté par l’intercommunalité, non par le conseil municipal.'
-        : urb.qui === 'transferee'
-          ? `Ce plan ne couvre que la commune, mais la compétence en urbanisme appartient ` +
-            `désormais à ${urb.porteur ?? 'son intercommunalité'} : c’est son conseil qui en ` +
-            `votera la révision.`
-          : 'Il est voté par le conseil municipal.');
+    : (() => {
+        // « Une carte communale, approuvé […] Il est voté » : le seul document
+        // féminin de la liste tombait dans des phrases écrites au masculin.
+        // L'article porte déjà le genre, autant s'en servir.
+        const f = ARTICLE_DOCUMENT[urb.document] === 'une';
+        const il = f ? 'Elle' : 'Il';
+        return (
+          `La commune est couverte par ${ARTICLE_DOCUMENT[urb.document] ?? 'un'} ` +
+          `${NOM_DOCUMENT[urb.document] ?? urb.document}` +
+          (urb.approuve ? `, approuvé${f ? 'e' : ''} le ${enFrancais(urb.approuve)}` : '') +
+          '. ' +
+          (urb.qui === 'groupement'
+            ? urb.porteur
+              ? `${il} est porté${f ? 'e' : ''} par ${urb.porteur} : ses règles sont votées par ` +
+                `le conseil de ce groupement, non par le conseil municipal.`
+              : `${il} est porté${f ? 'e' : ''} par l’intercommunalité, non par le conseil ` +
+                'municipal.'
+            : urb.qui === 'transferee'
+              ? `${f ? 'Cette carte' : 'Ce plan'} ne couvre que la commune, mais la compétence ` +
+                `en urbanisme appartient désormais à ${urb.porteur ?? 'son intercommunalité'} : ` +
+                `c’est son conseil qui en votera la révision.`
+              : `${il} est voté${f ? 'e' : ''} par le conseil municipal.`)
+        );
+      })();
 
 /**
  * Ce qu'on trouve sur place, et ce pour quoi il faut partir.
@@ -376,6 +386,25 @@ function moisAnnee(iso: string): string | null {
             </span>
           </p>
         )}
+        {urb.aVenir && (
+          <p class="c-urbanisme-a-venir">
+            {`${ARTICLE_DOCUMENT[urb.aVenir.type] === 'une' ? 'Une' : 'Un'} ` +
+              `${NOM_DOCUMENT[urb.aVenir.type] ?? urb.aVenir.type} a été approuvé le ` +
+              `${enFrancais(urb.aVenir.approuve)}` +
+              (urb.aVenir.communes > 1
+                ? `, pour ${urb.aVenir.communes} communes`
+                : '') +
+              '.'}
+            <span class="c-urbanisme-prise">
+              Approuvé n’est pas opposable&nbsp;: le document ne s’applique qu’une fois la
+              délibération transmise au préfet et publiée. Tant que ces formalités ne sont pas
+              faites, c’est le document ci-dessus qui fonde les permis.
+              {urb.aVenir.reglement && (
+                <> <a href={urb.aVenir.reglement}>Son règlement est publié</a>.</>
+              )}
+            </span>
+          </p>
+        )}
         {urb.totalPartout > 0 && (
           <p class="c-urbanisme-repere">
             {`Sur les ${urb.totalPartout.toLocaleString('fr-FR')} communes du pays, ` +
@@ -413,7 +442,11 @@ function moisAnnee(iso: string): string | null {
                 `approuvé depuis n’y figure pas encore`
               : '') +
             '. Le document lui-même — son règlement, son zonage, le plan de la parcelle — se ' +
-            'consulte en mairie, et le plus souvent sur le Géoportail de l’urbanisme.'}
+            'consulte en mairie, et le plus souvent sur le Géoportail de l’urbanisme.' +
+            (urb.aVenir
+              ? ` Le document approuvé du ${enFrancais(urb.aVenir.approuve)} vient du Géoportail,` +
+                ' qui est alimenté au fil de l’eau par les collectivités.'
+              : '')}
         </p>
       </section>
     )}

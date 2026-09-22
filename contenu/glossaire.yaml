@@ -356,6 +356,12 @@ sigles:
     definition: "L'application par laquelle les préfectures enregistrent les associations depuis 2009. Elle a donné son nom au fichier du répertoire national et à sa nomenclature des objets sociaux."
     liens: [od-rna, waldec-nomenclature]
 
+  - id: sigle-cnig
+    sigle: CNIG
+    developpe: "Conseil national de l'information géographique"
+    definition: "Il fixe le format dans lequel les collectivités versent leurs documents d'urbanisme au Géoportail. C'est son standard qui distingue un document opposable d'un document seulement approuvé."
+    liens: [cnig-plu, od-gpu]
+
   - id: sigle-actes
     sigle: ACTES
     developpe: "Aide au contrôle de légalité dématérialisé"

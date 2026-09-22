@@ -688,6 +688,7 @@ abbr[title] {
 /* Le même propos sur la page statique de la commune. */
 .c-urbanisme { font-size: .95rem; line-height: 1.55; margin: 0 0 .5rem; max-width: var(--mesure); }
 .c-urbanisme-en-cours { font-size: .92rem; line-height: 1.55; margin: 0 0 .5rem; font-weight: 600; max-width: var(--mesure); }
+.c-urbanisme-a-venir { font-size: .92rem; line-height: 1.55; margin: 0 0 .5rem; font-weight: 600; max-width: var(--mesure); }
 .c-urbanisme-prise { display: block; margin-top: .2rem; font-weight: 400; color: var(--encre-douce); }
 .c-fiscalite { font-size: .95rem; line-height: 1.55; margin: 0 0 .5rem; max-width: var(--mesure); }
 .c-fiscalite-suite { display: block; margin-top: .4rem; }

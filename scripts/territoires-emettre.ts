@@ -29,6 +29,7 @@ import { ecrireAssociations, type Associations } from './associations-emettre.ts
 import { ecrirePopulations, type Populations } from './population-emettre.ts';
 import { ecrireConseils, type Conseils } from './conseils-emettre.ts';
 import { ecrireUrbanisme, type Urbanisme } from './urbanisme-emettre.ts';
+import { ecrirePlu, type Plu } from './plu-emettre.ts';
 import { ecrireLogements, type Logements } from './logements-emettre.ts';
 import { ecrireFiscalite, type Fiscalite } from './fiscalite-emettre.ts';
 import { ecrireEquipements, type Equipements } from './equipements-emettre.ts';
@@ -112,6 +113,7 @@ export function emettre(o: {
   populations: Populations | null;
   conseils: Conseils | null;
   urbanisme: Urbanisme | null;
+  plu: Plu | null;
   logements: Logements | null;
   fiscalite: Fiscalite | null;
   equipements: Equipements | null;
@@ -305,6 +307,7 @@ export function emettre(o: {
   let popEcrites = 0;
   let conseilsEcrits = 0;
   let urbanismeEcrit = 0;
+  let pluEcrit = 0;
   let logementsEcrits = 0;
   let fiscaliteEcrite = 0;
   let equipementsEcrits = 0;
@@ -353,6 +356,16 @@ export function emettre(o: {
 
     if (o.urbanisme) {
       urbanismeEcrit += ecrireUrbanisme(sortie, dep, liste.map((c) => c.code), o.urbanisme);
+      // Le filtre a besoin de l'horizon de l'enquête : sans elle, rien à dire.
+      if (o.plu) {
+        pluEcrit += ecrirePlu(
+          sortie,
+          dep,
+          liste.map((c) => c.code),
+          o.plu,
+          o.urbanisme.jusquau,
+        );
+      }
     }
 
     if (o.logements) {
@@ -659,6 +672,12 @@ export function emettre(o: {
   if (o.conseils) {
     dire(
       `${GRIS}Conseils municipaux : ${conseilsEcrits.toLocaleString('fr-FR')} composés.${RAZ}`,
+    );
+  }
+  if (o.plu) {
+    dire(
+      `${GRIS}Géoportail de l’urbanisme : ${pluEcrit.toLocaleString('fr-FR')} communes dont le ` +
+        `document approuvé est postérieur à l’enquête.${RAZ}`,
     );
   }
   if (o.urbanisme) {

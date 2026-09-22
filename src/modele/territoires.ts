@@ -114,6 +114,15 @@ type UrbanismeDep = {
   c: Record<string, { d: number; a: string; i: 0 | 1 | 2; s: string; e: number; p: string }>;
 };
 
+/**
+ * Ce que le Géoportail de l'urbanisme sait et que l'enquête annuelle ignore :
+ * un document approuvé après sa clôture, donc pas encore opposable.
+ */
+type PluDep = {
+  maj: string;
+  c: Record<string, { a: { t: string; d: string; n: number; r: string } }>;
+};
+
 /** Les logements autorisés et commencés du département. */
 type LogementsDep = {
   maj: string;
@@ -195,6 +204,7 @@ const cacheElections = new Map<string, ElectionsDep | null>();
 const cachePop = new Map<string, PopDep | null>();
 const cacheConseils = new Map<string, ConseilsDep | null>();
 const cacheUrbanisme = new Map<string, UrbanismeDep | null>();
+const cachePlu = new Map<string, PluDep | null>();
 const cacheLogements = new Map<string, LogementsDep | null>();
 const cacheFiscalite = new Map<string, FiscaliteDep | null>();
 const cacheEquipements = new Map<string, EquipementsDep | null>();
@@ -390,6 +400,12 @@ export interface Fiche {
     /** Jusqu'où va l'enquête : elle est annuelle et paraît avec du retard. */
     jusquau: string;
     maj: string;
+    /**
+     * Le document approuvé après la clôture de l'enquête, que le Géoportail
+     * connaît et qu'elle ne pouvait pas voir. Approuvé n'est pas opposable :
+     * il ne s'applique qu'une fois les transmissions et publicités faites.
+     */
+    aVenir: { type: string; approuve: string; communes: number; reglement: string } | null;
   } | null;
   /**
    * Ce qui est prélevé ici, et par qui.
@@ -583,6 +599,7 @@ function assemblerUrbanisme(
   if (!u || !f) return null;
   const document = u.documents[f.d];
   if (!document) return null;
+  const v = enCache(cachePlu, c.dep, `dep/${c.dep}-plu.json`)?.c[c.code]?.a;
   return {
     document,
     approuve: f.a,
@@ -595,6 +612,7 @@ function assemblerUrbanisme(
     totalPartout: u.total,
     jusquau: u.jusquau,
     maj: u.maj,
+    aVenir: v ? { type: v.t, approuve: v.d, communes: v.n, reglement: v.r } : null,
   };
 }
 

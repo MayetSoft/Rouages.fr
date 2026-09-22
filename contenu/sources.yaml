@@ -182,6 +182,7 @@ sources:
   - { id: od-banatic, type: donnees_ouvertes, titre: "BANATIC — intercommunalités et répartition de leurs compétences", url: "https://www.banatic.interieur.gouv.fr/", consulte_le: 2026-09-05 }
   - { id: od-rne, type: donnees_ouvertes, titre: "Répertoire national des élus", url: "https://www.data.gouv.fr/fr/datasets/repertoire-national-des-elus-1/", consulte_le: 2026-09-05 }
   - { id: od-gpu, type: donnees_ouvertes, titre: "Géoportail de l'urbanisme — documents d'urbanisme opposables", url: "https://www.geoportail-urbanisme.gouv.fr/", consulte_le: 2026-09-05 }
+  - { id: cnig-plu, type: page_officielle, titre: "Standard CNIG PLU — il distingue l'état « opposable », approuvé et publié, de l'état « approuvé », dont les formalités de publicité ne sont pas achevées", url: "https://www.geoportail-urbanisme.gouv.fr/image/231220_standard_cnig_plu_v2024-01.pdf", consulte_le: 2026-09-22 }
   - { id: od-sitadel, type: donnees_ouvertes, titre: "Sitadel — permis de construire délivrés", url: "https://www.statistiques.developpement-durable.gouv.fr/donnees-sitadel", consulte_le: 2026-09-05 }
   # Le Géoportail de l'urbanisme ne répond que commune par commune : SuDocUH
   # publie le même état des lieux en un seul fichier national.

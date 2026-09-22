@@ -38,8 +38,9 @@ Reste :
   désormais « aucune fiche à confirmer », et le détail est plus bas.
 - ~~le plan local d'urbanisme, seul document que rien ne reliait~~ — fait&nbsp;:
   le douzième processus l'écrit, et `npm run valider` ne signale plus rien.
-- **l'ingestion du Géoportail de l'urbanisme**, qui dirait le zonage et la
-  fraîcheur réelle du document opposable (voir plus bas).
+- ~~l'ingestion du Géoportail de l'urbanisme~~ — faite pour ce qu'elle apporte
+  sans risque&nbsp;: le document approuvé que l'enquête annuelle ne peut pas
+  connaître. Le zonage reste à faire, et le coût en est mesuré plus bas.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1687,6 +1688,68 @@ Ce que la fiche apporte, et qu'aucune page officielle ne met côte à côte&nbsp
   d'effet du plan, un vice de forme ou de procédure ne peut plus être soulevé par
   voie d'exception contre un permis. Deux défauts y échappent — l'absence de mise
   à disposition du public, et la violation des règles de l'enquête publique.
+
+### Le Géoportail de l'urbanisme : approuvé n'est pas opposable ✔
+
+L'enquête SuDocUH dit quel document couvre chaque commune, mais elle est
+annuelle&nbsp;: elle connaît les approbations jusqu'à sa clôture — **le
+10 janvier 2025** pour le millésime en place — et rien au-delà. Le Géoportail,
+lui, est alimenté au fil de l'eau par les collectivités.
+
+Le standard CNIG distingue deux états que le langage courant confond, et c'est
+toute la valeur de la collecte&nbsp;:
+
+- **« opposable »** — le document est approuvé *et* a fait l'objet de toutes les
+  transmissions et publicités nécessaires. C'est lui qui fonde un permis
+  aujourd'hui ;
+- **« approuvé »** — la délibération est prise, ces formalités ne sont pas
+  achevées, **le document ne s'applique pas encore**.
+
+Le Mayet-de-Montagne est le cas d'école. SuDocUH donne un plan intercommunal
+sectoriel approuvé le 31 mars 2022. Le Géoportail porte, en plus, un plan
+intercommunal de Vichy Communauté approuvé le **8 janvier 2026**, encore à
+l'état « approuvé », couvrant **quinze** des trente-neuf communes du
+groupement — et son règlement est en ligne. Dire que ce plan s'applique serait
+faux&nbsp;; ne rien dire laisserait un habitant préparer son projet sur un texte
+en sursis. La fiche de commune dit les deux, dans cet ordre.
+
+**Trois pièges ont été trouvés en route, et chacun aurait publié un faux.**
+
+1. **`partition` n'est pas la clé d'un document.** C'est un *lot de dépôt*&nbsp;:
+   la direction départementale des territoires de l'Allier a versé cent
+   trente-neuf documents sous la seule `DU_03053`. Joindre là-dessus faisait
+   d'une carte communale de 2016 un document couvrant **cent vingt-neuf
+   communes**, et l'attribuait au Mayet-de-Montagne, qui relève d'un plan
+   intercommunal. La vraie clé est `idurba`.
+2. **Les deux sources ne mesurent pas la même date.** Sur les 16 108 communes
+   dont les deux connaissent le document opposable, elles s'accordent sur le
+   **type** dans 86 % des cas mais sur la **date** dans 20 % seulement — parce
+   que le Géoportail date la *dernière procédure ayant fait évoluer le
+   document*, fût-ce une modification du seul règlement écrit. Le site ne publie
+   donc pas l'opposable du Géoportail&nbsp;: il lui manque en outre plus de la
+   moitié des communes que SuDocUH situe.
+3. **L'état « approuvé » seul ne veut rien dire.** Le fichier en porte 7 536,
+   dont plus de sept cents antérieurs à 2020 — des lignes jamais repassées à
+   « opposable » — et des dates à `00000000`, une à 2035. Le filtre retenu n'est
+   pas un seuil choisi&nbsp;: **on ne garde que ce qui est postérieur à l'horizon
+   déclaré par SuDocUH**. En deçà, les deux sources ont eu la même occasion de
+   voir le document et n'en disent pas la même chose — sans moyen de trancher,
+   le site se tait. Il reste **4 809 communes**, toutes 2025 ou 2026.
+
+Coût&nbsp;: trois couches, 69 643 lignes, **sept secondes**. La source entre à la
+veille, et un défaut d'accord révélé au passage est corrigé — « une carte
+communale, **approuvé** […] **Il** est voté » était écrit au masculin pour le
+seul document féminin de la liste.
+
+**Ce qui n'est pas fait, et ce qu'il en coûterait.** La couche `zone_urba`
+porte, zone par zone, le libellé long et **jusqu'à la page du règlement** qui la
+décrit — `200071363_reglement_20260108_A.pdf#page=38`. C'est la « lecture
+assistée du PLU » de la phase 4, pour le prix d'une ingestion. Mesuré&nbsp;:
+**1 341 261 entités**, environ 1,1 Mo par page de cinq mille, quelque **290 Mo**
+en tout, et une vingtaine de secondes par page en pagination profonde. Faisable,
+pas gratuit. Et une limite qui n'est pas de volume&nbsp;: un zonage se rapporte
+au **document**, pas à la commune. Sans géométrie, on ne peut pas dire laquelle
+de ces zones couvre une adresse — et le laisser croire serait pire que se taire.
 
 ### Une ingestion qui ne se perd plus en route
 

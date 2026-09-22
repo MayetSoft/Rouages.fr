@@ -188,6 +188,16 @@ surveillances:
 
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
+  - id: gpu-documents
+    nom: "Géoportail de l'urbanisme — documents d'urbanisme"
+    alimente: "le document approuvé que l'enquête annuelle ne connaît pas encore"
+    # On surveille le service, pas un fichier : la requête demande le compte des
+    # entités sans en rapatrier aucune, ce qui suffit à savoir s'il répond et
+    # coûte quelques octets.
+    type: disponibilite
+    url: "https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=wfs_du:doc_urba&RESULTTYPE=hits"
+    lien: od-gpu
+
   - id: gaspar-risques
     nom: "GASPAR — risques majeurs, commune par commune"
     alimente: "les risques recensés, les catastrophes naturelles et les plans de prévention"

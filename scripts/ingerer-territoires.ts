@@ -553,6 +553,16 @@ async function principal() {
     ),
   );
 
+  // Ce que l'enquête annuelle ne peut pas voir : un document approuvé après sa
+  // clôture. Le Géoportail est alimenté au fil de l'eau par les collectivités.
+  const { collecterPlu } = await import('./plu-emettre.ts');
+  const plu = await tenter('Géoportail de l’urbanisme', () =>
+    collecterPlu(
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   const { collecterPopulations } = await import('./population-emettre.ts');
   const decoupage = tablesDuDecoupage();
   const populations = await tenter('Séries de population', () =>
@@ -648,6 +658,7 @@ async function principal() {
     populations,
     conseils,
     urbanisme,
+    plu,
     logements,
     fiscalite,
     equipements,
@@ -779,6 +790,7 @@ async function ecrire(
   >,
   conseils: Awaited<ReturnType<typeof import('./conseils-emettre.ts')['collecterConseils']>>,
   urbanisme: Awaited<ReturnType<typeof import('./urbanisme-emettre.ts')['collecterUrbanisme']>>,
+  plu: Awaited<ReturnType<typeof import('./plu-emettre.ts')['collecterPlu']>>,
   logements: Awaited<ReturnType<typeof import('./logements-emettre.ts')['collecterLogements']>>,
   fiscalite: Awaited<ReturnType<typeof import('./fiscalite-emettre.ts')['collecterFiscalite']>>,
   equipements: Awaited<
@@ -812,6 +824,7 @@ async function ecrire(
     populations,
     conseils,
     urbanisme,
+    plu,
     logements,
     fiscalite,
     equipements,

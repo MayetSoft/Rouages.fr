@@ -84,8 +84,8 @@ processus:
         acteur: conseil-municipal
         action: "Approbation du plan par délibération"
         produit: [plu]
-        note: "Le plan approuvé devient opposable une fois la délibération transmise au préfet et publiée. C'est à partir de cette prise d'effet que courent les délais de contestation."
-        liens: [cu-l153-21, cgct]
+        note: "Le plan approuvé devient opposable une fois la délibération transmise au préfet et publiée. C'est à partir de cette prise d'effet que courent les délais de contestation. Le Géoportail de l'urbanisme distingue les deux états, et les fiches de commune du site le disent : un plan peut être approuvé sans s'appliquer encore."
+        liens: [cu-l153-21, cgct, cnig-plu, od-gpu]
         confiance: etabli
 
     leviers:
