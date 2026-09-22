@@ -425,7 +425,9 @@ function moisAnnee(iso: string): string | null {
           <strong>{`${equ.proximite} des ${equ.proximiteTotal} équipements de proximité`}</strong>
           {` que recense l’INSEE en ${equ.millesime} — médiane des communes : ` +
             `${equ.medianeProximite}. Les plus nombreux : ` +
-            equ.principaux.map((x) => `${x.nom} (${x.nombre})`).join(', ') + '.'}
+            equ.principaux
+              .map((x) => `${x.nom} (${x.nombre.toLocaleString('fr-FR')})`)
+              .join(', ') + '.'}
           {equ.absents.length > 0 && (
             <span class="c-equipements-absents">
               {'Absents de la gamme de proximité : ' +

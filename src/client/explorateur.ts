@@ -2619,7 +2619,7 @@ function demarrer(reseau: Reseau) {
       const ul = document.createElement('ul');
       for (const x of g.liste) {
         const li = document.createElement('li');
-        li.append(ligne('span', 'p-risque-nombre', String(x.nombre)));
+        li.append(ligne('span', 'p-risque-nombre', x.nombre.toLocaleString('fr-FR')));
         li.append(ligne('span', 'p-risque-nom', x.nom));
         ul.append(li);
       }
