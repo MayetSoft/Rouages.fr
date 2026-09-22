@@ -1344,9 +1344,16 @@ function demarrer(reseau: Reseau) {
    * précision de donnée, affichée là où le site répond « chez vous » — au même
    * rang que le nom de la communauté de communes.
    *
-   * La date de prise de fonction l'accompagne toujours. Un nom sans date
-   * vieillit en silence, et envoyer quelqu'un écrire à un élu qui n'est plus en
-   * poste serait pire que de ne rien dire.
+   * Une date l'accompagne toujours : un nom sans date vieillit en silence, et
+   * envoyer quelqu'un écrire à un élu qui n'est plus en poste serait pire que
+   * de ne rien dire.
+   *
+   * **Mais cette date n'est pas l'ancienneté.** Le répertoire la remet à zéro à
+   * chaque scrutin : les 34 743 maires qu'il nomme portent tous une date de
+   * 2026, sans une exception. Elle dit quand le mandat en cours a commencé, pas
+   * depuis quand la personne est maire — un élu reconduit depuis vingt ans y
+   * figure à la date du dernier scrutin. Écrire « en fonction depuis » était
+   * donc faux pour tous ceux qui ont été reconduits.
    */
   function blocMaire(): HTMLElement | null {
     const m = territoire?.maire;
@@ -1356,7 +1363,7 @@ function demarrer(reseau: Reseau) {
     p.append(ligne('span', 'p-maire-fonction', 'Maire'));
     p.append(ligne('span', 'p-maire-nom', `${m.prenom} ${m.nom}`));
     const depuis = moisAnnee(m.depuis);
-    if (depuis) p.append(ligne('span', 'p-maire-depuis', `en fonction depuis ${depuis}`));
+    if (depuis) p.append(ligne('span', 'p-maire-depuis', `mandat en cours depuis ${depuis}`));
     return p;
   }
 

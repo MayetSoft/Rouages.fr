@@ -35,7 +35,11 @@ export const GENRES = [
   'Subvention votée',
   'Association créée',
   'Catastrophe naturelle reconnue',
-  'Changement de maire',
+  // « Changement » serait faux : le répertoire date le mandat en cours, et un
+  // maire reconduit y figure comme un nouveau. L'élection, elle, a bien eu
+  // lieu — le conseil élit son maire à sa première séance, reconduction
+  // comprise.
+  'Élection du maire',
   // Les trois derniers ne viennent pas d'un fait daté mais d'une comparaison
   // de deux états du registre des transferts : voir
   // `scripts/transferts-emettre.ts`, qui dit pourquoi c'est là, et seulement

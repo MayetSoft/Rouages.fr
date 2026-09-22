@@ -19,8 +19,13 @@
  *
  * **La péremption est le vrai risque.** Un nom périmé est pire qu'un nom
  * absent : il envoie écrire à quelqu'un qui n'est plus en fonction. D'où la
- * date de prise de fonction affichée avec le nom, et la surveillance du
- * répertoire dans la veille.
+ * date affichée avec le nom, et la surveillance du répertoire dans la veille.
+ *
+ * **Cette date est celle du mandat en cours, pas l'ancienneté.** Le répertoire
+ * la remet à zéro à chaque scrutin : les 34 743 maires qu'il nomme portent tous
+ * une date de 2026, sans une exception. Un maire reconduit depuis vingt ans y
+ * figure à la date du dernier scrutin, et le site écrit donc « mandat en cours
+ * depuis » plutôt qu'« en fonction depuis », qui serait faux pour lui.
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -38,7 +43,7 @@ interface Maire {
   /** Nom de famille, tel que publié : le répertoire l'écrit en capitales. */
   nom: string;
   prenom: string;
-  /** Date de prise de fonction : c'est elle qui date la réponse. */
+  /** Début du mandat en cours : c'est elle qui date la réponse, pas l'ancienneté. */
   depuis: string;
 }
 

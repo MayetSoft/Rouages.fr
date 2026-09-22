@@ -110,14 +110,20 @@ export interface FluxPercu {
  *
  * Le graphe garde la fonction — « le maire » — et ne nomme personne ; le nom
  * de son titulaire est une donnée territoriale, au même titre que le nom de la
- * communauté de communes. La date de prise de fonction est affichée avec lui :
- * un nom sans date vieillit en silence, et envoyer quelqu'un écrire à un élu
- * qui n'est plus en poste serait pire que ne rien dire.
+ * communauté de communes. Une date est affichée avec lui : un nom sans date
+ * vieillit en silence, et envoyer quelqu'un écrire à un élu qui n'est plus en
+ * poste serait pire que ne rien dire.
+ *
+ * Cette date est celle du **mandat en cours**, jamais l'ancienneté : le
+ * répertoire la remet à zéro à chaque scrutin.
  */
 export interface Maire {
   prenom: string;
   nom: string;
-  /** Date de prise de fonction, au format ISO. */
+  /**
+   * Début du mandat en cours, au format ISO — pas l'ancienneté dans la
+   * fonction : le répertoire la remet à zéro à chaque scrutin.
+   */
   depuis: string;
 }
 
@@ -739,7 +745,7 @@ type MarcheBrut = {
 };
 const marchesDep = new Map<string, MarchesDep | null>();
 
-/** Le maire de chaque commune du département : [prénom, nom, prise de fonction]. */
+/** Le maire de chaque commune : [prénom, nom, début du mandat en cours]. */
 type ElusDep = { maj: string; c: Record<string, [string, string, string]> };
 const elusDep = new Map<string, ElusDep | null>();
 const servicesDep = new Map<string, ServicesDep | null>();

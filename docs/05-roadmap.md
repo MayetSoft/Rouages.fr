@@ -1120,6 +1120,26 @@ aux conseils municipaux et conseils communautaires », qui couvre toutes les
 communes quel que soit leur mode de désignation. Son adresse est résolue, mais
 le fichier n'a pas répondu depuis cet environnement au moment de l'écrire.
 
+### « En fonction depuis » était faux ✔
+
+Le site écrivait «&nbsp;Jean-Pierre RAYMOND, en fonction depuis mars 2026&nbsp;».
+La formule se lit comme une ancienneté&nbsp;; elle n'en est pas une.
+
+La vérification tient en une ligne&nbsp;: **les 34 743 maires nommés portent une
+date de 2026, sans une exception**. Le répertoire national des élus remet le
+compteur à chaque scrutin — la date qu'il publie est celle du mandat en cours,
+et un maire reconduit depuis vingt ans y figure à la date des dernières
+municipales. Le site écrit donc «&nbsp;**mandat en cours depuis** mars
+2026&nbsp;», sur la page comme dans la carte, et la méthode explique pourquoi.
+
+Le journal portait la même erreur, en pire&nbsp;: 5 708 événements intitulés
+«&nbsp;Changement de maire&nbsp;» dont beaucoup sont des reconductions. Le
+genre devient «&nbsp;**Élection du maire**&nbsp;», qui est vrai dans les deux
+cas — le conseil élit son maire à sa première séance, reconduction comprise —
+et le détail «&nbsp;prise de fonction&nbsp;» devient «&nbsp;début du
+mandat&nbsp;». L'identité des entrées de flux ne change pas&nbsp;: elle repose
+sur le rang du genre, pas sur son libellé.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

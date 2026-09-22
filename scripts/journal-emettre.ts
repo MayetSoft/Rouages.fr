@@ -91,14 +91,14 @@ export function rassembler(s: Sources, aujourdhui = new Date()): Evenement[] {
   }
 
   if (s.elus) {
-    const genre = GENRES.indexOf('Changement de maire');
+    const genre = GENRES.indexOf('Élection du maire');
     for (const [code, m] of s.elus.parCommune) {
       if (m.depuis) {
         tout.push({
           genre,
           date: m.depuis,
           quoi: `${m.prenom} ${m.nom}`,
-          detail: 'prise de fonction',
+          detail: 'début du mandat',
           commune: code,
         });
       }
