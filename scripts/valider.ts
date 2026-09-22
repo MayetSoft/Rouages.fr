@@ -64,6 +64,23 @@ for (const id of g.sources.keys()) {
   if (!citees.has(id)) avertissements.push(`page de référence « ${id} » déclarée mais liée depuis aucun nœud`);
 }
 
+// Une source qui annonce un article dans son titre doit pointer cet article, et
+// non la racine du code. Trois d'entre elles renvoyaient au sommaire : le
+// lecteur qui suivait le lien pour vérifier n'avait aucun moyen de retrouver la
+// disposition citée, ce qui vide de son sens la règle « on cite l'article qui
+// fonde l'affirmation ». Sur Légifrance, un lien vérifiable porte LEGIARTI pour
+// un article ou LEGISCTA pour une section.
+for (const s of g.sources.values()) {
+  if (s.type !== 'droit') continue;
+  if (!s.url.includes('legifrance.gouv.fr')) continue;
+  if (!/\bart\./.test(s.titre)) continue;
+  if (/LEGIARTI|LEGISCTA/.test(s.url)) continue;
+  erreurs.push(
+    `page de référence « ${s.id} » annonce un article dans son titre mais renvoie à la racine du code — ` +
+      `pointez l'article (LEGIARTI) ou la section (LEGISCTA).`,
+  );
+}
+
 // Tout sigle employé doit avoir son entrée au glossaire. C'est la règle qui
 // empêche le site de redevenir illisible pour qui n'est pas du métier — et elle
 // se renforce toute seule à mesure que le réseau grossit.

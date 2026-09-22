@@ -1623,6 +1623,21 @@ crée pas un « événement » au sens fiscal — le Bulletin officiel des finan
 publiques l'écrit en toutes lettres. Qui n'a pas réclamé pour son propre compte
 ne rattrape rien.
 
+**Et un dernier défaut de la même famille a été transformé en règle.** Quatre
+pages de référence annonçaient un article dans leur titre — « art. R600-1 et
+R600-2 », « art. L424-2 », « art. A424-15 et s. », « art. 9 » — en renvoyant à
+la racine du code ou du décret. Le lecteur qui suivait le lien pour vérifier
+tombait sur un sommaire, ce qui vide de son sens la règle « on cite l'article
+qui fonde l'affirmation ». `npm run valider` refuse désormais un renvoi à
+Légifrance qui nomme un article sans le pointer. La règle a trouvé la quatrième
+occurrence toute seule, à la minute où elle est entrée.
+
+Au passage, les deux articles du contentieux de l'urbanisme ont été
+**séparés**, parce qu'ils ne disent pas la même chose&nbsp;: R*600-1 impose la
+notification du recours sous quinze jours à peine d'irrecevabilité, R*600-2 fait
+courir le délai des tiers du premier jour d'une période continue de deux mois
+d'affichage. Chaque affirmation cite maintenant celui des deux qui la fonde.
+
 Ce qui reste vrai après coup&nbsp;: `npm run relire` ne repartira pas de zéro.
 Chaque fiche porte un `perime_apres_mois`, et la file se remplira d'elle-même
 au fil des péremptions. C'est le but — une relecture qui revient, pas une
