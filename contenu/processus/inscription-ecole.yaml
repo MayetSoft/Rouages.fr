@@ -18,51 +18,61 @@ processus:
   - id: inscription-ecole
     nom: "L'inscription d'un enfant à l'école primaire"
     famille: quotidien
-    resume: "La mairie inscrit et sectorise, le directeur admet, le conseil d'école suit. Trois rôles distincts que l'on découvre souvent trop tard."
+    resume: "La mairie inscrit et sectorise, le directeur admet, le conseil d'école vote son règlement. Trois rôles distincts que l'on découvre souvent trop tard."
     declencheur: "Un enfant qui atteint trois ans, ou un déménagement"
     sortie: "Un enfant admis dans une classe, dans une école désignée par la commune"
     decideur: maire
     competences: [ecoles-primaires, carte-scolaire, avis-vie-ecole]
-    liens: [code-education, sp-inscription-ecole, education-gouv]
-    verifie_le: 2026-09-19
+    liens: [code-education, sp-inscription-ecole, education-gouv, ce-l212-8, education-inscription-maternelle]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les cinq étapes et les quatre leviers sont vérifiés. La correction qui a
+    # compté porte sur la dérogation : la fiche ne nommait que l'accord de la
+    # commune d'accueil, quand le plus déterminant est celui du maire de la
+    # commune de résidence — et trois situations rendent sa participation due
+    # même sans accord. « Le conseil d'école suit » est devenu « vote son
+    # règlement », comme sur les autres fiches qui le concernent.
+    confiance: etabli
 
     etapes:
       - ordre: 1
         acteur: commune
         action: "Découpage de la commune en secteurs scolaires"
         note: "Le conseil municipal fixe la carte scolaire communale. C'est elle qui décide de quelle école dépend une adresse — et c'est une délibération, donc publique."
-        liens: [code-education, cgct]
-        confiance: a_confirmer
+        liens: [code-education, cgct, education-carte-scolaire]
+        confiance: etabli
       - ordre: 2
         acteur: citoyen
         action: "Inscription en mairie et retrait du certificat"
         delai: { valeur: 3, unite: mois, nature: indicatif }
         produit: [certificat-inscription]
         note: "L'instruction est obligatoire dès trois ans. Les communes ouvrent en général les inscriptions au printemps pour la rentrée de septembre."
-        liens: [code-education, sp-inscription-ecole]
-        confiance: a_confirmer
+        liens: [code-education, sp-inscription-ecole, education-inscription-maternelle]
+        confiance: etabli
       - ordre: 3
         acteur: rectorat
         action: "Admission de l'élève par le directeur de l'école"
         note: "Le directeur admet au vu du certificat de la mairie. La mairie inscrit, l'école admet : deux actes, deux autorités, et un refus possible de chaque côté pour des motifs différents."
-        liens: [code-education, sp-inscription-ecole]
-        confiance: a_confirmer
+        liens: [code-education, sp-inscription-ecole, education-inscription-maternelle]
+        confiance: etabli
       - ordre: 4
+        # Correction : la fiche ne nommait que l'accord de la commune d'accueil. Le
+        # plus déterminant est celui du maire de la commune de *résidence*, dont
+        # dépend sa participation aux frais — et trois situations la rendent due même
+        # sans accord. C'est l'argument du refus le plus fréquent qui tombe là.
         acteur: maire
         action: "Décision sur une demande de dérogation"
         conditionnelle: true
         produit: [derogation-carte-scolaire]
-        note: "Hors secteur, l'accord de la commune d'accueil est nécessaire, et une participation financière peut être demandée à la commune de résidence."
-        liens: [code-education, sp-inscription-ecole]
-        confiance: a_confirmer
+        note: "Deux accords, souvent confondus : celui de la commune d'accueil, qui admet l'enfant, et celui du maire de la commune de résidence, sans lequel elle n'a pas à payer sa part des frais. Mais dans trois situations — fratrie déjà scolarisée, obligations professionnelles des parents sans garde sur place, raisons médicales — elle doit participer même sans avoir donné son accord."
+        liens: [code-education, sp-inscription-ecole, ce-l212-8]
+        confiance: etabli
       - ordre: 5
         acteur: conseil-ecole
         action: "Vote du règlement intérieur et avis sur la vie de l'école"
         note: "Il siège au moins une fois par trimestre et comprend des parents élus. Les décisions de carte scolaire n'y sont pas prises, mais elles s'y annoncent."
-        liens: [code-education, wp-conseil-ecole]
-        confiance: a_confirmer
+        liens: [code-education, wp-conseil-ecole, ce-d411-1]
+        confiance: etabli
 
     leviers:
       - id: lire-la-carte-scolaire
@@ -73,18 +83,20 @@ processus:
         ancre_etape: 1
         recours_si_refus: "Saisir la CADA"
         piege: "La sectorisation est une délibération communicable. Se fier à l'usage du quartier plutôt qu'au texte fait découvrir l'école d'affectation en juin."
-        liens: [code-education, cada, crpa]
-        confiance: a_confirmer
+        liens: [code-education, cada, crpa, cada-saisine]
+        confiance: etabli
       - id: demander-une-derogation
+        # Les trois motifs ne sont pas des arguments rhétoriques : ce sont les cas où
+        # la commune de résidence doit payer sa part même sans avoir donné son accord.
         quoi: "Demander une dérogation à la carte scolaire"
         quand: "Au moment de l'inscription, avant la clôture fixée par la commune"
         aupres_de: "Le maire de la commune de l'école souhaitée"
         difficulte: moyenne
         ancre_etape: 4
         recours_si_refus: "Recours gracieux auprès du maire, puis tribunal administratif"
-        piege: "Motiver par une situation objective — fratrie déjà scolarisée, garde, contrainte professionnelle — et non par une préférence : c'est sur ces motifs que la commune arbitre."
-        liens: [code-education, sp-inscription-ecole, wp-recours-administratif]
-        confiance: a_confirmer
+        piege: "Motiver par une situation objective — fratrie déjà scolarisée, obligations professionnelles sans garde sur place, raisons médicales — et non par une préférence : ce sont les trois cas où la commune de résidence doit participer aux frais même si elle n'a pas donné son accord, ce qui lui retire l'argument du coût."
+        liens: [code-education, sp-inscription-ecole, wp-recours-administratif, ce-l212-8]
+        confiance: etabli
       - id: se-presenter-au-conseil-ecole
         quoi: "Se présenter comme représentant des parents au conseil d'école"
         quand: "Élections dans les premières semaines de la rentrée"
@@ -92,8 +104,8 @@ processus:
         difficulte: faible
         ancre_etape: 5
         piege: "C'est le seul mandat qui donne accès aux échanges entre la commune et l'école — notamment lorsqu'une fermeture de classe se prépare."
-        liens: [code-education, wp-conseil-ecole]
-        confiance: a_confirmer
+        liens: [code-education, wp-conseil-ecole, ce-d411-1]
+        confiance: etabli
       - id: verifier-les-effectifs
         quoi: "Vérifier l'évolution des effectifs de l'école avant une fermeture de classe"
         quand: "En amont des décisions de carte scolaire, au premier trimestre"
