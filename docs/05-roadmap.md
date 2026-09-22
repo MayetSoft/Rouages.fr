@@ -1476,9 +1476,10 @@ Ce que la vérification a ajouté&nbsp;:
   autorités organisatrices (Cerema), là où la fiche disait « souvent plus que la
   recette des billets » ;
 - la **TEOM** partage la base de la taxe foncière, et son produit **ne doit pas
-  être disproportionné** au coût du service — un contribuable a fait annuler des
-  délibérations sur ce fondement, et le dégrèvement est alors à la charge de la
-  collectivité. Il y a là un levier à décrire ;
+  être disproportionné** au coût du service — la délibération qui s'en écarte
+  est illégale, et depuis la loi de finances pour 2019 le dégrèvement n'est plus
+  supporté par l'État mais par la collectivité. Le levier qui en découle est
+  écrit&nbsp;;
 - la **redevance de concession** a deux parts nommées par le contrat&nbsp;: l'une
   finance le contrôle que l'autorité exerce sur le concessionnaire, l'autre les
   travaux qu'elle conduit elle-même.
@@ -1609,6 +1610,18 @@ service d'incendie « sous l'autorité opérationnelle du préfet » et les PLU 
 doivent « se conformer » au SCoT sont apparus **cinq fois** chacun, dans trois
 familles de nœuds différentes. Aucune relecture fiche par fiche ne les aurait
 vus&nbsp;; c'est la deuxième occurrence de la même phrase qui les a trahis.
+
+**Un levier repéré pendant la relecture a été écrit ensuite**, sur « contester
+une délibération »&nbsp;: la **réclamation fiscale**. Une délibération qui fixe
+un taux d'imposition se conteste deux fois — par le recours pour excès de
+pouvoir, deux mois, et par la réclamation contre son propre avis d'imposition,
+recevable **jusqu'au 31 décembre de l'année suivant la mise en recouvrement du
+rôle**. La seconde voie est bien plus longue, et c'est la seule qui rende de
+l'argent. Le piège est net&nbsp;: l'annulation obtenue par un autre contribuable
+**ne rouvre pas votre délai**, parce que le juge qui censure la délibération ne
+crée pas un « événement » au sens fiscal — le Bulletin officiel des finances
+publiques l'écrit en toutes lettres. Qui n'a pas réclamé pour son propre compte
+ne rattrape rien.
 
 Ce qui reste vrai après coup&nbsp;: `npm run relire` ne repartira pas de zéro.
 Chaque fiche porte un `perime_apres_mois`, et la file se remplira d'elle-même

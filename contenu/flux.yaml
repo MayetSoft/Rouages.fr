@@ -26,15 +26,16 @@ flux:
   - id: teom
     # Les deux moitiés tiennent : la taxe est assise sur le revenu cadastral qui
     # sert de base à la taxe foncière bâtie, et son produit ne doit pas être
-    # disproportionné au coût du service. Un contribuable a fait annuler des
-    # délibérations sur ce fondement, et le dégrèvement est alors à la charge de
-    # la collectivité — il y a là un levier à décrire un jour.
+    # disproportionné au coût du service. Depuis la loi de finances pour 2019, le
+    # dégrèvement qui suit l'illégalité de la délibération n'est plus supporté par
+    # l'État mais par la collectivité — c'est ce qui donne son poids au levier
+    # « réclamation fiscale » du processus « contester une délibération ».
     nom: "Taxe d'enlèvement des ordures ménagères"
     nature: argent
     de: citoyen
     vers: [epci]
-    resume: "La taxe d'enlèvement des ordures ménagères, adossée à la taxe foncière et affectée au service des déchets."
-    liens: [wp-teom, od-sinoe, collectivites-teom]
+    resume: "La taxe d'enlèvement des ordures ménagères, adossée à la taxe foncière et affectée au service des déchets. Son produit ne doit pas être disproportionné au coût du service : sinon la délibération est illégale, et le dégrèvement pèse sur la collectivité."
+    liens: [wp-teom, od-sinoe, collectivites-teom, bofip-teom-degrevement]
     verifie_le: 2026-09-22
     confiance: etabli
 

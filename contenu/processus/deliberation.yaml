@@ -101,6 +101,21 @@ processus:
         piege: "Le préfet n'est jamais obligé de déférer. Ce signalement ne conserve pas votre propre délai de recours : il faut mener les deux en parallèle."
         liens: [cgct, wp-prefet, cgct-l2131-6]
         confiance: etabli
+      - id: reclamation-fiscale
+        # Le levier que la relecture des flux avait repéré sans l'écrire. Une
+        # délibération qui fixe un taux d'imposition se conteste deux fois : par
+        # le recours pour excès de pouvoir, deux mois, et par la réclamation
+        # contre son propre avis d'imposition, bien plus longue. La seconde voie
+        # est la seule qui rende de l'argent.
+        quoi: "Réclamer contre son propre avis d'imposition, quand la délibération fixe un taux"
+        quand: "Jusqu'au 31 décembre de l'année qui suit la mise en recouvrement du rôle — bien après les deux mois du recours"
+        aupres_de: "Le service des impôts dont relève l'avis, par réclamation préalable"
+        difficulte: moyenne
+        recours_si_refus: "Le tribunal administratif, une fois la réclamation rejetée"
+        ancre_etape: 4
+        piege: "L'annulation obtenue par un autre contribuable ne rouvre pas votre délai : le juge qui censure la délibération ne crée pas un « événement » au sens fiscal. Qui n'a pas réclamé dans son propre délai ne rattrape rien."
+        liens: [lpf-r196-2, bofip-delai-reclamation, collectivites-teom, ce-448159]
+        confiance: etabli
       - id: recours-deliberation
         quoi: "Former un recours devant le tribunal administratif"
         quand: "2 mois à compter de la publication ou de l'affichage"
