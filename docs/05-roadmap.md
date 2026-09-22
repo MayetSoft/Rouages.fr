@@ -28,14 +28,15 @@ Fait :
   mobilité et son exploitant, syndicat de SCoT, agence d'urbanisme, employeurs ;
 - huit flux de plus — versement mobilité, redevance de concession, compensation
   à l'exploitant, cotisations, données ouvertes de réseau ;
-- 39 acteurs, 37 compétences, 18 flux, 215 relations, 86 pages de référence.
+- au total : 75 acteurs, 84 compétences, 19 flux, 11 processus, 24 documents,
+  541 relations et 346 pages de référence.
 
 Reste :
-- **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
-  vrai reste à faire, pas le volume. `npm run relire` en donne la file :
-  l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs, les 41 compétences, les 15 flux et quatre processus
-  entiers sont faits (voir plus bas) ; restent 71 fiches.
+- ~~la relecture des attributions marquées `confiance: a_confirmer`~~ — faite.
+  Les 204 fiches sont relues contre leur source : 37 acteurs, 41 compétences,
+  15 flux, 11 processus et tout ce qu'ils portent. `npm run relire` affiche
+  désormais « aucune fiche à confirmer », et le détail est plus bas.
+- **le domaine**, et la mise en ligne.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -58,14 +59,14 @@ déjà été faux une fois.
 
 ## Phase 2 bis — Mettre en ligne *(presque)*
 
-Déploiement ✔, sitemap ✔, licences ✔, mentions légales ✔ — à ceci près que le
-nom de l'éditeur, son contact, le directeur de la publication et l'hébergeur
-restent à déclarer dans `contenu/editeur.yaml` : ce sont les seules
-informations du site que personne ne peut déduire d'une source. Le déploiement
-refuse de publier tant qu'elles manquent.
+Déploiement ✔, sitemap ✔, licences ✔, mentions légales ✔ — `contenu/editeur.yaml`
+est rempli : éditeur, contact, directeur de la publication, hébergeur et
+réalisation technique. C'étaient les seules informations du site que personne ne
+peut déduire d'une source, et le déploiement refusait de publier tant qu'elles
+manquaient.
 
-Reste le domaine, et la relecture des attributions : rien n'est réel tant que
-personne d'extérieur n'a touché le site.
+Reste le domaine : rien n'est réel tant que personne d'extérieur n'a touché le
+site.
 
 ## Phase 2 ter — « Chez moi » ✔ *(en place)*
 
@@ -1370,7 +1371,7 @@ comptent donc par regroupement, et les 85 types suivis n'en forment que 74 —
 C'est la seule liste du site qui affiche explicitement **ce qui manque**. Une
 liste de ce qui existe ne dit pas pour quoi il faut prendre la voiture.
 
-### Les fiches « à confirmer » : les acteurs sont relus ✔
+### Les fiches « à confirmer » : la relecture est finie ✔
 
 Deux cent quatre attributions portaient `confiance: a_confirmer` — une
 affirmation écrite mais jamais contrôlée contre sa source. C'était un nombre
@@ -1555,7 +1556,64 @@ Deux autres corrections sur ce seul processus&nbsp;:
   condition d'urgence à démontrer. Et une collectivité qui veut passer outre sur
   son propre projet doit le réitérer par délibération motivée.
 
-Reste 71 fiches&nbsp;: 7 processus, 37 étapes, 27 leviers.
+**Les sept processus restants ont suivi.** Ce qu'ils ont rendu, dans l'ordre
+où il faut le savoir&nbsp;:
+
+- **Contester une délibération** décrivait l'**ancien régime**. L'ordonnance du
+  7 octobre 2021, en vigueur depuis le 1er juillet 2022, a supprimé l'affichage
+  du compte rendu sous huit jours au profit de la publication du procès-verbal,
+  électronique là où la commune a un site. Le piège qui en découle est ajouté,
+  et c'est le plus coûteux&nbsp;: le procès-verbal n'est publié qu'une fois
+  **approuvé**, à la séance suivante, quand le délai de recours contre la
+  délibération court déjà depuis sa propre publication. Le document qui donne
+  les motifs arrive après la fenêtre pour s'en servir.
+- **Inscrire un enfant à l'école** nommait le mauvais accord. Ce n'est pas
+  celui de la commune d'accueil qui commande, c'est celui du maire de la commune
+  de **résidence**, parce qu'il commande sa participation aux frais — et c'est
+  sur ce coût qu'un refus se fonde presque toujours. L'article L212-8 prévoit
+  **trois cas** où la participation est due sans cet accord&nbsp;: fratrie déjà
+  scolarisée, obligations professionnelles des parents sans garde sur place,
+  raisons médicales. Ce ne sont pas des arguments pour convaincre, ce sont les
+  cas où l'argument du coût tombe.
+- **Le RSA**&nbsp;: contester un indu a un **effet suspensif**, la récupération
+  s'arrête pendant l'examen du recours. Beaucoup subissent les retenues en
+  croyant devoir payer d'abord. Et la suspension de l'allocation est
+  **réversible**&nbsp;: reprendre ses engagements la fait lever, avec
+  régularisation des sommes retenues — ce qu'une notification de suspension ne
+  dit pas.
+- **Le budget communal** a gagné trois chiffres et deux conséquences. Le débat
+  d'orientation budgétaire est une **formalité substantielle**&nbsp;: un budget
+  adopté sans lui est illégal, c'est un moyen de recours. Et dès la saisine de
+  la chambre régionale des comptes, le conseil **ne peut plus délibérer** sur
+  son budget&nbsp;; c'est le préfet qui l'arrête. La commune perd la main, ce
+  que « le préfet saisit la chambre » ne laissait pas voir.
+- **Demander un logement social**&nbsp;: le contingent de l'État représente
+  **30 %** du parc de chaque organisme. Relancer le bailleur pour un logement
+  réservé ne sert à rien, et la fiche ne chiffrait pas la part. Le droit au
+  logement opposable, lui, a des dents&nbsp;: faute de proposition, le tribunal
+  administratif peut condamner l'État à une **astreinte**.
+- **Contester une facture d'eau** est la **première fiche juste de bout en
+  bout** — sept étapes, six leviers, rien à corriger. Les onze précédentes
+  portaient toutes au moins une inexactitude.
+- **S'informer sur les risques**, enfin, a rendu une correction et une
+  abstention. Les dispositions d'un plan de prévention rendues opposables par
+  anticipation **tombent si le plan n'est pas approuvé dans les trois ans** —
+  une contrainte anticipée n'est pas définitive. Et l'affirmation qu'elles
+  n'ouvrent « aucun droit à indemnisation » a été **retirée**&nbsp;: le principe
+  existe, mais il n'a pas été vérifié ici, et la fiche n'en a pas besoin.
+
+**Reste zéro fiche.** Deux cent quatre attributions écrites sans contrôle,
+deux cent quatre relues contre leur source. Ce que l'exercice a appris tient en
+une phrase&nbsp;: *une formulation fausse se recopie avant qu'on la relise.* Le
+service d'incendie « sous l'autorité opérationnelle du préfet » et les PLU qui
+doivent « se conformer » au SCoT sont apparus **cinq fois** chacun, dans trois
+familles de nœuds différentes. Aucune relecture fiche par fiche ne les aurait
+vus&nbsp;; c'est la deuxième occurrence de la même phrase qui les a trahis.
+
+Ce qui reste vrai après coup&nbsp;: `npm run relire` ne repartira pas de zéro.
+Chaque fiche porte un `perime_apres_mois`, et la file se remplira d'elle-même
+au fil des péremptions. C'est le but — une relecture qui revient, pas une
+campagne qu'on termine.
 
 ### Une ingestion qui ne se perd plus en route
 
