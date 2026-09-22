@@ -28,6 +28,7 @@ import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emett
 import { ecrireAssociations, type Associations } from './associations-emettre.ts';
 import { ecrirePopulations, type Populations } from './population-emettre.ts';
 import { ecrireConseils, type Conseils } from './conseils-emettre.ts';
+import { ecrireUrbanisme, type Urbanisme } from './urbanisme-emettre.ts';
 import { ecrireJournal, rassembler } from './journal-emettre.ts';
 import { comparerTransferts, type EtatDep } from './transferts-emettre.ts';
 import { retenir } from '../src/modele/journal.ts';
@@ -107,6 +108,7 @@ export function emettre(o: {
   associations: Associations | null;
   populations: Populations | null;
   conseils: Conseils | null;
+  urbanisme: Urbanisme | null;
   elections: Elections | null;
   deliberations: Deliberations | null;
   subventions: Subventions | null;
@@ -296,6 +298,7 @@ export function emettre(o: {
   let assoEcrites = 0;
   let popEcrites = 0;
   let conseilsEcrits = 0;
+  let urbanismeEcrit = 0;
   let journalEcrit = 0;
   let transfertsVus = 0;
   let electionsEcrites = 0;
@@ -337,6 +340,10 @@ export function emettre(o: {
 
     if (o.conseils) {
       conseilsEcrits += ecrireConseils(sortie, dep, liste.map((c) => c.code), o.conseils);
+    }
+
+    if (o.urbanisme) {
+      urbanismeEcrit += ecrireUrbanisme(sortie, dep, liste.map((c) => c.code), o.urbanisme);
     }
 
     if (o.elections) {
@@ -631,6 +638,12 @@ export function emettre(o: {
   if (o.conseils) {
     dire(
       `${GRIS}Conseils municipaux : ${conseilsEcrits.toLocaleString('fr-FR')} composés.${RAZ}`,
+    );
+  }
+  if (o.urbanisme) {
+    dire(
+      `${GRIS}Documents d’urbanisme : ${urbanismeEcrit.toLocaleString('fr-FR')} communes situées, ` +
+        `dont ${o.urbanisme.sansDocument.toLocaleString('fr-FR')} au règlement national.${RAZ}`,
     );
   }
   if (o.populations) {

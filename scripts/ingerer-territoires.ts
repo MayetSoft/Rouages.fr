@@ -539,6 +539,20 @@ async function principal() {
 
   // La population dans le temps : le dénominateur de tous les autres chiffres
   // du site méritait sa propre histoire.
+  // Qui écrit la règle de ce qui peut se construire : un document par commune,
+  // et la collectivité qui le porte. Le Géoportail de l'urbanisme ne répond que
+  // commune par commune ; SuDocUH publie le même état en un fichier.
+  const { collecterUrbanisme } = await import('./urbanisme-emettre.ts');
+  const urbanisme = await tenter('Documents d’urbanisme', () =>
+    collecterUrbanisme(
+      (url, vers) =>
+        telechargerEnCache(url, vers, reutiliser, 'Enquête SuDocUH (environ 5 Mo)'),
+      CACHE,
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   const { collecterPopulations } = await import('./population-emettre.ts');
   const populations = await tenter('Séries de population', () =>
     collecterPopulations(
@@ -590,6 +604,7 @@ async function principal() {
     associations,
     populations,
     conseils,
+    urbanisme,
   );
 }
 
@@ -717,6 +732,7 @@ async function ecrire(
     ReturnType<typeof import('./population-emettre.ts')['collecterPopulations']>
   >,
   conseils: Awaited<ReturnType<typeof import('./conseils-emettre.ts')['collecterConseils']>>,
+  urbanisme: Awaited<ReturnType<typeof import('./urbanisme-emettre.ts')['collecterUrbanisme']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -744,6 +760,7 @@ async function ecrire(
     associations,
     populations,
     conseils,
+    urbanisme,
     sortie: SORTIE,
     dire,
     VERT,

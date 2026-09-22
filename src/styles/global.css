@@ -450,6 +450,14 @@ details.p-pli[open] > :nth-child(2) { margin-top: 0; }
 .p-sru-prelevement { font-size: .84rem; margin: .25rem 0 0; font-variant-numeric: tabular-nums; }
 @media (max-width: 480px) { .p-sru-liste > div { grid-template-columns: 1fr; gap: .05rem; } }
 
+/* Qui écrit la règle de ce qui peut se construire. La situation en une
+   phrase ; la procédure en cours est mise en avant, parce que c'est le seul
+   moment où l'avis d'un habitant a encore prise. */
+.p-urbanisme { margin-top: 1.2rem; }
+.p-urbanisme-en-cours { font-size: .88rem; margin: .6rem 0 0; line-height: 1.5; font-weight: 600; }
+.p-urbanisme-prise { display: block; margin-top: .2rem; font-weight: 400; color: var(--encre-douce); }
+.p-urbanisme-repere { font-size: .84rem; margin: .5rem 0 0; line-height: 1.45; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
+
 .p-marches { margin-top: 1.2rem; }
 .p-marche-acheteur { margin: .9rem 0 0; }
 .p-marche-qui { margin: 0 0 .35rem; display: grid; gap: .02rem; }
@@ -671,6 +679,12 @@ abbr[title] {
 .c-conseil-compo { display: block; margin-top: .4rem; font-size: .9rem; color: var(--encre); line-height: 1.55; }
 .c-conseil-designes { display: block; margin-top: .4rem; font-size: .86rem; color: var(--encre-douce); line-height: 1.5; }
 .p-scrutin-designes { font-size: .78rem; color: var(--encre-douce); line-height: 1.45; margin: .5rem 0 0; }
+
+/* Le même propos sur la page statique de la commune. */
+.c-urbanisme { font-size: .95rem; line-height: 1.55; margin: 0 0 .5rem; max-width: var(--mesure); }
+.c-urbanisme-en-cours { font-size: .92rem; line-height: 1.55; margin: 0 0 .5rem; font-weight: 600; max-width: var(--mesure); }
+.c-urbanisme-prise { display: block; margin-top: .2rem; font-weight: 400; color: var(--encre-douce); }
+.c-urbanisme-repere { font-size: .86rem; line-height: 1.5; margin: 0 0 .5rem; color: var(--encre-douce); font-variant-numeric: tabular-nums; max-width: var(--mesure); }
 
 /* --- ce qui a bougé, sur la page d'une commune ---
    La date à gauche, en chiffres alignés : c'est par elle qu'on balaie une

@@ -8,7 +8,7 @@ documents:
   - id: plu
     nom: "Plan local d'urbanisme"
     ou_le_trouver: "Mairie, ou Géoportail de l'urbanisme."
-    liens: [wp-plu, od-gpu]
+    liens: [wp-plu, od-gpu, od-sudocuh]
   - id: arrete-permis
     nom: "Arrêté de permis"
     ou_le_trouver: "Affiché en mairie ; communicable sur demande."
@@ -27,7 +27,7 @@ processus:
     sortie: "Un arrêté de permis, un refus, ou une décision tacite"
     decideur: maire
     competences: [delivrance-autorisation-urbanisme, redaction-plu]
-    liens: [sp-permis, cu-l422-1, od-sitadel]
+    liens: [sp-permis, cu-l422-1, cu-l111-3, cu-l422-5, od-sitadel, od-sudocuh]
     verifie_le: 2026-09-05
     confiance: a_confirmer
 

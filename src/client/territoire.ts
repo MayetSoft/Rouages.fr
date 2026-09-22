@@ -366,6 +366,38 @@ function assemblerConseil(commune: CommuneBreve): Conseil | null {
  * antérieur à l'existence de la commune, l'outre-mer avant 1954 — et
  * redeviennent `null` ici : zéro habitant tracerait une courbe qui plonge.
  */
+/**
+ * Qui écrit la règle de constructibilité, et depuis quand.
+ *
+ * Le fichier ne porte qu'un SIREN pour désigner le porteur d'un plan
+ * intercommunal : on le résout sur les groupements de la commune plutôt que
+ * de republier un libellé de plus, et on ne nomme rien quand il n'y figure
+ * pas — un plan porté par un syndicat mixte auquel la commune n'adhère pas
+ * directement existe, et inventer son nom serait pire que se taire.
+ */
+function assemblerUrbanisme(commune: CommuneBreve, structures: Structure[]): Urbanisme | null {
+  const d = urbanismeDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const document = d.documents[f.d];
+  if (!document) return null;
+  return {
+    document,
+    approuve: f.a,
+    qui: f.i === 1 ? 'groupement' : f.i === 2 ? 'transferee' : 'commune',
+    porteur: (f.s && structures.find((s) => s.siren === f.s)?.nom) || null,
+    enCours:
+      f.e === -1 || !d.documents[f.e]
+        ? null
+        : { document: d.documents[f.e], prescrit: f.p },
+    sansDocumentPartout: d.sansDocument,
+    intercommunalesPartout: d.intercommunales,
+    totalPartout: d.total,
+    jusquau: d.jusquau,
+    maj: d.maj,
+  };
+}
+
 function assemblerPopulation(commune: CommuneBreve): Population | null {
   const d = popDep.get(commune.dep);
   const f = d?.c[commune.code];
@@ -459,6 +491,40 @@ export interface Conseil {
   maj: string;
 }
 
+/**
+ * Ce qui peut se construire dans la commune, et qui en écrit la règle.
+ *
+ * Le site montre le permis de construire comme un processus dont le maire
+ * signe l'arrêté — c'est exact, et ce n'est pas suffisant : dans une commune
+ * sur quatre le plan qu'il applique est voté ailleurs, et dans une sur quatre
+ * encore il n'existe pas, auquel cas le préfet doit donner son accord sur
+ * chaque permis.
+ */
+export interface Urbanisme {
+  /** Le sigle du document opposable, tel que le fichier le nomme. */
+  document: string;
+  /** Sa date d'approbation, AAAA-MM-JJ ; vide sous règlement national. */
+  approuve: string;
+  /**
+   * Qui écrit la règle : `commune`, `groupement` quand le document lui-même
+   * est intercommunal, `transferee` quand le plan reste communal mais que la
+   * compétence est passée au groupement — c'est alors sa révision, et non le
+   * plan en vigueur, qui échappe au conseil municipal.
+   */
+  qui: 'commune' | 'groupement' | 'transferee';
+  /** Le groupement concerné, quand la commune en relève. */
+  porteur: string | null;
+  /** La procédure en cours, quand il y en a une : c'est là qu'on peut peser. */
+  enCours: { document: string; prescrit: string } | null;
+  /** Combien de communes du pays relèvent du règlement national, sur combien. */
+  sansDocumentPartout: number;
+  intercommunalesPartout: number;
+  totalPartout: number;
+  /** Jusqu'où va l'enquête : elle est annuelle et paraît avec du retard. */
+  jusquau: string;
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -548,6 +614,8 @@ export interface Territoire {
   histoire: Population | null;
   /** De quoi le conseil municipal est fait. */
   conseil: Conseil | null;
+  /** Ce qui peut se construire, et qui en écrit la règle. */
+  urbanisme: Urbanisme | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -755,6 +823,18 @@ type ConseilsDep = {
   >;
 };
 const conseilsDep = new Map<string, ConseilsDep | null>();
+
+/** L'état des documents d'urbanisme du département. */
+type UrbanismeDep = {
+  maj: string;
+  jusquau: string;
+  documents: string[];
+  sansDocument: number;
+  intercommunales: number;
+  total: number;
+  c: Record<string, { d: number; a: string; i: 0 | 1 | 2; s: string; e: number; p: string }>;
+};
+const urbanismeDep = new Map<string, UrbanismeDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -1052,7 +1132,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -1073,6 +1153,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<AssoDep>(`${BASE}/dep/${commune.dep}-associations.json`).catch(() => null),
       json<PopDep>(`${BASE}/dep/${commune.dep}-population.json`).catch(() => null),
       json<ConseilsDep>(`${BASE}/dep/${commune.dep}-conseils.json`).catch(() => null),
+      json<UrbanismeDep>(`${BASE}/dep/${commune.dep}-urbanisme.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -1089,6 +1170,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     assoDep.set(commune.dep, asso);
     popDep.set(commune.dep, pop);
     conseilsDep.set(commune.dep, cons);
+    urbanismeDep.set(commune.dep, urb);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -1147,6 +1229,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     associations: assemblerAssociations(commune, ligne[2]),
     histoire: assemblerPopulation(commune),
     conseil: assemblerConseil(commune),
+    urbanisme: assemblerUrbanisme(commune, structures),
     scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,

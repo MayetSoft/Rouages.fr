@@ -103,6 +103,17 @@ type ConseilsDep = {
   >;
 };
 
+/** L'état des documents d'urbanisme du département. */
+type UrbanismeDep = {
+  maj: string;
+  jusquau: string;
+  documents: string[];
+  sansDocument: number;
+  intercommunales: number;
+  total: number;
+  c: Record<string, { d: number; a: string; i: 0 | 1 | 2; s: string; e: number; p: string }>;
+};
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -148,6 +159,7 @@ const cacheJournal = new Map<string, JournalDep | null>();
 const cacheElections = new Map<string, ElectionsDep | null>();
 const cachePop = new Map<string, PopDep | null>();
 const cacheConseils = new Map<string, ConseilsDep | null>();
+const cacheUrbanisme = new Map<string, UrbanismeDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -315,6 +327,32 @@ export interface Fiche {
     designes: boolean;
     scrutin: string;
   } | null;
+  /**
+   * Qui écrit la règle de ce qui peut se construire.
+   *
+   * Le site décrit le permis de construire comme un acte du maire : vrai de la
+   * signature, faux de la règle appliquée dès que le plan est intercommunal —
+   * et sans document local, c'est le préfet qui donne son accord sur chaque
+   * permis.
+   */
+  urbanisme: {
+    /** Le sigle du document opposable : PLU, PLUi, PLUiS, CC, POS, RNU. */
+    document: string;
+    /** Sa date d'approbation, vide sous règlement national. */
+    approuve: string;
+    /** `commune`, `groupement` si le document l'est, `transferee` si seule
+     * la compétence l'est — le plan en vigueur restant alors communal. */
+    qui: 'commune' | 'groupement' | 'transferee';
+    /** Le groupement concerné, quand la commune en relève. */
+    porteur: string | null;
+    enCours: { document: string; prescrit: string } | null;
+    sansDocumentPartout: number;
+    intercommunalesPartout: number;
+    totalPartout: number;
+    /** Jusqu'où va l'enquête : elle est annuelle et paraît avec du retard. */
+    jusquau: string;
+    maj: string;
+  } | null;
   maj: string;
 }
 
@@ -417,6 +455,7 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
         : null,
     soumiseSru: !!sru?.c[c.code],
     conseil: assemblerConseil(c, structures),
+    urbanisme: assemblerUrbanisme(c, structures),
     sommet: assemblerSommet(c),
     maj: dep.maj,
   };
@@ -437,6 +476,38 @@ function assemblerSommet(c: CommuneIndex): Fiche['sommet'] {
   const actuelle = [...serie].reverse().find((x) => x > 0);
   if (!actuelle || valeur === 0) return null;
   return { annee, valeur, ecart: Math.round(((actuelle - valeur) / valeur) * 100) };
+}
+
+/**
+ * Le pendant, à la construction de la page, de ce que fait le panneau.
+ *
+ * Le SIREN du porteur est résolu sur les groupements de la commune, et rien
+ * n'est nommé quand il n'y figure pas : un plan porté par une structure à
+ * laquelle la commune n'adhère pas directement existe, et lui inventer un nom
+ * serait pire que se taire.
+ */
+function assemblerUrbanisme(
+  c: CommuneIndex,
+  structures: { siren: string; nom: string; nature: string }[],
+): Fiche['urbanisme'] {
+  const u = enCache(cacheUrbanisme, c.dep, `dep/${c.dep}-urbanisme.json`);
+  const f = u?.c[c.code];
+  if (!u || !f) return null;
+  const document = u.documents[f.d];
+  if (!document) return null;
+  return {
+    document,
+    approuve: f.a,
+    qui: f.i === 1 ? 'groupement' : f.i === 2 ? 'transferee' : 'commune',
+    porteur: (f.s && structures.find((s) => s.siren === f.s)?.nom) || null,
+    enCours:
+      f.e === -1 || !u.documents[f.e] ? null : { document: u.documents[f.e], prescrit: f.p },
+    sansDocumentPartout: u.sansDocument,
+    intercommunalesPartout: u.intercommunales,
+    totalPartout: u.total,
+    jusquau: u.jusquau,
+    maj: u.maj,
+  };
 }
 
 function assemblerConseil(

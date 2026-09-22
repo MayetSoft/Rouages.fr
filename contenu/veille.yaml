@@ -146,6 +146,17 @@ surveillances:
     ressource: "t-finess.csv"
     lien: od-finess
 
+  - id: sudocuh-documents
+    nom: "SuDocUH — état des documents d'urbanisme par commune"
+    alimente: "le document opposable de chaque commune et la collectivité qui le porte"
+    # L'enquête est annuelle et son fichier est redéposé sous une adresse
+    # nouvelle à chaque millésime : c'est la ressource qu'on surveille, par son
+    # intitulé, et non l'URL — la même leçon que Mégalis.
+    type: datagouv-ressource
+    url: "620b924d90e837a5ce0ba819"
+    ressource: "documents d'urbanisme par commune"
+    lien: od-sudocuh
+
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
   - id: gaspar-risques

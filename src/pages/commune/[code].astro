@@ -24,6 +24,7 @@ import { communes, ficheCommune, journalCommune, metaTerritoires } from '../../m
 import type { Verdict } from '../../modele/verdict.ts';
 import { urlSignaler } from '../../modele/signalement.ts';
 import Glose from '../../composants/Glose.astro';
+import { ARTICLE_DOCUMENT, enFrancais, NOM_DOCUMENT } from '../../modele/urbanisme.ts';
 
 export function getStaticPaths() {
   // `ROUAGES_DEPS` restreint la génération à quelques départements : engendrer
@@ -123,6 +124,37 @@ interface ServiceAffiche {
   prive: boolean;
   chiffres: string | null;
 }
+/**
+ * Qui écrit la règle de ce qui peut se construire, en une phrase.
+ *
+ * Trois situations, qui n'ont pas les mêmes conséquences pour un habitant :
+ * un plan voté par le conseil municipal, un plan voté ailleurs, ou pas de
+ * plan du tout — auquel cas le préfet donne son accord sur chaque permis.
+ */
+const urb = fiche?.urbanisme ?? null;
+const phraseUrbanisme = !urb
+  ? ''
+  : urb.document === 'RNU'
+    ? 'Aucun document d’urbanisme local : c’est le règlement national d’urbanisme qui s’applique ' +
+      'ici. Une construction n’y est en principe autorisée que dans les parties déjà urbanisées ' +
+      'de la commune (article L111-3 du code de l’urbanisme), et le maire ne peut délivrer un ' +
+      'permis qu’avec l’accord du préfet — un avis conforme, c’est-à-dire qu’un avis défavorable ' +
+      'l’interdit (article L422-5).'
+    : `La commune est couverte par ${ARTICLE_DOCUMENT[urb.document] ?? 'un'} ` +
+      `${NOM_DOCUMENT[urb.document] ?? urb.document}` +
+      (urb.approuve ? `, approuvé le ${enFrancais(urb.approuve)}` : '') +
+      '. ' +
+      (urb.qui === 'groupement'
+        ? urb.porteur
+          ? `Il est porté par ${urb.porteur} : ses règles sont votées par le conseil de ce ` +
+            `groupement, non par le conseil municipal.`
+          : 'Il est porté par l’intercommunalité, non par le conseil municipal.'
+        : urb.qui === 'transferee'
+          ? `Ce plan ne couvre que la commune, mais la compétence en urbanisme appartient ` +
+            `désormais à ${urb.porteur ?? 'son intercommunalité'} : c’est son conseil qui en ` +
+            `votera la révision.`
+          : 'Il est voté par le conseil municipal.');
+
 const parFamille = new Map<string, ServiceAffiche[]>();
 for (const s of fiche?.services ?? []) {
   if (!parFamille.has(s.famille)) parFamille.set(s.famille, []);
@@ -264,6 +296,43 @@ function moisAnnee(iso: string): string | null {
         <p class="p-source-territoire">
           D’après les transferts de compétences déclarés à BANATIC ({fiche!.maj}). Une compétence
           exercée sans transfert déclaré — par convention, par exemple — n’y figure pas.
+        </p>
+      </section>
+    )}
+
+    {urb && (
+      <section>
+        <h2 class="badge">Ce qui peut s’y construire</h2>
+        <p class="c-urbanisme">{phraseUrbanisme}</p>
+        {urb.enCours && (
+          <p class="c-urbanisme-en-cours">
+            {`Une procédure est en cours : ${ARTICLE_DOCUMENT[urb.enCours.document] ?? 'un'} ` +
+              `${NOM_DOCUMENT[urb.enCours.document] ?? urb.enCours.document}, ` +
+              `prescrit${urb.enCours.document === 'CC' ? 'e' : ''} le ` +
+              `${enFrancais(urb.enCours.prescrit)}.`}
+            <span class="c-urbanisme-prise">
+              C’est pendant une telle procédure, et à l’enquête publique qui la clôt, que l’avis
+              d’un habitant a encore prise sur le texte.
+            </span>
+          </p>
+        )}
+        {urb.totalPartout > 0 && (
+          <p class="c-urbanisme-repere">
+            {`Sur les ${urb.totalPartout.toLocaleString('fr-FR')} communes du pays, ` +
+              `${urb.sansDocumentPartout.toLocaleString('fr-FR')} n’ont aucun document local ` +
+              `(${Math.round((urb.sansDocumentPartout / urb.totalPartout) * 100)} %) et ` +
+              `${urb.intercommunalesPartout.toLocaleString('fr-FR')} relèvent d’une règle ` +
+              `intercommunale (${Math.round((urb.intercommunalesPartout / urb.totalPartout) * 100)} %).`}
+          </p>
+        )}
+        <p class="p-source-territoire">
+          {`D’après l’enquête annuelle SuDocUH du ministère chargé de l’urbanisme (${urb.maj})` +
+            (urb.jusquau
+              ? `, qui connaît les approbations jusqu’au ${enFrancais(urb.jusquau)} : un document ` +
+                `approuvé depuis n’y figure pas encore`
+              : '') +
+            '. Le document lui-même — son règlement, son zonage, le plan de la parcelle — se ' +
+            'consulte en mairie, et le plus souvent sur le Géoportail de l’urbanisme.'}
         </p>
       </section>
     )}

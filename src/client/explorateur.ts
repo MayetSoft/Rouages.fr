@@ -32,6 +32,7 @@ import {
 import { decalageTexte, formeNoeud, largeurPastille } from '../vues/formes.ts';
 import { construireGlossaire, expansions } from '../modele/glossaire.ts';
 import { urlSignaler } from '../modele/signalement.ts';
+import { ARTICLE_DOCUMENT, enFrancais, NOM_DOCUMENT } from '../modele/urbanisme.ts';
 import type { ServicePublic } from './territoire.ts';
 import {
   chercher as chercherCommune,
@@ -731,6 +732,7 @@ function demarrer(reseau: Reseau) {
     ajouter('L’intercommunalité', blocFluxPercus());
     ajouter('Les échelons', blocEchelons());
     ajouter('Une vente immobilière', blocDmto());
+    ajouter('Ce qui peut s’y construire', blocUrbanisme());
     ajouter('Les risques', blocRisques());
     ajouter('Le logement social', blocSru());
     ajouter('Les marchés', blocMarches());
@@ -2276,6 +2278,113 @@ function demarrer(reseau: Reseau) {
    * sont pas soumises à l'article 55, et écrire « 0 » se lirait comme un
    * manquement.
    */
+  /**
+   * Qui écrit la règle de ce qui peut se construire.
+   *
+   * Le panneau décrivait le permis de construire comme un acte du maire, ce
+   * qui est vrai de la signature et faux de la règle appliquée : dans une
+   * commune sur quatre, le plan est voté par un conseil communautaire ; dans
+   * une sur quatre encore, il n'existe pas et c'est le préfet qui donne son
+   * accord sur chaque permis. L'écart entre ces trois situations est le genre
+   * de chose qu'un habitant découvre au moment où il dépose un dossier.
+   */
+  function blocUrbanisme(): HTMLElement | null {
+    const u = territoire?.urbanisme;
+    if (!u) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-urbanisme';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui peut s’y construire'));
+
+    const nom = NOM_DOCUMENT[u.document] ?? u.document;
+    if (u.document === 'RNU') {
+      bloc.append(
+        ligne(
+          'p',
+          'p-strate',
+          'Aucun document d’urbanisme local : c’est le règlement national d’urbanisme qui ' +
+            's’applique ici. Une construction n’y est en principe autorisée que dans les parties ' +
+            'déjà urbanisées de la commune (article L111-3 du code de l’urbanisme), et le maire ' +
+            'ne peut délivrer un permis qu’avec l’accord du préfet — un avis conforme, c’est-à-dire ' +
+            'qu’un avis défavorable l’interdit (article L422-5).',
+        ),
+      );
+    } else {
+      bloc.append(
+        ligne(
+          'p',
+          'p-strate',
+          `La commune est couverte par ${ARTICLE_DOCUMENT[u.document] ?? 'un'} ${nom}` +
+            (u.approuve ? `, approuvé le ${enFrancais(u.approuve)}` : '') +
+            '. ' +
+            (u.qui === 'groupement'
+              ? u.porteur
+                ? `Il est porté par ${u.porteur} : les règles de constructibilité sont votées ` +
+                  `par son conseil, où la commune pèse le nombre de sièges que dit le bloc ` +
+                  `« Le conseil ».`
+                : 'Il est porté par l’intercommunalité, non par le conseil municipal.'
+              : u.qui === 'transferee'
+                ? `Ce plan ne couvre que la commune, mais la compétence en urbanisme appartient ` +
+                  `désormais à ${u.porteur ?? 'son intercommunalité'} : c’est son conseil qui en ` +
+                  `votera la révision.`
+                : 'Il est voté par le conseil municipal.'),
+        ),
+      );
+    }
+
+    // La procédure en cours est le seul moment où un habitant peut encore
+    // peser sur la règle : après l'approbation, il ne reste que le recours.
+    if (u.enCours) {
+      const enCoursNom = NOM_DOCUMENT[u.enCours.document] ?? u.enCours.document;
+      const p = ligne(
+        'p',
+        'p-urbanisme-en-cours',
+        `Une procédure est en cours : ${ARTICLE_DOCUMENT[u.enCours.document] ?? 'un'} ` +
+          `${enCoursNom}, prescrit${u.enCours.document === 'CC' ? 'e' : ''} le ` +
+          `${enFrancais(u.enCours.prescrit)}.`,
+      );
+      p.append(
+        ligne(
+          'span',
+          'p-urbanisme-prise',
+          'C’est pendant une telle procédure, et à l’enquête publique qui la clôt, que l’avis ' +
+            'd’un habitant a encore prise sur le texte.',
+        ),
+      );
+      bloc.append(p);
+    }
+
+    // Le repère national : savoir qu'on est dans le cas d'une commune sur
+    // quatre n'a pas le même sens que de s'y croire seul.
+    if (u.totalPartout > 0) {
+      const part = (n: number) => Math.round((n / u.totalPartout) * 100);
+      bloc.append(
+        ligne(
+          'p',
+          'p-urbanisme-repere',
+          `Sur les ${u.totalPartout.toLocaleString('fr-FR')} communes du pays, ` +
+            `${u.sansDocumentPartout.toLocaleString('fr-FR')} n’ont aucun document local ` +
+            `(${part(u.sansDocumentPartout)} %) et ${u.intercommunalesPartout.toLocaleString('fr-FR')} ` +
+            `relèvent d’une règle intercommunale (${part(u.intercommunalesPartout)} %).`,
+        ),
+      );
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D’après l’enquête annuelle SuDocUH du ministère chargé de l’urbanisme (${u.maj}), ` +
+          (u.jusquau
+            ? `qui connaît les approbations jusqu’au ${enFrancais(u.jusquau)}. Un document approuvé ` +
+              `depuis n’y figure pas encore. `
+            : '') +
+          `Le document lui-même — son règlement, son zonage, le plan de la parcelle — se consulte ` +
+          `en mairie, et le plus souvent sur le Géoportail de l’urbanisme.`,
+      ),
+    );
+    return bloc;
+  }
+
   function blocSru(): HTMLElement | null {
     const s = territoire?.sru;
     if (!s) return null;

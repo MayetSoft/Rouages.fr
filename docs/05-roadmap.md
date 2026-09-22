@@ -1188,6 +1188,10 @@ médian, huit compteurs&nbsp;:
 > **Vichy** — 35 élus, 49 % de femmes, âge médian 51 ans&nbsp;: **17 cadres**,
 > 7 artisans, 7 retraités, 2 employés — **aucun ouvrier, aucun agriculteur**.
 
+L'âge est donné avec son étendue, et non par la seule médiane&nbsp;: un conseil
+de 57 ans de médiane dont le plus jeune a 28 ans et le plus âgé 73 ne ressemble
+pas à celui où personne n'a moins de cinquante ans. La médiane le cachait.
+
 Les huit groupes sont ceux de la **PCS 2003** de l'INSEE, pris au premier
 chiffre du code comme les familles d'actes le sont au leur. Les quarante-deux
 catégories du répertoire correspondent exactement aux quarante-deux de la
@@ -1217,6 +1221,46 @@ soixante-cinq méga-octets du répertoire, pourtant en UTF-8, repartaient donc e
 Windows-1252 et toutes les colonnes accentuées devenaient introuvables. Le mode
 «&nbsp;stream&nbsp;» d'un décodeur strict tolère une séquence incomplète en fin
 de morceau&nbsp;: c'est exactement ce qu'il fallait.
+
+### Qui écrit la règle de ce qui peut se construire ✔
+
+Le site décrivait le permis de construire comme un acte du maire. C'est exact
+de la signature, et faux de la règle appliquée&nbsp;: sur les **34 931 communes**
+que l'enquête recense, **8 578 n'ont aucun document d'urbanisme local** (25 %)
+et **10 141 relèvent d'une règle intercommunale** (29 %). Trois situations qui
+n'ont rien de comparable pour un habitant, et qu'on découvrait jusqu'ici en
+déposant un dossier.
+
+> **Le Mayet-de-Montagne** — plan local d'urbanisme intercommunal sectoriel,
+> approuvé le 31 mars 2022, porté par CA Vichy Communauté&nbsp;: ses règles sont
+> votées par le conseil communautaire, où la commune a un siège.
+>
+> **Vichy** — plan local d'urbanisme communal de 2017, mais **la compétence est
+> passée à l'agglomération**&nbsp;: c'est elle qui en votera la révision. Le
+> fichier distingue les deux cas, le site aussi.
+>
+> **Agonges, Ainay-le-Château, et 8 576 autres** — aucun document&nbsp;: on ne
+> construit en principe que dans les parties déjà urbanisées (art. L111-3 du code de
+> l'urbanisme) et le préfet donne sur chaque permis un **avis conforme**, qu'un
+> refus de sa part rend contraignant (art. L422-5). Les deux articles ont été
+> vérifiés par recherche, Légifrance refusant les requêtes de cet environnement.
+
+Quand une procédure est en cours, la page le dit et dit sa date de
+prescription&nbsp;: c'est le seul moment où l'avis d'un habitant a encore prise
+sur le texte, avant que l'enquête publique la clôture.
+
+**Le Géoportail de l'urbanisme ne pouvait pas servir**&nbsp;: son interface
+répond commune par commune, et trente-cinq mille appels ne sont pas une
+ingestion. L'enquête **SuDocUH**, que la direction de l'habitat mène chaque
+année auprès des directions départementales des territoires, publie le même
+état des lieux en un seul classeur. Elle est annuelle et paraît avec quelques
+mois de retard&nbsp;: la page ne prétend donc pas être à jour, elle dit jusqu'où
+la donnée va — les approbations connues jusqu'au 10 janvier 2025, date lue dans
+le fichier et non supposée.
+
+Le jeu est désigné par son identifiant et la ressource par son intitulé, jamais
+par son adresse&nbsp;: le classeur est redéposé sous une URL neuve à chaque
+millésime. C'est la leçon de Mégalis, apprise une fois.
 
 ### Une ingestion qui ne se perd plus en route
 

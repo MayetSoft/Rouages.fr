@@ -30,7 +30,7 @@ npm run territoires -- --cache   réingère tout en réutilisant les gros fichie
 ```
 
 `npm run territoires` dure une trentaine de minutes et touche une quinzaine de
-sources — dont onze collectes facultatives, isolées : celle qui échoue laisse en
+sources — dont quatorze collectes facultatives, isolées : celle qui échoue laisse en
 place les fichiers de l'ingestion précédente plutôt que de tout emporter. Ce qui
 reste fatal, ce sont les référentiels dont dépend la structure du réseau,
 BANATIC et le découpage.
