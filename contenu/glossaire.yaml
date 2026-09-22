@@ -136,6 +136,18 @@ sigles:
     definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
     liens: [od-banatic]
 
+  - id: sigle-dgcl
+    sigle: DGCL
+    developpe: "Direction générale des collectivités locales"
+    definition: "La direction du ministère de l'Intérieur qui calcule et publie chaque année la dotation de chaque commune."
+    liens: [cgct-l2334-1]
+
+  - id: sigle-drees
+    sigle: DREES
+    developpe: "Direction de la recherche, des études, de l'évaluation et des statistiques"
+    definition: "Le service statistique des ministères sociaux : c'est lui qui chiffre l'aide sociale des départements."
+    liens: [drees-aide-sociale]
+
   - id: sigle-sraddet
     sigle: SRADDET
     developpe: "Schéma régional d'aménagement, de développement durable et d'égalité des territoires"

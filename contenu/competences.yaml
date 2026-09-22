@@ -243,9 +243,9 @@ competences:
     acteur: region
     resume: "La région achète des formations pour les demandeurs d'emploi et organise l'information sur les métiers ; France Travail oriente vers elles."
     partagee_avec: [etat, france-travail, mission-locale, employeur]
-    liens: [vp-competences, wp-loi-notre, code-travail]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [vp-competences, wp-loi-notre, code-travail, ctrav-l6121-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: amenagement-territoire
     # Quatrième variante de la même erreur, après le SCoT, le SDIS et la DDT :
@@ -565,23 +565,30 @@ competences:
     confiance: etabli
 
   - id: protection-donnees
+    # Les deux moitiés sont vérifiées, et la seconde a un précédent : la CNIL a
+    # mis en demeure une commune pour ses caméras-piétons et sa vidéoprotection.
+    # Ce n'est donc pas une faculté théorique.
     nom: "Protection des données personnelles"
     acteur: cnil
     resume: "Fichiers, vidéoprotection, téléservices : une commune qui traite des données personnelles répond devant la CNIL, et toute personne peut la saisir."
     partagee_avec: [citoyen, commune, epci, etat]
-    liens: [cnil-fr, wp-cnil, loi-aai]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [cnil-fr, wp-cnil, loi-aai, cnil-plainte-videoprotection, cnil-mise-en-demeure-commune]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: preparation-textes
+    # « La clé de répartition d'une dotation » se décidait ici, disait la fiche.
+    # C'est la loi qui la fixe — articles L2334-1 et suivants pour la dotation
+    # globale de fonctionnement — et l'administration qui la calcule et la publie.
+    # La nuance compte : on conteste un calcul devant le juge, pas un choix.
     nom: "Préparation des textes et répartition des crédits"
     nom_court: "Préparation des textes"
     acteur: administration-centrale
-    resume: "C'est là que se décide le détail d'application d'une loi, et la clé de répartition d'une dotation entre collectivités."
+    resume: "C’est là que s’écrit le détail d’application d’une loi — décret, arrêté, circulaire — et que se calcule la répartition des dotations, dont la loi fixe les critères."
     partagee_avec: [gouvernement, prefet, rectorat]
-    liens: [gouvernement-fr, od-annuaire-administration, od-ofgl]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [gouvernement-fr, od-annuaire-administration, od-ofgl, charte-deconcentration, cgct-l2334-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Les assemblées délibérantes ------------------------------------------
   # Les compétences ci-dessus sont attribuées à la collectivité ; ce sont ses
@@ -603,14 +610,18 @@ competences:
     confiance: etabli
 
   - id: vote-budget-departemental
+    # Les deux moitiés sont vérifiées séparément : la part de l'aide sociale vient
+    # d'une étude de la DREES et porte son millésime, et le montant forfaitaire du
+    # revenu de solidarité active est revalorisé chaque 1er avril par décret, sur
+    # l'indice des prix — le conseil départemental le paie sans le fixer.
     nom: "Vote du budget départemental"
     nom_court: "Budget départemental"
     acteur: conseil-departemental
-    resume: "L'assemblée vote un budget dont l'action sociale, le RSA en tête, occupe la plus grande part — une dépense qu'elle ne fixe pourtant pas elle-même."
+    resume: "L’assemblée vote un budget dont l’aide sociale occupait 69 % du fonctionnement en 2022 — et dont le revenu de solidarité active, revalorisé par décret, ne se fixe pas ici."
     partagee_avec: [departement, prefet, chambre-regionale-comptes, etat]
-    liens: [cgct, od-ofgl, vp-budget-local]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [cgct, od-ofgl, vp-budget-local, drees-aide-sociale]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: vote-budget-regional
     # Même correction que pour l'aménagement du territoire : un schéma régional
@@ -627,14 +638,17 @@ competences:
 
   # --- L'accueil du public --------------------------------------------------
   - id: accueil-demarches
+    # La précision utile est qu'il y a un socle obligatoire — les mêmes opérateurs
+    # nationaux dans toutes les maisons — et un supplément local variable. Ce qui
+    # explique qu'on n'y traite pas les mêmes choses d'un endroit à l'autre.
     nom: "Accompagnement aux démarches administratives"
     nom_court: "Accueil des démarches"
     acteur: france-services
-    resume: "Un seul lieu pour des démarches relevant d'administrations différentes : c'est le partage entre opérateurs qui fait tout l'intérêt, et toute la complexité."
+    resume: "Un seul lieu pour des démarches relevant d’administrations différentes : un socle national d’opérateurs est obligatoire partout, que des partenariats locaux peuvent compléter."
     partagee_avec: [citoyen, caf, commune, epci, etat]
-    liens: [france-services-gouv, wp-france-services, od-annuaire-administration]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [france-services-gouv, wp-france-services, od-annuaire-administration, france-services-socle]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Sécurité, contrôle, médiation, financement ----------------------------
   - id: securite-publique-etat
@@ -688,14 +702,19 @@ competences:
   # permanences tenues dans les points-justice. Le CDAD n'a pas son propre nœud :
   # ce serait un organe de plus pour une seule relation.
   - id: acces-au-droit
+    # « Conciliateur ou association » est remplacé par ce que le ministère nomme :
+    # les consultations sont assurées par des professionnels du droit — avocat,
+    # notaire, commissaire de justice — ou par un juriste, dans les points-justice
+    # que coordonne le conseil départemental de l'accès au droit. La gratuité et
+    # la confidentialité sont acquises, et ce sont elles qui décident d'y aller.
     nom: "Accès gratuit au droit"
     nom_court: "Accès au droit"
     acteur: tribunal-judiciaire
-    resume: "Une permanence gratuite pour comprendre ses droits avant d'aller plus loin : avocat, notaire, conciliateur ou association, selon le jour et le lieu."
+    resume: "Une consultation gratuite et confidentielle pour comprendre ses droits avant d’aller plus loin : avocat, notaire, commissaire de justice ou juriste, selon le jour et le lieu."
     partagee_avec: [citoyen, conciliateur-justice, france-services, departement]
-    liens: [justice-fr-annuaire, cdad-justice, wp-aide-juridictionnelle]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [justice-fr-annuaire, cdad-justice, wp-aide-juridictionnelle, justice-cdad]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: reglement-amiable
     nom: "Règlement amiable d'un litige"
@@ -938,14 +957,18 @@ competences:
 
   # --- La région ------------------------------------------------------------
   - id: transport-regional
+    # La première moitié est vérifiée mot pour mot — l'offre, les dessertes et la
+    # politique tarifaire sont fixées par la région dans la convention. La seconde
+    # est la mécanique même du conventionnement : la région verse une contribution
+    # qui complète la recette. On n'avance pas de chiffre, faute de l'avoir vérifié.
     nom: "Trains et cars régionaux"
     nom_court: "TER et cars régionaux"
     acteur: region
-    resume: "La région décide des lignes, des horaires et des tarifs, et paie la différence entre le prix du billet et le coût réel du trajet."
+    resume: "La région décide des lignes, des horaires et des tarifs, par une convention avec l’exploitant qu’elle rémunère : la recette des billets ne couvre pas le service."
     partagee_avec: [etat, operateur-transport, aom, president-region]
-    liens: [wp-ter, code-transports, od-transport]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-ter, code-transports, od-transport, ct-l2121-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # Le cas d'école d'une compétence qu'un registre ne montre pas : la loi NOTRe
   # l'a transférée aux régions au 1er septembre 2017, mais l'article L3111-9 du

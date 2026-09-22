@@ -34,8 +34,8 @@ Reste :
 - **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
   vrai reste à faire, pas le volume. `npm run relire` en donne la file :
   l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs et 21 des 41 compétences sont faits (voir plus bas) ;
-  restent 142 fiches, pour l'essentiel des étapes et des leviers de processus.
+  fiche. Les 37 acteurs et les 41 compétences sont faits (voir plus bas) ;
+  restent 125 fiches — 15 flux, 11 processus, 57 étapes, 42 leviers.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1435,7 +1435,34 @@ des affaires, et le **compte rendu annuel de la concession d'électricité**,
 remis à l'autorité concédante — qui n'est pas la mairie là où la compétence a
 été transférée, ce qui est précisément le piège.
 
-Reste 142 fiches, dont 57 étapes et 42 leviers de processus.
+**Les 41 compétences sont faites**, et la relecture y a trouvé autre chose
+qu'une erreur&nbsp;: un **nœud en trop**. « Transports régionaux » disait
+exactement ce que « Trains et cars régionaux » et « Transport scolaire » disent
+déjà, en moins précis, et rien ne le référençait — ni processus, ni partage, ni
+code BANATIC. Une région l'aurait affiché deux fois. Il est retiré.
+
+Cinq précisions décident d'un droit, d'un refus, ou de l'adresse où écrire&nbsp;:
+
+- l'**allocation personnalisée d'autonomie** s'arrête aux quatre premiers degrés
+  de perte d'autonomie sur six&nbsp;; les deux derniers n'y ouvrent pas droit ;
+- l'**intérêt communautaire** non défini dans les deux ans fait passer la
+  compétence **entière** au groupement&nbsp;;
+- le **plan de prévention des risques** approuvé vaut servitude d'utilité
+  publique et s'impose directement aux permis, sans que le maire ait à le
+  reprendre dans son arrêté&nbsp;;
+- une **autorisation d'activité de soins** est signée par le directeur général
+  de l'agence régionale de santé — une fermeture de maternité ne se plaide ni en
+  mairie ni au département&nbsp;;
+- la **clé de répartition d'une dotation** ne « se décide » pas dans les
+  ministères&nbsp;: la loi la fixe, l'administration la calcule. On conteste un
+  calcul devant le juge, pas un choix.
+
+Deux fiches gagnent le **nom de l'autorité** plutôt que celui de
+l'institution — le directeur académique pour la carte scolaire, le directeur
+général de l'agence pour les soins. C'est à quelqu'un qu'on écrit, pas à un
+sigle.
+
+Reste 125 fiches&nbsp;: 15 flux, 11 processus, 57 étapes, 42 leviers.
 
 ### Une ingestion qui ne se perd plus en route
 
