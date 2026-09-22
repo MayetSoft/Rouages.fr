@@ -554,6 +554,7 @@ async function principal() {
   );
 
   const { collecterPopulations } = await import('./population-emettre.ts');
+  const decoupage = tablesDuDecoupage();
   const populations = await tenter('Séries de population', () =>
     collecterPopulations(
       (url, vers) =>
@@ -563,8 +564,22 @@ async function principal() {
     ),
   );
 
+  // Ce qui sort du plan d'urbanisme : les logements autorisés et commencés,
+  // commune par commune, depuis 2013. L'autre moitié du bloc précédent.
+  const { collecterLogements } = await import('./logements-emettre.ts');
+  const logements = await tenter('Logements autorisés', () =>
+    collecterLogements(
+      (url, vers) =>
+        telechargerEnCache(url, vers, reutiliser, 'Sitadel — séries communales (environ 500 Mo)'),
+      CACHE,
+      lignesCsv,
+      decoupage.populations,
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   const { collecterAssociations } = await import('./associations-emettre.ts');
-  const decoupage = tablesDuDecoupage();
   const associations = await tenter('Associations', () =>
     collecterAssociations(
       // Le fichier pèse 1,2 Go : il passe par le cache, comme FINESS, sinon
@@ -605,6 +620,7 @@ async function principal() {
     populations,
     conseils,
     urbanisme,
+    logements,
   );
 }
 
@@ -733,6 +749,7 @@ async function ecrire(
   >,
   conseils: Awaited<ReturnType<typeof import('./conseils-emettre.ts')['collecterConseils']>>,
   urbanisme: Awaited<ReturnType<typeof import('./urbanisme-emettre.ts')['collecterUrbanisme']>>,
+  logements: Awaited<ReturnType<typeof import('./logements-emettre.ts')['collecterLogements']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -761,6 +778,7 @@ async function ecrire(
     populations,
     conseils,
     urbanisme,
+    logements,
     sortie: SORTIE,
     dire,
     VERT,

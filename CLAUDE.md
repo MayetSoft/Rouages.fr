@@ -30,14 +30,15 @@ npm run territoires -- --cache   réingère tout en réutilisant les gros fichie
 ```
 
 `npm run territoires` dure une trentaine de minutes et touche une quinzaine de
-sources — dont quatorze collectes facultatives, isolées : celle qui échoue laisse en
+sources — dont quinze collectes facultatives, isolées : celle qui échoue laisse en
 place les fichiers de l'ingestion précédente plutôt que de tout emporter. Ce qui
 reste fatal, ce sont les référentiels dont dépend la structure du réseau,
 BANATIC et le découpage.
 
-Deux sources pèsent l'essentiel du temps : le répertoire national des
-associations (1,2 Go) et le référentiel FINESS (244 Mo). `--cache` les réutilise,
-et sans lui il faut compter le téléchargement en plus.
+Trois sources pèsent l'essentiel du temps : le répertoire national des
+associations (1,2 Go), les séries communales Sitadel (500 Mo) et le référentiel
+FINESS (244 Mo). `--cache` les réutilise, et sans lui il faut compter le
+téléchargement en plus.
 
 ## Ce que l'environnement de développement ne joint pas
 

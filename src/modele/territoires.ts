@@ -114,6 +114,15 @@ type UrbanismeDep = {
   c: Record<string, { d: number; a: string; i: 0 | 1 | 2; s: string; e: number; p: string }>;
 };
 
+/** Les logements autorisés et commencés du département. */
+type LogementsDep = {
+  maj: string;
+  arrete: string;
+  annees: number[];
+  mediane: number;
+  c: Record<string, [number[], number, number]>;
+};
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -160,6 +169,7 @@ const cacheElections = new Map<string, ElectionsDep | null>();
 const cachePop = new Map<string, PopDep | null>();
 const cacheConseils = new Map<string, ConseilsDep | null>();
 const cacheUrbanisme = new Map<string, UrbanismeDep | null>();
+const cacheLogements = new Map<string, LogementsDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -353,6 +363,19 @@ export interface Fiche {
     jusquau: string;
     maj: string;
   } | null;
+  /** Ce qui s'y construit réellement, une fois la règle écrite. */
+  logements: {
+    annees: number[];
+    autorises: number;
+    commences: number;
+    individuels: number;
+    /** Pour mille habitants sur la fenêtre, ici et à la médiane. */
+    taux: number;
+    medianeTaux: number;
+    /** Le dernier mois que le fichier porte, AAAA-MM. */
+    arrete: string;
+    maj: string;
+  } | null;
   maj: string;
 }
 
@@ -456,6 +479,7 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
     soumiseSru: !!sru?.c[c.code],
     conseil: assemblerConseil(c, structures),
     urbanisme: assemblerUrbanisme(c, structures),
+    logements: assemblerLogements(c),
     sommet: assemblerSommet(c),
     maj: dep.maj,
   };
@@ -507,6 +531,24 @@ function assemblerUrbanisme(
     totalPartout: u.total,
     jusquau: u.jusquau,
     maj: u.maj,
+  };
+}
+
+function assemblerLogements(c: CommuneIndex): Fiche['logements'] {
+  const d = enCache(cacheLogements, c.dep, `dep/${c.dep}-logements.json`);
+  const f = d?.c[c.code];
+  if (!d || !f) return null;
+  const [parAnnee, commences, individuels] = f;
+  const autorises = parAnnee.reduce((s, x) => s + x, 0);
+  return {
+    annees: d.annees,
+    autorises,
+    commences,
+    individuels,
+    taux: c.population > 0 ? (autorises / c.population) * 1000 : 0,
+    medianeTaux: d.mediane,
+    arrete: d.arrete,
+    maj: d.maj,
   };
 }
 

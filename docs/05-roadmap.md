@@ -1262,6 +1262,36 @@ Le jeu est désigné par son identifiant et la ressource par son intitulé, jama
 par son adresse&nbsp;: le classeur est redéposé sous une URL neuve à chaque
 millésime. C'est la leçon de Mégalis, apprise une fois.
 
+### Ce qui s'y construit, une fois la règle écrite ✔
+
+L'autre moitié de l'urbanisme. Deux communes sous le même plan intercommunal ne
+vivent pas la même chose selon que rien n'en sort ou que trente logements y sont
+autorisés chaque année, et aucun document réglementaire ne le dit.
+
+**Sitadel** publie, commune par commune et mois par mois depuis 2013, les
+logements autorisés et commencés. Sur les dix dernières années pleines,
+2016-2025&nbsp;: **4 311 126 logements autorisés** dans 33 694 communes, soit
+431 000 par an — l'ordre de grandeur que le service statistique publie par
+ailleurs, ce qui vaut vérification de la lecture.
+
+> **Le Mayet-de-Montagne** — 29 logements autorisés en dix ans, 21,0 pour mille
+> habitants contre 32,1 à la médiane des communes&nbsp;; 21 commencés (72 %),
+> 25 maisons individuelles (86 %).
+>
+> **Vichy** — 1 539 autorisés, 61,3 pour mille&nbsp;; 769 commencés (50 %), et
+> **86 maisons seulement** (6 %) — une ville qui construit en collectif.
+
+**Trois précautions, reprises sur la page.** Un logement n'est pas un
+permis&nbsp;: un permis d'immeuble en porte vingt, et c'est bien des logements
+qu'on compte. La série est en *date de prise en compte*, le mois où
+l'autorisation entre dans le système et non celui où le maire l'a signée. Et
+autoriser n'est pas construire&nbsp;: les deux colonnes sont montrées à part,
+parce que leur écart est l'information.
+
+La fenêtre s'arrête à la dernière année **pleine**. Le fichier va jusqu'à
+juillet 2026&nbsp;; afficher 2026 à côté de dix années entières se lirait comme
+un effondrement de la construction, et ce serait faux.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

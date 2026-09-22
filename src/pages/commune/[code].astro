@@ -155,6 +155,11 @@ const phraseUrbanisme = !urb
             `votera la révision.`
           : 'Il est voté par le conseil municipal.');
 
+/** Ce qui sort du plan : autorisé, commencé, et la part des maisons. */
+const log = fiche?.logements ?? null;
+const dixieme = (v: number) =>
+  v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
 const parFamille = new Map<string, ServiceAffiche[]>();
 for (const s of fiche?.services ?? []) {
   if (!parFamille.has(s.famille)) parFamille.set(s.famille, []);
@@ -323,6 +328,27 @@ function moisAnnee(iso: string): string | null {
               `(${Math.round((urb.sansDocumentPartout / urb.totalPartout) * 100)} %) et ` +
               `${urb.intercommunalesPartout.toLocaleString('fr-FR')} relèvent d’une règle ` +
               `intercommunale (${Math.round((urb.intercommunalesPartout / urb.totalPartout) * 100)} %).`}
+          </p>
+        )}
+        {log && (
+          <p class="c-logements">
+            {`En ${log.annees.length} ans, de ${log.annees[0]} à ${log.annees[log.annees.length - 1]}, `}
+            <strong>{`${log.autorises.toLocaleString('fr-FR')} logement${log.autorises > 1 ? 's' : ''} autorisé${log.autorises > 1 ? 's' : ''}`}</strong>
+            {` — ${dixieme(log.taux)} pour 1 000 habitants, contre ${dixieme(log.medianeTaux)} à la ` +
+              'médiane des communes. ' +
+              (log.commences === 0
+                ? 'Aucun n’a été commencé.'
+                : `${log.commences.toLocaleString('fr-FR')} ${log.commences > 1 ? 'ont' : 'a'} ` +
+                  `été commencé${log.commences > 1 ? 's' : ''}.`) +
+              (log.autorises === 0 || log.individuels === 0
+                ? ''
+                : ` ${log.individuels.toLocaleString('fr-FR')} des autorisations ` +
+                  `${log.individuels > 1 ? 'portent' : 'porte'} sur une maison individuelle.`)}
+            <span class="c-logements-source">
+              {`D’après Sitadel (${log.maj}), arrêté à ${moisAnnee(log.arrete) ?? log.arrete}. Ce ` +
+                'sont des logements et non des permis, en date de prise en compte de ' +
+                'l’autorisation et non de signature.'}
+            </span>
           </p>
         )}
         <p class="p-source-territoire">

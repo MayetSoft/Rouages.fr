@@ -398,6 +398,25 @@ function assemblerUrbanisme(commune: CommuneBreve, structures: Structure[]): Urb
   };
 }
 
+function assemblerLogements(commune: CommuneBreve, population: number): Logements | null {
+  const d = logementsDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const [parAnnee, commences, individuels] = f;
+  const autorises = parAnnee.reduce((s, x) => s + x, 0);
+  return {
+    annees: d.annees,
+    parAnnee,
+    autorises,
+    commences,
+    individuels,
+    taux: population > 0 ? (autorises / population) * 1000 : 0,
+    medianeTaux: d.mediane,
+    arrete: d.arrete,
+    maj: d.maj,
+  };
+}
+
 function assemblerPopulation(commune: CommuneBreve): Population | null {
   const d = popDep.get(commune.dep);
   const f = d?.c[commune.code];
@@ -525,6 +544,31 @@ export interface Urbanisme {
   maj: string;
 }
 
+/**
+ * Ce qui s'y construit, une fois la règle écrite.
+ *
+ * L'autre moitié de l'urbanisme : une commune sous plan intercommunal où rien
+ * ne sort et une commune sous le même plan où trente logements sont autorisés
+ * chaque année ne vivent pas la même chose, et aucun document réglementaire ne
+ * le dit.
+ */
+export interface Logements {
+  /** Les années de la fenêtre, et les logements autorisés chacune. */
+  annees: number[];
+  parAnnee: number[];
+  /** Autorisés sur la fenêtre, et commencés : l'écart est une information. */
+  autorises: number;
+  commences: number;
+  /** Maisons individuelles parmi les autorisés. */
+  individuels: number;
+  /** Pour mille habitants sur la fenêtre, ici et à la médiane des communes. */
+  taux: number;
+  medianeTaux: number;
+  /** Le dernier mois que le fichier porte, AAAA-MM. */
+  arrete: string;
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -616,6 +660,8 @@ export interface Territoire {
   conseil: Conseil | null;
   /** Ce qui peut se construire, et qui en écrit la règle. */
   urbanisme: Urbanisme | null;
+  /** Ce qui s'y construit réellement, une fois la règle écrite. */
+  logements: Logements | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -835,6 +881,16 @@ type UrbanismeDep = {
   c: Record<string, { d: number; a: string; i: 0 | 1 | 2; s: string; e: number; p: string }>;
 };
 const urbanismeDep = new Map<string, UrbanismeDep | null>();
+
+/** Les logements autorisés et commencés du département. */
+type LogementsDep = {
+  maj: string;
+  arrete: string;
+  annees: number[];
+  mediane: number;
+  c: Record<string, [number[], number, number]>;
+};
+const logementsDep = new Map<string, LogementsDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -1132,7 +1188,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb] =
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb, logs] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -1154,6 +1210,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<PopDep>(`${BASE}/dep/${commune.dep}-population.json`).catch(() => null),
       json<ConseilsDep>(`${BASE}/dep/${commune.dep}-conseils.json`).catch(() => null),
       json<UrbanismeDep>(`${BASE}/dep/${commune.dep}-urbanisme.json`).catch(() => null),
+      json<LogementsDep>(`${BASE}/dep/${commune.dep}-logements.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -1171,6 +1228,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     popDep.set(commune.dep, pop);
     conseilsDep.set(commune.dep, cons);
     urbanismeDep.set(commune.dep, urb);
+    logementsDep.set(commune.dep, logs);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -1230,6 +1288,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     histoire: assemblerPopulation(commune),
     conseil: assemblerConseil(commune),
     urbanisme: assemblerUrbanisme(commune, structures),
+    logements: assemblerLogements(commune, ligne[2]),
     scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,

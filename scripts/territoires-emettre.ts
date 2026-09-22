@@ -29,6 +29,7 @@ import { ecrireAssociations, type Associations } from './associations-emettre.ts
 import { ecrirePopulations, type Populations } from './population-emettre.ts';
 import { ecrireConseils, type Conseils } from './conseils-emettre.ts';
 import { ecrireUrbanisme, type Urbanisme } from './urbanisme-emettre.ts';
+import { ecrireLogements, type Logements } from './logements-emettre.ts';
 import { ecrireJournal, rassembler } from './journal-emettre.ts';
 import { comparerTransferts, type EtatDep } from './transferts-emettre.ts';
 import { retenir } from '../src/modele/journal.ts';
@@ -109,6 +110,7 @@ export function emettre(o: {
   populations: Populations | null;
   conseils: Conseils | null;
   urbanisme: Urbanisme | null;
+  logements: Logements | null;
   elections: Elections | null;
   deliberations: Deliberations | null;
   subventions: Subventions | null;
@@ -299,6 +301,7 @@ export function emettre(o: {
   let popEcrites = 0;
   let conseilsEcrits = 0;
   let urbanismeEcrit = 0;
+  let logementsEcrits = 0;
   let journalEcrit = 0;
   let transfertsVus = 0;
   let electionsEcrites = 0;
@@ -344,6 +347,10 @@ export function emettre(o: {
 
     if (o.urbanisme) {
       urbanismeEcrit += ecrireUrbanisme(sortie, dep, liste.map((c) => c.code), o.urbanisme);
+    }
+
+    if (o.logements) {
+      logementsEcrits += ecrireLogements(sortie, dep, liste.map((c) => c.code), o.logements);
     }
 
     if (o.elections) {
@@ -644,6 +651,12 @@ export function emettre(o: {
     dire(
       `${GRIS}Documents d’urbanisme : ${urbanismeEcrit.toLocaleString('fr-FR')} communes situées, ` +
         `dont ${o.urbanisme.sansDocument.toLocaleString('fr-FR')} au règlement national.${RAZ}`,
+    );
+  }
+  if (o.logements) {
+    dire(
+      `${GRIS}Logements autorisés : ${logementsEcrits.toLocaleString('fr-FR')} communes, ` +
+        `${o.logements.total.toLocaleString('fr-FR')} logements depuis ${o.logements.annees[0]}.${RAZ}`,
     );
   }
   if (o.populations) {

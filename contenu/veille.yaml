@@ -157,6 +157,16 @@ surveillances:
     ressource: "documents d'urbanisme par commune"
     lien: od-sudocuh
 
+  - id: sitadel-communes
+    nom: "Sitadel — logements autorisés, séries communales"
+    alimente: "ce qui se construit dans chaque commune"
+    # Le fichier est republié tous les mois : son adresse est stable mais sa
+    # date de modification dit si la série avance encore.
+    type: datagouv-ressource
+    url: "689c430033671e3d26466245"
+    ressource: "csv"
+    lien: od-sitadel-communes
+
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
   - id: gaspar-risques

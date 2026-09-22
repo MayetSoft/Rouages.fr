@@ -27,7 +27,7 @@ processus:
     sortie: "Un arrêté de permis, un refus, ou une décision tacite"
     decideur: maire
     competences: [delivrance-autorisation-urbanisme, redaction-plu]
-    liens: [sp-permis, cu-l422-1, cu-l111-3, cu-l422-5, od-sitadel, od-sudocuh]
+    liens: [sp-permis, cu-l422-1, cu-l111-3, cu-l422-5, od-sitadel, od-sitadel-communes, od-sudocuh]
     verifie_le: 2026-09-05
     confiance: a_confirmer
 

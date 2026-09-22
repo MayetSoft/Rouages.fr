@@ -733,6 +733,7 @@ function demarrer(reseau: Reseau) {
     ajouter('Les échelons', blocEchelons());
     ajouter('Une vente immobilière', blocDmto());
     ajouter('Ce qui peut s’y construire', blocUrbanisme());
+    ajouter('Ce qui s’y construit', blocLogements());
     ajouter('Les risques', blocRisques());
     ajouter('Le logement social', blocSru());
     ajouter('Les marchés', blocMarches());
@@ -2380,6 +2381,86 @@ function demarrer(reseau: Reseau) {
             : '') +
           `Le document lui-même — son règlement, son zonage, le plan de la parcelle — se consulte ` +
           `en mairie, et le plus souvent sur le Géoportail de l’urbanisme.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * Ce qui sort réellement du plan d'urbanisme.
+   *
+   * Le bloc précédent dit qui écrit la règle ; celui-ci dit ce qu'elle produit.
+   * Les deux colonnes sont montrées séparément — autorisé et commencé — parce
+   * que leur écart est l'information : un plan généreux dont rien ne sort et un
+   * plan strict entièrement bâti ne racontent pas la même commune.
+   */
+  function blocLogements(): HTMLElement | null {
+    const g = territoire?.logements;
+    if (!g) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-logements';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui s’y construit'));
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const d = document.createElement('div');
+    d.append(ligne('dt', '', `Logements autorisés en ${g.annees.length} ans`));
+    const dd = document.createElement('dd');
+    dd.append(ligne('span', 'p-montant', g.autorises.toLocaleString('fr-FR')));
+    dd.append(reglette(g.taux, g.medianeTaux, 'la médiane des communes'));
+    const dixieme = (v: number) =>
+      v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    dd.append(
+      ligne(
+        'span',
+        'p-mediane',
+        `${dixieme(g.taux)} pour 1 000 habitants — médiane ${dixieme(g.medianeTaux)}`,
+      ),
+    );
+    const courbe = tendance(g.parAnnee, g.annees, (v) => `${v} logement${v > 1 ? 's' : ''}`);
+    if (courbe) {
+      const l = document.createElement('span');
+      l.className = 'p-tendance-ligne';
+      l.append(courbe);
+      dd.append(l);
+    }
+    d.append(dd);
+    dl.append(d);
+    bloc.append(dl);
+
+    // Autoriser n'est pas construire : le site montre les deux plutôt que de
+    // laisser croire qu'un permis est un chantier.
+    const nombre = (n: number) => n.toLocaleString('fr-FR');
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        (g.commences === 0
+          ? 'Aucun n’a été commencé sur la même période.'
+          : `${nombre(g.commences)} ${g.commences > 1 ? 'ont' : 'a'} été commencé` +
+            `${g.commences > 1 ? 's' : ''} sur la même période` +
+            (g.autorises > 0
+              ? `, soit ${Math.round((g.commences / g.autorises) * 100)} % des autorisations.`
+              : '.')) +
+          (g.autorises === 0
+            ? ''
+            : g.individuels === 0
+              ? ' Aucune de ces autorisations ne porte sur une maison individuelle.'
+              : ` ${nombre(g.individuels)} des logements autorisés ` +
+                `${g.individuels > 1 ? 'sont des maisons individuelles' : 'est une maison individuelle'}` +
+                ` (${Math.round((g.individuels / g.autorises) * 100)} %).`),
+      ),
+    );
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D’après Sitadel, le recensement des autorisations d’urbanisme du ministère chargé du ` +
+          `logement (${g.maj}), arrêté à ${moisAnnee(g.arrete) ?? g.arrete}. Ce sont des ` +
+          `logements, non des permis — ` +
+          `un permis d’immeuble en porte plusieurs — et la date est celle de la prise en compte ` +
+          `de l’autorisation, non celle de la signature du maire.`,
       ),
     );
     return bloc;
