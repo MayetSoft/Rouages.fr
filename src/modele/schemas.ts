@@ -224,7 +224,17 @@ export const Document = z.object({
 export const Delai = z.object({
   valeur: z.number().positive(),
   unite: z.enum(['jours', 'semaines', 'mois', 'annees']),
-  nature: z.enum(['maximum_legal', 'indicatif', 'observe']),
+  /**
+   * Un plancher n'est pas un plafond, et le confondre trompe dans le sens le
+   * plus coûteux.
+   *
+   * `minimum_legal` est venu de la relecture de l'enquête publique : sa durée
+   * ne peut pas être inférieure à trente jours, et la fiche l'annonçait comme
+   * « indicative ». Un lecteur en déduisait qu'elle pouvait être raccourcie, ou
+   * qu'elle n'engageait personne. C'est l'inverse — c'est le minimum que
+   * l'autorité doit laisser au public, et elle ne peut pas descendre en dessous.
+   */
+  nature: z.enum(['maximum_legal', 'minimum_legal', 'indicatif', 'observe']),
 });
 
 export const Etape = z.object({

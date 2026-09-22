@@ -22,51 +22,70 @@ processus:
   - id: enquete-publique
     nom: "Une enquête publique"
     famille: quotidien
-    resume: "Un projet s'installe près de chez vous : le seul moment où la loi organise votre prise de parole, et il est court."
+    resume: "Un projet s'installe près de chez vous : le moment le plus formel où la loi organise votre prise de parole, et il est court."
     declencheur: "Arrêté d'ouverture de l'enquête, pris par le préfet ou la collectivité"
     sortie: "Un avis motivé du commissaire enquêteur, puis la décision de l'autorité compétente"
     decideur: prefet
     competences: [participation-public, normes-environnementales]
-    liens: [wp-enquete-publique, code-environnement, vp-enquete-publique]
-    verifie_le: 2026-09-05
+    liens: [wp-enquete-publique, code-environnement, vp-enquete-publique, ce-l123-9, ce-l123-15, ce-l123-16]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # « Le seul moment où la loi organise votre prise de parole » était faux :
+    # la concertation préalable et la participation par voie électronique en
+    # sont d'autres. L'enquête reste le plus formel, et c'est ce qu'on écrit.
+    #
+    # Les cinq étapes et les quatre leviers sont vérifiés. Deux délais y ont
+    # changé de nature — ce sont des planchers, pas des plafonds — et l'effet
+    # d'un avis défavorable était très sous-estimé.
+    confiance: etabli
 
     etapes:
       - ordre: 1
         acteur: prefet
         action: "Arrêté d'ouverture et désignation du commissaire enquêteur"
-        liens: [code-environnement, vp-enquete-publique]
-        confiance: a_confirmer
+        liens: [code-environnement, vp-enquete-publique, ce-l123-15]
+        confiance: etabli
       - ordre: 2
+        # Le délai était marqué « maximum » : c'est un minimum. L'avis paraît quinze
+        # jours *au moins* avant l'ouverture, et il est rappelé dans les huit premiers
+        # jours de l'enquête.
         acteur: commune
         action: "Publicité : affichage sur le terrain, en mairie et dans la presse"
-        delai: { valeur: 15, unite: jours, nature: maximum_legal }
-        note: "L'avis doit être publié avant l'ouverture. C'est le seul signal que reçoit le voisinage, et il passe souvent inaperçu."
-        liens: [code-environnement]
-        confiance: a_confirmer
+        delai: { valeur: 15, unite: jours, nature: minimum_legal }
+        note: "L'avis doit paraître quinze jours au moins avant l'ouverture, puis être rappelé dans les huit premiers jours, dans deux journaux du département. C'est le seul signal que reçoit le voisinage, et il passe souvent inaperçu."
+        liens: [code-environnement, ce-l123-9]
+        confiance: etabli
       - ordre: 3
+        # « Un minimum légal » est devenu le chiffre : trente jours quand le projet
+        # est soumis à évaluation environnementale, quinze sinon. Et la nature du
+        # délai a changé — annoncer un plancher comme « indicatif » laissait croire
+        # qu'il pouvait être raccourci.
         acteur: citoyen
         action: "Consultation du dossier et dépôt des observations"
         produit: [dossier-enquete, registre-enquete]
-        delai: { valeur: 1, unite: mois, nature: indicatif }
-        note: "La durée est fixée par l'arrêté, avec un minimum légal. C'est la fenêtre utile, et elle ne se rouvre pas."
-        liens: [code-environnement, vp-enquete-publique]
-        confiance: a_confirmer
+        delai: { valeur: 30, unite: jours, nature: minimum_legal }
+        note: "L'arrêté fixe la durée, sans pouvoir descendre sous trente jours quand le projet est soumis à évaluation environnementale — quinze sinon. C'est la fenêtre utile, et elle ne se rouvre pas."
+        liens: [code-environnement, vp-enquete-publique, ce-l123-9]
+        confiance: etabli
       - ordre: 4
         acteur: commissaire-enqueteur
         action: "Rapport et avis motivé"
         produit: [rapport-commissaire]
         delai: { valeur: 1, unite: mois, nature: maximum_legal }
         note: "L'avis peut être défavorable ou assorti de réserves ; il ne lie pas l'autorité qui décide."
-        liens: [code-environnement]
-        confiance: a_confirmer
+        liens: [code-environnement, ce-l123-15]
+        confiance: etabli
       - ordre: 5
+        # « Fragilise la décision devant le juge » sous-estimait beaucoup : après des
+        # conclusions défavorables, le juge des référés suspend dès qu'un moyen fait
+        # naître un doute sérieux, sans condition d'urgence à démontrer. Et une
+        # collectivité qui veut passer outre sur son propre projet doit le réitérer
+        # par délibération motivée.
         acteur: prefet
         action: "Décision d'autorisation ou de refus"
-        note: "Passer outre un avis défavorable est possible, mais fragilise la décision devant le juge."
-        liens: [code-environnement, code-justice-administrative]
-        confiance: a_confirmer
+        note: "Passer outre un avis défavorable est possible, et coûteux : le juge des référés suspend alors la décision dès qu'un moyen fait naître un doute sérieux, sans qu'il faille démontrer l'urgence. Et quand le projet est celui de la collectivité elle-même, il lui faut une délibération motivée pour le réitérer."
+        liens: [code-environnement, code-justice-administrative, ce-l123-16]
+        confiance: etabli
 
     leviers:
       - id: surveiller-les-avis
@@ -76,8 +95,8 @@ processus:
         difficulte: faible
         ancre_etape: 1
         piege: "L'affichage légal est facile à manquer. Le portail national, lui, est consultable depuis chez soi."
-        liens: [od-projets-environnement]
-        confiance: a_confirmer
+        liens: [od-projets-environnement, ce-l123-9]
+        confiance: etabli
       - id: ecrire-au-registre
         quoi: "Écrire sur le registre d'enquête"
         quand: "Pendant toute la durée de l'enquête, pas après"
@@ -88,8 +107,8 @@ processus:
           Une observation écrite au registre est versée au dossier et doit être
           examinée. Une réclamation faite ailleurs — courrier au maire, réseaux
           sociaux, pétition — n'existe pas juridiquement.
-        liens: [code-environnement, vp-enquete-publique]
-        confiance: a_confirmer
+        liens: [code-environnement, vp-enquete-publique, ce-l123-15]
+        confiance: etabli
       - id: rencontrer-le-commissaire
         quoi: "Rencontrer le commissaire enquêteur lors d'une permanence"
         quand: "Aux dates fixées par l'arrêté d'ouverture"
@@ -97,8 +116,8 @@ processus:
         difficulte: faible
         ancre_etape: 3
         piege: "Demander que l'échange soit consigné au registre : à l'oral seul, il n'en reste rien."
-        liens: [code-environnement]
-        confiance: a_confirmer
+        liens: [code-environnement, ce-l123-15]
+        confiance: etabli
       - id: demander-le-rapport
         quoi: "Demander le rapport et l'avis motivé"
         quand: "Après la clôture, avant la décision si possible"
@@ -107,5 +126,5 @@ processus:
         recours_si_refus: "Saisir la CADA"
         ancre_etape: 4
         piege: "C'est dans les réserves du rapport que se trouvent les arguments réutilisables en cas de recours."
-        liens: [cada, code-environnement]
-        confiance: a_confirmer
+        liens: [cada, code-environnement, ce-l123-15, cada-saisine]
+        confiance: etabli

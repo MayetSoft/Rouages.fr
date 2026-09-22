@@ -102,6 +102,7 @@ export function svg(
 /** Court, pour les schémas. */
 export const NATURE_DELAI: Record<string, string> = {
   maximum_legal: 'maximum prévu par les textes',
+  minimum_legal: 'minimum prévu par les textes',
   indicatif: 'indicatif',
   observe: 'constaté en pratique',
 };
@@ -109,6 +110,7 @@ export const NATURE_DELAI: Record<string, string> = {
 /** Développé, pour les tableaux et les descriptions lues à voix haute. */
 export const NATURE_DELAI_LONG: Record<string, string> = {
   maximum_legal: 'délai maximum prévu par les textes',
+  minimum_legal: 'délai minimum prévu par les textes — il ne peut pas être plus court',
   indicatif: 'délai seulement indicatif',
   observe: 'délai constaté en pratique',
 };

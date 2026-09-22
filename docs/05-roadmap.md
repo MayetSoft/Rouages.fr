@@ -34,8 +34,8 @@ Reste :
 - **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
   vrai reste à faire, pas le volume. `npm run relire` en donne la file :
   l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs, les 41 compétences, les 15 flux et trois processus
-  entiers sont faits (voir plus bas) ; restent 81 fiches.
+  fiche. Les 37 acteurs, les 41 compétences, les 15 flux et quatre processus
+  entiers sont faits (voir plus bas) ; restent 71 fiches.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1535,7 +1535,27 @@ mentionne pas cette obligation, l'irrecevabilité n'est pas opposable**. Le
 voisin qui photographie le panneau le fait donc pour deux raisons, et la
 seconde peut sauver son recours.
 
-Reste 81 fiches&nbsp;: 8 processus, 42 étapes, 31 leviers.
+**L'enquête publique** a obligé à toucher au modèle. Sa durée ne peut pas être
+inférieure à trente jours quand le projet est soumis à évaluation
+environnementale — et la fiche l'annonçait comme un délai « indicatif ». Un
+plancher n'est pas un plafond&nbsp;: le lecteur en déduisait qu'il pouvait être
+raccourci, quand c'est le contraire. Le schéma a donc gagné une quatrième
+nature de délai, `minimum_legal`, qui s'affiche « délai minimum prévu par les
+textes — il ne peut pas être plus court ». L'avis de publicité, lui aussi un
+plancher de quinze jours, en relève également.
+
+Deux autres corrections sur ce seul processus&nbsp;:
+
+- le résumé promettait « **le seul** moment où la loi organise votre prise de
+  parole ». C'est faux — la concertation préalable et la participation par voie
+  électronique en sont d'autres. L'enquête reste le plus **formel**&nbsp;;
+- « passer outre un avis défavorable fragilise la décision devant le juge »
+  sous-estimait beaucoup&nbsp;: après des conclusions défavorables, le juge des
+  référés **suspend** dès qu'un moyen fait naître un doute sérieux, **sans**
+  condition d'urgence à démontrer. Et une collectivité qui veut passer outre sur
+  son propre projet doit le réitérer par délibération motivée.
+
+Reste 71 fiches&nbsp;: 7 processus, 37 étapes, 27 leviers.
 
 ### Une ingestion qui ne se perd plus en route
 
