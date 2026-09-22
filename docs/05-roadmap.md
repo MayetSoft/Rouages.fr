@@ -36,7 +36,8 @@ Reste :
   Les 204 fiches sont relues contre leur source : 37 acteurs, 41 compétences,
   15 flux, 11 processus et tout ce qu'ils portent. `npm run relire` affiche
   désormais « aucune fiche à confirmer », et le détail est plus bas.
-- **le domaine**, et la mise en ligne.
+- **la densité du réseau elle-même** : le plan local d'urbanisme reste le seul
+  document que rien ne relie, faute du processus qui le produit.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -65,8 +66,10 @@ réalisation technique. C'étaient les seules informations du site que personne 
 peut déduire d'une source, et le déploiement refusait de publier tant qu'elles
 manquaient.
 
-Reste le domaine : rien n'est réel tant que personne d'extérieur n'a touché le
-site.
+Le domaine répond, et chaque poussée sur la branche par défaut valide, génère,
+téléverse en FTPS et purge le cache. Il reste que rien n'est réel tant que
+personne d'extérieur n'a touché le site — mais ce n'est plus une question de
+mise en ligne.
 
 ## Phase 2 ter — « Chez moi » ✔ *(en place)*
 
