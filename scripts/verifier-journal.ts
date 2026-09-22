@@ -10,7 +10,8 @@
  * associations porte onze créations datées de 2029, et une seule suffirait à
  * occuper la tête du flux pendant trois ans.
  */
-import { FENETRE_MOIS, PAR_ACTEUR, retenir, type Evenement } from '../src/modele/journal.ts';
+import { FENETRE_MOIS, GENRES, PAR_ACTEUR, retenir, type Evenement } from '../src/modele/journal.ts';
+import { comparerTransferts, type EtatDep } from './transferts-emettre.ts';
 
 const ROUGE = '\x1b[31m', VERT = '\x1b[32m', GRIS = '\x1b[90m', RAZ = '\x1b[0m';
 let echecs = 0;
@@ -134,6 +135,86 @@ attendre(
   retenir(desordre, LE_JOUR).map((e) => e.quoi),
   ['neuf', 'entre', 'vieux'],
   'le journal sort du plus récent au plus ancien',
+);
+
+// --- la comparaison des états du registre des transferts ---
+//
+// C'est le seul endroit du journal qui compare deux états plutôt que de
+// projeter des faits datés, parce que BANATIC ne date pas ses transferts. Les
+// garde-fous comptent donc plus qu'ailleurs.
+const LIBELLES = new Map([
+  ['C4020', 'Eau (Traitement, Adduction, Distribution)'],
+  ['C4502', 'Collecte des déchets des ménages'],
+]);
+
+const etat = (maj: string, codes: string[], rattachements: number[] = [0]): EtatDep => ({
+  maj,
+  g: [
+    ['200071454', 'CA Vichy Communauté', 'CA', codes],
+    ['250301165', 'SM des eaux de l’Allier', 'SM', ['C4020']],
+  ],
+  c: [['03165', 'Le Mayet-de-Montagne', 1383, rattachements, '03250']],
+});
+
+attendre(
+  'deux ingestions sur le même export',
+  comparerTransferts(etat('2026-01-01', ['C4020']), etat('2026-01-01', ['C4020', 'C4502']), LIBELLES).length,
+  0,
+  "le registre n'a pas bougé : relire le même export ne date pas un changement",
+);
+attendre(
+  'aucun état précédent',
+  comparerTransferts(null, etat('2026-02-01', ['C4020']), LIBELLES).length,
+  0,
+  'une première ingestion ne peut rien comparer, et annoncerait tout comme neuf',
+);
+
+const pris = comparerTransferts(etat('2026-01-01', []), etat('2026-02-01', ['C4020']), LIBELLES);
+attendre(
+  'une agglomération prend une compétence',
+  pris.map((e) => [GENRES[e.genre], e.quoi, e.siren]),
+  [['Compétence transférée', 'Eau (Traitement, Adduction, Distribution)', '200071454']],
+  "un fait et non cent quatre : l'événement est porté par le groupement, ses communes le voient",
+);
+attendre(
+  'et il est daté du nouvel export',
+  pris[0]?.date,
+  '2026-02-01',
+  'du jour où le registre le publie, jamais du jour où on le relit',
+);
+attendre(
+  'une agglomération rend une compétence',
+  comparerTransferts(etat('2026-01-01', ['C4502']), etat('2026-02-01', []), LIBELLES)
+    .map((e) => GENRES[e.genre]),
+  ['Compétence reprise'],
+  'le retrait se lit aussi bien que la prise',
+);
+
+attendre(
+  'une commune rejoint un syndicat',
+  comparerTransferts(etat('2026-01-01', ['C4020'], [0]), etat('2026-02-01', ['C4020'], [0, 1]), LIBELLES)
+    .map((e) => [GENRES[e.genre], e.quoi, e.commune]),
+  [['Rattachement modifié', 'Rattachement à SM des eaux de l’Allier', '03165']],
+  "le rattachement appartient à la commune, pas au groupement qui l'accueille",
+);
+attendre(
+  'une commune quitte un syndicat',
+  comparerTransferts(etat('2026-01-01', ['C4020'], [0, 1]), etat('2026-02-01', ['C4020'], [0]), LIBELLES)
+    .map((e) => e.quoi),
+  ['Sortie de SM des eaux de l’Allier'],
+  'et la sortie se nomme avec le nom que le groupement portait alors',
+);
+
+const neuf: EtatDep = {
+  maj: '2026-02-01',
+  g: [['200099999', 'CC toute neuve', 'CC', ['C4020', 'C4502']]],
+  c: [['03165', 'Le Mayet-de-Montagne', 1383, [0], '03250']],
+};
+attendre(
+  'un groupement qui apparaît',
+  comparerTransferts(etat('2026-01-01', ['C4020']), neuf, LIBELLES).map((e) => GENRES[e.genre]),
+  ['Rattachement modifié', 'Rattachement modifié'],
+  "sa création ne « transfère » rien : c'est le rattachement des communes qui le dit",
 );
 
 console.log(

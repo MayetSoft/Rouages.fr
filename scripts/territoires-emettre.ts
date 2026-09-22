@@ -27,6 +27,8 @@ import { ecrireDmto, type Dmto } from './dmto-emettre.ts';
 import { ecrireEchelons, reperesEchelons, type Echelons } from './echelons-emettre.ts';
 import { ecrireAssociations, type Associations } from './associations-emettre.ts';
 import { ecrireJournal, rassembler } from './journal-emettre.ts';
+import { comparerTransferts, type EtatDep } from './transferts-emettre.ts';
+import { retenir } from '../src/modele/journal.ts';
 import { ecrireRisques, type Risques } from './risques-emettre.ts';
 import { ecrireElections, type Elections } from './elections-emettre.ts';
 import { ecrireDeliberations, type Deliberations } from './deliberations-emettre.ts';
@@ -78,6 +80,8 @@ export function emettre(o: {
   graphe: ReturnType<typeof chargerGraphe>;
   groupements: Map<string, Groupement>;
   codesSuivis: Map<string, string[]>;
+  /** Le libellé de chaque code BANATIC : le journal nomme ce qui est transféré. */
+  libelleDeCode: Map<string, string>;
   dateExport: string;
   natures: Map<string, string>;
   finances: {
@@ -287,6 +291,7 @@ export function emettre(o: {
   let risquesEcrits = 0;
   let assoEcrites = 0;
   let journalEcrit = 0;
+  let transfertsVus = 0;
   let electionsEcrites = 0;
   let delibEcrites = 0;
   let subvEcrites = 0;
@@ -372,23 +377,9 @@ export function emettre(o: {
       }
     }
 
-    // Le journal réunit ce que les autres écrivent séparément : il ne
-    // s'attache à aucune source, seulement à ce qui est daté.
-    if (journal.length > 0) {
-      journalEcrit += ecrireJournal(
-        sortie,
-        dep,
-        liste.map((c) => c.code),
-        [...sirens, ...echelonsDelib, ...echelonsSubv],
-        sirenDeCommune,
-        journal,
-        majJournal,
-      );
-    }
-
     const refs = new Map<string, number>();
     const table: [string, string, string, string[]][] = [];
-    const rows = liste.map((c) => {
+    const rows: EtatDep['c'] = liste.map((c) => {
       const g = utiles(closure(c.siren!));
       if (g.length === 0) sansRattachement++;
       else couvertes++;
@@ -420,6 +411,16 @@ export function emettre(o: {
       couvertureNationale.set(comp, couvertureNationale.get(comp)! + n);
     }
 
+    // Ce que le registre a changé depuis l'export précédent. Se lit avant
+    // d'écrire : le fichier qu'on s'apprête à remplacer est l'état d'avant.
+    const etatNouveau: EtatDep = { maj: dateExport, g: table, c: rows };
+    const transferts = comparerTransferts(
+      lireEtat(join(sortie, 'dep', `${dep}.json`)),
+      etatNouveau,
+      o.libelleDeCode,
+    );
+    transfertsVus += transferts.length;
+
     ecrireJson(join(sortie, 'dep', `${dep}.json`), {
       dep,
       maj: dateExport,
@@ -427,6 +428,22 @@ export function emettre(o: {
       c: rows,
       couverture: couvertureDep,
     });
+
+    // Le journal réunit ce que les autres écrivent séparément : il ne
+    // s'attache à aucune source, seulement à ce qui est daté — sauf les
+    // transferts, qui n'ont pas de date et se déduisent d'une comparaison.
+    const duDep = retenir([...journal, ...transferts]);
+    if (duDep.length > 0) {
+      journalEcrit += ecrireJournal(
+        sortie,
+        dep,
+        liste.map((c) => c.code),
+        [...sirens, ...echelonsDelib, ...echelonsSubv],
+        sirenDeCommune,
+        duDep,
+        majJournal,
+      );
+    }
 
     if (eau && codesEau.length > 0) {
       const eauxCommunes = new Map<string, ServiceEau>();
@@ -604,8 +621,11 @@ export function emettre(o: {
   }
   if (journal.length > 0) {
     dire(
-      `${GRIS}Journal : ${journal.length.toLocaleString('fr-FR')} événements retenus sur la fenêtre, ` +
-        `${journalEcrit.toLocaleString('fr-FR')} écrits dans les fichiers de département.${RAZ}`,
+      `${GRIS}Journal : ${journal.length.toLocaleString('fr-FR')} événements datés` +
+        (transfertsVus > 0
+          ? `, ${transfertsVus.toLocaleString('fr-FR')} changements au registre des transferts`
+          : ', aucun changement au registre des transferts') +
+        `, ${journalEcrit.toLocaleString('fr-FR')} lignes écrites.${RAZ}`,
     );
   }
   if (o.risques) {
@@ -658,6 +678,20 @@ export function emettre(o: {
       `${couvertes.toLocaleString('fr-FR')} communes rattachées à au moins un groupement suivi · ` +
       `${sansRattachement.toLocaleString('fr-FR')} sans rattachement.`,
   );
+}
+
+/**
+ * L'état précédent d'un département, quand il existe.
+ *
+ * Un fichier absent — première ingestion, nouveau département — ne vaut pas un
+ * registre vide : la comparaison le refuse et n'annonce rien.
+ */
+function lireEtat(chemin: string): EtatDep | null {
+  try {
+    return JSON.parse(readFileSync(chemin, 'utf8')) as EtatDep;
+  } catch {
+    return null;
+  }
 }
 
 function ecrireJson(chemin: string, donnee: unknown) {

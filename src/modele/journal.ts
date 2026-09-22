@@ -36,6 +36,14 @@ export const GENRES = [
   'Association créée',
   'Catastrophe naturelle reconnue',
   'Changement de maire',
+  // Les trois derniers ne viennent pas d'un fait daté mais d'une comparaison
+  // de deux états du registre des transferts : voir
+  // `scripts/transferts-emettre.ts`, qui dit pourquoi c'est là, et seulement
+  // là, que le journal a besoin de mémoire. Ajoutés en queue : un genre se
+  // désigne par sa position, et les flux déjà publiés y renvoient.
+  'Compétence transférée',
+  'Compétence reprise',
+  'Rattachement modifié',
 ] as const;
 
 /** Sur combien de mois le journal regarde en arrière. */
