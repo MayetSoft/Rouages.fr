@@ -57,6 +57,9 @@ for (const p of g.processus.values()) {
 // ici signalait comme orpheline une source pourtant bien citée.
 for (const s of g.sigles.values()) recolter(s.liens);
 for (const r of g.reperes.values()) recolter(r.liens);
+// Les mentions légales citent chaque jeu surveillé par son lien : une source
+// qui n'apparaît que là est publiée, pas orpheline.
+for (const s of g.surveillances.values()) if (s.lien) citees.add(s.lien);
 for (const id of g.sources.keys()) {
   if (!citees.has(id)) avertissements.push(`page de référence « ${id} » déclarée mais liée depuis aucun nœud`);
 }

@@ -441,4 +441,3 @@ sources:
   - { id: waldec-nomenclature, type: donnees_ouvertes, titre: "Nomenclature WALDEC des objets sociaux — les domaines déclarés par les associations", url: "https://www.data.gouv.fr/datasets/repertoire-national-des-associations-nomenclature-waldec", consulte_le: 2026-09-21 }
   - { id: scdl-subventions, type: page_officielle, titre: "Schéma SCDL « subventions » — les données essentielles des conventions", url: "https://schema.data.gouv.fr/scdl/subventions/", consulte_le: 2026-09-21 }
   - { id: decret-subventions, type: droit, titre: "Décret n° 2017-779 du 5 mai 2017 — accès aux données essentielles des conventions de subvention", url: "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000034600552", consulte_le: 2026-09-21 }
-  - { id: associations-gouv, type: page_officielle, titre: "associations.gouv.fr — le portail des associations", url: "https://www.associations.gouv.fr/", consulte_le: 2026-09-21 }
