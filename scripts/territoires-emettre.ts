@@ -30,6 +30,7 @@ import { ecrirePopulations, type Populations } from './population-emettre.ts';
 import { ecrireConseils, type Conseils } from './conseils-emettre.ts';
 import { ecrireUrbanisme, type Urbanisme } from './urbanisme-emettre.ts';
 import { ecrireLogements, type Logements } from './logements-emettre.ts';
+import { ecrireFiscalite, type Fiscalite } from './fiscalite-emettre.ts';
 import { ecrireJournal, rassembler } from './journal-emettre.ts';
 import { comparerTransferts, type EtatDep } from './transferts-emettre.ts';
 import { retenir } from '../src/modele/journal.ts';
@@ -111,6 +112,7 @@ export function emettre(o: {
   conseils: Conseils | null;
   urbanisme: Urbanisme | null;
   logements: Logements | null;
+  fiscalite: Fiscalite | null;
   elections: Elections | null;
   deliberations: Deliberations | null;
   subventions: Subventions | null;
@@ -302,6 +304,7 @@ export function emettre(o: {
   let conseilsEcrits = 0;
   let urbanismeEcrit = 0;
   let logementsEcrits = 0;
+  let fiscaliteEcrite = 0;
   let journalEcrit = 0;
   let transfertsVus = 0;
   let electionsEcrites = 0;
@@ -351,6 +354,10 @@ export function emettre(o: {
 
     if (o.logements) {
       logementsEcrits += ecrireLogements(sortie, dep, liste.map((c) => c.code), o.logements);
+    }
+
+    if (o.fiscalite) {
+      fiscaliteEcrite += ecrireFiscalite(sortie, dep, liste.map((c) => c.code), o.fiscalite);
     }
 
     if (o.elections) {
@@ -657,6 +664,13 @@ export function emettre(o: {
     dire(
       `${GRIS}Logements autorisés : ${logementsEcrits.toLocaleString('fr-FR')} communes, ` +
         `${o.logements.total.toLocaleString('fr-FR')} logements depuis ${o.logements.annees[0]}.${RAZ}`,
+    );
+  }
+  if (o.fiscalite) {
+    dire(
+      `${GRIS}Taux d’imposition ${o.fiscalite.millesime} : ` +
+        `${fiscaliteEcrite.toLocaleString('fr-FR')} communes, foncier bâti médian ` +
+        `${o.fiscalite.medianeFb} %.${RAZ}`,
     );
   }
   if (o.populations) {

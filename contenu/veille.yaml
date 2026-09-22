@@ -167,6 +167,16 @@ surveillances:
     ressource: "csv"
     lien: od-sitadel-communes
 
+  - id: rei-millesime
+    nom: "REI — taux d'imposition, millésime publié"
+    alimente: "les taux de taxe foncière, d'ordures ménagères et de CFE"
+    # Le jeu ne porte aucune ligne : toute la donnée est en pièces jointes, une
+    # par année depuis 1982. C'est le millésime le plus récent qui compte.
+    type: opendatasoft-pieces
+    url: "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-dir"
+    ressource: "REI[-_](\\d{4})"
+    lien: od-rei
+
 # Ce qu'on cherche à voir apparaître. Les jeux déjà connus sont ignorés ; les
 # autres sont proposés, à nous de juger s'ils méritent un nœud.
   - id: gaspar-risques

@@ -398,6 +398,32 @@ function assemblerUrbanisme(commune: CommuneBreve, structures: Structure[]): Urb
   };
 }
 
+function assemblerFiscalite(commune: CommuneBreve): Fiscalite | null {
+  const d = fiscaliteDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const [fb, thCommune, thAutres, majoration, omTaux, omQui, cfeCom, cfeGrp, fnbCom, fnbGrp] = f;
+  const total = (v: number[]) => Number(v.reduce((s, x) => s + x, 0).toFixed(2));
+  return {
+    millesime: d.millesime,
+    fbTotal: total(fb),
+    fb: fb
+      .map((taux, i) => ({ nom: d.percepteurs[i] ?? '', taux }))
+      .filter((x) => x.taux > 0 && x.nom),
+    medianeFb: d.medianeFb,
+    thCommune,
+    thTotal: total([thCommune, thAutres]),
+    majoration,
+    omTaux,
+    omQui: d.teom[omQui] ?? '',
+    medianeOm: d.medianeOm,
+    cfeCommune: cfeCom,
+    cfeGroupement: cfeGrp,
+    fnbTotal: total([fnbCom, fnbGrp]),
+    maj: d.maj,
+  };
+}
+
 function assemblerLogements(commune: CommuneBreve, population: number): Logements | null {
   const d = logementsDep.get(commune.dep);
   const f = d?.c[commune.code];
@@ -569,6 +595,36 @@ export interface Logements {
   maj: string;
 }
 
+/**
+ * Ce qui est prélevé ici, et par qui.
+ *
+ * La ligne « taxe foncière » d'un avis d'imposition n'est pas un taux mais une
+ * somme de taux votés par des assemblées différentes. Les séparer est
+ * exactement ce que ce site existe pour faire.
+ */
+export interface Fiscalite {
+  /** L'année dont les taux sont ceux votés. */
+  millesime: number;
+  /** Foncier bâti : le total, puis les parts non nulles, nommées. */
+  fbTotal: number;
+  fb: { nom: string; taux: number }[];
+  medianeFb: number;
+  /** Résidences secondaires : la part communale, le total, la majoration. */
+  thCommune: number;
+  thTotal: number;
+  majoration: number;
+  /** Ordures ménagères : le taux, qui la perçoit, la médiane de ceux qui l'ont. */
+  omTaux: number;
+  omQui: string;
+  medianeOm: number;
+  /** Entreprises : le taux communal de CFE, puis l'intercommunal. */
+  cfeCommune: number;
+  cfeGroupement: number;
+  /** Foncier non bâti, commune et intercommunalité additionnées. */
+  fnbTotal: number;
+  maj: string;
+}
+
 export interface ServiceEau {
   /** Euros TTC par m³, pour la consommation de référence de 120 m³. */
   prix: number | null;
@@ -662,6 +718,8 @@ export interface Territoire {
   urbanisme: Urbanisme | null;
   /** Ce qui s'y construit réellement, une fois la règle écrite. */
   logements: Logements | null;
+  /** Ce qui est prélevé sur place, et par qui. */
+  fiscalite: Fiscalite | null;
   /** Le dernier scrutin municipal, quand le ministère l'a publié. */
   scrutin: Scrutin | null;
   /** Ce qui a été délibéré, là où la collectivité publie ses actes. */
@@ -891,6 +949,21 @@ type LogementsDep = {
   c: Record<string, [number[], number, number]>;
 };
 const logementsDep = new Map<string, LogementsDep | null>();
+
+/** Les taux d'imposition du département. */
+type FiscaliteDep = {
+  maj: string;
+  millesime: number;
+  percepteurs: string[];
+  teom: string[];
+  medianeFb: number;
+  medianeOm: number;
+  c: Record<
+    string,
+    [number[], number, number, number, number, number, number, number, number, number]
+  >;
+};
+const fiscaliteDep = new Map<string, FiscaliteDep | null>();
 
 /** Le dernier scrutin municipal du département. */
 type ElectionsDep = {
@@ -1188,7 +1261,8 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
   if (!depComplets.has(commune.dep)) {
     // Les deux fichiers en parallèle : ils concernent le même département et
     // arrivent ensemble, plutôt que l'un après l'autre.
-    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb, logs] =
+    // eslint-disable-next-line prettier/prettier
+    const [structure, argent, eau, servs, ecoles, elus, mar, inv, risq, scr, del, sub, asso, pop, cons, urb, logs, fisc] =
       await Promise.all([
       departements.get(commune.dep) ?? json(`${BASE}/dep/${commune.dep}.json`),
       json<{ annee: number; annees: number[]; h: Record<string, (number | null)[][]> }>(
@@ -1211,6 +1285,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
       json<ConseilsDep>(`${BASE}/dep/${commune.dep}-conseils.json`).catch(() => null),
       json<UrbanismeDep>(`${BASE}/dep/${commune.dep}-urbanisme.json`).catch(() => null),
       json<LogementsDep>(`${BASE}/dep/${commune.dep}-logements.json`).catch(() => null),
+      json<FiscaliteDep>(`${BASE}/dep/${commune.dep}-fiscalite.json`).catch(() => null),
     ]);
     departements.set(commune.dep, structure);
     financesDep.set(commune.dep, argent);
@@ -1229,6 +1304,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     conseilsDep.set(commune.dep, cons);
     urbanismeDep.set(commune.dep, urb);
     logementsDep.set(commune.dep, logs);
+    fiscaliteDep.set(commune.dep, fisc);
     depComplets.add(commune.dep);
   }
   const dep = departements.get(commune.dep) as DepStructure;
@@ -1289,6 +1365,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     conseil: assemblerConseil(commune),
     urbanisme: assemblerUrbanisme(commune, structures),
     logements: assemblerLogements(commune, ligne[2]),
+    fiscalite: assemblerFiscalite(commune),
     scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,

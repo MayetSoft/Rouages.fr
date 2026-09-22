@@ -155,6 +155,11 @@ const phraseUrbanisme = !urb
             `votera la révision.`
           : 'Il est voté par le conseil municipal.');
 
+/** Ce qui est prélevé ici, et par qui. */
+const fisc = fiche?.fiscalite ?? null;
+const pourCent = (v: number) =>
+  `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %`;
+
 /** Ce qui sort du plan : autorisé, commencé, et la part des maisons. */
 const log = fiche?.logements ?? null;
 const dixieme = (v: number) =>
@@ -301,6 +306,46 @@ function moisAnnee(iso: string): string | null {
         <p class="p-source-territoire">
           D’après les transferts de compétences déclarés à BANATIC ({fiche!.maj}). Une compétence
           exercée sans transfert déclaré — par convention, par exemple — n’y figure pas.
+        </p>
+      </section>
+    )}
+
+    {fisc && (
+      <section>
+        <h2 class="badge">Ce qui est prélevé ici</h2>
+        <p class="c-fiscalite">
+          {`Taxe foncière sur le bâti ${fisc.millesime} : `}
+          <strong>{pourCent(fisc.fbTotal)}</strong>
+          {` — médiane des communes ${pourCent(fisc.medianeFb)}. Ce taux additionne ` +
+            fisc.fb.map((p) => `${pourCent(p.taux)} (${p.nom.toLowerCase()})`).join(', ') +
+            '.'}
+          <span class="c-fiscalite-suite">
+            {(fisc.omTaux > 0 && fisc.omQui
+              ? `Ordures ménagères : ${pourCent(fisc.omTaux)}, perçus par ${fisc.omQui}. `
+              : 'Aucune taxe d’enlèvement des ordures ménagères : le service est financé par une ' +
+                'redevance ou sur le budget général. ') +
+              (fisc.thTotal > 0
+                ? `Résidences secondaires : ${pourCent(fisc.thTotal)} de taxe d’habitation, dont ` +
+                  `${pourCent(fisc.thCommune)} pour la commune` +
+                  (fisc.majoration > 0
+                    ? `, majorés de ${fisc.majoration.toLocaleString('fr-FR')} %`
+                    : '') +
+                  '. '
+                : '') +
+              (fisc.cfeGroupement > 0
+                ? `Entreprises : ${pourCent(fisc.cfeGroupement)} de cotisation foncière, votés par ` +
+                  'l’intercommunalité.'
+                : fisc.cfeCommune > 0
+                  ? `Entreprises : ${pourCent(fisc.cfeCommune)} de cotisation foncière, votés par ` +
+                    'le conseil municipal.'
+                  : '')}
+          </span>
+          <span class="c-fiscalite-source">
+            {`D’après le recensement des éléments d’imposition de la DGFiP, millésime ` +
+              `${fisc.millesime} (${fisc.maj}). Le taux communal de taxe foncière a absorbé en ` +
+              '2021 l’ancienne part départementale. Le montant dû dépend aussi de la valeur ' +
+              'locative du bien, que ce site ne connaît pas.'}
+          </span>
         </p>
       </section>
     )}

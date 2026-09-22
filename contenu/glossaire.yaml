@@ -136,6 +136,12 @@ sigles:
     definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
     liens: [od-banatic]
 
+  - id: sigle-rei
+    sigle: REI
+    developpe: "Recensement des éléments d'imposition à la fiscalité directe locale"
+    definition: "Le fichier annuel de la DGFiP qui donne, commune par commune, les taux et les bases de chaque impôt local."
+    liens: [od-rei]
+
   - id: sigle-sispea
     sigle: SISPEA
     developpe: "Système d'information sur les services publics d'eau et d'assainissement"

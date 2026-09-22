@@ -359,6 +359,7 @@ export const Surveillance = z.object({
     'ofgl-millesime',
     'sispea-millesime',
     'opendatasoft-total',
+    'opendatasoft-pieces',
     'datagouv-tabulaire',
     'datagouv-ressource',
     'paquet-npm',
@@ -374,9 +375,9 @@ export const Surveillance = z.object({
    */
   echelon: z.enum(['commune', 'groupement']).default('commune'),
   /**
-   * Pour `datagouv-ressource` : le motif que doit porter le nom de la
-   * ressource suivie. Un jeu de données en publie souvent plusieurs, dont des
-   * notices PDF ; sans motif, on comparerait n'importe quoi.
+   * Pour `datagouv-ressource` et `opendatasoft-pieces` : le motif que doit
+   * porter le nom de la ressource suivie. Un jeu de données en publie souvent
+   * plusieurs, dont des notices PDF ; sans motif, on comparerait n'importe quoi.
    */
   ressource: z.string().min(1).optional(),
   /**

@@ -729,6 +729,7 @@ function demarrer(reseau: Reseau) {
     ajouter('Le conseil', blocConseil());
     ajouter('Qui exerce quoi', blocResolution(), true);
     ajouter('Ses comptes', blocFinances());
+    ajouter('Ce qui est prélevé ici', blocFiscalite());
     ajouter('L’intercommunalité', blocFluxPercus());
     ajouter('Les échelons', blocEchelons());
     ajouter('Une vente immobilière', blocDmto());
@@ -2461,6 +2462,117 @@ function demarrer(reseau: Reseau) {
           `logements, non des permis — ` +
           `un permis d’immeuble en porte plusieurs — et la date est celle de la prise en compte ` +
           `de l’autorisation, non celle de la signature du maire.`,
+      ),
+    );
+    return bloc;
+  }
+
+  /**
+   * Ce qui est prélevé ici, et par qui.
+   *
+   * La ligne « taxe foncière » d'un avis d'imposition n'est pas un taux : c'est
+   * une somme de taux votés par des assemblées différentes — la commune,
+   * l'intercommunalité, un syndicat, un établissement public foncier, la
+   * gestion des milieux aquatiques. Les séparer est exactement ce que ce site
+   * existe pour faire, et personne d'autre ne le fait sur l'avis lui-même.
+   */
+  function blocFiscalite(): HTMLElement | null {
+    const f = territoire?.fiscalite;
+    if (!f) return null;
+    const bloc = document.createElement('section');
+    bloc.className = 'p-fiscalite';
+    bloc.append(ligne('h3', 'p-titre-section', 'Ce qui est prélevé ici'));
+
+    const pourCent = (v: number) =>
+      `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %`;
+
+    const dl = document.createElement('dl');
+    dl.className = 'p-reperes';
+    const d = document.createElement('div');
+    d.append(ligne('dt', '', `Taxe foncière ${f.millesime}`));
+    const dd = document.createElement('dd');
+    dd.append(ligne('span', 'p-montant', pourCent(f.fbTotal)));
+    dd.append(reglette(f.fbTotal, f.medianeFb, 'la médiane des communes'));
+    dd.append(
+      ligne('span', 'p-mediane', `médiane des communes : ${pourCent(f.medianeFb)}`),
+    );
+    d.append(dd);
+    dl.append(d);
+    bloc.append(dl);
+
+    // Le détail : c'est là que se lit qui vote quoi.
+    if (f.fb.length > 0) {
+      const g = document.createElement('div');
+      g.className = 'p-risque-groupe';
+      g.append(ligne('span', 'p-service-famille', 'Ce que ce taux additionne'));
+      const ul = document.createElement('ul');
+      for (const part of f.fb) {
+        const li = document.createElement('li');
+        li.append(ligne('span', 'p-risque-nombre', pourCent(part.taux)));
+        li.append(ligne('span', 'p-risque-nom', part.nom));
+        ul.append(li);
+      }
+      g.append(ul);
+      bloc.append(g);
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-strate',
+        f.omTaux > 0 && f.omQui
+          ? `Ordures ménagères : ${pourCent(f.omTaux)} sur la même base, perçus par ${f.omQui} ` +
+            `(médiane ${pourCent(f.medianeOm)} là où la taxe existe).`
+          : 'Aucune taxe d’enlèvement des ordures ménagères : le service est financé autrement — ' +
+            'par une redevance calculée sur le service rendu, ou sur le budget général.',
+      ),
+    );
+
+    if (f.thTotal > 0) {
+      bloc.append(
+        ligne(
+          'p',
+          'p-strate',
+          `Résidences secondaires : ${pourCent(f.thTotal)} de taxe d’habitation, dont ` +
+            `${pourCent(f.thCommune)} pour la commune` +
+            (f.majoration > 0
+              ? `, majorés de ${f.majoration.toLocaleString('fr-FR')} % par délibération du conseil municipal`
+              : '') +
+            '. La taxe d’habitation sur la résidence principale, elle, n’existe plus depuis 2023.',
+        ),
+      );
+    }
+
+    const cfe = f.cfeGroupement > 0 ? f.cfeGroupement : f.cfeCommune;
+    if (cfe > 0) {
+      bloc.append(
+        ligne(
+          'p',
+          'p-strate',
+          `Entreprises : ${pourCent(cfe)} de cotisation foncière, ` +
+            (f.cfeGroupement > 0
+              ? 'votés par l’intercommunalité — sous fiscalité professionnelle unique, la commune ' +
+                'ne vote plus ce taux et ne perçoit plus cet impôt.'
+              : 'votés par le conseil municipal.'),
+        ),
+      );
+    }
+
+    if (f.fnbTotal > 0) {
+      bloc.append(
+        ligne('p', 'p-strate', `Terres et terrains non bâtis : ${pourCent(f.fnbTotal)}.`),
+      );
+    }
+
+    bloc.append(
+      ligne(
+        'p',
+        'p-source-territoire',
+        `D’après le recensement des éléments d’imposition à la fiscalité directe locale de la ` +
+          `DGFiP, millésime ${f.millesime} (${f.maj}). Le taux communal de taxe foncière a ` +
+          `absorbé en 2021 l’ancienne part départementale : le comparer à celui de 2020 n’aurait ` +
+          `pas de sens. Le montant dû dépend aussi de la valeur locative du bien, que ce site ne ` +
+          `connaît pas.`,
       ),
     );
     return bloc;

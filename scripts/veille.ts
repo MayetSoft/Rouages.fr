@@ -255,6 +255,39 @@ const controles: Record<
    * change d'identifiant, casse l'ingestion en silence.
    */
   /**
+   * Un jeu Opendatasoft dont la donnée vit dans ses pièces jointes.
+   *
+   * Le REI de la DGFiP est publié ainsi : le jeu ne porte aucune ligne, et un
+   * fichier par millésime est attaché. Ce qu'on surveille est donc le
+   * millésime le plus récent, lu sur l'intitulé des pièces — leur identifiant,
+   * lui, porte des coquilles (« tracezip » pour 2025) et ne se prête pas au
+   * tri.
+   */
+  async 'opendatasoft-pieces'(s) {
+    const d = (await (await obstine(s.url)).json()) as {
+      attachments?: { title?: string }[];
+    };
+    const motif = new RegExp(s.ressource ?? '(\\d{4})', 'i');
+    const annees = (d.attachments ?? [])
+      .map((a) => motif.exec(a.title ?? '')?.[1])
+      .filter((x): x is string => !!x)
+      .map(Number);
+    if (annees.length === 0) {
+      return {
+        gravite: 'alerte',
+        message: 'aucune pièce jointe reconnue : le jeu a changé de forme',
+      };
+    }
+    const dernier = Math.max(...annees);
+    return {
+      gravite: 'ok',
+      message: `dernier millésime publié : ${dernier}`,
+      empreinte: String(dernier),
+      millesime: dernier,
+    };
+  },
+
+  /**
    * Une ressource servie par l'API tabulaire de data.gouv.
    *
    * Deux pannes distinctes à attraper, et la seconde est la plus vicieuse : la

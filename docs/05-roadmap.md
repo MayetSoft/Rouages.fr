@@ -1292,6 +1292,48 @@ La fenêtre s'arrête à la dernière année **pleine**. Le fichier va jusqu'à
 juillet 2026&nbsp;; afficher 2026 à côté de dix années entières se lirait comme
 un effondrement de la construction, et ce serait faux.
 
+### Ce qui est prélevé ici, et par qui ✔
+
+Le site savait dire combien une commune dépense par habitant. Il ne savait pas
+dire ce que son propriétaire paie, ni surtout **à qui**. Or la ligne « taxe
+foncière » d'un avis d'imposition n'est pas un taux&nbsp;: c'est une somme de
+taux votés par des assemblées différentes, et les séparer est exactement ce que
+ce site existe pour faire.
+
+> **Le Mayet-de-Montagne**, 39,24 % au total&nbsp;: 38,17 % pour la commune,
+> 0,41 % pour l'intercommunalité, 0,21 % de taxes spéciales d'équipement,
+> 0,45 % pour la gestion des milieux aquatiques. Médiane des communes&nbsp;:
+> 40,34 %.
+>
+> **Vichy**, 48,88 %, avec une ligne de plus — 0,26 % pour des syndicats.
+
+S'y ajoutent, sur la même base, les **ordures ménagères**&nbsp;: 14,76 % au
+Mayet, perçus par l'intercommunalité. Le fichier dit *qui* perçoit, et la
+réponse surprend — sur 34 873 communes, l'intercommunalité dans 24 199 cas, un
+syndicat dans 203, et **la commune elle-même dans deux**. Les 10 468 restantes
+n'ont pas de TEOM du tout&nbsp;: elles financent le service par une redevance
+ou sur le budget général.
+
+Puis la **taxe d'habitation des résidences secondaires** — celle sur la
+résidence principale n'existe plus depuis 2023 — et la **cotisation foncière
+des entreprises**, que sous fiscalité professionnelle unique la commune ne vote
+plus et ne perçoit plus.
+
+**La vérification.** Le total est la somme exhaustive des taux que la trace du
+fichier déclare applicables au foncier bâti — commune, intercommunalité,
+syndicats, TSE, TASA, GEMAPI. Testé sur Rennes&nbsp;: 45,66 % commune + 1,73 %
+métropole + annexes = **47,703 %**, quand la valeur publiée ailleurs est
+47,70 %. Testé sur Paris&nbsp;: 20,50 % pour la part communale, le chiffre que
+la Ville affiche elle-même. Sans ces deux recoupements le total n'aurait pas
+été publié.
+
+**Un piège écarté.** Le taux communal a absorbé en 2021 l'ancienne part
+départementale (article 16 de la loi de finances pour 2020)&nbsp;: le comparer à
+celui de 2020 n'a aucun sens, et la page le dit plutôt que de laisser conclure
+à un doublement. Le fichier compte sept cents colonnes aux noms opaques
+(`E12`, `H52gGEMAPI`, `F71`)&nbsp;; aucune n'a été devinée — la trace publiée
+avec le fichier les documente une à une, et c'est elle qui a servi.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

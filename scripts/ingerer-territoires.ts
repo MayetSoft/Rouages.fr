@@ -579,6 +579,21 @@ async function principal() {
     ),
   );
 
+  // Ce qui est prélevé sur place, et par qui : la ligne « taxe foncière » d'un
+  // avis n'est pas un taux, c'est une somme de taux votés par des assemblées
+  // différentes. Le REI les sépare, personne d'autre ne le fait.
+  const { collecterFiscalite } = await import('./fiscalite-emettre.ts');
+  const { lignesCsvOuvert } = await import('./donnees-ouvertes.ts');
+  const fiscalite = await tenter('Taux d’imposition', () =>
+    collecterFiscalite(
+      (url, vers) => telechargerEnCache(url, vers, reutiliser, 'REI — taux d’imposition (18 Mo)'),
+      CACHE,
+      (lire) => lignesCsvOuvert('rei', lire),
+      async <T,>(url: string) => (await obstine(url)).json() as Promise<T>,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+
   const { collecterAssociations } = await import('./associations-emettre.ts');
   const associations = await tenter('Associations', () =>
     collecterAssociations(
@@ -621,6 +636,7 @@ async function principal() {
     conseils,
     urbanisme,
     logements,
+    fiscalite,
   );
 }
 
@@ -750,6 +766,7 @@ async function ecrire(
   conseils: Awaited<ReturnType<typeof import('./conseils-emettre.ts')['collecterConseils']>>,
   urbanisme: Awaited<ReturnType<typeof import('./urbanisme-emettre.ts')['collecterUrbanisme']>>,
   logements: Awaited<ReturnType<typeof import('./logements-emettre.ts')['collecterLogements']>>,
+  fiscalite: Awaited<ReturnType<typeof import('./fiscalite-emettre.ts')['collecterFiscalite']>>,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -779,6 +796,7 @@ async function ecrire(
     conseils,
     urbanisme,
     logements,
+    fiscalite,
     sortie: SORTIE,
     dire,
     VERT,

@@ -123,6 +123,20 @@ type LogementsDep = {
   c: Record<string, [number[], number, number]>;
 };
 
+/** Les taux d'imposition du département. */
+type FiscaliteDep = {
+  maj: string;
+  millesime: number;
+  percepteurs: string[];
+  teom: string[];
+  medianeFb: number;
+  medianeOm: number;
+  c: Record<
+    string,
+    [number[], number, number, number, number, number, number, number, number, number]
+  >;
+};
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -170,6 +184,7 @@ const cachePop = new Map<string, PopDep | null>();
 const cacheConseils = new Map<string, ConseilsDep | null>();
 const cacheUrbanisme = new Map<string, UrbanismeDep | null>();
 const cacheLogements = new Map<string, LogementsDep | null>();
+const cacheFiscalite = new Map<string, FiscaliteDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -363,6 +378,28 @@ export interface Fiche {
     jusquau: string;
     maj: string;
   } | null;
+  /**
+   * Ce qui est prélevé ici, et par qui.
+   *
+   * La ligne « taxe foncière » d'un avis n'est pas un taux : c'est une somme
+   * de taux votés par des assemblées différentes.
+   */
+  fiscalite: {
+    millesime: number;
+    fbTotal: number;
+    fb: { nom: string; taux: number }[];
+    medianeFb: number;
+    thCommune: number;
+    thTotal: number;
+    majoration: number;
+    omTaux: number;
+    omQui: string;
+    medianeOm: number;
+    cfeCommune: number;
+    cfeGroupement: number;
+    fnbTotal: number;
+    maj: string;
+  } | null;
   /** Ce qui s'y construit réellement, une fois la règle écrite. */
   logements: {
     annees: number[];
@@ -480,6 +517,7 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
     conseil: assemblerConseil(c, structures),
     urbanisme: assemblerUrbanisme(c, structures),
     logements: assemblerLogements(c),
+    fiscalite: assemblerFiscalite(c),
     sommet: assemblerSommet(c),
     maj: dep.maj,
   };
@@ -531,6 +569,32 @@ function assemblerUrbanisme(
     totalPartout: u.total,
     jusquau: u.jusquau,
     maj: u.maj,
+  };
+}
+
+function assemblerFiscalite(c: CommuneIndex): Fiche['fiscalite'] {
+  const d = enCache(cacheFiscalite, c.dep, `dep/${c.dep}-fiscalite.json`);
+  const f = d?.c[c.code];
+  if (!d || !f) return null;
+  const [fb, thCommune, thAutres, majoration, omTaux, omQui, cfeCom, cfeGrp, fnbCom, fnbGrp] = f;
+  const total = (v: number[]) => Number(v.reduce((s, x) => s + x, 0).toFixed(2));
+  return {
+    millesime: d.millesime,
+    fbTotal: total(fb),
+    fb: fb
+      .map((taux, i) => ({ nom: d.percepteurs[i] ?? '', taux }))
+      .filter((x) => x.taux > 0 && x.nom),
+    medianeFb: d.medianeFb,
+    thCommune,
+    thTotal: total([thCommune, thAutres]),
+    majoration,
+    omTaux,
+    omQui: d.teom[omQui] ?? '',
+    medianeOm: d.medianeOm,
+    cfeCommune: cfeCom,
+    cfeGroupement: cfeGrp,
+    fnbTotal: total([fnbCom, fnbGrp]),
+    maj: d.maj,
   };
 }
 

@@ -77,6 +77,9 @@ sources:
   - { id: od-sudocuh, type: donnees_ouvertes, titre: "SuDocUH — état des documents d'urbanisme, commune par commune", url: "https://www.data.gouv.fr/fr/datasets/620b924d90e837a5ce0ba819/", consulte_le: 2026-09-22 }
   # Les séries communales de Sitadel : ce qui sort du plan, mois par mois.
   - { id: od-sitadel-communes, type: donnees_ouvertes, titre: "Sitadel — logements autorisés et commencés, séries mensuelles communales", url: "https://www.data.gouv.fr/fr/datasets/689c430033671e3d26466245/", consulte_le: 2026-09-22 }
+  # Les taux d'imposition, commune par commune : le fichier que la DGFiP publie
+  # chaque année, et dont la trace documente les sept cents colonnes.
+  - { id: od-rei, type: donnees_ouvertes, titre: "REI — recensement des éléments d'imposition à la fiscalité directe locale (DGFiP)", url: "https://data.economie.gouv.fr/explore/dataset/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-dir/", consulte_le: 2026-09-22 }
   - { id: od-sispea, type: donnees_ouvertes, titre: "SISPEA — prix et performance des services d'eau, commune par commune", url: "https://services.eaufrance.fr/", consulte_le: 2026-09-05 }
   - { id: od-sinoe, type: donnees_ouvertes, titre: "SINOE — données sur les déchets ménagers (ADEME)", url: "https://www.sinoe.org/", consulte_le: 2026-09-05 }
   - { id: od-decp, type: donnees_ouvertes, titre: "Données essentielles de la commande publique", url: "https://www.data.gouv.fr/fr/datasets/donnees-essentielles-de-la-commande-publique-fichiers-consolides/", consulte_le: 2026-09-05 }
