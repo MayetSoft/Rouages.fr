@@ -34,8 +34,8 @@ Reste :
 - **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
   vrai reste à faire, pas le volume. `npm run relire` en donne la file :
   l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs, les 41 compétences, les 15 flux et deux processus
-  entiers sont faits (voir plus bas) ; restent 91 fiches.
+  fiche. Les 37 acteurs, les 41 compétences, les 15 flux et trois processus
+  entiers sont faits (voir plus bas) ; restent 81 fiches.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1518,7 +1518,24 @@ désigner assesseur. Et une surprise confirmée&nbsp;: passé dix jours, la list
 d'émargement devient une archive fermée **cinquante ans**, parce qu'elle révèle
 qui est allé voter.
 
-Reste 91 fiches&nbsp;: 9 processus, 47 étapes, 35 leviers.
+**Le permis de construire**, troisième processus relu, a rendu deux
+corrections qui vont toutes deux dans le sens du citoyen.
+
+La première était une contradiction interne&nbsp;: une demande de pièces
+manquantes « suspend l'instruction **et** fait repartir le compte à rebours ».
+Ni l'un ni l'autre. Le dossier est **réputé complet** si la mairie n'a pas
+notifié la liste dans le mois du dépôt, et une demande faite après ce mois **ne
+décale plus rien** — l'administration ne peut pas repousser sa propre échéance
+en réclamant tard.
+
+La seconde tient à un détail du panneau. Un recours doit être notifié au
+bénéficiaire du permis dans les quinze jours, sous peine d'irrecevabilité —
+c'est ce que la fiche disait. Ce qu'elle ne disait pas&nbsp;: **si le panneau ne
+mentionne pas cette obligation, l'irrecevabilité n'est pas opposable**. Le
+voisin qui photographie le panneau le fait donc pour deux raisons, et la
+seconde peut sauver son recours.
+
+Reste 81 fiches&nbsp;: 8 processus, 42 étapes, 31 leviers.
 
 ### Une ingestion qui ne se perd plus en route
 
