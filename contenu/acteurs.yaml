@@ -59,9 +59,9 @@ acteurs:
     type: service_administratif
     echelon: commune
     resume: "Placée sous l'autorité du maire, aux pouvoirs distincts de ceux de la police nationale ou de la gendarmerie."
-    liens: [code-securite-interieure, cgct]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-securite-interieure, cgct, csi-l511-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Intercommunalité -------------------------------------------------
   - id: epci
@@ -120,10 +120,14 @@ acteurs:
     nom_court: "Pompiers"
     type: service_administratif
     echelon: departement
-    resume: "Établissement public financé par le département et les communes, mais dirigé opérationnellement par le préfet."
-    liens: [wp-sdis, code-securite-interieure]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    # « Dirigé par le préfet » était faux d'une moitié des interventions : le
+    # service agit sous l'autorité du maire ou du préfet selon le pouvoir de
+    # police en cause (art. L1424-3 et L1424-4). C'est le maire qu'on trouve
+    # au bout de la chaîne pour un feu communal, pas la préfecture.
+    resume: "Établissement public autonome, financé par le département et les communes ; il intervient sous l'autorité du maire ou du préfet, selon le pouvoir de police en cause."
+    liens: [wp-sdis, code-securite-interieure, cgct-l1424-3, cgct-l1424-35]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Région -----------------------------------------------------------
   - id: region
@@ -192,15 +196,19 @@ acteurs:
     confiance: etabli
 
   - id: abf
+    # « Parfois conforme » est la formulation juste, et elle est volontairement
+    # prudente : l'accord de l'ABF lie l'autorité qui délivre le permis aux abords
+    # d'un monument et en site patrimonial remarquable, quand son avis reste simple
+    # ailleurs. Écrire « toujours » ou « jamais » serait faux dans les deux cas.
     nom: "L'architecte des Bâtiments de France"
     nom_court: "Bâtiments de France"
     type: service_deconcentre
     echelon: etat
     pouvoirs: [executif]
     resume: "Rend un avis, parfois conforme, sur les projets situés en périmètre de protection du patrimoine."
-    liens: [wp-abf, code-patrimoine]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-abf, code-patrimoine, cpat-l632-2]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: caf
     nom: "La CAF"
@@ -220,9 +228,9 @@ acteurs:
     echelon: etat
     pouvoirs: [executif]
     resume: "Établissement de bassin qui perçoit des redevances sur l'eau et subventionne les travaux des collectivités."
-    liens: [wp-agence-eau, code-environnement, eaufrance]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-agence-eau, code-environnement, eaufrance, ce-l213-8]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: tribunal-administratif
     nom: "Le tribunal administratif"
@@ -443,10 +451,15 @@ acteurs:
     type: service_deconcentre
     echelon: etat
     pouvoirs: [executif]
-    resume: "Le bras technique du préfet sur l'urbanisme, l'eau, les risques et les routes ; elle instruit encore les permis pour les communes sans document d'urbanisme."
-    liens: [wp-ddt, annuaire-ddt, code-urbanisme]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    # Le critère n'est pas l'absence de document d'urbanisme, comme cette fiche
+    # le disait, mais la population : sous dix mille habitants et hors d'une
+    # intercommunalité qui les atteint, la commune peut demander gratuitement
+    # l'instruction à l'État (art. L422-8). Une commune au règlement national
+    # mais peuplée n'y a pas droit ; une commune dotée d'un PLU mais petite, si.
+    resume: "Le bras technique du préfet sur l'urbanisme, l'eau, les risques et les routes ; sous dix mille habitants, une commune peut lui faire instruire gratuitement ses permis."
+    liens: [wp-ddt, annuaire-ddt, code-urbanisme, cu-l422-8]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: dreal
     nom: "La DREAL"
@@ -454,10 +467,14 @@ acteurs:
     type: service_deconcentre
     echelon: region
     pouvoirs: [executif]
-    resume: "Environnement, risques industriels et logement à l'échelle régionale : c'est elle qui autorise et contrôle les installations classées."
-    liens: [wp-dreal, annuaire-dreal, code-environnement]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    # C'est le préfet qui autorise une installation classée, pas la DREAL :
+    # elle en instruit le dossier et l'inspecte ensuite. La distinction compte
+    # pour qui cherche à qui s'adresser — on écrit au préfet, on est contrôlé
+    # par la DREAL.
+    resume: "Environnement, risques industriels et logement à l'échelle régionale : elle instruit les autorisations d'installations classées, que le préfet signe, et les inspecte ensuite."
+    liens: [wp-dreal, annuaire-dreal, code-environnement, ce-icpe-autorisation]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: dgfip
     nom: "Les finances publiques"
@@ -531,10 +548,13 @@ acteurs:
     nom_court: "CAUE"
     type: association
     echelon: departement
+    # La gratuité n'est pas une pratique mais une règle : article 7 de la loi
+    # du 3 janvier 1977, qui a aussi créé les CAUE. Le financement par la part
+    # départementale de la taxe d'aménagement en fait l'essentiel des recettes.
     resume: "Conseil gratuit en architecture et urbanisme, ouvert aux particuliers comme aux communes, financé par une part de la taxe d'aménagement."
-    liens: [wp-caue, fncaue, code-urbanisme]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-caue, fncaue, code-urbanisme, loi-architecture-1977]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Union européenne -------------------------------------------------
   - id: union-europeenne
@@ -591,24 +611,32 @@ acteurs:
     confiance: etabli
 
   - id: commissaire-enqueteur
+    # Deux précisions ajoutées après vérification : c'est le président du tribunal
+    # administratif qui le désigne — pas le porteur du projet, ce qui est tout
+    # l'intérêt — et son rapport comme ses conclusions sont publics de droit
+    # (art. L123-15). Savoir qu'on peut les lire change ce qu'on peut en faire.
     nom: "Le commissaire enquêteur"
     nom_court: "Commissaire enquêteur"
     type: personne
     echelon: etat
-    resume: "Désigné pour conduire une enquête publique : il recueille les observations et rend un rapport avec un avis motivé."
-    liens: [wp-enquete-publique, code-environnement, vp-enquete-publique]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Désigné par le tribunal administratif pour conduire une enquête publique : il recueille les observations et rend un rapport et des conclusions motivées, rendus publics."
+    liens: [wp-enquete-publique, code-environnement, vp-enquete-publique, ce-l123-15]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: ccas
+    # Deux précisions qui changent la lecture : le CCAS est une personne morale
+    # à part, avec son budget et son conseil d'administration — ce n'est pas un
+    # service de la mairie ; et il n'est obligatoire qu'au-dessus de mille cinq
+    # cents habitants. Le Mayet-de-Montagne, 1 383 habitants, est en dessous.
     nom: "Le CCAS"
     nom_court: "CCAS"
     type: service_administratif
     echelon: commune
-    resume: "Centre communal d'action sociale : l'aide sociale de proximité, distincte de celle du département."
-    liens: [wp-ccas, code-action-sociale, unccas]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Établissement public distinct de la commune, obligatoire au-dessus de 1 500 habitants : il mène l’aide sociale de proximité et participe à l’instruction des demandes d’aide légale, que le département décide."
+    liens: [wp-ccas, code-action-sociale, unccas, casf-l123-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: chambre-regionale-comptes
     nom: "La chambre régionale des comptes"
@@ -626,10 +654,13 @@ acteurs:
     nom_court: "Conseil d'école"
     type: assemblee
     echelon: commune
-    resume: "Réunit enseignants, parents élus et la commune ; il est consulté sur la vie de l'école mais ne décide pas des moyens."
-    liens: [wp-conseil-ecole, code-education]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    # « Consulté » sous-estimait : le conseil d'école *vote* le règlement
+    # intérieur (art. D411-2). Ce qu'il ne décide pas, c'est la répartition des
+    # moyens — le directeur la fixe, et il ne fait que donner un avis dessus.
+    resume: "Réunit enseignants, parents élus et la commune : il vote le règlement intérieur et donne son avis sur la vie de l'école, mais ne décide pas de la répartition des moyens."
+    liens: [wp-conseil-ecole, code-education, ce-d411-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Réseaux, mobilité, planification -----------------------------------
   - id: syndicat-energie
@@ -637,10 +668,14 @@ acteurs:
     nom_court: "Syndicat d'énergie"
     type: collectivite
     echelon: epci
-    resume: "Propriétaire du réseau de distribution d'électricité et autorité concédante : c'est lui qui signe avec Enedis, pas la commune seule."
-    liens: [wp-concession-electricite, code-energie, fnccr]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    # Le réseau appartient bien à la collectivité — commune ou, quand elle lui
+    # a transféré la compétence, le syndicat — et non au gestionnaire qui
+    # l'exploite (art. L322-4). C'est ce qui fait du syndicat l'autorité
+    # concédante, celle qui signe et qui contrôle.
+    resume: "Autorité organisatrice de la distribution d'électricité : le réseau lui appartient, et c'est lui qui le concède à Enedis, pas la commune seule."
+    liens: [wp-concession-electricite, code-energie, cen-l322-4, fnccr]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: enedis
     nom: "Enedis"
@@ -658,9 +693,9 @@ acteurs:
     type: collectivite
     echelon: epci
     resume: "Décide de l'offre de transport de son ressort : lignes, tarifs, fréquences. Intercommunalité le plus souvent, région à défaut."
-    liens: [wp-aom, code-transports, vp-mobilite, od-transport]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-aom, code-transports, vp-mobilite, od-transport, lom-2019]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: operateur-transport
     nom: "L'exploitant du réseau de transport"
@@ -677,10 +712,13 @@ acteurs:
     nom_court: "Syndicat de SCoT"
     type: collectivite
     echelon: epci
-    resume: "Porte le schéma de cohérence territoriale, cadre auquel les PLU doivent se conformer sur un bassin de vie entier."
-    liens: [wp-scot, code-urbanisme, od-gpu]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    # « Compatible » et non « conforme » : un PLU peut s'écarter du SCoT tant
+    # qu'il n'en remet pas en cause les orientations générales (art. L131-4).
+    # Écrire « se conformer » donnait au schéma une rigidité qu'il n'a pas.
+    resume: "Porte le schéma de cohérence territoriale, avec lequel les PLU d'un bassin de vie entier doivent être compatibles."
+    liens: [wp-scot, code-urbanisme, cu-l131-4, od-gpu]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: agence-urbanisme
     nom: "L'agence d'urbanisme"
@@ -693,14 +731,17 @@ acteurs:
     confiance: a_confirmer
 
   - id: employeur
+    # Le seuil est chiffré plutôt que laissé à « un seuil d'effectif » : onze
+    # salariés. Et le versement n'est pas dû partout — il faut que l'autorité
+    # organisatrice l'ait institué sur son ressort.
     nom: "Les employeurs"
     nom_court: "Employeurs"
     type: entreprise
     echelon: prive
-    resume: "Au-delà d'un seuil d'effectif, ils financent les transports du territoire par le versement mobilité."
-    liens: [wp-versement-mobilite, code-transports]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "À partir de onze salariés, et là où l’autorité organisatrice l’a institué, ils financent les transports du territoire par le versement mobilité."
+    liens: [wp-versement-mobilite, code-transports, urssaf-versement-mobilite]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Les officiers publics et ministériels -------------------------------
   # Ce ne sont pas des entreprises ordinaires : l'État leur délègue une
@@ -722,19 +763,22 @@ acteurs:
     type: metier
     echelon: prive
     resume: "Huissier et commissaire-priseur judiciaire réunis depuis 2022 : il signifie les actes, dresse les constats et exécute les décisions de justice."
-    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire, ordonnance-commissaires-justice]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: geometre-expert
     nom: "Le géomètre-expert"
     nom_court: "Géomètre-expert"
     type: metier
     echelon: prive
-    resume: "Seul habilité à fixer la limite d'une propriété : le bornage qu'il établit fait foi, là où un relevé quelconque n'engage personne."
-    liens: [wp-geometre-expert, ordre-geometres, code-urbanisme]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    # Le monopole est réel et ancien — loi du 7 mai 1946. La nuance apportée
+    # porte sur ce qui « fait foi » : c'est le procès-verbal signé par les
+    # voisins, non le plan seul, qui fixe la limite entre eux.
+    resume: "Seul habilité à fixer la limite d'une propriété : le procès-verbal de bornage qu'il dresse et que les voisins signent les engage, là où un relevé quelconque n'engage personne."
+    liens: [wp-geometre-expert, ordre-geometres, code-urbanisme, loi-geometres-1946]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- L'échelon qu'on touche sans le savoir --------------------------------
   # Le département était représenté par quatre nœuds quand l'État en comptait
@@ -819,6 +863,6 @@ acteurs:
     type: organe_collegial
     echelon: commune
     resume: "Contrôle a posteriori les décisions du maire sur les inscriptions et radiations, et statue sur le recours de l'électeur avant tout passage devant le juge."
-    liens: [code-electoral, insee-reu, sp-listes-electorales]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [code-electoral, cel-l19, insee-reu, sp-listes-electorales]
+    verifie_le: 2026-09-22
+    confiance: etabli
