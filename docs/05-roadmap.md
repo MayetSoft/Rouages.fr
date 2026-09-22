@@ -34,8 +34,8 @@ Reste :
 - **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
   vrai reste à faire, pas le volume. `npm run relire` en donne la file :
   l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs sont faits (voir plus bas) ; restent 166 fiches, pour
-  l'essentiel des étapes et des leviers de processus.
+  fiche. Les 37 acteurs et 21 des 41 compétences sont faits (voir plus bas) ;
+  restent 142 fiches, pour l'essentiel des étapes et des leviers de processus.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1402,10 +1402,40 @@ son travail pendant l'exercice — deux sigles employés sans entrée au glossai
 refusés à la publication.
 
 **`npm run relire`** transforme le reste en file de travail&nbsp;: pour chaque
-fiche, l'affirmation exacte et les pages qui devraient la fonder. Reste 166
-fiches, dont 57 étapes et 42 leviers de processus. Toutes ne finiront pas en
-`etabli` — un délai observé ou une pratique locale doit garder sa réserve, et
-le site l'affiche plutôt que de la taire.
+fiche, l'affirmation exacte et les pages qui devraient la fonder. Toutes ne
+finiront pas en `etabli` — un délai observé ou une pratique locale doit garder
+sa réserve, et le site l'affiche plutôt que de la taire.
+
+**La suite, sur les compétences, a appris quelque chose sur la méthode.** Trois
+des erreurs corrigées sur les acteurs s'y répétaient mot pour mot — le service
+d'incendie « sous l'autorité opérationnelle du préfet », les PLU qui doivent
+« se conformer » au SCoT, l'instruction gratuite réservée aux « communes sans
+document d'urbanisme ». Une formulation fausse recopiée d'une famille à l'autre
+ne se voit pas en relisant une fiche&nbsp;: elle se voit en relisant la même
+affirmation deux fois.
+
+Et une **quatrième variante** de la même famille d'erreur est apparue&nbsp;: le
+schéma régional « s'impose aux documents d'urbanisme locaux ». Il ne s'impose
+pas. Ses **objectifs** sont pris en compte, ses **règles générales** respectées
+en compatibilité (art. L4251-3), et il n'atteint le plan communal qu'à travers
+le SCoT. Trois rapports juridiques différents dans une phrase de onze mots, et
+c'est exactement la chaîne que ce site existe pour montrer.
+
+Deux précisions valent d'être retenues. L'**intérêt communautaire** doit être
+défini dans les deux ans suivant le transfert&nbsp;: à défaut, le groupement
+exerce la compétence **en entier**. Le silence ne laisse donc rien à la commune,
+il lui enlève tout. Et la **carte scolaire** relève du directeur académique
+seul, la commune propriétaire de l'école n'étant qu'informée — ce que le
+ministère écrit lui-même.
+
+Deux leviers sont entrés au passage, tirés de la relecture des acteurs&nbsp;: le
+**rapport annuel du délégataire**, dont l'assemblée « prend acte » sans
+l'approuver et que la CADA tient pour communicable après occultation du secret
+des affaires, et le **compte rendu annuel de la concession d'électricité**,
+remis à l'autorité concédante — qui n'est pas la mairie là où la compétence a
+été transférée, ce qui est précisément le piège.
+
+Reste 142 fiches, dont 57 étapes et 42 leviers de processus.
 
 ### Une ingestion qui ne se perd plus en route
 
