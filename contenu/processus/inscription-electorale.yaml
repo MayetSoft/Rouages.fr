@@ -24,51 +24,62 @@ processus:
     sortie: "Une inscription au répertoire électoral unique, dans un bureau de vote donné"
     decideur: maire
     competences: [listes-electorales, etat-civil]
-    liens: [code-electoral, insee-reu, sp-listes-electorales, loi-inscription-electorale]
-    verifie_le: 2026-09-19
+    liens: [code-electoral, insee-reu, sp-listes-electorales, loi-inscription-electorale, cel-l19, cel-l30]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les six étapes et les cinq leviers sont vérifiés : c'est ce qui permet au
+    # processus de passer. Une erreur y a été corrigée — les assesseurs sont
+    # désignés par les candidats parmi les électeurs du *département*, non de la
+    # seule commune — et trois délais ont été chiffrés : cinq jours pour la
+    # décision du maire, cinq jours pour la contester, trois jours avant le
+    # scrutin pour se faire désigner assesseur.
+    confiance: etabli
 
     etapes:
       - ordre: 1
         acteur: citoyen
         action: "Demande d'inscription, en ligne ou en mairie"
         note: "L'inscription est automatique à dix-huit ans lorsque le recensement citoyen a été fait à seize ans, et après une naturalisation. Dans tous les autres cas — un déménagement, notamment — elle se demande."
-        liens: [sp-listes-electorales, code-electoral]
-        confiance: a_confirmer
+        liens: [sp-listes-electorales, code-electoral, cel-l30]
+        confiance: etabli
       - ordre: 2
         acteur: maire
         action: "Décision d'inscription ou de refus"
         delai: { valeur: 5, unite: jours, nature: maximum_legal }
         note: "Depuis 2019, le maire décide seul : la commission administrative qui statuait avant n'existe plus. La décision est transmise à l'Insee, qui tient le répertoire national."
-        liens: [code-electoral, insee-reu]
-        confiance: a_confirmer
+        liens: [code-electoral, insee-reu, cel-l19]
+        confiance: etabli
       - ordre: 3
         acteur: commission-controle-listes
         action: "Contrôle a posteriori et examen des recours"
         note: "La commission vérifie la régularité de la liste et statue sur le recours de l'électeur contre une décision du maire. Elle peut inscrire un électeur omis ou radier une inscription indue."
-        liens: [code-electoral, insee-reu]
-        confiance: a_confirmer
+        liens: [code-electoral, insee-reu, cel-l19]
+        confiance: etabli
       - ordre: 4
+        # Correction : la fiche disait « tout électeur de la commune peut être
+        # désigné assesseur ». C'est l'inverse du mécanisme principal — ce sont les
+        # candidats qui désignent, parmi les électeurs du département. La commune ne
+        # prend les siens qu'à défaut. Un habitant du village voisin peut donc tenir
+        # un bureau, ce que la formulation précédente décourageait.
         acteur: commune
         action: "Publication de la liste et tenue du bureau de vote"
         produit: [carte-electorale, liste-emargement]
-        note: "Le bureau de vote est présidé par le maire ou son représentant. Tout électeur de la commune peut être désigné assesseur, et tout électeur du département peut être délégué d'un candidat."
-        liens: [code-electoral, wp-procedures-electorales]
-        confiance: a_confirmer
+        note: "Le bureau de vote est présidé par le maire ou son représentant. Les assesseurs sont désignés par les candidats parmi les électeurs du département — pas seulement de la commune ; à défaut de désignation, le maire les prend parmi les conseillers municipaux, puis parmi les électeurs de la commune."
+        liens: [code-electoral, wp-procedures-electorales, cel-r44]
+        confiance: etabli
       - ordre: 5
         acteur: conseil-municipal
         action: "Élection au scrutin de liste paritaire"
         note: "Depuis la loi du 21 mai 2025, toutes les communes votent au scrutin de liste à deux tours, sur des listes alternant femmes et hommes. Le panachage a disparu : on ne peut plus rayer ni ajouter un nom. Sept communes sur dix étaient jusque-là au scrutin majoritaire."
-        liens: [loi-scrutin-liste, vp-scrutin-liste, wp-municipales]
-        confiance: a_confirmer
+        liens: [loi-scrutin-liste, vp-scrutin-liste, wp-municipales, interieur-scrutin-liste]
+        confiance: etabli
       - ordre: 6
         acteur: tribunal-judiciaire
         action: "Contentieux de l'inscription"
         conditionnelle: true
         note: "Le juge judiciaire tranche les litiges sur les listes électorales — pas le juge administratif, contrairement à ce que la nature communale de la décision laisserait croire."
-        liens: [code-electoral, code-organisation-judiciaire, justice-fr]
-        confiance: a_confirmer
+        liens: [code-electoral, code-organisation-judiciaire, justice-fr, cel-l19]
+        confiance: etabli
 
     leviers:
       - id: s-inscrire-avant-le-scrutin
@@ -78,8 +89,8 @@ processus:
         difficulte: faible
         ancre_etape: 1
         piege: "La date du 31 décembre n'a plus cours depuis 2019. Certaines situations — déménagement professionnel, majorité récente — ouvrent en outre un délai plus tardif, jusqu'au dixième jour précédant le scrutin."
-        liens: [sp-listes-electorales, code-electoral, loi-inscription-electorale]
-        confiance: a_confirmer
+        liens: [sp-listes-electorales, code-electoral, loi-inscription-electorale, cel-l30]
+        confiance: etabli
       - id: verifier-son-inscription
         quoi: "Vérifier sa situation électorale au répertoire national"
         quand: "À tout moment, et systématiquement après un déménagement"
@@ -87,28 +98,36 @@ processus:
         difficulte: faible
         ancre_etape: 2
         piege: "Un déménagement dans la même commune ne se propage pas tout seul : l'électeur reste rattaché à son ancien bureau de vote tant qu'il ne le signale pas."
-        liens: [sp-listes-electorales, insee-reu]
-        confiance: a_confirmer
+        liens: [sp-listes-electorales, insee-reu, cel-l19]
+        confiance: etabli
       - id: contester-une-radiation
+        # Le délai était « celui indiqué sur la décision » : il est de cinq jours à
+        # compter de la notification. Le dire évite de le découvrir passé.
         quoi: "Contester une radiation ou un refus d'inscription"
-        quand: "Dans les délais indiqués sur la décision du maire"
+        quand: "Dans les cinq jours suivant la notification de la décision du maire"
         aupres_de: "La commission de contrôle de la commune"
         difficulte: moyenne
         ancre_etape: 3
         recours_si_refus: "Tribunal judiciaire"
         piege: "Le recours devant la commission est un préalable obligatoire : saisir directement le juge fait rejeter la demande sans examen du fond."
-        liens: [code-electoral, wp-recours-administratif, justice-fr]
-        confiance: a_confirmer
+        liens: [code-electoral, wp-recours-administratif, justice-fr, cel-l19]
+        confiance: etabli
       - id: tenir-un-bureau-de-vote
+        # Deux précisions vérifiées : la désignation se fait jusqu'au troisième jour
+        # précédant le scrutin à dix-huit heures, et il n'est pas nécessaire d'être
+        # électeur de la commune.
         quoi: "Être assesseur ou délégué dans un bureau de vote"
-        quand: "En amont du scrutin, auprès de la mairie ou d'un candidat"
+        quand: "Jusqu'au troisième jour précédant le scrutin, à 18 heures"
         aupres_de: "La mairie, ou le candidat que l'on souhaite représenter"
         difficulte: faible
         ancre_etape: 4
-        piege: "C'est la seule façon de voir le dépouillement de l'intérieur, et les communes manquent d'assesseurs presque à chaque scrutin."
-        liens: [code-electoral, wp-procedures-electorales]
-        confiance: a_confirmer
+        piege: "C'est la seule façon de voir le dépouillement de l'intérieur, et les communes manquent d'assesseurs presque à chaque scrutin. Il n'est pas nécessaire d'être électeur de la commune : un candidat peut désigner tout électeur du département."
+        liens: [code-electoral, wp-procedures-electorales, cel-r44]
+        confiance: etabli
       - id: consulter-la-liste-d-emargement
+        # Les deux moitiés sont vérifiées, y compris la seconde, qui surprend : passé
+        # les dix jours, la liste devient une archive publique soumise à un délai de
+        # cinquante ans, parce qu'elle révèle qui est allé voter — la CADA l'a jugé.
         quoi: "Consulter la liste d'émargement après le scrutin"
         quand: "Dans les dix jours qui suivent le vote"
         aupres_de: "La mairie"
@@ -116,5 +135,5 @@ processus:
         ancre_etape: 4
         recours_si_refus: "Saisir la CADA"
         piege: "C'est le document qui permet de vérifier une procuration contestée ou un vote qu'on n'a pas exprimé. Passé les dix jours, la liste rejoint les archives et n'est plus communicable avant cinquante ans."
-        liens: [code-electoral, cada, crpa]
-        confiance: a_confirmer
+        liens: [code-electoral, cada, crpa, cel-l68, cada-documents-electoraux]
+        confiance: etabli

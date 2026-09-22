@@ -10,10 +10,15 @@ processus:
     sortie: "Le document, ou un refus contestable devant la CADA puis le juge"
     decideur: cada
     competences: [communication-documents, acces-documents]
-    liens: [crpa, sp-documents-administratifs, cada]
-    verifie_le: 2026-09-05
+    liens: [crpa, sp-documents-administratifs, cada, cada-saisine, cada-suites]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les cinq étapes et les quatre leviers sont vérifiés : c'est ce qui permet
+    # au processus lui-même de passer, la validation l'exigeant désormais. Les
+    # délais viennent de la CADA — un mois de silence vaut refus, deux mois
+    # pour la saisir, un mois pour son avis, et sa saisine préalable conditionne
+    # le recours au juge.
+    confiance: etabli
 
     etapes:
       - ordre: 1
@@ -26,29 +31,29 @@ processus:
         action: "Réponse de l'administration : communication, refus, ou silence"
         delai: { valeur: 1, unite: mois, nature: maximum_legal }
         note: "Le silence gardé pendant un mois vaut refus. C'est ce refus implicite qui ouvre la suite."
-        liens: [crpa, sp-documents-administratifs]
-        confiance: a_confirmer
+        liens: [crpa, sp-documents-administratifs, cada-saisine]
+        confiance: etabli
       - ordre: 3
         acteur: citoyen
         action: "Saisine de la CADA"
         delai: { valeur: 2, unite: mois, nature: maximum_legal }
         note: "À compter du refus, explicite ou implicite. Gratuit, par simple courrier ou formulaire."
-        liens: [cada, crpa]
-        confiance: a_confirmer
+        liens: [cada, crpa, cada-saisine]
+        confiance: etabli
       - ordre: 4
         acteur: cada
         action: "Instruction et avis de la CADA"
         delai: { valeur: 1, unite: mois, nature: indicatif }
         note: "L'avis n'est pas contraignant, mais l'administration le suit dans la plupart des cas."
-        liens: [cada]
-        confiance: a_confirmer
+        liens: [cada, cada-suites]
+        confiance: etabli
       - ordre: 5
         acteur: tribunal-administratif
         action: "Recours contentieux si le refus persiste"
         conditionnelle: true
-        note: "La saisine préalable de la CADA est un passage obligé avant le juge."
-        liens: [code-justice-administrative, cada]
-        confiance: a_confirmer
+        note: "La saisine préalable de la CADA est un passage obligé avant le juge. Après son avis, l'administration a un mois pour dire ce qu'elle compte faire ; son silence gardé deux mois vaut nouveau refus, et c'est lui qu'on attaque."
+        liens: [code-justice-administrative, cada, cada-suites]
+        confiance: etabli
 
     leviers:
       - id: demander-par-ecrit
@@ -66,8 +71,8 @@ processus:
         difficulte: faible
         ancre_etape: 2
         piege: "Relancer ne repousse pas le délai, mais brouille la date de départ. Garder l'accusé d'envoi initial."
-        liens: [crpa]
-        confiance: a_confirmer
+        liens: [crpa, cada-saisine]
+        confiance: etabli
       # Un exemple concret, parce que ce processus reste abstrait tant qu'on ne
       # sait pas quoi demander : le compte rendu annuel de la concession
       # d'électricité, que presque personne ne sait pouvoir lire.
@@ -88,5 +93,5 @@ processus:
         recours_si_refus: "Le tribunal administratif, après l'avis"
         ancre_etape: 3
         piege: "Passé deux mois, la voie est fermée pour cette demande — il faut alors la reformuler entièrement."
-        liens: [cada, crpa]
-        confiance: a_confirmer
+        liens: [cada, crpa, cada-saisine]
+        confiance: etabli

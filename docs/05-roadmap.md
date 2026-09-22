@@ -34,8 +34,8 @@ Reste :
 - **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
   vrai reste à faire, pas le volume. `npm run relire` en donne la file :
   l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs, les 41 compétences et les 15 flux sont faits (voir
-  plus bas) ; restent 110 fiches — 11 processus, 57 étapes, 42 leviers.
+  fiche. Les 37 acteurs, les 41 compétences, les 15 flux et deux processus
+  entiers sont faits (voir plus bas) ; restent 91 fiches.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1487,7 +1487,38 @@ reste écrite « minoritaire », sans chiffre. Les taux publiés varient trop d'
 agglomération à l'autre et selon le périmètre retenu — charges d'exploitation ou
 coût complet — pour qu'un nombre unique soit honnête.
 
-Reste 110 fiches&nbsp;: 11 processus, 57 étapes, 42 leviers.
+**Les processus ont d'abord imposé une règle.** Les onze portaient leur niveau
+de confiance indépendamment de leurs étapes&nbsp;: un processus pouvait se
+déclarer établi pendant que cinq de ses six étapes restaient à vérifier. Or
+c'est l'étape qui porte le délai, et le délai est ce qu'un lecteur vient
+chercher. `npm run valider` refuse désormais un processus établi dont un
+élément reste à confirmer, et `npm run relire` affiche ce qui bloque chacun.
+La réciproque n'est pas imposée&nbsp;: un processus dont toutes les étapes sont
+vérifiées peut rester `a_confirmer` si son ordonnancement ne l'est pas.
+
+**Deux processus entiers sont relus.** « Demander un document administratif »
+d'abord&nbsp;: les quatre délais tiennent, dits par la CADA elle-même — un mois
+de silence vaut refus, deux mois pour la saisir, un mois pour son avis, et sa
+saisine conditionne le recours au juge. Une précision manquait, ajoutée&nbsp;:
+après l'avis, le silence de l'administration pendant deux mois vaut nouveau
+refus, et c'est lui qu'on attaque.
+
+« S'inscrire sur les listes électorales » ensuite, où une **erreur** attendait.
+La fiche disait que « tout électeur de la commune peut être désigné assesseur ».
+C'est l'inverse du mécanisme&nbsp;: ce sont les **candidats** qui désignent,
+parmi les électeurs du **département**&nbsp;; la commune ne prend les siens qu'à
+défaut. La formulation décourageait exactement les gens qu'elle aurait dû
+appeler — un habitant du village voisin peut tenir un bureau de vote.
+
+Trois délais y ont été chiffrés, là où la fiche renvoyait au vague&nbsp;: cinq
+jours pour la décision du maire, **cinq jours** pour la contester devant la
+commission — « les délais indiqués sur la décision », disait-elle —, et le
+**troisième jour précédant le scrutin à dix-huit heures** pour se faire
+désigner assesseur. Et une surprise confirmée&nbsp;: passé dix jours, la liste
+d'émargement devient une archive fermée **cinquante ans**, parce qu'elle révèle
+qui est allé voter.
+
+Reste 91 fiches&nbsp;: 9 processus, 47 étapes, 35 leviers.
 
 ### Une ingestion qui ne se perd plus en route
 
