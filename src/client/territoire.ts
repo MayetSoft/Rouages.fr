@@ -348,7 +348,9 @@ function assemblerConseil(commune: CommuneBreve): Conseil | null {
   return {
     elus: f.n,
     femmes: f.f,
-    ageMedian: f.age,
+    ageMedian: f.age[1],
+    ageMin: f.age[0],
+    ageMax: f.age[2],
     groupes: f.p.map(([i, n]) => ({ nom: d.groupes[i] ?? '', nombre: n })).filter((g) => g.nom),
     communautaires: f.cc,
     partFemmesNationale: d.femmes,
@@ -444,6 +446,9 @@ export interface Conseil {
   elus: number;
   femmes: number;
   ageMedian: number;
+  /** Le plus jeune et le plus âgé : l'étendue dit ce que la médiane cache. */
+  ageMin: number;
+  ageMax: number;
   /** Par groupe socioprofessionnel, du plus fourni au moins fourni. */
   groupes: { nom: string; nombre: number }[];
   /** Représentants de la commune au conseil communautaire. */
@@ -744,7 +749,10 @@ type ConseilsDep = {
   groupes: string[];
   femmes: number;
   age: number;
-  c: Record<string, { n: number; f: number; age: number; p: [number, number][]; cc: number }>;
+  c: Record<
+    string,
+    { n: number; f: number; age: [number, number, number]; p: [number, number][]; cc: number }
+  >;
 };
 const conseilsDep = new Map<string, ConseilsDep | null>();
 

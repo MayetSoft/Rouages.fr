@@ -97,7 +97,10 @@ type ConseilsDep = {
   groupes: string[];
   femmes: number;
   age: number;
-  c: Record<string, { n: number; f: number; age: number; p: [number, number][]; cc: number }>;
+  c: Record<
+    string,
+    { n: number; f: number; age: [number, number, number]; p: [number, number][]; cc: number }
+  >;
 };
 
 type JournalDep = {
@@ -292,6 +295,9 @@ export interface Fiche {
     elus: number;
     femmes: number;
     ageMedian: number;
+    /** Le plus jeune et le plus âgé du conseil. */
+    ageMin: number;
+    ageMax: number;
     groupes: { nom: string; nombre: number }[];
     /** Les mêmes chiffres pour l'ensemble des conseils du pays. */
     femmesPartout: number;
@@ -453,7 +459,9 @@ function assemblerConseil(
     ou: conseil?.nom ?? null,
     elus: comp?.n ?? 0,
     femmes: comp?.f ?? 0,
-    ageMedian: comp?.age ?? 0,
+    ageMedian: comp?.age[1] ?? 0,
+    ageMin: comp?.age[0] ?? 0,
+    ageMax: comp?.age[2] ?? 0,
     groupes: (comp?.p ?? [])
       .map(([i, n]) => ({ nom: k?.groupes[i] ?? '', nombre: n }))
       .filter((g) => g.nom),

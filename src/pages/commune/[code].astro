@@ -211,6 +211,9 @@ function moisAnnee(iso: string): string | null {
             }{', dont '}<strong>{Math.round((fiche.conseil.femmes / fiche.conseil.elus) * 100)} % de femmes</strong>{
               ` (contre ${fiche.conseil.femmesPartout.toLocaleString('fr-FR')} % dans l’ensemble des conseils), d’un âge médian de `
             }<strong>{fiche.conseil.ageMedian} ans</strong>{` (contre ${fiche.conseil.agePartout}).`}
+            {fiche.conseil.ageMax > fiche.conseil.ageMin && (
+              <>{` Du plus jeune, ${fiche.conseil.ageMin} ans, au plus âgé, ${fiche.conseil.ageMax} ans.`}</>
+            )}
             {fiche.conseil.groupes.length > 0 && (
               <>{' Par groupe socioprofessionnel : '}{fiche.conseil.groupes
                 .map((g) => `${g.nombre} ${g.nom.toLowerCase()}`)

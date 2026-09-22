@@ -60,8 +60,15 @@ export interface ConseilCommune {
   n: number;
   /** Combien de femmes. La parité ne s'impose qu'au-dessus de mille habitants. */
   f: number;
-  /** Âge médian, en années révolues à la date de l'ingestion. */
-  age: number;
+  /**
+   * Âges en années révolues à la date de l'ingestion : le plus jeune, le
+   * médian, le plus âgé.
+   *
+   * L'étendue dit ce que la médiane cache — un conseil de 45 ans de médiane
+   * dont le plus jeune a 23 ans et le plus âgé 78 ne ressemble pas à un
+   * conseil où tout le monde a entre 42 et 48.
+   */
+  age: [number, number, number];
   /** Par groupe : son index dans `GROUPES`, puis le nombre. */
   p: [number, number][];
   /** Représentants de la commune au conseil communautaire, s'il y en a. */
@@ -127,7 +134,7 @@ export async function collecterConseils(
     if (!/^\d[\dAB]\d{3}$/.test(code)) continue;
     let c = communes.get(code);
     if (!c) {
-      c = { n: 0, f: 0, age: 0, p: [], cc: 0 };
+      c = { n: 0, f: 0, age: [0, 0, 0], p: [], cc: 0 };
       communes.set(code, c);
       ages.set(code, []);
     }
@@ -177,7 +184,8 @@ export async function collecterConseils(
   }
 
   for (const [code, c] of communes) {
-    c.age = mediane(ages.get(code) ?? []);
+    const v = ages.get(code) ?? [];
+    c.age = v.length === 0 ? [0, 0, 0] : [Math.min(...v), mediane(v), Math.max(...v)];
     c.p.sort((a, b) => b[1] - a[1] || a[0] - b[0]);
   }
 

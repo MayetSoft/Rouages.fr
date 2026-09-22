@@ -2061,6 +2061,18 @@ function demarrer(reseau: Reseau) {
     }
     bloc.append(dl);
 
+    // La médiane cache l'étendue : un conseil de 57 ans de médiane dont le plus
+    // jeune a 23 ans ne ressemble pas à celui où personne n'a moins de 50.
+    if (k.ageMax > k.ageMin) {
+      bloc.append(
+        ligne(
+          'p',
+          'p-strate',
+          `Du plus jeune, ${k.ageMin} ans, au plus âgé, ${k.ageMax} ans.`,
+        ),
+      );
+    }
+
     if (k.groupes.length > 0) {
       const g = document.createElement('div');
       g.className = 'p-risque-groupe';
