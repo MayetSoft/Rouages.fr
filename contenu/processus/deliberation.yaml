@@ -22,10 +22,14 @@ processus:
     sortie: "Délibération maintenue, retirée, ou annulée par le juge"
     decideur: tribunal-administratif
     competences: [vote-du-budget, controle-legalite, acces-documents]
-    liens: [cgct, wp-recours-administratif, code-justice-administrative]
-    verifie_le: 2026-09-05
+    liens: [cgct, wp-recours-administratif, code-justice-administrative, cgct-l2131-6, collectivites-proces-verbal]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les cinq étapes et les quatre leviers sont vérifiés. La correction qui a
+    # compté est une mise à jour : la réforme du 1er juillet 2022 a supprimé
+    # l'affichage du compte rendu sous huit jours et lui a substitué la
+    # publication du procès-verbal — la fiche décrivait l'ancien régime.
+    confiance: etabli
 
     etapes:
       - ordre: 1
@@ -36,25 +40,29 @@ processus:
         liens: [cgct]
         confiance: etabli
       - ordre: 2
+        # Mise à jour : l'ordonnance du 7 octobre 2021, en vigueur depuis le 1er
+        # juillet 2022, a supprimé l'affichage du compte rendu sous huit jours et lui
+        # a substitué la publication du procès-verbal. La fiche décrivait l'ancien
+        # régime.
         acteur: maire
         action: "Publication ou affichage, et transmission au préfet"
-        note: "C'est la publicité de l'acte qui le rend exécutoire, et qui fait courir les délais de recours."
-        liens: [cgct]
-        confiance: a_confirmer
+        note: "C'est la publicité de l'acte qui le rend exécutoire et qui fait courir les délais de recours. Depuis la réforme entrée en vigueur le 1er juillet 2022, c'est la publication électronique qui fait foi là où la commune a un site."
+        liens: [cgct, collectivites-proces-verbal]
+        confiance: etabli
       - ordre: 3
         acteur: prefet
         action: "Contrôle de légalité"
         delai: { valeur: 2, unite: mois, nature: maximum_legal }
         note: "Le préfet peut demander le retrait de l'acte, puis le déférer au tribunal administratif."
-        liens: [cgct, wp-prefet]
-        confiance: a_confirmer
+        liens: [cgct, wp-prefet, cgct-l2131-6]
+        confiance: etabli
       - ordre: 4
         acteur: citoyen
         action: "Recours gracieux auprès de l'auteur de l'acte"
         conditionnelle: true
         delai: { valeur: 2, unite: mois, nature: maximum_legal }
-        liens: [wp-recours-administratif]
-        confiance: a_confirmer
+        liens: [wp-recours-administratif, cgct-l2131-6]
+        confiance: etabli
       - ordre: 5
         acteur: tribunal-administratif
         action: "Jugement du recours"
@@ -72,15 +80,18 @@ processus:
         liens: [cgct]
         confiance: etabli
       - id: demander-le-pv
-        quoi: "Demander le procès-verbal, plus complet que la délibération"
-        quand: "Après la séance"
-        aupres_de: "La mairie"
+        # Le piège ajouté est celui qui coûte le plus cher : le procès-verbal n'est
+        # publié qu'une fois approuvé, soit à la séance suivante, quand le délai de
+        # recours contre la délibération court déjà depuis sa publication à elle.
+        quoi: "Lire le procès-verbal, plus complet que la délibération"
+        quand: "Dans la semaine qui suit la séance où il a été approuvé — soit un conseil plus tard"
+        aupres_de: "Le site de la commune, ou la mairie à défaut"
         difficulte: faible
         recours_si_refus: "Saisir la CADA"
         ancre_etape: 2
-        piege: "La délibération dit ce qui a été décidé, pas ce qui a été dit. Les motifs utiles sont dans le procès-verbal."
-        liens: [cada, sp-documents-administratifs]
-        confiance: a_confirmer
+        piege: "La délibération dit ce qui a été décidé, pas ce qui a été dit : les motifs utiles sont dans le procès-verbal. Mais il n'est publié qu'une fois approuvé, à la séance suivante — le délai de recours contre la délibération, lui, court déjà."
+        liens: [cada, sp-documents-administratifs, collectivites-proces-verbal]
+        confiance: etabli
       - id: alerter-le-prefet
         quoi: "Signaler l'illégalité supposée au préfet, au titre du contrôle de légalité"
         quand: "Pendant les deux mois qui suivent la transmission"
@@ -88,8 +99,8 @@ processus:
         difficulte: moyenne
         ancre_etape: 3
         piege: "Le préfet n'est jamais obligé de déférer. Ce signalement ne conserve pas votre propre délai de recours : il faut mener les deux en parallèle."
-        liens: [cgct, wp-prefet]
-        confiance: a_confirmer
+        liens: [cgct, wp-prefet, cgct-l2131-6]
+        confiance: etabli
       - id: recours-deliberation
         quoi: "Former un recours devant le tribunal administratif"
         quand: "2 mois à compter de la publication ou de l'affichage"
@@ -97,5 +108,5 @@ processus:
         difficulte: elevee
         ancre_etape: 4
         piege: "Il faut un intérêt à agir. Être contribuable de la commune en donne un dans certains cas, pas dans tous."
-        liens: [code-justice-administrative, wp-recours-administratif]
-        confiance: a_confirmer
+        liens: [code-justice-administrative, wp-recours-administratif, cgct-l2131-6]
+        confiance: etabli
