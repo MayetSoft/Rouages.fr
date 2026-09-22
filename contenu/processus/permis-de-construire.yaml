@@ -16,7 +16,7 @@ documents:
   - id: panneau-affichage
     nom: "Panneau d'affichage sur le terrain"
     resume: "C'est lui, et non l'arrêté, qui fait courir le délai de recours des tiers."
-    liens: [cu-a424-15, cu-r600]
+    liens: [cu-a424-15, cu-r600-2]
 
 processus:
   - id: permis-de-construire
@@ -79,7 +79,7 @@ processus:
         produit: [panneau-affichage]
         delai: { valeur: 2, unite: mois, nature: maximum_legal }
         note: "Doit rester continu pendant tout le délai de recours des tiers."
-        liens: [cu-a424-15, cu-r600, justice-affichage-urbanisme]
+        liens: [cu-a424-15, cu-r600-2, justice-affichage-urbanisme]
         confiance: etabli
 
     leviers:
@@ -111,7 +111,7 @@ processus:
         difficulte: faible
         ancre_etape: 6
         piege: "Un affichage absent ou incomplet ne fait pas courir le délai. La preuve se constitue avant, pas après."
-        liens: [cu-a424-15, cu-r600, justice-affichage-urbanisme]
+        liens: [cu-a424-15, cu-r600-2, justice-affichage-urbanisme]
         confiance: etabli
       - id: recours-gracieux
         # Précision vérifiée et décisive : l'irrecevabilité tirée du défaut de
@@ -125,7 +125,7 @@ processus:
         recours_si_refus: "Tribunal administratif, 2 mois après le rejet"
         ancre_etape: 6
         piege: "Le recours doit être notifié au bénéficiaire du permis et à l'auteur de la décision dans les 15 jours, sous peine d'irrecevabilité — sauf si le panneau ne mentionnait pas cette obligation, auquel cas elle n'est pas opposable. Photographier le panneau sert aussi à cela."
-        liens: [cu-r600, sp-recours-urbanisme, justice-affichage-urbanisme]
+        liens: [cu-r600-1, cu-r600-2, sp-recours-urbanisme, justice-affichage-urbanisme]
         confiance: etabli
       - id: recours-contentieux
         acteur: citoyen
@@ -135,5 +135,5 @@ processus:
         difficulte: elevee
         ancre_etape: 6
         piege: "Il faut justifier d'un intérêt à agir : être voisin ne suffit pas toujours."
-        liens: [cu-r600, sp-recours-urbanisme, wp-tribunal-administratif, justice-affichage-urbanisme]
+        liens: [cu-r600-1, cu-r600-2, sp-recours-urbanisme, wp-tribunal-administratif, justice-affichage-urbanisme]
         confiance: etabli
