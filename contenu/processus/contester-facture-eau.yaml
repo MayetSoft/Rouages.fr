@@ -25,10 +25,15 @@ processus:
     sortie: "Un plafonnement, un dégrèvement, un avis de médiation, ou un litige porté devant le juge"
     decideur: syndicat-eau
     competences: [eau-potable, assainissement, mediation-service-public, reglement-amiable]
-    liens: [code-environnement, sp-fuite-eau, od-sispea]
-    verifie_le: 2026-09-19
+    liens: [code-environnement, sp-fuite-eau, od-sispea, cgct-l2224-12-4]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les sept étapes et les six leviers sont vérifiés, et la fiche s'est révélée
+    # juste de bout en bout — c'est la première. Le dispositif de plafonnement
+    # tient à l'article L2224-12-4 : consommation supérieure au double de la
+    # moyenne des trois dernières années, information sans délai de l'abonné,
+    # un mois pour réparer et transmettre l'attestation.
+    confiance: etabli
 
     etapes:
       - ordre: 1
@@ -36,49 +41,49 @@ processus:
         action: "Organisation du service et compte rendu annuel"
         produit: [reglement-service-eau, rapport-prix-qualite-eau]
         note: "La collectivité organisatrice fixe le tarif, choisit entre régie et délégation, et présente chaque année à son assemblée un rapport sur le prix et la qualité du service. C'est elle qui répond du service, même quand une entreprise le facture."
-        liens: [code-environnement, od-sispea, eaufrance]
-        confiance: a_confirmer
+        liens: [code-environnement, od-sispea, eaufrance, cgct-l1411-3]
+        confiance: etabli
       - ordre: 2
         acteur: delegataire-eau
         action: "Relève du compteur et émission de la facture"
         note: "Le délégataire facture, mais il exécute un contrat passé par la collectivité : c'est elle qui fixe le tarif et la structure de la facture."
-        liens: [code-environnement, od-sispea]
-        confiance: a_confirmer
+        liens: [code-environnement, od-sispea, cgct-l1411-1]
+        confiance: etabli
       - ordre: 3
         acteur: delegataire-eau
         action: "Information de l'abonné en cas de consommation anormale"
         note: "Le service doit alerter l'abonné dès que la consommation relevée dépasse le double de la consommation moyenne des trois dernières années."
-        liens: [decret-fuites-eau, sp-fuite-eau]
-        confiance: a_confirmer
+        liens: [decret-fuites-eau, sp-fuite-eau, cgct-l2224-12-4]
+        confiance: etabli
       - ordre: 4
         acteur: citoyen
         action: "Réparation de la fuite et envoi de l'attestation"
         delai: { valeur: 1, unite: mois, nature: maximum_legal }
         note: "L'attestation du plombier doit indiquer le lieu de la fuite et la date de la réparation. Le plafonnement ne vaut que pour une fuite sur canalisation après compteur, dans un local d'habitation — pas pour un appareil ménager ni un équipement sanitaire."
-        liens: [decret-fuites-eau, sp-fuite-eau]
-        confiance: a_confirmer
+        liens: [decret-fuites-eau, sp-fuite-eau, cgct-l2224-12-4]
+        confiance: etabli
       - ordre: 5
         acteur: citoyen
         action: "Réclamation écrite au service"
         delai: { valeur: 2, unite: mois, nature: indicatif }
         note: "C'est le passage obligé : sans réclamation écrite préalable, la médiation refuse le dossier. Le service dispose d'environ deux mois pour répondre."
-        liens: [sp-mediateur-eau, mediation-eau-fr]
-        confiance: a_confirmer
+        liens: [sp-mediateur-eau, mediation-eau-fr, sispea-mediation]
+        confiance: etabli
       - ordre: 6
         acteur: mediateur-eau
         action: "Médiation, sur saisine de l'abonné"
         conditionnelle: true
         delai: { valeur: 12, unite: mois, nature: maximum_legal }
         note: "La saisine doit intervenir dans l'année qui suit la réclamation écrite. La médiation est écartée si le litige est déjà devant un juge ou un autre médiateur."
-        liens: [sp-mediateur-eau, mediation-eau-fr, wp-mediation-consommation]
-        confiance: a_confirmer
+        liens: [sp-mediateur-eau, mediation-eau-fr, wp-mediation-consommation, sispea-mediation]
+        confiance: etabli
       - ordre: 7
         acteur: tribunal-judiciaire
         action: "Litige porté devant le juge"
         conditionnelle: true
         note: "Le contentieux entre un abonné et un service d'eau relève du juge judiciaire quand le service est industriel et commercial, ce qui est le cas courant."
-        liens: [code-organisation-judiciaire, justice-fr, wp-tribunal-judiciaire]
-        confiance: a_confirmer
+        liens: [code-organisation-judiciaire, justice-fr, wp-tribunal-judiciaire, sispea-mediation]
+        confiance: etabli
 
     leviers:
       - id: demander-le-plafonnement
@@ -88,8 +93,8 @@ processus:
         difficulte: faible
         ancre_etape: 4
         piege: "Le plafonnement n'est jamais automatique : il faut le demander, avec l'attestation de réparation, dans le délai. Passé ce délai, la facture reste due en entier."
-        liens: [decret-fuites-eau, sp-fuite-eau]
-        confiance: a_confirmer
+        liens: [decret-fuites-eau, sp-fuite-eau, cgct-l2224-12-4]
+        confiance: etabli
       - id: lire-le-reglement-de-service
         quoi: "Lire le règlement de service avant de contester"
         quand: "Dès la première facture contestée"
@@ -97,8 +102,8 @@ processus:
         difficulte: faible
         ancre_etape: 5
         piege: "Il fixe la procédure de réclamation et les délais opposables. Contester hors de cette procédure fait perdre le bénéfice de la médiation."
-        liens: [code-environnement, eaufrance]
-        confiance: a_confirmer
+        liens: [code-environnement, eaufrance, sispea-mediation]
+        confiance: etabli
       - id: saisir-la-mediation-eau
         quoi: "Saisir la Médiation de l'eau"
         quand: "Après une réclamation écrite restée sans réponse satisfaisante, et dans l'année qui suit"
@@ -107,8 +112,8 @@ processus:
         ancre_etape: 6
         recours_si_refus: "Tribunal judiciaire"
         piege: "La médiation ne couvre que les services qui y adhèrent. Vérifier l'adhésion de son service avant de laisser courir le délai de recours."
-        liens: [sp-mediateur-eau, mediation-eau-fr]
-        confiance: a_confirmer
+        liens: [sp-mediateur-eau, mediation-eau-fr, sispea-mediation]
+        confiance: etabli
       - id: comparer-le-prix-de-l-eau
         quoi: "Comparer le prix du mètre cube au prix médian national"
         quand: "À tout moment"
@@ -138,5 +143,5 @@ processus:
         ancre_etape: 1
         recours_si_refus: "Saisir la CADA"
         piege: "Le rendement du réseau y figure. Une part de la facture paie l'eau perdue avant le compteur, et ce chiffre-là est public."
-        liens: [code-environnement, od-sispea, cada]
-        confiance: a_confirmer
+        liens: [code-environnement, od-sispea, cada, cada-saisine]
+        confiance: etabli
