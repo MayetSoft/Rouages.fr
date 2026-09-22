@@ -77,6 +77,17 @@ type RisquesDep = {
  * événement. Un marché d'agglomération y figure sous son SIREN, pas sous
  * chacune des communes qu'il concerne — c'est ici qu'on fait l'éventail.
  */
+/**
+ * Le dernier scrutin municipal du département. La page n'en retient que les
+ * sièges : la participation et les bulletins blancs sont dans la carte, et
+ * c'est le poids de la commune qui manquait ici.
+ */
+type ElectionsDep = {
+  maj: string;
+  scrutin: string;
+  c: Record<string, { cm: number; cc: number }>;
+};
+
 type JournalDep = {
   maj: string;
   fenetre: number;
@@ -119,6 +130,7 @@ const cacheEcoles = new Map<string, EcolesDep | null>();
 const cacheSru = new Map<string, SruDep | null>();
 const cacheRisques = new Map<string, RisquesDep | null>();
 const cacheJournal = new Map<string, JournalDep | null>();
+const cacheElections = new Map<string, ElectionsDep | null>();
 
 function enCache<T>(c: Map<string, T | null>, dep: string, f: string): T | null {
   if (!c.has(dep)) c.set(dep, lire<T>(f));
@@ -241,6 +253,30 @@ export interface Fiche {
     maj: string;
   } | null;
   soumiseSru: boolean;
+  /**
+   * Ce que pèse la commune dans les deux assemblées où elle siège.
+   *
+   * « Un siège » ne dit rien tant qu'on ignore sur combien : c'est le rapport
+   * qui dit ce qu'elle pèse quand l'intercommunalité vote.
+   */
+  conseil: {
+    sieges: number;
+    siegesCc: number;
+    /** L'intercommunalité à fiscalité propre où la commune siège. */
+    ou: string | null;
+    /**
+     * Représentée sans que ses sièges soient élus.
+     *
+     * Sous mille habitants, les conseillers communautaires ne sont pas élus au
+     * scrutin fléché : ce sont les conseillers municipaux pris dans l'ordre du
+     * tableau (article L273-11 du code électoral). Le fichier des résultats
+     * ne porte donc aucun siège pour elles — vingt-quatre des trente-neuf
+     * communes de Vichy Communauté, par exemple. Se taire laisserait croire
+     * qu'elles ne siègent pas.
+     */
+    designes: boolean;
+    scrutin: string;
+  } | null;
   maj: string;
 }
 
@@ -342,6 +378,31 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
           }
         : null,
     soumiseSru: !!sru?.c[c.code],
+    conseil: assemblerConseil(c, structures),
     maj: dep.maj,
+  };
+}
+
+/**
+ * Les natures dont le conseil est élu au suffrage fléché. Un syndicat n'en est
+ * pas : ses délégués sont désignés par les conseils municipaux, et parler de
+ * sièges à son propos serait faux.
+ */
+const FISCALITE_PROPRE = new Set(['CC', 'CA', 'CU', 'METRO', 'MET69', 'SAN', 'EPT']);
+
+function assemblerConseil(
+  c: CommuneIndex,
+  structures: { siren: string; nom: string; nature: string }[],
+): Fiche['conseil'] {
+  const e = enCache(cacheElections, c.dep, `dep/${c.dep}-elections.json`);
+  const f = e?.c[c.code];
+  if (!e || !f) return null;
+  const conseil = structures.find((st) => FISCALITE_PROPRE.has(st.nature));
+  return {
+    sieges: f.cm,
+    siegesCc: f.cc,
+    ou: conseil?.nom ?? null,
+    designes: f.cc === 0 && !!conseil,
+    scrutin: e.scrutin,
   };
 }

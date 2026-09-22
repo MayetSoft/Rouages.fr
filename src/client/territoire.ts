@@ -286,6 +286,22 @@ export interface Scrutin {
   sieges: number;
   /** Sièges de la commune au conseil communautaire : son poids dans l'intercommunalité. */
   siegesCc: number;
+  /**
+   * L'intercommunalité où la commune siège, quand elle en a une à fiscalité
+   * propre — un syndicat n'a pas de conseil élu.
+   */
+  conseilCc: string | null;
+  /**
+   * Vrai quand la commune est représentée sans que ses sièges soient élus.
+   *
+   * Sous mille habitants, les conseillers communautaires ne sont pas élus au
+   * scrutin fléché : ce sont les conseillers municipaux désignés dans l'ordre
+   * du tableau (article L273-11 du code électoral). Le fichier des résultats
+   * ne porte donc aucun siège pour elles — vingt-quatre des trente-neuf
+   * communes de Vichy Communauté, par exemple. Se taire laisserait croire
+   * qu'elles ne siègent pas.
+   */
+  ccDesignes: boolean;
   /** Part des communes où une seule liste se présentait, en pour cent. */
   partListeUnique: number;
   maj: string;
@@ -1004,7 +1020,7 @@ export async function resoudre(commune: CommuneBreve): Promise<Territoire> {
     dmto: assemblerDmto(commune, ligne[2]),
     risques: assemblerRisques(commune),
     associations: assemblerAssociations(commune, ligne[2]),
-    scrutin: assemblerScrutin(commune),
+    scrutin: assemblerScrutin(commune, structures),
     deliberations: assemblerDeliberations(commune, structures),
     delibDepuis: delibDep.get(commune.dep)?.depuis ?? null,
     subventions: assemblerSubventions(commune, structures),
@@ -1154,10 +1170,20 @@ function assemblerDeliberations(
  * se discute pas — 57 % n'est ni bon ni mauvais tant qu'on ignore que la
  * médiane est à 63 %.
  */
-function assemblerScrutin(commune: CommuneBreve): Scrutin | null {
+/**
+ * Les natures dont le conseil est élu au suffrage fléché. Un syndicat n'en est
+ * pas : ses délégués sont désignés par les conseils municipaux, et parler de
+ * sièges à son propos serait faux.
+ */
+const FISCALITE_PROPRE = new Set(['CC', 'CA', 'CU', 'METRO', 'MET69', 'SAN', 'EPT']);
+
+function assemblerScrutin(commune: CommuneBreve, structures: Structure[]): Scrutin | null {
   const d = electionsDep.get(commune.dep);
   const f = d?.c[commune.code];
   if (!d || !f) return null;
+  // L'intercommunalité à fiscalité propre, et il n'y en a qu'une : c'est la
+  // seule dont le conseil est élu au suffrage fléché.
+  const conseil = structures.find((st) => FISCALITE_PROPRE.has(st.nature));
   const tour = (numero: number, t: (typeof f)['t1'] | undefined) => {
     if (!t) return null;
     const m = d.medianes[numero - 1];
@@ -1178,6 +1204,8 @@ function assemblerScrutin(commune: CommuneBreve): Scrutin | null {
     tours,
     sieges: f.cm,
     siegesCc: f.cc,
+    conseilCc: conseil?.nom ?? null,
+    ccDesignes: f.cc === 0 && !!conseil,
     partListeUnique: d.listeUnique,
     maj: d.maj,
   };

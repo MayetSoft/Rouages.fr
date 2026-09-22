@@ -186,6 +186,25 @@ function moisAnnee(iso: string): string | null {
       </p>
     )}
 
+    {fiche?.conseil && fiche.conseil.sieges > 0 && (
+      <p class="c-conseil">
+        <strong>{fiche.conseil.sieges} sièges</strong> au conseil municipal{fiche.conseil.siegesCc > 0 && (
+          <>{', et '}<strong>{fiche.conseil.siegesCc}</strong>{' au conseil '}{fiche.conseil.ou
+            ? <Glose texte={`de ${fiche.conseil.ou}`} />
+            : <>communautaire</>}</>
+        )}.{' '}
+        <span class="c-conseil-source">D’après les résultats des {fiche.conseil.scrutin}.</span>
+        {fiche.conseil.designes && fiche.conseil.ou && (
+          <span class="c-conseil-designes">
+            Au conseil de <Glose texte={fiche.conseil.ou} />, la commune n’élit pas ses
+            représentants&nbsp;: sous mille habitants, ce sont les conseillers municipaux pris
+            dans l’ordre du tableau — le maire, puis les adjoints (article L273-11 du code
+            électoral). Le résultat du scrutin ne les nomme donc pas.
+          </span>
+        )}
+      </p>
+    )}
+
     {fiche && fiche.structures.length > 0 && (
       <section>
         <h2 class="badge">Les structures dont elle dépend</h2>

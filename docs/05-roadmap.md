@@ -1092,6 +1092,34 @@ les compteurs d'eau télérelevés du SMEA et le gardiennage des bâtiments de
 Vichy Communauté. Presque tout y est intercommunal — et c'est précisément ce
 que personne ne regarde.
 
+### Ce que pèse une commune dans son intercommunalité ✔ *(et un total refusé)*
+
+Les sièges étaient déjà collectés et déjà affichés dans la carte&nbsp;; la page
+de commune, elle, n'en disait rien. Elle le dit maintenant&nbsp;: quinze sièges
+au conseil municipal du Mayet-de-Montagne, un au conseil de CA Vichy
+Communauté.
+
+**Le « sur combien » a été calculé, vérifié, et jeté.** Sommer les sièges de
+toutes les communes membres donnait 53 pour Vichy Communauté&nbsp;; l'agglo en
+publie **77**. La vérification a montré pourquoi&nbsp;: **vingt-quatre de ses
+trente-neuf communes n'ont aucun siège dans le fichier des résultats**, et
+toutes font moins de mille habitants. Sous ce seuil, les conseillers
+communautaires ne sont pas élus au scrutin fléché — ce sont les conseillers
+municipaux pris dans l'ordre du tableau, le maire puis les adjoints
+(**article L273-11 du code électoral**). Le total était donc structurellement
+sous-estimé, d'un montant qui varie d'une intercommunalité à l'autre. C'est
+exactement l'agrégat que `CLAUDE.md` interdit de publier.
+
+Le trou est devenu l'information. Là où le fichier ne porte pas de siège, la
+commune ne se tait plus&nbsp;: elle explique qu'elle est représentée sans
+élire ses représentants, et par qui. C'est plus utile qu'un nombre — et c'est
+le sujet du site.
+
+Le vrai total viendra du référentiel officiel, « Nombre de sièges à pourvoir
+aux conseils municipaux et conseils communautaires », qui couvre toutes les
+communes quel que soit leur mode de désignation. Son adresse est résolue, mais
+le fichier n'a pas répondu depuis cet environnement au moment de l'écrire.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.

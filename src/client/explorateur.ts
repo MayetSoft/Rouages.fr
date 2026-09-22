@@ -1792,8 +1792,29 @@ function demarrer(reseau: Reseau) {
     // décident les compétences transférées, que tout le reste du panneau décrit.
     const sieges: string[] = [];
     if (sc.sieges > 0) sieges.push(`${sc.sieges} sièges au conseil municipal`);
-    if (sc.siegesCc > 0) sieges.push(`${sc.siegesCc} au conseil communautaire`);
-    if (sieges.length > 0) bloc.append(ligne('p', 'p-scrutin-sieges', `${sieges.join(', ')}.`));
+    if (sc.siegesCc > 0) {
+      sieges.push(
+        sc.conseilCc
+          ? `${sc.siegesCc} au conseil de ${sc.conseilCc}`
+          : `${sc.siegesCc} au conseil communautaire`,
+      );
+    }
+    if (sieges.length > 0) bloc.append(glose('p', 'p-scrutin-sieges', `${sieges.join(', ')}.`));
+    // Sous mille habitants, les sièges ne sont pas élus : les taire laisserait
+    // croire que la commune ne siège pas, alors qu'elle y est représentée par
+    // les premiers de son propre tableau.
+    if (sc.ccDesignes && sc.conseilCc) {
+      bloc.append(
+        glose(
+          'p',
+          'p-scrutin-designes',
+          `Au conseil de ${sc.conseilCc}, la commune n'élit pas ses représentants : ` +
+            `sous mille habitants, ce sont les conseillers municipaux pris dans l'ordre du ` +
+            `tableau — le maire, puis les adjoints (article L273-11 du code électoral). ` +
+            `Le résultat du scrutin ne les nomme donc pas.`,
+        ),
+      );
+    }
 
     bloc.append(
       ligne(
