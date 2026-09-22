@@ -136,6 +136,12 @@ sigles:
     definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
     liens: [od-banatic]
 
+  - id: sigle-sraddet
+    sigle: SRADDET
+    developpe: "Schéma régional d'aménagement, de développement durable et d'égalité des territoires"
+    definition: "Le document par lequel la région oriente l'aménagement : ses objectifs sont pris en compte par les documents d'urbanisme, ses règles générales s'y imposent en compatibilité."
+    liens: [cgct-l4251-3]
+
   - id: sigle-feder
     sigle: FEDER
     developpe: "Fonds européen de développement régional"

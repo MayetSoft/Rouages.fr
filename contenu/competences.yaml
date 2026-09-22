@@ -29,14 +29,18 @@ competences:
   # rectorat. Montrer le fait et nommer le décideur suffit à savoir à qui
   # écrire ; prétendre expliquer serait inventer.
   - id: carte-scolaire
+    # Le ministère l'écrit lui-même : la mesure de carte scolaire relève de la
+    # seule compétence du directeur académique, qui a un devoir d'information
+    # auprès des exécutifs locaux. Nommer l'autorité vaut mieux que « les services
+    # de l'État » — c'est à elle qu'on écrit.
     nom: "Ouverture et fermeture de classes"
     nom_court: "Ouverture de classes"
     acteur: rectorat
-    resume: "Décidée par les services de l'État, pas par le maire — même quand la commune est propriétaire de l'école."
+    resume: "Décidée par le directeur académique, pas par le maire — même quand la commune est propriétaire de l’école, qui n’est qu’informée du projet."
     partagee_avec: [commune]
-    liens: [code-education, education-gouv, od-effectifs-ecoles]
-    verifie_le: 2026-09-13
-    confiance: a_confirmer
+    liens: [code-education, education-gouv, od-effectifs-ecoles, education-carte-scolaire]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: police-tranquillite
     nom: "Tranquillité et salubrité publiques"
@@ -253,13 +257,18 @@ competences:
     confiance: a_confirmer
 
   - id: amenagement-territoire
+    # Quatrième variante de la même erreur, après le SCoT, le SDIS et la DDT :
+    # « s'impose » était faux deux fois. Le SRADDET est opposable de deux manières
+    # distinctes — prise en compte des objectifs, compatibilité avec les règles
+    # générales (art. L4251-3) — et il ne vise le PLU directement qu'en l'absence
+    # de SCoT. La chaîne est SRADDET, puis SCoT, puis PLU.
     nom: "Aménagement du territoire"
     acteur: region
-    resume: "Le schéma régional s'impose aux documents d'urbanisme locaux : la règle communale n'est pas écrite seule."
+    resume: "Le schéma régional n’est pas un règlement : ses objectifs doivent être pris en compte, ses règles générales respectées en compatibilité — et il atteint le plan communal par l’intermédiaire du SCoT."
     partagee_avec: [etat, epci]
-    liens: [code-urbanisme, vp-competences]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-urbanisme, vp-competences, cgct-l4251-3, cu-l131-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- État et Europe ---------------------------------------------------
   - id: controle-legalite
@@ -586,14 +595,18 @@ competences:
   # communautaire, départemental et régional restaient des nœuds isolés — donc
   # invisibles depuis n'importe quel autre point du réseau.
   - id: interet-communautaire
+    # La précision ajoutée est celle qui décide de l'issue : à défaut de définition
+    # dans les deux ans suivant le transfert, la compétence est exercée en entier
+    # par le groupement. Le silence ne laisse donc rien à la commune — il lui
+    # enlève tout.
     nom: "Définition de l'intérêt communautaire"
     nom_court: "Intérêt communautaire"
     acteur: conseil-communautaire
-    resume: "Une compétence transférée n'est pas exercée entièrement : le conseil fixe le seuil à partir duquel elle passe à l'intercommunalité, et ce qui reste à la commune."
+    resume: "Une compétence transférée n’est pas toujours exercée entière : le conseil communautaire fixe, aux deux tiers, ce qui relève de lui. Faute de l’avoir fait dans les deux ans, il l’exerce en totalité."
     partagee_avec: [epci, commune, conseil-municipal]
-    liens: [cgct, wp-intercommunalite, od-banatic]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [cgct, wp-intercommunalite, od-banatic, cgct-l5214-16-interet]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: vote-budget-departemental
     nom: "Vote du budget départemental"
@@ -606,14 +619,17 @@ competences:
     confiance: a_confirmer
 
   - id: vote-budget-regional
+    # Même correction que pour l'aménagement du territoire : un schéma régional
+    # ne « s'impose » pas aux documents locaux, il leur est opposable de deux
+    # manières distinctes.
     nom: "Vote du budget régional"
     nom_court: "Budget régional"
     acteur: conseil-regional
-    resume: "L'assemblée vote le budget et les schémas qui s'imposent ensuite aux documents d'urbanisme locaux."
+    resume: "L’assemblée vote le budget et les schémas régionaux, dont les objectifs sont ensuite pris en compte par les documents d’urbanisme et les règles générales respectées en compatibilité."
     partagee_avec: [region, prefet, chambre-regionale-comptes]
-    liens: [cgct, od-ofgl, vp-budget-local]
-    verifie_le: 2026-09-06
-    confiance: a_confirmer
+    liens: [cgct, od-ofgl, vp-budget-local, cgct-l4231-1, cgct-l4251-3]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- L'accueil du public --------------------------------------------------
   - id: accueil-demarches
@@ -713,9 +729,9 @@ competences:
     acteur: anah
     resume: "Énergie, adaptation au grand âge, habitat dégradé : les aides sont nationales mais souvent complétées par la commune, le département ou la région."
     partagee_avec: [citoyen, commune, epci, departement, region]
-    liens: [wp-anah, anah-fr, code-construction]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-anah, anah-fr, code-construction, anah-aides]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: ingenierie-etat
     nom: "Ingénierie de l'État pour les collectivités"
@@ -723,9 +739,9 @@ competences:
     acteur: anct
     resume: "Une petite commune sans bureau d'études peut demander à l'État de financer l'étude qu'elle n'a pas les moyens de commander."
     partagee_avec: [commune, epci, prefet, agence-urbanisme, caue]
-    liens: [wp-anct, anct-fr]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-anct, anct-fr, anct-ingenierie]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: aides-transition
     nom: "Aides à la transition écologique"
@@ -733,9 +749,9 @@ competences:
     acteur: ademe
     resume: "Subventions et conseil pour les projets d'énergie, de déchets et de mobilité, ouverts aux collectivités comme aux entreprises."
     partagee_avec: [commune, epci, region, employeur]
-    liens: [wp-ademe, ademe-fr, code-environnement]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-ademe, ademe-fr, code-environnement, ademe-aides]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: conseil-architecture
     nom: "Conseil gratuit en architecture et urbanisme"
@@ -743,9 +759,9 @@ competences:
     acteur: caue
     resume: "Ouvert au particulier qui construit comme à la commune qui planifie, et financé par une part de la taxe d'aménagement que chacun paie déjà."
     partagee_avec: [citoyen, petitionnaire, commune, departement, abf]
-    liens: [wp-caue, fncaue, code-urbanisme]
-    verifie_le: 2026-09-11
-    confiance: a_confirmer
+    liens: [wp-caue, fncaue, code-urbanisme, loi-architecture-1977]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Culture, sport, funéraire, numérique -------------------------------
   # Quatre compétences que le site décrivait par leur absence. Les deux
@@ -827,14 +843,18 @@ competences:
 
   # --- Ce que l'État délègue à des professions ------------------------------
   - id: authentification-actes
+    # Les deux moitiés sont vérifiées : la force probante jusqu'à inscription de
+    # faux tient de l'article 1371 du code civil, et la force exécutoire dispense
+    # le créancier d'obtenir un jugement avant de faire exécuter — ce que l'acte
+    # sous seing privé ne permet pas.
     nom: "Donner force authentique à un acte"
     nom_court: "Acte authentique"
     acteur: notaire
     resume: "Vente, succession, donation, contrat de mariage : l'acte authentique fait foi jusqu'à inscription de faux et s'exécute sans passer par un juge."
     partagee_avec: [citoyen, etat, tribunal-judiciaire]
-    liens: [wp-notaire, annuaire-notaires]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-notaire, annuaire-notaires, cciv-1371]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: execution-decisions
     nom: "Signifier et exécuter une décision de justice"
@@ -842,19 +862,22 @@ competences:
     acteur: commissaire-justice
     resume: "Un jugement gagné ne s'applique pas tout seul : il faut le faire signifier puis exécuter, et cela ne peut passer que par un commissaire de justice."
     partagee_avec: [citoyen, tribunal-judiciaire, prefet]
-    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire, cpce-l122-1, ordonnance-commissaires-justice]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: bornage
+    # Même nuance que sur la fiche du géomètre-expert : son monopole est réel,
+    # mais ce qui « fait foi » entre voisins est le procès-verbal qu'ils signent,
+    # non le plan seul.
     nom: "Fixer la limite d'une propriété"
     nom_court: "Bornage"
     acteur: geometre-expert
-    resume: "Le cadastre sert l'impôt, pas la propriété : il ne délimite rien juridiquement. Seul le bornage établi par un géomètre-expert fait foi entre voisins."
+    resume: "Le cadastre sert l’impôt, pas la propriété : il ne délimite rien juridiquement. Seul le géomètre-expert peut fixer une limite, et c’est le procès-verbal signé par les voisins qui les engage."
     partagee_avec: [citoyen, petitionnaire, commune, dgfip]
-    liens: [wp-geometre-expert, ordre-geometres, code-urbanisme]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-geometre-expert, ordre-geometres, code-urbanisme, loi-geometres-1946]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   # --- Le département : ce qu'on touche sans le savoir ----------------------
   # « Protection de l'enfance et PMI » ne faisait qu'une fiche pour deux
@@ -863,14 +886,17 @@ competences:
   # consultation gratuite de l'autre. La fiche groupée est remplacée par les
   # deux qui suivent.
   - id: rsa
+    # Les trois guichets ont été vérifiés séparément : le département décide et
+    # finance, la caisse verse pour son compte, et depuis 2025 l'allocataire est
+    # inscrit à France Travail puis orienté vers qui l'accompagnera.
     nom: "Revenu de solidarité active"
     nom_court: "RSA"
     acteur: departement
     resume: "Le département décide et finance, la caisse d'allocations familiales verse, France Travail accompagne : trois guichets pour une seule allocation."
     partagee_avec: [citoyen, caf, france-travail, president-departement, etat]
-    liens: [wp-rsa, sp-rsa, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-rsa, sp-rsa, code-action-sociale, caf-rsa, ft-inscription-2025]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: apa
     nom: "Allocation personnalisée d'autonomie"
@@ -888,9 +914,9 @@ competences:
     acteur: mdph
     resume: "Carte de stationnement, prestation de compensation, orientation scolaire ou professionnelle : une commission décide, le département finance une partie."
     partagee_avec: [citoyen, departement, etat, rectorat]
-    liens: [wp-mdph, code-action-sociale]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    liens: [wp-mdph, code-action-sociale, casf-l146-3]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: aide-sociale-enfance
     nom: "Protection de l'enfance"
