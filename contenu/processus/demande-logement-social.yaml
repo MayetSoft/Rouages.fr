@@ -23,10 +23,15 @@ processus:
     sortie: "Une proposition de logement, ou un délai d'attente qui ouvre un recours"
     decideur: bailleur-social
     competences: [logement-social, action-sociale]
-    liens: [sp-logement-social, anct-hlm, wp-hlm]
-    verifie_le: 2026-09-19
+    liens: [sp-logement-social, anct-hlm, wp-hlm, ecologie-attributions-hlm, anil-dalo]
+    verifie_le: 2026-09-22
     perime_apres_mois: 12
-    confiance: a_confirmer
+    # Les cinq étapes et les cinq leviers sont vérifiés. Deux ajouts ont compté :
+    # le contingent de l'État représente 30 % du parc de chaque organisme — un
+    # logement sur trois échappe donc au bailleur qu'on relance — et la
+    # reconnaissance au titre du droit au logement opposable ouvre, faute de
+    # relogement, une astreinte prononcée contre l'État par le juge.
+    confiance: etabli
 
     etapes:
       - ordre: 1
@@ -34,36 +39,43 @@ processus:
         action: "Dépôt de la demande et obtention du numéro unique"
         produit: [numero-unique-logement]
         note: "Aucune attribution ne peut être prononcée sans enregistrement au répertoire national. Une seule demande vaut pour tous les bailleurs du périmètre choisi."
-        liens: [anct-hlm, code-construction, sp-logement-social]
-        confiance: a_confirmer
+        liens: [anct-hlm, code-construction, sp-logement-social, ecologie-attributions-hlm]
+        confiance: etabli
       - ordre: 2
         acteur: citoyen
         action: "Renouvellement annuel de la demande"
         delai: { valeur: 12, unite: mois, nature: maximum_legal }
         note: "Faute de renouvellement, la demande est radiée et l'ancienneté repart de zéro. C'est la première cause de perte de rang."
-        liens: [code-construction, sp-logement-social]
-        confiance: a_confirmer
+        liens: [code-construction, sp-logement-social, ecologie-attributions-hlm]
+        confiance: etabli
       - ordre: 3
+        # Le contingent de l'État est chiffré : 30 % du parc de chaque organisme.
+        # Savoir qu'un logement sur trois échappe au bailleur change l'interlocuteur
+        # qu'on relance.
         acteur: prefet
         action: "Désignation de candidats sur le contingent réservé de l'État"
         conditionnelle: true
-        note: "Une part des logements est réservée à des réservataires — l'État, Action Logement, les collectivités — qui proposent leurs propres candidats au bailleur."
-        liens: [code-construction, prefectures, wp-hlm]
-        confiance: a_confirmer
+        note: "Une part des logements est réservée à des réservataires — l'État, Action Logement, les collectivités — qui proposent leurs propres candidats au bailleur. Le contingent de l'État représente 30 % du parc de chaque organisme."
+        liens: [code-construction, prefectures, wp-hlm, ecologie-attributions-hlm]
+        confiance: etabli
       - ordre: 4
         acteur: bailleur-social
         action: "Examen par la commission d'attribution"
         note: "La commission d'attribution des logements et d'examen de l'occupation des logements examine en principe au moins trois candidatures par logement vacant."
-        liens: [code-construction, wp-hlm, anct-hlm]
-        confiance: a_confirmer
+        liens: [code-construction, wp-hlm, anct-hlm, ecologie-attributions-hlm]
+        confiance: etabli
       - ordre: 5
+        # Ajout vérifié : la reconnaissance ne se borne pas à obliger l'État à
+        # reloger. Faute de proposition, le tribunal administratif peut le condamner
+        # à une astreinte — c'est ce qui donne au droit au logement opposable sa
+        # portée, et la fiche s'arrêtait avant.
         acteur: prefet
         action: "Commission de médiation DALO, puis injonction de relogement"
         conditionnelle: true
         produit: [recours-dalo]
-        note: "Au-delà du délai anormalement long fixé dans le département, ou dans certaines situations prioritaires, la commission peut reconnaître le demandeur prioritaire et l'État doit alors le reloger."
-        liens: [code-construction, wp-droit-logement, prefectures]
-        confiance: a_confirmer
+        note: "Au-delà du délai anormalement long fixé dans le département, ou dans certaines situations prioritaires, la commission peut reconnaître le demandeur prioritaire : l'État doit alors le reloger, et le tribunal administratif peut le condamner à une astreinte s'il ne le fait pas."
+        liens: [code-construction, wp-droit-logement, prefectures, anil-dalo]
+        confiance: etabli
 
     leviers:
       - id: enregistrer-tot
@@ -73,8 +85,8 @@ processus:
         difficulte: faible
         ancre_etape: 1
         piege: "C'est la date du premier enregistrement qui compte, pas celle du besoin. Attendre coûte exactement le temps attendu."
-        liens: [anct-hlm, sp-logement-social, code-construction]
-        confiance: a_confirmer
+        liens: [anct-hlm, sp-logement-social, code-construction, ecologie-attributions-hlm]
+        confiance: etabli
       - id: elargir-le-perimetre
         quoi: "Élargir les communes demandées sur la demande unique"
         quand: "À tout moment, par modification de la demande"
@@ -82,8 +94,8 @@ processus:
         difficulte: faible
         ancre_etape: 1
         piege: "Une demande restreinte à une seule commune n'est examinée que pour les logements de cette commune, quelles que soient les vacances voisines."
-        liens: [anct-hlm, sp-logement-social]
-        confiance: a_confirmer
+        liens: [anct-hlm, sp-logement-social, ecologie-attributions-hlm]
+        confiance: etabli
       - id: identifier-le-reservataire
         quoi: "Demander à quel réservataire est rattaché le logement visé"
         quand: "Avant de relancer, pour relancer le bon interlocuteur"
@@ -91,18 +103,21 @@ processus:
         difficulte: moyenne
         ancre_etape: 3
         piege: "Relancer le bailleur pour un logement du contingent préfectoral ne sert à rien : le candidat est proposé par le réservataire."
-        liens: [code-construction, wp-hlm, prefectures]
-        confiance: a_confirmer
+        liens: [code-construction, wp-hlm, prefectures, ecologie-attributions-hlm]
+        confiance: etabli
       - id: saisir-la-commission-dalo
+        # L'écart entre départements est considérable — de dix-huit mois à plusieurs
+        # années — et personne ne le dit au demandeur. C'est pourtant ce chiffre-là
+        # qui décide si l'attente est « anormale ».
         quoi: "Saisir la commission de médiation au titre du droit au logement opposable"
         quand: "Passé le délai anormalement long du département, ou sans délai si la situation est prioritaire"
         aupres_de: "La préfecture du département"
         difficulte: moyenne
         ancre_etape: 5
         recours_si_refus: "Recours devant le tribunal administratif contre la décision de la commission"
-        piege: "Le délai anormalement long n'est pas national : il est fixé département par département, et il faut le vérifier avant de conclure que l'attente est normale."
-        liens: [code-construction, wp-droit-logement, code-justice-administrative]
-        confiance: a_confirmer
+        piege: "Le délai anormalement long n'est pas national : chaque préfet le fixe par arrêté, et l'écart va de dix-huit mois à plusieurs années selon les départements. Il faut donc le vérifier avant de conclure que l'attente est normale — et la reconnaissance ouvre, à défaut de relogement, une astreinte contre l'État."
+        liens: [code-construction, wp-droit-logement, code-justice-administrative, anil-dalo]
+        confiance: etabli
       - id: verifier-l-obligation-sru
         quoi: "Vérifier si la commune est en retard sur son obligation de logements sociaux"
         quand: "À tout moment"

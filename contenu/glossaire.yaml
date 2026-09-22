@@ -136,6 +136,12 @@ sigles:
     definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
     liens: [od-banatic]
 
+  - id: sigle-anil
+    sigle: ANIL
+    developpe: "Agence nationale pour l'information sur le logement"
+    definition: "Le réseau public qui renseigne gratuitement sur le logement ; chaque département a son antenne."
+    liens: [anil-dalo]
+
   - id: sigle-teom
     sigle: TEOM
     developpe: "Taxe d'enlèvement des ordures ménagères"
