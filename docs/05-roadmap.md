@@ -34,8 +34,8 @@ Reste :
 - **la relecture** des attributions marquées `confiance: a_confirmer` — c'est le
   vrai reste à faire, pas le volume. `npm run relire` en donne la file :
   l'affirmation exacte à contrôler et les pages qui la fondent, fiche par
-  fiche. Les 37 acteurs et les 41 compétences sont faits (voir plus bas) ;
-  restent 125 fiches — 15 flux, 11 processus, 57 étapes, 42 leviers.
+  fiche. Les 37 acteurs, les 41 compétences et les 15 flux sont faits (voir
+  plus bas) ; restent 110 fiches — 11 processus, 57 étapes, 42 leviers.
 
 **Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
 n'importe quel autre en trois clics, sans passer par une impasse.
@@ -1462,7 +1462,32 @@ l'institution — le directeur académique pour la carte scolaire, le directeur
 général de l'agence pour les soins. C'est à quelqu'un qu'on écrit, pas à un
 sigle.
 
-Reste 125 fiches&nbsp;: 15 flux, 11 processus, 57 étapes, 42 leviers.
+**Les 15 flux ensuite**, et la même mécanique&nbsp;: deux des erreurs déjà
+corrigées y revenaient une **cinquième** fois — les pompiers « que le préfet
+dirige en opération », le schéma « auquel leurs PLU devront se conformer ». Une
+phrase fausse se recopie cinq fois avant qu'on la relise une.
+
+Ce que la vérification a ajouté&nbsp;:
+
+- la **taxe d'aménagement** a **trois** parts, pas deux&nbsp;: la fiche oubliait
+  la part régionale d'Île-de-France ;
+- le **versement mobilité** pèse environ **la moitié** des recettes des
+  autorités organisatrices (Cerema), là où la fiche disait « souvent plus que la
+  recette des billets » ;
+- la **TEOM** partage la base de la taxe foncière, et son produit **ne doit pas
+  être disproportionné** au coût du service — un contribuable a fait annuler des
+  délibérations sur ce fondement, et le dégrèvement est alors à la charge de la
+  collectivité. Il y a là un levier à décrire ;
+- la **redevance de concession** a deux parts nommées par le contrat&nbsp;: l'une
+  finance le contrôle que l'autorité exerce sur le concessionnaire, l'autre les
+  travaux qu'elle conduit elle-même.
+
+Et une abstention&nbsp;: la part du billet dans le coût d'un réseau de transport
+reste écrite « minoritaire », sans chiffre. Les taux publiés varient trop d'une
+agglomération à l'autre et selon le périmètre retenu — charges d'exploitation ou
+coût complet — pour qu'un nombre unique soit honnête.
+
+Reste 110 fiches&nbsp;: 11 processus, 57 étapes, 42 leviers.
 
 ### Une ingestion qui ne se perd plus en route
 

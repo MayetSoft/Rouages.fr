@@ -8,9 +8,9 @@ flux:
     vers: [commune, epci, departement]
     resume: "La dotation globale de fonctionnement : le principal versement de l'État aux collectivités, calculé par formule."
     ordre_de_grandeur: "Plusieurs dizaines de milliards d'euros par an, tous échelons confondus."
-    liens: [wp-dgf, od-ofgl, cl-gouv]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-dgf, od-ofgl, cl-gouv, cgct-l2334-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: taxe-fonciere
     nom: "Taxe foncière"
@@ -24,14 +24,19 @@ flux:
     confiance: etabli
 
   - id: teom
+    # Les deux moitiés tiennent : la taxe est assise sur le revenu cadastral qui
+    # sert de base à la taxe foncière bâtie, et son produit ne doit pas être
+    # disproportionné au coût du service. Un contribuable a fait annuler des
+    # délibérations sur ce fondement, et le dégrèvement est alors à la charge de
+    # la collectivité — il y a là un levier à décrire un jour.
     nom: "Taxe d'enlèvement des ordures ménagères"
     nature: argent
     de: citoyen
     vers: [epci]
     resume: "La taxe d'enlèvement des ordures ménagères, adossée à la taxe foncière et affectée au service des déchets."
-    liens: [wp-teom, od-sinoe]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-teom, od-sinoe, collectivites-teom]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: facture-eau
     nom: "Facture d'eau"
@@ -40,29 +45,35 @@ flux:
     vers: [epci, syndicat-eau, delegataire-eau, agence-eau]
     resume: "La facture d'eau finance à la fois le service, l'assainissement et les redevances de l'agence de l'eau."
     ordre_de_grandeur: "Le prix au mètre cube de chaque commune est public et comparable."
-    liens: [od-sispea, eaufrance, wp-agence-eau]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [od-sispea, eaufrance, wp-agence-eau, ce-l213-8]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: taxe-amenagement
+    # Trois parts, non deux : la fiche oubliait la part régionale d'Île-de-France.
+    # Le reversement de la commune à son intercommunalité a été rendu obligatoire
+    # fin 2021 puis rendu facultatif un an plus tard — on n'en dit donc rien.
     nom: "Taxe d'aménagement"
     nature: argent
     de: petitionnaire
     vers: [commune, departement]
-    resume: "Due à raison d'une autorisation d'urbanisme, et partagée entre la commune et le département."
-    liens: [sp-taxe-amenagement, code-urbanisme]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Due à raison d’une autorisation d’urbanisme : une part communale ou intercommunale, une part départementale, et une part régionale en Île-de-France."
+    liens: [sp-taxe-amenagement, code-urbanisme, collectivites-taxe-amenagement]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: contribution-sdis
+    # Cinquième occurrence de la même erreur, après le SDIS et la compétence
+    # « secours-incendie » : le service n'est pas dirigé par le seul préfet.
+    # Les contributions, elles, sont des dépenses obligatoires (art. L1424-35).
     nom: "Contribution au SDIS"
     nature: argent
     de: departement
     vers: [sdis]
-    resume: "Le département et les communes financent les pompiers, que le préfet dirige en opération."
-    liens: [wp-sdis, od-ofgl]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Le département et les communes financent les pompiers ; le service intervient sous l’autorité du maire ou du préfet, selon le pouvoir de police en cause."
+    liens: [wp-sdis, od-ofgl, cgct-l1424-3, cgct-l1424-35]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: fonds-europeens
     nom: "Fonds européens"
@@ -70,9 +81,9 @@ flux:
     de: union-europeenne
     vers: [region]
     resume: "Les fonds structurels européens sont pour l'essentiel gérés par les régions."
-    liens: [europa, wp-region]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [europa, wp-region, europe-en-france]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: rsa-verse
     nom: "RSA"
@@ -80,9 +91,9 @@ flux:
     de: departement
     vers: [citoyen]
     resume: "Le RSA est financé par le département et versé par la CAF : deux acteurs différents pour un même euro."
-    liens: [code-action-sociale, caf-fr, od-ofgl]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-action-sociale, caf-fr, od-ofgl, caf-rsa]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: subvention-agence-eau
     nom: "Aides de l'agence de l'eau"
@@ -90,9 +101,9 @@ flux:
     de: agence-eau
     vers: [epci, syndicat-eau]
     resume: "Les redevances perçues sur les factures d'eau reviennent aux collectivités sous forme d'aides aux travaux."
-    liens: [wp-agence-eau, eaufrance]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-agence-eau, eaufrance, ce-l213-8]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: deliberations
     nom: "Délibérations publiées"
@@ -108,25 +119,33 @@ flux:
   # Les ordres de grandeur restent qualitatifs : les chiffrer commune par
   # commune demande d'ingérer l'OFGL, ce qui reste à faire (docs/05-roadmap.md).
   - id: versement-mobilite
+    # Le seuil est chiffré, comme sur la fiche des employeurs : onze salariés. Et
+    # « souvent plus que la recette des billets » devient une part mesurée — le
+    # Cerema situe le versement à la moitié des recettes des autorités
+    # organisatrices, quand le billet en couvre une part bien moindre.
     nom: "Versement mobilité"
     nature: argent
     de: employeur
     vers: [aom]
-    resume: "Les employeurs au-delà d'un seuil d'effectif financent les transports du territoire, souvent pour plus que la recette des billets."
+    resume: "À partir de onze salariés, les employeurs financent les transports du territoire : ce versement pèse environ la moitié des recettes des autorités organisatrices."
     ordre_de_grandeur: "Première ressource des réseaux urbains, devant la billetterie."
-    liens: [wp-versement-mobilite, code-transports, od-ofgl-flux]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [wp-versement-mobilite, code-transports, od-ofgl-flux, urssaf-versement-mobilite, cerema-versement-mobilite]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: billet-transport
+    # L'affirmation tient, et on s'abstient de la chiffrer : les taux de
+    # couverture publiés varient fortement d'une agglomération à l'autre et selon
+    # le périmètre retenu — charges d'exploitation ou coût complet. « Une part
+    # minoritaire » est ce qu'on peut écrire sans se tromper.
     nom: "Titres de transport"
     nature: argent
     de: citoyen
     vers: [operateur-transport, aom]
     resume: "Ce que paie l'usager ne couvre qu'une part minoritaire du coût réel du réseau."
-    liens: [code-transports, od-transport]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-transports, od-transport, ccomptes-usagers-transports, cerema-versement-mobilite]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: subvention-transport
     nom: "Compensation à l'exploitant"
@@ -134,29 +153,36 @@ flux:
     de: aom
     vers: [operateur-transport]
     resume: "L'autorité organisatrice verse à l'exploitant la différence entre le coût du service et les recettes."
-    liens: [code-transports, od-decp]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [code-transports, od-decp, ct-l2121-1, cgct-l1411-1]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: redevance-concession
+    # « Aux propriétaires du réseau » devient « à l'autorité concédante », qui est
+    # la même chose mais nommée comme le contrat la nomme. Les deux parts ont été
+    # vérifiées : R1 pour les dépenses de structure et le contrôle, R2 en
+    # contrepartie des travaux réalisés sous maîtrise d'ouvrage de l'autorité.
     nom: "Redevance de concession"
     nature: argent
     de: enedis
     vers: [syndicat-energie, commune]
-    resume: "Le concessionnaire verse une redevance aux propriétaires du réseau, en contrepartie de son exploitation."
-    liens: [code-energie, fnccr, od-ofgl-flux]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Le concessionnaire verse une redevance à l’autorité qui détient le réseau : une part finance son contrôle du contrat, l’autre les travaux qu’elle conduit elle-même."
+    liens: [code-energie, fnccr, od-ofgl-flux, enedis-redevance-concession, cen-l322-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: cotisation-scot
+    # Cinquième occurrence de la confusion conformité / compatibilité, après le
+    # syndicat de SCoT, la compétence « planification-scot » et les deux fiches du
+    # schéma régional.
     nom: "Cotisations au syndicat de SCoT"
     nature: argent
     de: epci
     vers: [syndicat-scot]
-    resume: "Les intercommunalités financent la structure qui porte le schéma auquel leurs PLU devront se conformer."
-    liens: [code-urbanisme, od-ofgl-flux]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    resume: "Les intercommunalités financent la structure qui porte le schéma avec lequel leurs PLU devront être compatibles."
+    liens: [code-urbanisme, od-ofgl-flux, cu-l131-4]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: financement-agence-urbanisme
     nom: "Financement de l'agence d'urbanisme"
@@ -164,9 +190,9 @@ flux:
     de: epci
     vers: [agence-urbanisme]
     resume: "Financée conjointement par les collectivités, l'État et la région : son indépendance tient à ce partage."
-    liens: [fnau, wp-agence-urbanisme]
-    verifie_le: 2026-09-05
-    confiance: a_confirmer
+    liens: [fnau, wp-agence-urbanisme, cu-l132-6]
+    verifie_le: 2026-09-22
+    confiance: etabli
 
   - id: donnees-reseau
     nom: "Données de réseau ouvertes"
@@ -192,6 +218,9 @@ flux:
   # « frais de notaire » est à environ 80 % de l'impôt, et cet impôt ne va pas
   # au notaire. Il va au département et aux communes.
   - id: dmto
+    # Les trois parts ont été relevées dans le fichier de la DGFiP pendant le
+    # travail sur les taux d'imposition : la part départementale domine, la part
+    # communale suit, et l'État prélève des frais d'assiette sur la première.
     nom: "Droits de mutation"
     nature: argent
     de: citoyen
@@ -199,5 +228,5 @@ flux:
     resume: "Payés à l'achat d'un logement et collectés par le notaire : l'essentiel revient au département, une part aux communes, une autre à l'État."
     ordre_de_grandeur: "Première ressource fiscale propre des départements, et la plus sensible au marché immobilier."
     liens: [wp-mutation, cgi-1594d, cgi-1584, cgi-1595bis, impots-enregistrement, od-dmto]
-    verifie_le: 2026-09-19
-    confiance: a_confirmer
+    verifie_le: 2026-09-22
+    confiance: etabli

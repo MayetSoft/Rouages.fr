@@ -136,6 +136,12 @@ sigles:
     definition: "Dit, pour chaque intercommunalité, quelles compétences les communes lui ont transférées."
     liens: [od-banatic]
 
+  - id: sigle-teom
+    sigle: TEOM
+    developpe: "Taxe d'enlèvement des ordures ménagères"
+    definition: "La ligne « ordures ménagères » de l'avis de taxe foncière : elle en partage la base, et son produit ne doit pas dépasser ce que coûte le service."
+    liens: [collectivites-teom]
+
   - id: sigle-dgcl
     sigle: DGCL
     developpe: "Direction générale des collectivités locales"
