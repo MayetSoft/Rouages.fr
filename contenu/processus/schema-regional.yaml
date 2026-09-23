@@ -1,0 +1,78 @@
+# Peser sur le schéma régional d'aménagement.
+# Le conseil régional ne tenait au réseau que par son budget. C'est pourtant lui
+# qui adopte le document le plus lointain et le plus contraignant de la chaîne
+# d'urbanisme : ce que le PLU d'une commune devra respecter dans dix ans se
+# décide ici, par le SCoT interposé.
+documents:
+  - id: sraddet
+    nom: "Le schéma régional d'aménagement"
+    resume: "Ses objectifs doivent être pris en compte, ses règles générales respectées en compatibilité par les SCoT — et par les PLU là où il n'y a pas de SCoT."
+    ou_le_trouver: "Site de la région ; le dossier d'enquête publique pendant la consultation."
+    liens: [cgct-sraddet, cgct-l4251-3]
+
+processus:
+  - id: schema-regional
+    nom: "Peser sur le schéma régional d'aménagement"
+    famille: publics
+    resume: "Le conseil régional adopte le schéma qui s'imposera, en compatibilité, aux SCoT puis aux PLU. L'enquête publique est le moment où un habitant peut encore en discuter les règles."
+    declencheur: "L'élaboration ou la modification du schéma, dans les trois ans qui suivent le renouvellement du conseil régional"
+    sortie: "Un schéma adopté par le conseil régional et approuvé par le préfet de région"
+    decideur: conseil-regional
+    competences: [amenagement-territoire, participation-public]
+    liens: [cgct-sraddet, cgct-l4251-7, cgct-l4251-3]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: region
+        action: "Élaboration du projet de schéma"
+        liens: [cgct-sraddet]
+        confiance: etabli
+      - ordre: 2
+        acteur: epci
+        action: "Avis des collectivités et organismes associés"
+        delai: { valeur: 3, unite: mois, nature: maximum_legal }
+        note: "Le projet est soumis pour avis, notamment aux départements, aux intercommunalités et au conseil économique, social et environnemental régional. Sans réponse dans les trois mois, l'avis est réputé favorable."
+        liens: [cgct-sraddet]
+        confiance: etabli
+      - ordre: 3
+        acteur: commissaire-enqueteur
+        action: "Enquête publique"
+        note: "Le dossier soumis au public comprend notamment l'avis de l'autorité environnementale et ceux des organismes consultés. Le processus « participer à une enquête publique » en décrit le déroulement."
+        liens: [prefecture-enquete-sraddet, cgct-sraddet]
+        confiance: etabli
+      - ordre: 4
+        acteur: conseil-regional
+        action: "Adoption par délibération du conseil régional"
+        note: "Dans les trois ans qui suivent le renouvellement général des conseils régionaux."
+        liens: [cgct-l4251-7]
+        confiance: etabli
+      - ordre: 5
+        acteur: prefet
+        action: "Approbation par arrêté du préfet de région"
+        produit: [sraddet]
+        note: "Le préfet vérifie la procédure et la conformité aux lois, aux règlements et aux intérêts nationaux. S'il refuse d'approuver, il le notifie au conseil régional par une décision motivée."
+        liens: [cgct-l4251-7]
+        confiance: etabli
+
+    leviers:
+      - id: observer-le-schema-regional
+        quoi: "Déposer une observation à l'enquête publique sur le schéma"
+        quand: "Pendant l'enquête, avant l'adoption par le conseil régional"
+        aupres_de: "La commission d'enquête"
+        difficulte: moyenne
+        ancre_etape: 3
+        piege: "Le schéma ne se lit pas comme un règlement de parcelle, et c'est pour cela qu'on le laisse passer : ses règles générales s'imposeront pourtant au SCoT, puis au PLU de la commune. C'est ici, et non à la révision du PLU, qu'on peut encore les discuter."
+        liens: [cgct-l4251-3, prefecture-enquete-sraddet]
+        confiance: etabli
+      - id: lire-les-avis-du-dossier
+        quoi: "Lire les avis joints au dossier d'enquête"
+        quand: "Dès l'ouverture de l'enquête"
+        aupres_de: "Le dossier d'enquête publique"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Les avis du département et des intercommunalités disent souvent, en clair, ce que le schéma changera pour elles. Un avis réputé favorable faute de réponse n'en dit rien : son absence est aussi une information."
+        liens: [cgct-sraddet]
+        confiance: etabli

@@ -51,8 +51,8 @@ comme elle le mérite&nbsp;:
 - **sans impasse — un invariant.** Aucun nœud isolé, le graphe d'un seul tenant.
   Toute régression fait échouer le build. C'est acquis&nbsp;: 0 isolé,
   38 220 paires atteignables sur 38 220 ;
-- **trois clics — un cliquet.** 67,0 % des paires y sont, diamètre 6 — contre
-  62,0 % et 7 à la première mesure. À 211 nœuds, l'exiger de *toutes* les paires
+- **trois clics — un cliquet.** 67,5 % des paires y sont, diamètre 6 — contre
+  62,0 % et 7 à la première mesure. À 213 nœuds, l'exiger de *toutes* les paires
   reviendrait à demander un graphe presque complet&nbsp;; le contrôle retient
   donc le plancher atteint et refuse de redescendre, plutôt que de poursuivre un
   absolu.
@@ -1971,12 +1971,10 @@ Ce qui décide d'une issue&nbsp;:
 
 **Ce qui n'est pas fait, et pourquoi.**
 
-- **Le conseil régional tient toujours à un seul fil.** La répartition du
-  transport scolaire entre la région et les autorités organisatrices de la
-  mobilité est vérifiée&nbsp;; le fait que l'assemblée régionale en vote elle-même
-  le règlement ne l'est pas — le règlement lu désigne le *président* de Région
-  comme autorité organisatrice. Le faire agir sans preuve aurait été gonfler une
-  métrique.
+- ~~**Le conseil régional tient toujours à un seul fil.**~~ Il n'a pas été
+  relié au transport scolaire, faute de preuve qu'il en vote le règlement — le
+  règlement lu désigne le *président* de Région. Il l'a été ensuite par deux
+  textes qui le nomment lui-même, voir la section suivante.
 - **Les critères de priorité des dérogations au collège restent à confirmer.**
   Les pages du ministère et des académies refusent les requêtes de cet
   environnement&nbsp;; l'étape est marquée `a_confirmer`, la fiche avec elle, et
@@ -2036,6 +2034,37 @@ section entière&nbsp;; il pointe désormais l'article.
 
 Réseau&nbsp;: 207 → 211 nœuds, 628 → 650 arêtes, 66,2 % → **67,0 %** à trois
 clics. Plancher du cliquet relevé à 65 %.
+
+### Le conseil régional, par les textes qui le nomment ✔
+
+Il tenait au réseau par son seul budget, et la première tentative l'avait laissé
+ainsi&nbsp;: rien ne prouvait qu'il votât le règlement du transport scolaire. La
+règle a donc été de ne le relier que là où **la loi nomme l'assemblée
+elle-même**, et non la région en général ou son président. Deux articles le
+font&nbsp;:
+
+- **le schéma régional d'aménagement est adopté par délibération du conseil
+  régional**, dans les trois ans qui suivent son renouvellement, puis approuvé
+  par arrêté du préfet de région — qui peut refuser par décision motivée
+  (art. L4251-7). D'où un processus neuf, « peser sur le schéma régional
+  d'aménagement », et le document qu'il produit&nbsp;;
+- **le conseil régional est seul compétent pour définir les régimes d'aides aux
+  entreprises** et en décider l'octroi&nbsp;; communes et intercommunalités n'y
+  participent que par convention avec la région (art. L1511-2). D'où un partage
+  sur la compétence développement économique.
+
+Le processus rend visible ce que la chaîne d'urbanisme cache&nbsp;: ce que le PLU
+d'une commune devra respecter dans dix ans se décide ici, par le SCoT interposé.
+L'enquête publique sur le schéma est le seul moment où un habitant peut en
+discuter les règles générales — et c'est justement parce qu'il ne se lit pas
+comme un règlement de parcelle qu'on le laisse passer.
+
+Écarté faute de pouvoir le lire&nbsp;: un jugement d'annulation partielle d'un
+schéma régional, que les résultats de recherche mentionnaient mais dont la page
+renvoie à l'accueil du Conseil d'État.
+
+Conseil régional&nbsp;: **1 → 4 arêtes**, une démarche. Réseau&nbsp;: 211 → 213 nœuds,
+650 → 663 arêtes, 67,0 % → **67,5 %** à trois clics.
 
 ### Une ingestion qui ne se perd plus en route
 

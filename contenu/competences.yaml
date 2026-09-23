@@ -158,13 +158,17 @@ competences:
     nom_court: "Développement éco."
     acteur: epci
     resume: "Zones d'activité et immobilier d'entreprise pour l'intercommunalité ; la stratégie et les aides relèvent de la région."
-    partagee_avec: [region]
+    # La loi nomme l'assemblée elle-même : le conseil régional est seul compétent
+    # pour définir les régimes d'aides aux entreprises et en décider l'octroi ;
+    # communes et groupements n'y participent que par convention avec la région
+    # (art. L1511-2).
+    partagee_avec: [region, conseil-regional]
     banatic: ["4000", "4005"]
     # La loi NOTRe la transfère de plein droit depuis le 1er janvier 2017. Les
     # EPT en sont exclus : dans le Grand Paris, c'est la métropole qui l'exerce,
     # ce que confirme le registre — aucun des onze EPT ne la déclare.
     obligatoire_pour: [CC, CA, CU, METRO, MET69]
-    liens: [cgct, cgct-l5214-16, cgct-l5216-5, vp-competences, wp-loi-notre]
+    liens: [cgct, cgct-l5214-16, cgct-l5216-5, vp-competences, wp-loi-notre, cgct-l1511-2]
     verifie_le: 2026-09-06
     confiance: etabli
 
@@ -274,8 +278,10 @@ competences:
     nom: "Aménagement du territoire"
     acteur: region
     resume: "Le schéma régional n’est pas un règlement : ses objectifs doivent être pris en compte, ses règles générales respectées en compatibilité — et il atteint le plan communal par l’intermédiaire du SCoT."
-    partagee_avec: [etat, epci]
-    liens: [code-urbanisme, vp-competences, cgct-l4251-3, cu-l131-4]
+    # C'est le conseil régional qui adopte le schéma, par délibération, et le
+    # préfet de région qui l'approuve par arrêté (art. L4251-7).
+    partagee_avec: [etat, epci, conseil-regional, prefet]
+    liens: [code-urbanisme, vp-competences, cgct-l4251-3, cu-l131-4, cgct-l4251-7]
     verifie_le: 2026-09-22
     confiance: etabli
 
