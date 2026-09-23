@@ -1,0 +1,90 @@
+# Faire interroger le Gouvernement.
+# Le député et le sénateur tenaient au réseau par un ou deux fils, alors que la
+# question écrite est la voie la plus directe entre un habitant et un ministre —
+# et ce site en cite lui-même plusieurs parmi ses pages de référence.
+documents:
+  - id: reponse-ministerielle
+    nom: "La réponse ministérielle"
+    resume: "Publiée au Journal officiel à la suite de la question, et consultable en ligne sur le site de l'assemblée concernée."
+    ou_le_trouver: "Sites de l'Assemblée nationale et du Sénat, rubrique des questions."
+    liens: [an-questions, senat-questions-ecrites]
+
+processus:
+  - id: question-ecrite
+    nom: "Faire interroger le Gouvernement par son député ou son sénateur"
+    famille: publics
+    resume: "Un cas que le texte ne tranche pas, une règle qui s'applique mal : seul un parlementaire peut poser la question écrite, et le ministre a deux mois pour répondre au Journal officiel."
+    declencheur: "Une question sur l'application d'un texte, que ni la mairie ni la préfecture ne peuvent trancher"
+    sortie: "Une réponse ministérielle publiée au Journal officiel"
+    decideur: gouvernement
+    competences: [controle-gouvernement]
+    liens: [an-questions, senat-questions-ecrites, constitution]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Écrire à son député ou à son sénateur"
+        note: "Le citoyen ne peut pas poser la question lui-même : c'est un droit du parlementaire. Il peut en revanche lui soumettre un cas précis et lui demander de la poser."
+        liens: [an-questions, senat-questions-ecrites]
+        confiance: etabli
+      - ordre: 2
+        acteur: depute
+        action: "Dépôt de la question à l'Assemblée nationale"
+        note: "Le nombre de questions est plafonné par député et par session : la Conférence des présidents l'a fixé à cinquante-deux en 2015."
+        liens: [an-questions]
+        confiance: etabli
+      - ordre: 3
+        acteur: senateur
+        action: "Dépôt de la question au Sénat"
+        conditionnelle: true
+        note: "Au Sénat, la question écrite est présentée comme un droit individuel que le sénateur exerce à tout moment ; la page qui la décrit ne mentionne aucun quota."
+        liens: [senat-questions-ecrites]
+        confiance: etabli
+      - ordre: 4
+        acteur: gouvernement
+        action: "Réponse du ministre interrogé"
+        delai: { valeur: 2, unite: mois, nature: indicatif }
+        note: "Les deux assemblées donnent deux mois au ministre. Ce délai n'est pas une garantie : c'est précisément pour les questions restées sans réponse que l'Assemblée a créé les questions signalées, et le Sénat la question de rappel."
+        liens: [an-questions, senat-questions-ecrites]
+        confiance: etabli
+      - ordre: 5
+        acteur: assemblee-nationale
+        action: "Publication de la question et de la réponse"
+        produit: [reponse-ministerielle]
+        note: "Questions et réponses paraissent chaque semaine dans un fascicule spécial du Journal officiel, dématérialisé depuis 2016 ; la version qui fait foi est consultable sur le site de l'Assemblée."
+        liens: [an-questions]
+        confiance: etabli
+
+    leviers:
+      - id: demander-une-question-ecrite
+        quoi: "Demander à son député de poser une question écrite"
+        quand: "À tout moment"
+        aupres_de: "Le député de sa circonscription, ou un sénateur de son département"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Le député dispose d'un nombre limité de questions par session — cinquante-deux depuis 2015. Au Sénat, la page officielle ne mentionne aucun quota."
+        liens: [an-questions, senat-questions-ecrites]
+        confiance: etabli
+      - id: faire-signaler-la-question
+        acteur: depute
+        quoi: "Faire signaler une question restée sans réponse"
+        quand: "Après les deux mois"
+        aupres_de: "Le président de son groupe politique"
+        difficulte: moyenne
+        ancre_etape: 4
+        piege: "Les présidents de groupe ne choisissent que vingt-huit questions signalées, réparties entre les groupes ; le ministre s'engage alors à répondre dans les dix jours."
+        liens: [an-questions]
+        confiance: etabli
+      - id: transformer-en-question-orale
+        acteur: senateur
+        quoi: "Transformer la question écrite en question orale"
+        quand: "Après les deux mois sans réponse"
+        aupres_de: "Le Sénat"
+        difficulte: moyenne
+        ancre_etape: 4
+        piege: "La question orale garde la date de dépôt de la question écrite initiale. Le sénateur peut aussi, plus simplement, déposer une question de rappel."
+        liens: [senat-questions-ecrites]
+        confiance: etabli

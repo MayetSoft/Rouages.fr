@@ -51,10 +51,11 @@ comme elle le mérite&nbsp;:
 - **sans impasse — un invariant.** Aucun nœud isolé, le graphe d'un seul tenant.
   Toute régression fait échouer le build. C'est acquis&nbsp;: 0 isolé,
   38 220 paires atteignables sur 38 220 ;
-- **trois clics — un cliquet.** 62,0 % des paires y sont, diamètre 7. À 196
-  nœuds, l'exiger de *toutes* les paires reviendrait à demander un graphe
-  presque complet&nbsp;; le contrôle retient donc le plancher atteint et refuse
-  de redescendre, plutôt que de poursuivre un absolu.
+- **trois clics — un cliquet.** 64,5 % des paires y sont, diamètre 6 — contre
+  62,0 % et 7 à la première mesure. À 202 nœuds, l'exiger de *toutes* les paires
+  reviendrait à demander un graphe presque complet&nbsp;; le contrôle retient
+  donc le plancher atteint et refuse de redescendre, plutôt que de poursuivre un
+  absolu.
 
 Le détail de la première mesure est plus bas.
 
@@ -1839,6 +1840,77 @@ L'arête « utilise » reste défendable pour une autre raison, qui n'est pas
 métrique&nbsp;: un lecteur arrivé sur la fiche du plan local d'urbanisme aimerait
 voir « s'applique au permis de construire ». C'est un argument de navigation, à
 peser pour lui-même, pas un moyen d'atteindre un seuil.
+
+### L'échelon État densifié : les institutions nationales agissent enfin ✔
+
+L'inventaire a montré ce que le chiffre ne disait pas&nbsp;: les institutions
+nationales se tenaient **entre elles**. Le Parlement partageait ses compétences
+avec le Gouvernement, le Conseil constitutionnel avec les deux assemblées — et
+aucune n'intervenait dans une seule démarche d'habitant. L'échelon ne touchait
+le reste du réseau que par l'État et le préfet.
+
+Densifier, ce n'était donc pas ajouter des partages mais **les faire agir**. Trois
+processus, là où le site menait déjà sans le dire&nbsp;:
+
+- **faire appel d'un jugement du tribunal administratif** — tous les contentieux
+  du site s'arrêtaient au tribunal, du permis de construire au refus de
+  document, sans dire ce qui suit ;
+- **contester une loi au cours d'un procès** — la question prioritaire de
+  constitutionnalité, seule voie par laquelle un habitant fait juger une loi ;
+- **faire interroger le Gouvernement par son député ou son sénateur** — la
+  question écrite, dont ce site cite lui-même plusieurs réponses parmi ses
+  pages de référence.
+
+Et un acteur qui manquait&nbsp;: **la Cour de cassation**. Le graphe avait le
+sommet de l'ordre administratif et pas celui de l'ordre judiciaire, alors que
+c'est elle qui filtre toute question de constitutionnalité posée devant un juge
+judiciaire.
+
+**Deux affirmations fausses ont été écartées avant publication**, et elles
+auraient été crues sur parole&nbsp;:
+
+1. Un résultat de recherche donnait la liste des appels dispensés d'avocat, en
+   tête de laquelle **les recours pour excès de pouvoir**. C'était une ancienne
+   version de l'article R811-7&nbsp;: aujourd'hui l'avocat est obligatoire en
+   appel, y compris là où l'on plaidait seul devant le tribunal, et les
+   exceptions se réduisent aux contraventions de grande voirie et aux demandes
+   d'exécution. La fiche écrite de mémoire aurait dit à un habitant qu'il
+   pouvait faire appel seul — et son appel aurait été irrecevable.
+2. Le délai de réponse aux questions écrites était, de mémoire, d'**un mois**. Il
+   est de **deux**, à l'Assemblée comme au Sénat.
+
+Ce que les fiches apportent, et qui décide d'une issue&nbsp;:
+
+- **en zone tendue, il n'y a pas d'appel** contre un permis de construire de plus
+  de deux logements, pour les recours introduits jusqu'au 31 décembre 2027 — le
+  tribunal juge en premier et dernier ressort, et seule la cassation reste ;
+- **le pourvoi en cassation ne suspend pas la décision attaquée** — il faut
+  demander à part qu'il soit sursis à son exécution ;
+- **dans la QPC, le silence joue pour le justiciable** : si le Conseil d'État ou
+  la Cour de cassation n'a pas statué dans les trois mois, le Conseil
+  constitutionnel est saisi de plein droit ;
+- **le refus de transmettre une QPC ne se conteste jamais seul**, et celui du
+  second filtre est sans recours ;
+- **un député n'a que cinquante-deux questions écrites par session** depuis
+  2015 ; la page du Sénat ne mentionne aucun quota comparable.
+
+Trois partages vérifiés complètent l'ensemble, pour des nœuds qui tenaient à un
+seul fil&nbsp;: la police et la gendarmerie exécutent le **concours de la force
+publique** qu'un commissaire de justice requiert auprès du préfet — et dont le
+refus ouvre droit à réparation&nbsp;; l'ANCT **pilote le réseau France
+Services**&nbsp;; l'ADEME **accompagne les collectivités compétentes pour les
+déchets**.
+
+| | Avant | Après |
+|---|---|---|
+| Nœuds | 196 | 202 |
+| Arêtes | 555 | 591 |
+| Diamètre | 7 | **6** |
+| Part à trois clics, tout le graphe | 62,0 % | **64,5 %** |
+| Part à trois clics, échelon État | 50,0 % | **60,6 %** |
+
+Le cliquet de `npm run verifier-reseau` suit&nbsp;: plancher relevé à 62 %,
+diamètre maximal abaissé à 6. On ne redescendra pas sans le voir.
 
 ### Une ingestion qui ne se perd plus en route
 

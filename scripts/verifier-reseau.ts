@@ -27,16 +27,21 @@ const ROUGE = '\x1b[31m', VERT = '\x1b[32m', JAUNE = '\x1b[33m', GRIS = '\x1b[90
 let echecs = 0;
 
 /**
- * Le plancher, relevé le 23 septembre 2026 à 62,0 %.
+ * Le plancher, deux points sous la dernière mesure.
  *
- * On le garde deux points en dessous de la mesure : une fiche nouvelle déplace
- * le chiffre de quelques dixièmes sans rien dégrader, et un seuil collé à la
- * valeur ferait échouer le premier ajout venu.
+ * Relevé à 62,0 % à la première mesure, puis à 64,5 % une fois l'échelon État
+ * densifié — trois processus où les institutions nationales agissent enfin.
+ * On le garde deux points en dessous : une fiche nouvelle déplace le chiffre de
+ * quelques dixièmes sans rien dégrader, et un seuil collé à la valeur ferait
+ * échouer le premier ajout venu.
  */
-const PLANCHER_TROIS_CLICS = 60;
+const PLANCHER_TROIS_CLICS = 62;
 
-/** Le diamètre du jour. Il peut baisser ; qu'il monte demande une raison. */
-const DIAMETRE_MAX = 7;
+/**
+ * Le diamètre du jour. Il était de 7, et la densification de l'État l'a fait
+ * tomber à 6. Il peut baisser encore ; qu'il remonte demande une raison.
+ */
+const DIAMETRE_MAX = 6;
 
 function attendre(quoi: string, ok: boolean, detail: string) {
   if (!ok) echecs++;

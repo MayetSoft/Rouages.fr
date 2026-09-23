@@ -110,14 +110,17 @@ competences:
     nom_court: "Déchets ménagers"
     acteur: epci
     resume: "Compétence intercommunale dans la quasi-totalité des territoires, financée par la taxe ou la redevance d'enlèvement."
-    partagee_avec: [commune]
+    # L'ADEME accompagne les collectivités qui exercent la compétence —
+    # intercommunalités et syndicats — et finance notamment le passage à la
+    # tarification incitative. Elle tient aussi SINOE, la base que ce site cite.
+    partagee_avec: [commune, ademe]
     banatic: ["2080", "2085"]
     # Obligatoire pour les communautés de communes et d'agglomération depuis le
     # 1er janvier 2017 (loi NOTRe), et par construction pour les communautés
     # urbaines et les métropoles. Le registre le reflète déjà — 100 % de
     # couverture — mais l'inscrire protège d'un trou de saisie à venir.
     obligatoire_pour: [CC, CA, CU, METRO, MET69]
-    liens: [cgct, cgct-l5214-16, cgct-l5216-5, od-sinoe, od-banatic, wp-loi-notre]
+    liens: [cgct, cgct-l5214-16, cgct-l5216-5, od-sinoe, od-banatic, wp-loi-notre, ademe-dechets]
     verifie_le: 2026-09-11
     confiance: etabli
 
@@ -530,7 +533,7 @@ competences:
     nom_court: "Juger les particuliers"
     acteur: tribunal-judiciaire
     resume: "L'autre ordre de juridiction : un conflit de voisinage ou une infraction pénale ne relève pas du juge administratif."
-    partagee_avec: [citoyen]
+    partagee_avec: [citoyen, cour-de-cassation]
     liens: [code-organisation-judiciaire, justice-fr, wp-ordres-juridiction]
     verifie_le: 2026-09-06
     confiance: etabli
@@ -539,8 +542,8 @@ competences:
     nom: "Contrôle de constitutionnalité"
     acteur: conseil-constitutionnel
     resume: "Avant promulgation, ou à l'occasion d'un procès par question prioritaire de constitutionnalité : une loi déjà en vigueur peut encore tomber."
-    partagee_avec: [conseil-etat, assemblee-nationale, senat, president-republique]
-    liens: [constitution, conseil-constitutionnel-fr, wp-conseil-constitutionnel]
+    partagee_avec: [conseil-etat, cour-de-cassation, assemblee-nationale, senat, president-republique]
+    liens: [constitution, conseil-constitutionnel-fr, wp-conseil-constitutionnel, ordonnance-qpc]
     verifie_le: 2026-09-06
     confiance: etabli
 
@@ -645,8 +648,10 @@ competences:
     nom_court: "Accueil des démarches"
     acteur: france-services
     resume: "Un seul lieu pour des démarches relevant d’administrations différentes : un socle national d’opérateurs est obligatoire partout, que des partenariats locaux peuvent compléter."
-    partagee_avec: [citoyen, caf, commune, epci, etat]
-    liens: [france-services-gouv, wp-france-services, od-annuaire-administration, france-services-socle]
+    # Le réseau est piloté nationalement par l'Agence nationale de la cohésion des
+    # territoires, qui en conduit le programme.
+    partagee_avec: [citoyen, caf, commune, epci, etat, anct]
+    liens: [france-services-gouv, wp-france-services, od-annuaire-administration, france-services-socle, cl-anct]
     verifie_le: 2026-09-22
     confiance: etabli
 
@@ -874,8 +879,12 @@ competences:
     nom_court: "Exécution d'un jugement"
     acteur: commissaire-justice
     resume: "Un jugement gagné ne s'applique pas tout seul : il faut le faire signifier puis exécuter, et cela ne peut passer que par un commissaire de justice."
-    partagee_avec: [citoyen, tribunal-judiciaire, prefet]
-    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire, cpce-l122-1, ordonnance-commissaires-justice]
+    # Quand le débiteur résiste, le commissaire de justice requiert le concours de
+    # la force publique auprès du préfet, et ce sont la police ou la gendarmerie
+    # qui l'exécutent. L'État est tenu de le prêter ; son refus ouvre droit à
+    # indemnisation.
+    partagee_avec: [citoyen, tribunal-judiciaire, prefet, gendarmerie, police-nationale]
+    liens: [wp-commissaire-justice, annuaire-commissaires-justice, code-organisation-judiciaire, cpce-l122-1, ordonnance-commissaires-justice, cpce-concours, anil-concours]
     verifie_le: 2026-09-22
     confiance: etabli
 

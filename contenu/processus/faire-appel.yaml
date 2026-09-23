@@ -1,0 +1,79 @@
+# Faire appel d'un jugement du tribunal administratif.
+# Tous les contentieux du site s'arrêtaient au tribunal administratif : le permis
+# de construire, la délibération, le plan d'urbanisme, le refus de document.
+# Aucun ne disait ce qui vient après, et c'est pourtant là que les règles
+# changent le plus — on perd le droit de plaider seul, et on peut perdre
+# l'appel lui-même.
+processus:
+  - id: faire-appel
+    nom: "Faire appel d'un jugement du tribunal administratif"
+    famille: quotidien
+    resume: "Le jugement ne vous donne pas raison : deux mois pour faire appel, un avocat désormais obligatoire, et des litiges où l'appel n'existe pas — il ne reste alors que la cassation."
+    declencheur: "Un jugement du tribunal administratif notifié, qui ne vous donne pas satisfaction"
+    sortie: "Un arrêt de la cour administrative d'appel, puis le cas échéant une décision du Conseil d'État"
+    decideur: cour-administrative-appel
+    competences: [juger-administration]
+    liens: [code-justice-administrative, cja-appel, justice-cassation-ce]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: tribunal-administratif
+        action: "Notification du jugement"
+        note: "C'est la notification, et non l'audience ou la lecture du jugement, qui fait courir le délai d'appel. Si un délai plus court que deux mois s'applique à votre litige, la notification doit le dire ; faute de le mentionner, vous gardez deux mois."
+        liens: [cja-r811-2]
+        confiance: etabli
+      - ordre: 2
+        # Le piège le plus coûteux de la fiche, et il concerne directement le
+        # permis de construire : dans les zones tendues, il n'y a pas d'appel.
+        acteur: citoyen
+        action: "Vérifier que l'appel est ouvert"
+        note: "Certains litiges sont jugés en premier et dernier ressort : le tribunal est alors le seul juge du fond, et seule la cassation reste possible. C'est le cas, pour les recours introduits jusqu'au 31 décembre 2027, des recours contre un permis de construire de plus de deux logements situé en zone tendue — les agglomérations où l'offre de logements manque."
+        liens: [cja-appel, dalloz-zones-tendues]
+        confiance: etabli
+      - ordre: 3
+        acteur: cour-administrative-appel
+        action: "Appel devant la cour administrative d'appel"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "La requête d'appel doit être présentée par un avocat, à peine d'irrecevabilité — y compris contre un jugement rendu sur un recours pour excès de pouvoir, où l'on pouvait plaider seul devant le tribunal. Les exceptions sont étroites, comme les contraventions de grande voirie."
+        liens: [cja-r811-7, cja-r811-2]
+        confiance: etabli
+      - ordre: 4
+        acteur: conseil-etat
+        action: "Pourvoi en cassation devant le Conseil d'État"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        conditionnelle: true
+        note: "Le Conseil d'État ne rejuge pas les faits : il vérifie que le droit a été correctement appliqué. Le pourvoi exige un avocat au Conseil d'État et à la Cour de cassation, et passe d'abord une procédure d'admission qui écarte ceux qui ne reposent sur aucun moyen sérieux. Deux mois à compter de la notification, trois depuis l'outre-mer, quatre depuis l'étranger."
+        liens: [cja-r821-3, justice-cassation-ce]
+        confiance: etabli
+
+    leviers:
+      - id: lire-la-notification
+        quoi: "Lire la notification du jugement jusqu'au bout"
+        quand: "Dès réception — c'est elle qui fait courir le délai"
+        aupres_de: "Personne : elle accompagne le jugement"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Elle indique le délai et la juridiction d'appel. Un délai plus court que deux mois ne vous est opposable que si elle le mentionne."
+        liens: [cja-r811-2]
+        confiance: etabli
+      - id: prendre-un-avocat-appel
+        quoi: "Prendre un avocat avant l'échéance"
+        quand: "Tôt dans les deux mois : l'avocat doit avoir le temps d'écrire"
+        aupres_de: "Un avocat inscrit à un barreau"
+        difficulte: moyenne
+        ancre_etape: 3
+        piege: "Devant la cour, l'avocat est obligatoire même là où l'on plaidait seul devant le tribunal. Un appel déposé sans lui est irrecevable, et le délai, lui, continue de courir."
+        liens: [cja-r811-7]
+        confiance: etabli
+      - id: pourvoi-cassation
+        quoi: "Se pourvoir en cassation"
+        quand: "Deux mois à compter de la notification de l'arrêt, ou du jugement quand l'appel est fermé"
+        aupres_de: "Un avocat au Conseil d'État et à la Cour de cassation"
+        difficulte: elevee
+        ancre_etape: 4
+        piege: "Ce n'est pas un troisième procès : les faits ne sont plus discutés. Et le pourvoi ne suspend pas la décision attaquée — il faut demander à part qu'il soit sursis à son exécution."
+        liens: [cja-r821-3, justice-cassation-ce]
+        confiance: etabli

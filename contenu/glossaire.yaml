@@ -362,6 +362,13 @@ sigles:
     definition: "Il fixe le format dans lequel les collectivités versent leurs documents d'urbanisme au Géoportail. C'est son standard qui distingue un document opposable d'un document seulement approuvé."
     liens: [cnig-plu, od-gpu]
 
+  - id: sigle-qpc
+    sigle: QPC
+    developpe: "Question prioritaire de constitutionnalité"
+    definition: "Le moyen, pour une partie à un procès, de faire juger par le Conseil constitutionnel qu'une loi déjà en vigueur porte atteinte à ses droits. La question passe deux filtres avant de l'atteindre."
+    noeud: poser-une-qpc
+    liens: [ordonnance-qpc, cc-qpc-questions]
+
   - id: sigle-actes
     sigle: ACTES
     developpe: "Aide au contrôle de légalité dématérialisé"

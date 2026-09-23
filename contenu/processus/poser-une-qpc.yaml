@@ -1,0 +1,88 @@
+# Contester une loi au cours d'un procès.
+# Le Conseil constitutionnel tenait au réseau par un seul fil, alors qu'un
+# justiciable peut le saisir — indirectement, par deux filtres, mais réellement.
+# C'est la seule voie par laquelle un habitant fait juger une loi.
+documents:
+  - id: memoire-qpc
+    nom: "Le mémoire distinct"
+    resume: "L'écrit qui pose la question de constitutionnalité, séparé de tous les autres arguments du procès. Sans lui, la question n'existe pas."
+    ou_le_trouver: "Rédigé par la partie ou son avocat, et déposé devant le juge du litige."
+    liens: [ordonnance-qpc, cc-qpc-questions]
+
+processus:
+  - id: poser-une-qpc
+    nom: "Contester une loi au cours d'un procès"
+    famille: quotidien
+    resume: "Une loi appliquée à votre litige vous paraît contraire à vos droits : la question prioritaire de constitutionnalité, ses deux filtres, et les trois mois que chacun a pour trancher."
+    declencheur: "Un procès en cours, où s'applique une loi qui paraît porter atteinte à un droit garanti par la Constitution"
+    sortie: "Une décision du Conseil constitutionnel, qui peut abroger la disposition"
+    decideur: conseil-constitutionnel
+    competences: [controle-constitutionnalite, juger-administration, juger-litiges-prives]
+    liens: [constitution, ordonnance-qpc, cc-qpc-questions, ce-qpc]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Poser la question, par un écrit distinct et motivé"
+        produit: [memoire-qpc]
+        note: "Toute partie à un procès peut la poser, devant toute juridiction administrative ou judiciaire — sauf la cour d'assises. Elle vise une disposition législative qui porterait atteinte aux droits et libertés que la Constitution garantit."
+        liens: [ordonnance-qpc, cc-qpc-questions]
+        confiance: etabli
+      - ordre: 2
+        acteur: tribunal-administratif
+        action: "Premier filtre, devant le juge administratif du litige"
+        note: "Le juge transmet si trois conditions sont réunies : la disposition s'applique au litige, elle n'a pas déjà été déclarée conforme à la Constitution — sauf changement des circonstances —, et la question n'est pas dépourvue de caractère sérieux. S'il transmet, il sursoit en principe à statuer sur le fond."
+        liens: [ordonnance-qpc, ce-qpc]
+        confiance: etabli
+      - ordre: 3
+        acteur: tribunal-judiciaire
+        action: "Premier filtre, devant le juge judiciaire du litige"
+        conditionnelle: true
+        note: "Les mêmes trois conditions, devant n'importe quelle juridiction de l'ordre judiciaire. La question remonte alors à la Cour de cassation, et non au Conseil d'État."
+        liens: [ordonnance-qpc, cc-qpc-questions]
+        confiance: etabli
+      - ordre: 4
+        acteur: conseil-etat
+        action: "Second filtre au Conseil d'État"
+        delai: { valeur: 3, unite: mois, nature: maximum_legal }
+        note: "Le Conseil d'État a trois mois pour décider du renvoi. S'il ne s'est pas prononcé dans ce délai, le Conseil constitutionnel est saisi de plein droit — le silence joue pour le justiciable."
+        liens: [ordonnance-qpc, ce-qpc]
+        confiance: etabli
+      - ordre: 5
+        acteur: cour-de-cassation
+        action: "Second filtre à la Cour de cassation"
+        delai: { valeur: 3, unite: mois, nature: maximum_legal }
+        conditionnelle: true
+        note: "Pour les questions venues de l'ordre judiciaire, le même délai et la même règle : sans décision dans les trois mois, la question passe au Conseil constitutionnel."
+        liens: [ordonnance-qpc, cc-qpc-questions]
+        confiance: etabli
+      - ordre: 6
+        acteur: conseil-constitutionnel
+        action: "Décision du Conseil constitutionnel"
+        delai: { valeur: 3, unite: mois, nature: maximum_legal }
+        note: "Le Conseil juge dans les trois mois de sa saisine. S'il déclare la disposition contraire à la Constitution, elle est abrogée et disparaît de l'ordre juridique."
+        liens: [cc-qpc-questions, constitution]
+        confiance: etabli
+
+    leviers:
+      - id: rediger-le-memoire-distinct
+        quoi: "Présenter la question dans un écrit à part"
+        quand: "À tout moment du procès, y compris en appel ou en cassation"
+        aupres_de: "Le juge saisi du litige"
+        difficulte: elevee
+        ancre_etape: 1
+        piege: "Mêlée aux autres arguments, la question est irrecevable : l'écrit doit être distinct et motivé. Ce n'est pas une formalité, c'est ce qui fait exister la question."
+        liens: [ordonnance-qpc, cc-qpc-questions]
+        confiance: etabli
+      - id: contester-refus-transmission
+        quoi: "Contester un refus de transmettre la question"
+        quand: "Avec l'appel ou le pourvoi formé contre la décision qui tranche le litige"
+        aupres_de: "La juridiction d'appel ou de cassation"
+        difficulte: elevee
+        ancre_etape: 2
+        piege: "Le refus du premier juge ne se conteste jamais seul, et celui du Conseil d'État ou de la Cour de cassation n'est susceptible d'aucun recours. Le second filtre est le dernier."
+        liens: [cc-qpc-questions]
+        confiance: etabli
