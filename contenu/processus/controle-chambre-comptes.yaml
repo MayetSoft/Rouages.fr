@@ -1,0 +1,100 @@
+# Suivre un contrôle de la chambre régionale des comptes.
+# La chambre n'apparaissait que comme une étape du budget communal. Son contrôle
+# des comptes et de la gestion est pourtant une procédure à part entière, avec
+# ses délais, ses documents et trois moments où un habitant a prise : la séance
+# où le rapport est débattu, sa publication, et le rapport sur les suites un an
+# plus tard — celui que presque personne ne réclame.
+documents:
+  - id: rapport-observations-definitives
+    nom: "Le rapport d'observations définitives"
+    resume: "Le rapport de la chambre sur les comptes et la gestion d'une collectivité, publié avec les réponses écrites de ses dirigeants."
+    ou_le_trouver: "Site des juridictions financières ; joint à la convocation du conseil qui en débat."
+    liens: [cjf-l243-6, od-comptes-crc]
+
+processus:
+  - id: controle-chambre-comptes
+    nom: "Suivre un contrôle de la chambre régionale des comptes"
+    famille: publics
+    resume: "Un rapport contradictoire, un débat obligatoire à la séance suivante, une publication qui ne peut pas attendre plus de deux mois — et, un an plus tard, un rapport sur ce que la collectivité en a fait."
+    declencheur: "L'ouverture d'un contrôle des comptes et de la gestion d'une collectivité"
+    sortie: "Un rapport d'observations définitives publié, puis un rapport sur les suites dans l'année"
+    decideur: chambre-regionale-comptes
+    competences: [controle-des-comptes]
+    liens: [cjf-observations-definitives, cjf-l243-6, cjf-l243-9, cc-participation-crtc]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: chambre-regionale-comptes
+        action: "Contrôle des comptes et de la gestion"
+        note: "Périodique, non systématique. Depuis le 1er janvier 2023, la chambre ne juge plus seule les comptes des comptables publics : les gestionnaires publics fautifs relèvent d'une chambre du contentieux de la Cour des comptes, où ses magistrats siègent à parité."
+        liens: [cc-participation-crtc, ordonnance-gestionnaires-publics]
+        confiance: etabli
+      - ordre: 2
+        acteur: maire
+        action: "Réponse aux observations provisoires"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "La procédure est contradictoire : l'exécutif répond par écrit aux observations provisoires. Faute de réponse dans les deux mois, la chambre peut arrêter ses observations définitives sans elle."
+        liens: [cjf-observations-definitives]
+        confiance: etabli
+      - ordre: 3
+        acteur: chambre-regionale-comptes
+        action: "Observations définitives, et réponses écrites jointes"
+        delai: { valeur: 1, unite: mois, nature: maximum_legal }
+        note: "Le rapport est adressé à l'exécutif, et à celui qui était en fonctions pendant la période contrôlée. Ils ont un mois pour répondre par écrit ; leurs réponses sont jointes au rapport."
+        liens: [cjf-observations-definitives]
+        confiance: etabli
+      - ordre: 4
+        acteur: conseil-municipal
+        action: "Présentation et débat à la plus proche réunion du conseil"
+        produit: [rapport-observations-definitives]
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Le rapport est inscrit à l'ordre du jour de la séance suivante, joint à la convocation de chaque élu, et débattu. Il est publié à l'issue du débat — et au plus tard deux mois après sa communication par la chambre, même si le conseil ne s'est pas encore réuni."
+        liens: [cjf-l243-6]
+        confiance: etabli
+      - ordre: 5
+        acteur: conseil-communautaire
+        action: "Sous une intercommunalité, le rapport revient devant chaque conseil municipal"
+        conditionnelle: true
+        note: "Le rapport sur un groupement est transmis par la chambre aux maires des communes membres dès sa présentation au conseil communautaire. Chaque maire le présente au plus proche conseil municipal, où il donne lieu à un débat."
+        liens: [cjf-l243-8]
+        confiance: etabli
+      - ordre: 6
+        acteur: maire
+        action: "Rapport sur les suites, dans l'année"
+        delai: { valeur: 1, unite: annees, nature: maximum_legal }
+        note: "Dans l'année qui suit la présentation du rapport, l'exécutif présente devant la même assemblée les actions entreprises à la suite des observations. Ce rapport est transmis à la chambre, qui en fait une synthèse annuelle."
+        liens: [cjf-l243-9]
+        confiance: etabli
+
+    leviers:
+      - id: lire-le-rapport-crc
+        quoi: "Lire le rapport et assister à la séance où il est débattu"
+        quand: "À la séance qui suit sa communication ; en ligne au plus tard deux mois après"
+        aupres_de: "La mairie, ou le site des juridictions financières"
+        difficulte: faible
+        ancre_etape: 4
+        piege: "Rien n'est publié en période électorale : à partir du premier jour du troisième mois qui précède le mois du scrutin, et jusqu'au lendemain du résultat. Un rapport attendu avant une élection peut ne paraître qu'après."
+        liens: [cjf-l243-6]
+        confiance: etabli
+      - id: reclamer-le-rapport-de-suites
+        quoi: "Demander le rapport sur les suites données"
+        quand: "Un an après la présentation du rapport de la chambre"
+        aupres_de: "La mairie"
+        difficulte: faible
+        recours_si_refus: "Saisir la CADA"
+        ancre_etape: 6
+        piege: "C'est le seul document qui dise ce qui a changé après les recommandations. Il est présenté à la même assemblée, et presque personne ne le réclame."
+        liens: [cjf-l243-9, cada]
+        confiance: etabli
+      - id: proposer-un-theme-de-controle
+        quoi: "Proposer un thème de contrôle aux juridictions financières"
+        quand: "Pendant les campagnes périodiques de la plateforme"
+        aupres_de: "La plateforme de participation citoyenne de la Cour des comptes, qui vaut aussi pour les chambres régionales"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "On y propose un thème, que les juridictions retiennent ou non dans leur programme de travail : ce n'est pas une saisine, et rien n'oblige à y donner suite."
+        liens: [cc-participation-crtc]
+        confiance: etabli

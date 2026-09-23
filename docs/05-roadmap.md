@@ -52,7 +52,7 @@ comme elle le mérite&nbsp;:
   Toute régression fait échouer le build. C'est acquis&nbsp;: 0 isolé,
   38 220 paires atteignables sur 38 220 ;
 - **trois clics — un cliquet.** 67,5 % des paires y sont, diamètre 6 — contre
-  62,0 % et 7 à la première mesure. À 213 nœuds, l'exiger de *toutes* les paires
+  62,0 % et 7 à la première mesure. À 215 nœuds, l'exiger de *toutes* les paires
   reviendrait à demander un graphe presque complet&nbsp;; le contrôle retient
   donc le plancher atteint et refuse de redescendre, plutôt que de poursuivre un
   absolu.
@@ -2065,6 +2065,50 @@ renvoie à l'accueil du Conseil d'État.
 
 Conseil régional&nbsp;: **1 → 4 arêtes**, une démarche. Réseau&nbsp;: 211 → 213 nœuds,
 650 → 663 arêtes, 67,0 % → **67,5 %** à trois clics.
+
+### La chambre régionale des comptes, et une erreur d'avant 2023 ✔
+
+La chambre n'apparaissait que comme une étape du budget communal. Son contrôle
+des comptes et de la gestion est une procédure à part entière, et un processus
+neuf la décrit&nbsp;: « suivre un contrôle de la chambre régionale des comptes ».
+
+**Une vérification préalable a trouvé une fiche fausse.** Celle de la Cour des
+comptes disait qu'elle « **juge** les comptes de l'État ». Le mot était faux
+deux fois&nbsp;: la Cour **certifie** les comptes de l'État (art. 47-2 de la
+Constitution), et le jugement des comptables publics a disparu le 1er janvier
+2023, remplacé par un régime unique de responsabilité des gestionnaires publics
+— jugé par une chambre du contentieux de la Cour où les magistrats des chambres
+régionales siègent à parité. La fiche de la chambre régionale gagne au passage
+sa quatrième mission, l'évaluation des politiques publiques, ouverte par la loi
+du 21 février 2022.
+
+Ce que le processus rend visible&nbsp;:
+
+- **la publication ne peut pas être retardée**&nbsp;: le rapport est publié à
+  l'issue du débat, et au plus tard deux mois après sa communication par la
+  chambre, même si le conseil ne s'est pas réuni&nbsp;;
+- **rien ne paraît en période électorale**, du premier jour du troisième mois
+  précédant le scrutin jusqu'au lendemain du résultat — un rapport attendu avant
+  une élection peut ne paraître qu'après&nbsp;;
+- **sous une intercommunalité, le rapport revient devant chaque conseil
+  municipal**, avec débat — celui du groupement ne se discute pas qu'entre ses
+  délégués&nbsp;;
+- **un an après, l'exécutif doit présenter ce qu'il a fait** des observations.
+  C'est le seul document qui dise ce qui a changé, et presque personne ne le
+  réclame&nbsp;;
+- **un habitant peut proposer un thème de contrôle** sur la plateforme de
+  participation de la Cour, qui vaut pour les chambres régionales — ce n'est pas
+  une saisine, les juridictions retiennent ou non.
+
+Laissé tel quel, et à réexaminer&nbsp;: la chambre régionale figure toujours parmi
+les acteurs de la compétence « comptable public ». Le lien tenait au jugement des
+comptes, qui a disparu&nbsp;; la chambre contrôle toujours les comptes que le
+comptable produit, ce qui le rend défendable, mais il mérite une relecture à
+part.
+
+Chambre régionale des comptes&nbsp;: 7 → 8 arêtes, deux démarches au lieu d'une.
+Réseau&nbsp;: 213 → 215 nœuds, 663 → 672 arêtes, 67,5 % à trois clics — inchangé,
+les nouveaux nœuds ajoutant eux-mêmes des paires à relier.
 
 ### Une ingestion qui ne se perd plus en route
 

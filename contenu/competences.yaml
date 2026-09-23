@@ -572,9 +572,13 @@ competences:
     nom: "Contrôle des comptes et de la gestion publics"
     nom_court: "Contrôle des comptes"
     acteur: cour-comptes
-    resume: "La Cour juge les comptes de l'État et assiste le Parlement ; les chambres régionales font le même travail sur les collectivités, et publient."
+    # « La Cour juge les comptes de l'État » : le mot était faux deux fois. La Cour
+    # certifie les comptes de l'État (art. 47-2 de la Constitution), et le
+    # jugement des comptables a disparu le 1er janvier 2023 au profit d'un régime
+    # unique de responsabilité des gestionnaires publics.
+    resume: "La Cour certifie les comptes de l'État et assiste le Parlement ; les chambres régionales contrôlent les comptes et la gestion des collectivités, et publient. Depuis 2023, les gestionnaires fautifs sont jugés par une chambre du contentieux commune."
     partagee_avec: [chambre-regionale-comptes, assemblee-nationale, senat]
-    liens: [code-juridictions-financieres, ccomptes, constitution]
+    liens: [code-juridictions-financieres, ccomptes, constitution, constitution-47-2, ordonnance-gestionnaires-publics]
     verifie_le: 2026-09-06
     confiance: etabli
 
