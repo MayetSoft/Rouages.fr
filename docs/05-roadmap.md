@@ -1803,9 +1803,42 @@ c'est la forme du réseau qui s'en ressent.
 document ne se relie qu'au processus qui le *produit*. La délibération, le
 procès-verbal, le plan local d'urbanisme, le budget primitif&nbsp;: chacun pend
 d'un seul fil alors qu'ils sont consultés, cités et contestés un peu partout.
-C'est le plus gros levier disponible sur le chiffre des trois clics, et c'est
-une décision de modèle, pas une tâche — faut-il une arête « utilise » à côté de
-« produit »&nbsp;?
+D'où la question&nbsp;: faut-il une arête « utilise » à côté de « produit »&nbsp;?
+
+**Non — et c'est la simulation qui le dit, contre l'intuition.** Avant de
+toucher au modèle, les quatre cas ont été mesurés&nbsp;:
+
+| Scénario | Part à trois clics | Diamètre |
+|---|---|---|
+| tel quel | 62,0 % | 7 |
+| + les 6 arêtes « utilise » que les fiches énoncent déjà | **62,3 %** | 7 |
+| documents retirés du graphe | 67,5 % | 7 |
+| borne haute&nbsp;: chaque document relié à *tous* les processus (+300 arêtes) | 70,1 % | 7 |
+
+Six arêtes honnêtes rapportent **trois dixièmes de point**, et le maximum
+physiquement possible — qui serait un mensonge — en rapporte huit sans réduire
+le diamètre d'un cran. La raison est structurelle&nbsp;: un nœud de degré 1 est
+périphérique par définition, et le rapprocher d'un pôle déjà bien relié ne
+raccourcit aucun chemin entre les *autres* paires.
+
+**Ce qui pèse, c'est la densité, et elle pèse le plus à l'échelon État.** Mesuré
+en ajoutant des arêtes au hasard&nbsp;:
+
+| Arêtes ajoutées | Part à trois clics | Diamètre |
+|---|---|---|
+| +50 (9 % de plus) | 68,7 % | 7 |
+| +100 réparties partout | 72,9 % | 6 |
+| **+100 dans le seul échelon État** | **76,0 %** | 6 |
+| +400 | 93,7 % | 5 |
+
+Cent relations concentrées sur l'État rapportent plus que cent réparties au
+hasard. Le chiffre ne bougera donc pas par un ajustement de modèle, mais par du
+contenu — et du contenu placé là où le réseau est le plus mince.
+
+L'arête « utilise » reste défendable pour une autre raison, qui n'est pas
+métrique&nbsp;: un lecteur arrivé sur la fiche du plan local d'urbanisme aimerait
+voir « s'applique au permis de construire ». C'est un argument de navigation, à
+peser pour lui-même, pas un moyen d'atteindre un seuil.
 
 ### Une ingestion qui ne se perd plus en route
 
