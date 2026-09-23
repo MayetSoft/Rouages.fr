@@ -2110,6 +2110,26 @@ Chambre régionale des comptes&nbsp;: 7 → 8 arêtes, deux démarches au lieu d
 Réseau&nbsp;: 213 → 215 nœuds, 663 → 672 arêtes, 67,5 % à trois clics — inchangé,
 les nouveaux nœuds ajoutant eux-mêmes des paires à relier.
 
+### Une feuille de relecture pour les fiches de septembre
+
+Treize démarches nouvelles en deux jours, vérifiées une à une mais jamais
+relues par quelqu'un qui connaît le terrain. [`docs/relecture-2026-09.md`](relecture-2026-09.md)
+retient les affirmations qui décident d'une issue, dit pour chacune si elle a
+été vérifiée sur une page lue, sur un extrait d'article ou sur une source
+secondaire, et les range par risque.
+
+La préparer a suffi à en faire tomber deux au rang « à confirmer »&nbsp;: le
+partage entre révision et modification du PLU, qui dépend d'un article réécrit
+en mai 2026 que cet environnement ne peut pas lire, et un piège de la fiche MDPH
+qui tirait du rejet implicite une conséquence probablement trop forte.
+`npm run relire` en liste désormais trois, avec les dérogations au collège.
+
+Le point le plus sérieux n'est pourtant pas dans les fiches mais dans les
+données&nbsp;: la page du Mayet-de-Montagne annonce un plan intercommunal
+« approuvé mais pas encore opposable » depuis janvier. Huit mois après, il est
+plus probable que le Géoportail n'ait pas été mis à jour que les formalités ne
+soient pas faites.
+
 ### Une ingestion qui ne se perd plus en route
 
 Le rapatriement complet touche huit sources et dure une dizaine de minutes.
