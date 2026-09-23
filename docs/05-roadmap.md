@@ -42,8 +42,21 @@ Reste :
   sans risque&nbsp;: le document approuvé que l'enquête annuelle ne peut pas
   connaître. Le zonage reste à faire, et le coût en est mesuré plus bas.
 
-**Fini quand** un visiteur peut partir de n'importe quel nœud et atteindre
-n'importe quel autre en trois clics, sans passer par une impasse.
+**Fini quand** — le critère tenait en une phrase et n'avait jamais été
+mesuré&nbsp;: « partir de n'importe quel nœud et atteindre n'importe quel autre
+en trois clics, sans passer par une impasse ». Mesuré, il se révèle fait de deux
+exigences de nature différente, et `npm run verifier-reseau` les tient chacune
+comme elle le mérite&nbsp;:
+
+- **sans impasse — un invariant.** Aucun nœud isolé, le graphe d'un seul tenant.
+  Toute régression fait échouer le build. C'est acquis&nbsp;: 0 isolé,
+  38 220 paires atteignables sur 38 220 ;
+- **trois clics — un cliquet.** 62,0 % des paires y sont, diamètre 7. À 196
+  nœuds, l'exiger de *toutes* les paires reviendrait à demander un graphe
+  presque complet&nbsp;; le contrôle retient donc le plancher atteint et refuse
+  de redescendre, plutôt que de poursuivre un absolu.
+
+Le détail de la première mesure est plus bas.
 
 ### Une contrainte d'outillage levée ✔
 
@@ -61,7 +74,7 @@ refuse les requêtes automatisées, si bien qu'un article se vérifie par
 recherche web et jamais de mémoire. Un identifiant `LEGIARTI` écrit de tête a
 déjà été faux une fois.
 
-## Phase 2 bis — Mettre en ligne *(presque)*
+## Phase 2 bis — Mettre en ligne ✔
 
 Déploiement ✔, sitemap ✔, licences ✔, mentions légales ✔ — `contenu/editeur.yaml`
 est rempli : éditeur, contact, directeur de la publication, hébergeur et
@@ -1750,6 +1763,49 @@ en tout, et une vingtaine de secondes par page en pagination profonde. Faisable,
 pas gratuit. Et une limite qui n'est pas de volume&nbsp;: un zonage se rapporte
 au **document**, pas à la commune. Sans géométrie, on ne peut pas dire laquelle
 de ces zones couvre une adresse — et le laisser croire serait pire que se taire.
+
+### Le critère de fin, mesuré pour la première fois ✔
+
+Il était écrit en 2026 et jamais éprouvé. La mesure, le 23 septembre&nbsp;:
+
+```
+196 nœuds, 555 arêtes
+d'un seul tenant : 38 220 paires atteignables sur 38 220 — 0 nœud isolé
+diamètre 7 · à trois clics ou moins : 62,0 % des paires
+   hors échelon État : 71,6 %        échelon État seul : 50,0 %
+```
+
+La moitié « sans impasse » est acquise. La moitié « trois clics » ne l'est pas,
+et la poursuivre telle quelle serait une erreur de cadrage&nbsp;: entre 196
+nœuds, trois sauts pour toutes les paires demandent une densité qu'aucun réseau
+lisible n'a. Le contrôle la tient donc en cliquet, avec un plancher à 60 % — deux
+points sous la mesure, pour qu'une fiche nouvelle ne fasse pas échouer le build
+en déplaçant le chiffre de quelques dixièmes.
+
+**Là où la mollesse se trouve, elle est concentrée.** 43 nœuds sont de degré 1
+ou 2, documents exclus, et l'échelon État en porte la moitié — le Conseil
+constitutionnel, le député et la cour administrative d'appel tiennent chacun à
+un seul fil. Deux cas sortent du lot&nbsp;:
+
+| Assemblée | Arêtes |
+|---|---|
+| conseil municipal | 8, dont 4 processus |
+| conseil communautaire | 2 |
+| conseil départemental | 1 — le vote de son budget |
+| conseil régional | 1 — le vote de son budget |
+
+Les assemblées délibérantes de deux échelons entiers n'apparaissent dans **aucun
+processus**. Ce n'est pas forcément un défaut — le RSA est décidé par le
+*président* du conseil départemental, et le site a raison de le dire — mais
+c'est la forme du réseau qui s'en ressent.
+
+**Et 25 documents sont de degré 1 par construction**, soit 13 % du graphe. Un
+document ne se relie qu'au processus qui le *produit*. La délibération, le
+procès-verbal, le plan local d'urbanisme, le budget primitif&nbsp;: chacun pend
+d'un seul fil alors qu'ils sont consultés, cités et contestés un peu partout.
+C'est le plus gros levier disponible sur le chiffre des trois clics, et c'est
+une décision de modèle, pas une tâche — faut-il une arête « utilise » à côté de
+« produit »&nbsp;?
 
 ### Une ingestion qui ne se perd plus en route
 
