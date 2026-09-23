@@ -1,0 +1,84 @@
+# Demander l'allocation personnalisée d'autonomie.
+# Le département, deuxième échelon du pays par la dépense sociale, n'apparaissait
+# que dans le RSA. L'APA est la démarche où il décide le plus souvent pour une
+# famille — et la seule du site où le silence de l'administration joue pour le
+# demandeur plutôt que contre lui.
+processus:
+  - id: demander-apa
+    nom: "Demander l'allocation personnalisée d'autonomie"
+    famille: quotidien
+    resume: "Pour un parent de plus de soixante ans qui perd son autonomie : qui évalue, qui décide, pourquoi le silence du département vaut accord au bout de deux mois, et pourquoi l'aide ne sera jamais reprise sur la succession."
+    declencheur: "Une personne de soixante ans ou plus qui ne peut plus accomplir seule les actes de la vie courante"
+    sortie: "Un plan d'aide et une allocation, ou un refus à contester"
+    decideur: president-departement
+    competences: [apa, action-sociale]
+    liens: [sp-apa, casf-apa-gestion, code-action-sociale]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: conseil-departemental
+        action: "Le règlement départemental d'aide sociale"
+        note: "Voté par le conseil départemental, il fixe les règles d'attribution des aides sociales du département. Il peut prévoir des conditions et des montants plus favorables que la loi, le département en supportant la charge. C'est lui qu'il faut lire pour savoir ce qui vaut dans votre département."
+        liens: [casf-l121-3, casf-l121-4]
+        confiance: etabli
+      - ordre: 2
+        acteur: citoyen
+        action: "Dépôt du dossier auprès du département"
+        note: "Le délai de décision ne court qu'à partir du dossier complet. Le département en accuse réception, et en informe le centre communal d'action sociale ou le maire."
+        liens: [sp-apa, casf-apa-gestion]
+        confiance: etabli
+      - ordre: 3
+        acteur: departement
+        action: "Évaluation à domicile par l'équipe médico-sociale"
+        note: "Un professionnel se rend au domicile et situe la personne sur la grille nationale d'évaluation, en six degrés de perte d'autonomie. Seuls les quatre premiers ouvrent droit à l'allocation."
+        liens: [sp-apa]
+        confiance: etabli
+      - ordre: 4
+        acteur: president-departement
+        action: "Décision du président du conseil départemental"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Deux mois à compter du dossier complet. À défaut de décision notifiée dans ce délai, l'allocation à domicile est réputée accordée, pour un montant forfaitaire égal à la moitié du plafond du degré de perte d'autonomie le plus élevé, jusqu'à la décision expresse. La participation laissée à la charge du bénéficiaire dépend de ses ressources."
+        liens: [casf-apa-gestion, pasdecalais-apa, sp-apa]
+        confiance: etabli
+
+    leviers:
+      - id: lire-le-rdas
+        quoi: "Lire le règlement départemental d'aide sociale"
+        quand: "Avant la demande"
+        aupres_de: "Le site du département, ou ses services"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "La loi fixe un minimum, pas un maximum : le département peut faire mieux, et le règlement est le seul endroit où il l'écrit."
+        liens: [casf-l121-3, casf-l121-4]
+        confiance: etabli
+      - id: relancer-apres-deux-mois
+        quoi: "Faire valoir l'accord tacite après deux mois de silence"
+        quand: "Deux mois après l'accusé de réception du dossier complet"
+        aupres_de: "Les services autonomie du département"
+        difficulte: faible
+        ancre_etape: 4
+        piege: "Tout court à partir du dossier complet, pas du premier envoi : c'est la date de l'accusé de réception qui compte, et il faut la garder."
+        liens: [casf-apa-gestion, pasdecalais-apa]
+        confiance: etabli
+      - id: contester-apa
+        quoi: "Contester la décision"
+        quand: "Deux mois après sa notification"
+        aupres_de: "Le président du conseil départemental, par recours administratif"
+        difficulte: moyenne
+        recours_si_refus: "Le tribunal administratif, dans les deux mois de la réponse"
+        ancre_etape: 4
+        piege: "Le recours auprès du président est un préalable : saisir directement le tribunal ne sert à rien."
+        liens: [sp-apa]
+        confiance: etabli
+      - id: apa-et-succession
+        quoi: "Ne pas renoncer par crainte pour l'héritage"
+        quand: "Au moment de décider de demander"
+        aupres_de: "Personne : c'est la loi"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "L'APA n'est jamais reprise sur la succession, ni auprès d'un légataire, d'un donataire ou du bénéficiaire d'une assurance-vie. Beaucoup de familles s'en privent en croyant le contraire."
+        liens: [casf-apa-gestion, sp-apa]
+        confiance: etabli

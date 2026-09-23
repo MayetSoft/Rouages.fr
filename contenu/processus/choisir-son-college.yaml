@@ -1,0 +1,55 @@
+# Le collège de secteur, et comment en changer.
+# Le conseil départemental n'agissait dans aucune démarche. Il en décide une que
+# toutes les familles rencontrent : le secteur du collège. Mais c'est l'État qui
+# affecte l'élève et accorde les dérogations — deux autorités pour une même
+# rentrée, et la confusion entre elles fait écrire au mauvais guichet.
+#
+# Les critères de priorité des dérogations n'ont pu être lus sur aucune page
+# officielle : les sites du ministère et des académies refusent les requêtes de
+# cet environnement. L'étape qui les mentionne reste à confirmer, et la fiche
+# avec elle.
+processus:
+  - id: choisir-son-college
+    nom: "Connaître le collège de secteur, et en demander un autre"
+    famille: quotidien
+    resume: "Le département trace le secteur de chaque collège, mais c'est l'État qui affecte l'élève et accorde, ou non, une dérogation. Deux autorités pour une même rentrée."
+    declencheur: "L'entrée en sixième, ou un déménagement en cours de scolarité"
+    sortie: "Une affectation dans le collège de secteur, ou dans un autre par dérogation"
+    decideur: rectorat
+    competences: [colleges]
+    liens: [ced-l213-1, code-education]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: a_confirmer
+
+    etapes:
+      - ordre: 1
+        acteur: conseil-departemental
+        action: "Délimitation des secteurs de recrutement des collèges"
+        note: "Le conseil départemental arrête, après avis du conseil départemental de l'éducation nationale, la localisation des collèges, leur capacité d'accueil et leur secteur de recrutement, en tenant compte d'un équilibre démographique, économique et social. Pour favoriser la mixité sociale, un même secteur peut être partagé entre plusieurs collèges."
+        liens: [ced-l213-1]
+        confiance: etabli
+      - ordre: 2
+        acteur: rectorat
+        action: "Affectation de l'élève dans un collège public"
+        note: "La loi le dit à la suite : les autorités de l'État affectent les élèves dans les collèges publics. Le département dessine la carte, il ne place pas les enfants."
+        liens: [ced-l213-1]
+        confiance: etabli
+      - ordre: 3
+        acteur: rectorat
+        action: "Examen des demandes de dérogation"
+        note: "La demande s'adresse au directeur académique. Les dérogations sont examinées dans la limite des places restant après l'inscription des élèves du secteur, selon des critères de priorité fixés nationalement."
+        liens: [code-education]
+        confiance: a_confirmer
+
+    leviers:
+      - id: lire-la-deliberation-de-secteur
+        quoi: "Lire la délibération qui fixe les secteurs"
+        quand: "Avant de déménager, ou quand une modification est annoncée"
+        aupres_de: "Le département"
+        difficulte: faible
+        recours_si_refus: "Saisir la CADA : une délibération est communicable"
+        ancre_etape: 1
+        piege: "C'est une délibération du conseil départemental, donc un acte que l'on peut lire, discuter avant son adoption et contester après. Protester auprès du collège ne sert à rien : il ne dessine pas son secteur."
+        liens: [ced-l213-1, cada]
+        confiance: etabli

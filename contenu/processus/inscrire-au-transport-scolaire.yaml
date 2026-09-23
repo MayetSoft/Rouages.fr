@@ -1,0 +1,55 @@
+# Inscrire un enfant au transport scolaire.
+# La région n'agissait dans aucune démarche. Le transport scolaire est la plus
+# courante — et l'une des plus mal comprises, parce que l'autorité change selon
+# que la commune est ou non dans le ressort d'une autorité organisatrice de la
+# mobilité.
+#
+# Le conseil régional n'y figure pas comme acteur : la règle de répartition est
+# vérifiée, le fait qu'il vote lui-même le règlement ne l'est pas. Le règlement
+# lu désigne le président de la Région comme autorité organisatrice.
+processus:
+  - id: inscrire-au-transport-scolaire
+    nom: "Inscrire un enfant au transport scolaire"
+    famille: quotidien
+    resume: "La région organise le transport des élèves, sauf là où une intercommunalité est autorité organisatrice de la mobilité. Le trajet décide de l'autorité, et un trajet qui franchit la limite peut exiger deux inscriptions."
+    declencheur: "La rentrée d'un élève qui ne peut pas aller à pied à son établissement"
+    sortie: "Une carte de transport scolaire, et le cas échéant une participation des familles"
+    decideur: region
+    competences: [transport-scolaire, organisation-mobilite]
+    liens: [ct-l3111-7, region-aura-reglement-ts, code-transports]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Identifier l'autorité organisatrice du trajet"
+        note: "La région a la responsabilité du transport scolaire. Mais à l'intérieur du ressort territorial d'une autorité organisatrice de la mobilité, c'est elle qui l'exerce. Le règlement régional d'Auvergne-Rhône-Alpes l'énonce ainsi : domicile et établissement dans le même ressort, l'autorité organisatrice de la mobilité ; sinon la région, sauf accord entre elles."
+        liens: [ct-l3111-7, region-aura-reglement-ts]
+        confiance: etabli
+      - ordre: 2
+        acteur: president-region
+        action: "Inscription auprès de la région, autorité organisatrice"
+        conditionnelle: true
+        note: "Hors du ressort d'une autorité organisatrice de la mobilité, la région organise et finance le service ; elle consulte à son sujet les conseils départementaux de l'éducation nationale."
+        liens: [ct-l3111-7, region-aura-reglement-ts]
+        confiance: etabli
+      - ordre: 3
+        acteur: aom
+        action: "Inscription auprès de l'autorité organisatrice de la mobilité"
+        conditionnelle: true
+        note: "Quand un ressort est créé ou modifié et qu'il inclut le transport scolaire, une convention entre l'autorité organisatrice et la région fixe le financement du service dans le nouveau périmètre."
+        liens: [ct-l3111-7]
+        confiance: etabli
+
+    leviers:
+      - id: deux-inscriptions
+        quoi: "Vérifier si le trajet franchit la limite de deux réseaux"
+        quand: "Avant la date limite d'inscription"
+        aupres_de: "La région et l'autorité organisatrice de la mobilité concernées"
+        difficulte: moyenne
+        ancre_etape: 1
+        piege: "Le règlement régional d'Auvergne-Rhône-Alpes prévoit qu'un trajet empruntant les services de deux autorités organisatrices exige un dossier auprès de chacune, et des frais d'inscription versés en totalité à chacune."
+        liens: [region-aura-reglement-ts]
+        confiance: etabli

@@ -51,8 +51,8 @@ comme elle le mérite&nbsp;:
 - **sans impasse — un invariant.** Aucun nœud isolé, le graphe d'un seul tenant.
   Toute régression fait échouer le build. C'est acquis&nbsp;: 0 isolé,
   38 220 paires atteignables sur 38 220 ;
-- **trois clics — un cliquet.** 64,5 % des paires y sont, diamètre 6 — contre
-  62,0 % et 7 à la première mesure. À 202 nœuds, l'exiger de *toutes* les paires
+- **trois clics — un cliquet.** 66,2 % des paires y sont, diamètre 6 — contre
+  62,0 % et 7 à la première mesure. À 207 nœuds, l'exiger de *toutes* les paires
   reviendrait à demander un graphe presque complet&nbsp;; le contrôle retient
   donc le plancher atteint et refuse de redescendre, plutôt que de poursuivre un
   absolu.
@@ -1911,6 +1911,88 @@ déchets**.
 
 Le cliquet de `npm run verifier-reseau` suit&nbsp;: plancher relevé à 62 %,
 diamètre maximal abaissé à 6. On ne redescendra pas sans le voir.
+
+### Le département et la région agissent à leur tour ✔
+
+Le chiffre disait le contraire de l'intuition&nbsp;: département et région réunis
+atteignaient déjà **84,8 %** à trois clics, parce que `departement` et `region`
+sont des pôles de trente et vingt-deux arêtes. Le défaut n'était pas métrique
+mais de fond — **une seule démarche** faisait intervenir le département, le RSA,
+et la région n'apparaissait que par la chambre régionale des comptes, dans le
+budget communal. Ni les assemblées, ni la maison départementale des
+personnes handicapées, ni la DREAL n'agissaient nulle part.
+
+Cinq processus, choisis parmi les démarches qu'une famille rencontre&nbsp;:
+
+- **demander l'allocation personnalisée d'autonomie** — pour un parent qui perd
+  son autonomie ;
+- **demander une aide ou une reconnaissance à la MDPH** ;
+- **s'opposer à une installation classée** — élevage, carrière, usine&nbsp;: la
+  plus fréquente des oppositions en territoire rural ;
+- **connaître le collège de secteur, et en demander un autre** ;
+- **inscrire un enfant au transport scolaire.**
+
+**Un contraste que personne ne met côte à côte.** Pour l'APA, deux mois de
+silence du département **valent accord**, au forfait, jusqu'à la décision
+expresse. Pour la MDPH, quatre mois de silence de la commission **valent
+refus**. Deux démarches du même échelon, deux règles de silence opposées&nbsp;:
+la famille qui attend sans rien faire gagne dans un cas et perd dans l'autre.
+
+**Une réforme récente, encore.** Comme pour le plan local d'urbanisme, une fiche
+écrite de mémoire aurait décrit un droit disparu&nbsp;: depuis la loi du
+23 octobre 2023 sur l'industrie verte, pour les demandes déposées à partir du
+22 octobre 2024, l'enquête publique sur une installation classée est remplacée
+par une **consultation de trois mois menée en parallèle de l'instruction** —
+toujours sous un commissaire enquêteur, avec deux réunions publiques. Attendre
+la fin de l'examen par l'État pour réagir, c'est désormais arriver après la
+fenêtre.
+
+Ce qui décide d'une issue&nbsp;:
+
+- **l'APA n'est jamais reprise sur la succession**, ni auprès d'un légataire,
+  d'un donataire ou du bénéficiaire d'une assurance-vie — des familles s'en
+  privent en croyant le contraire&nbsp;;
+- **le règlement départemental d'aide sociale**, voté par le conseil
+  départemental, peut être plus favorable que la loi&nbsp;: c'est le seul
+  endroit où le département l'écrit&nbsp;;
+- **à la MDPH, deux mentions d'une même carte relèvent de deux juges** — le
+  stationnement du tribunal administratif, la priorité du tribunal
+  judiciaire&nbsp;; et la conciliation suspend le délai du recours préalable
+  seulement si on la demande avant lui&nbsp;;
+- **contre une installation classée, le recours des tiers dure quatre mois**, doit
+  être notifié à peine d'irrecevabilité comme pour un permis, et une
+  **réclamation reste possible après la mise en service** contre des
+  prescriptions insuffisantes&nbsp;;
+- **le département trace le secteur du collège, l'État affecte l'élève**&nbsp;:
+  protester auprès du collège ne sert à rien, il ne dessine pas son secteur&nbsp;;
+- **un trajet scolaire qui franchit la limite de deux réseaux** peut exiger deux
+  inscriptions et deux paiements — le règlement régional d'Auvergne-Rhône-Alpes
+  le prévoit en toutes lettres.
+
+**Ce qui n'est pas fait, et pourquoi.**
+
+- **Le conseil régional tient toujours à un seul fil.** La répartition du
+  transport scolaire entre la région et les autorités organisatrices de la
+  mobilité est vérifiée&nbsp;; le fait que l'assemblée régionale en vote elle-même
+  le règlement ne l'est pas — le règlement lu désigne le *président* de Région
+  comme autorité organisatrice. Le faire agir sans preuve aurait été gonfler une
+  métrique.
+- **Les critères de priorité des dérogations au collège restent à confirmer.**
+  Les pages du ministère et des académies refusent les requêtes de cet
+  environnement&nbsp;; l'étape est marquée `a_confirmer`, la fiche avec elle, et
+  `npm run relire` la signale.
+- La PMI, le CAUE, le service d'incendie et l'agence régionale de santé
+  n'interviennent encore dans aucune démarche.
+
+| | Avant | Après |
+|---|---|---|
+| Nœuds / arêtes | 202 / 591 | 207 / 628 |
+| Trois clics, tout le graphe | 64,5 % | **66,2 %** |
+| Trois clics, département et région | 84,8 % | **87,4 %** |
+| Démarches où intervient le département | 1 | **4** |
+| Démarches où intervient un acteur régional | 1 — le budget communal, par la chambre régionale des comptes | **3** |
+
+Le cliquet suit&nbsp;: plancher relevé à 64 %.
 
 ### Une ingestion qui ne se perd plus en route
 

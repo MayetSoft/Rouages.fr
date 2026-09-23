@@ -1,0 +1,81 @@
+# Demander une prestation ou une reconnaissance à la MDPH.
+# La maison départementale tenait au réseau par un seul fil. C'est pourtant la
+# démarche où l'on se trompe le plus souvent de juge : selon ce qu'on conteste,
+# ce n'est pas le même tribunal, et le mauvais choix coûte le délai.
+processus:
+  - id: saisir-la-mdph
+    nom: "Demander une aide ou une reconnaissance à la MDPH"
+    famille: quotidien
+    resume: "Allocation, carte, reconnaissance de travailleur handicapé, orientation : une commission décide, son silence vaut refus au bout de quatre mois, et le juge à saisir dépend de ce qu'on conteste."
+    declencheur: "Un handicap qui ouvre droit à une prestation, une carte ou une orientation"
+    sortie: "Une décision de la commission des droits et de l'autonomie des personnes handicapées"
+    decideur: mdph
+    competences: [handicap]
+    liens: [casf-r241-33, mdph77-recours, code-action-sociale]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Dépôt de la demande à la maison départementale"
+        liens: [mdph77-recours, code-action-sociale]
+        confiance: etabli
+      - ordre: 2
+        acteur: mdph
+        action: "Décision de la commission des droits et de l'autonomie"
+        delai: { valeur: 4, unite: mois, nature: maximum_legal }
+        note: "Le silence de la commission pendant plus de quatre mois à compter de la demande recevable vaut décision de rejet — l'inverse de l'allocation d'autonomie, où deux mois de silence valent accord."
+        liens: [casf-r241-33]
+        confiance: etabli
+      - ordre: 3
+        acteur: mdph
+        action: "Recours administratif préalable, devant la commission"
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Obligatoire avant tout procès : il s'adresse à la commission, par la maison départementale, dans les deux mois de la décision. Une conciliation demandée avant ce recours en suspend le délai."
+        liens: [mdph77-recours]
+        confiance: etabli
+      - ordre: 4
+        acteur: tribunal-judiciaire
+        action: "Recours devant le tribunal judiciaire"
+        conditionnelle: true
+        note: "Pour l'allocation aux adultes handicapés, la carte mobilité inclusion mention invalidité ou priorité, les autres prestations sociales, la scolarisation et l'orientation en établissement médico-social. Deux mois après la réponse au recours préalable."
+        liens: [mdph77-recours]
+        confiance: etabli
+      - ordre: 5
+        acteur: tribunal-administratif
+        action: "Recours devant le tribunal administratif"
+        conditionnelle: true
+        note: "Pour la carte mobilité inclusion mention stationnement, la reconnaissance de la qualité de travailleur handicapé et l'orientation professionnelle. Même délai de deux mois."
+        liens: [mdph77-recours]
+        confiance: etabli
+
+    leviers:
+      - id: noter-la-date-mdph
+        quoi: "Noter la date de la demande recevable"
+        quand: "Au dépôt"
+        aupres_de: "Personne : c'est à garder soi-même"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Au bout de quatre mois sans réponse, la demande est rejetée d'office, et le délai du recours préalable commence à courir sans qu'aucun courrier ne l'annonce."
+        liens: [casf-r241-33]
+        confiance: etabli
+      - id: conciliation-avant-recours
+        quoi: "Demander une conciliation avant le recours préalable"
+        quand: "Dans les deux mois de la décision"
+        aupres_de: "La maison départementale"
+        difficulte: faible
+        ancre_etape: 3
+        piege: "Elle suspend le délai du recours préalable si on la demande avant lui. Engagée après, elle ne suspend plus rien, et le délai pour saisir le tribunal continue de courir."
+        liens: [mdph77-recours]
+        confiance: etabli
+      - id: choisir-le-bon-juge
+        quoi: "Saisir le juge qui correspond à la décision contestée"
+        quand: "Deux mois après la réponse au recours préalable"
+        aupres_de: "Le tribunal judiciaire ou le tribunal administratif, selon la prestation"
+        difficulte: elevee
+        ancre_etape: 4
+        piege: "La carte de stationnement relève du tribunal administratif, la carte de priorité du tribunal judiciaire : deux mentions d'une même carte, deux juges différents."
+        liens: [mdph77-recours]
+        confiance: etabli

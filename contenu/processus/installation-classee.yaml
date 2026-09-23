@@ -1,0 +1,82 @@
+# S'opposer à une installation classée.
+# La DREAL ne figurait dans aucune démarche, alors que c'est la plus fréquente
+# des oppositions en territoire rural : un élevage, une carrière, un méthaniseur.
+# Et la loi du 23 octobre 2023 a changé la consultation du public : une fiche
+# écrite de mémoire décrirait une enquête publique qui n'existe plus.
+processus:
+  - id: installation-classee
+    nom: "S'opposer à une installation classée"
+    famille: quotidien
+    resume: "Un élevage, une carrière ou une usine en projet près de chez soi : l'État instruit et décide, le public est consulté trois mois, et les riverains gardent un recours même après la mise en service."
+    declencheur: "Un projet d'installation classée soumis à autorisation, à proximité"
+    sortie: "Un arrêté préfectoral d'autorisation ou de refus, et le cas échéant des prescriptions renforcées"
+    decideur: prefet
+    competences: [installations-classees, participation-public]
+    liens: [code-environnement, prefecture-industrie-verte, loi-industrie-verte, ce-r181-50]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: petitionnaire
+        action: "Dépôt de la demande d'autorisation environnementale"
+        liens: [prefecture-industrie-verte]
+        confiance: etabli
+      - ordre: 2
+        acteur: dreal
+        action: "Instruction par l'inspection des installations classées"
+        note: "Depuis la réforme, l'examen du dossier par les services de l'État et les consultations obligatoires — communes, autorité environnementale — se déroulent en même temps que la consultation du public, et non plus avant elle."
+        liens: [prefecture-industrie-verte]
+        confiance: etabli
+      - ordre: 3
+        acteur: commissaire-enqueteur
+        action: "Consultation du public, en parallèle de l'instruction"
+        delai: { valeur: 3, unite: mois, nature: indicatif }
+        note: "Pour les demandes déposées depuis le 22 octobre 2024, la consultation dure trois mois, sous la conduite d'un commissaire enquêteur, avec deux réunions publiques et un site internet dédié à la charge du porteur de projet. Elle remplace l'enquête publique."
+        liens: [prefecture-industrie-verte, loi-industrie-verte]
+        confiance: etabli
+      - ordre: 4
+        acteur: prefet
+        action: "Arrêté d'autorisation ou de refus"
+        note: "C'est le préfet qui signe, sur le rapport de l'inspection. L'arrêté est affiché en mairie et publié sur le site de la préfecture : c'est la dernière de ces formalités qui fait courir le délai des tiers."
+        liens: [ce-r181-50, code-environnement]
+        confiance: etabli
+      - ordre: 5
+        acteur: prefet
+        action: "Réclamation des tiers après la mise en service"
+        conditionnelle: true
+        delai: { valeur: 2, unite: mois, nature: maximum_legal }
+        note: "Une fois l'installation en service, un tiers peut contester auprès du préfet l'insuffisance des prescriptions au regard des nuisances ou des dangers. Le préfet a deux mois pour répondre de façon motivée ; son silence vaut rejet. S'il donne raison, il fixe des prescriptions complémentaires."
+        liens: [ce-r181-50]
+        confiance: etabli
+
+    leviers:
+      - id: deposer-pendant-la-consultation
+        quoi: "Déposer ses observations pendant la consultation"
+        quand: "Pendant les trois mois, et aux deux réunions publiques"
+        aupres_de: "Le commissaire enquêteur, par le site dédié ou en réunion"
+        difficulte: faible
+        ancre_etape: 3
+        piege: "L'instruction se déroule désormais en même temps : attendre la fin de l'examen par l'État pour réagir, c'est arriver après la fenêtre."
+        liens: [prefecture-industrie-verte]
+        confiance: etabli
+      - id: recours-autorisation-environnementale
+        quoi: "Former un recours contre l'autorisation"
+        quand: "Quatre mois à compter de l'affichage en mairie ou de la publication sur le site de la préfecture"
+        aupres_de: "Le tribunal administratif"
+        difficulte: elevee
+        ancre_etape: 4
+        piege: "Le recours doit être notifié à l'auteur de la décision et au bénéficiaire, à peine d'irrecevabilité — la même règle que pour un permis de construire. Et le délai court de la dernière formalité accomplie."
+        liens: [ce-r181-50]
+        confiance: etabli
+      - id: reclamer-apres-mise-en-service
+        quoi: "Réclamer des prescriptions plus strictes une fois l'installation en service"
+        quand: "À tout moment après la mise en service"
+        aupres_de: "Le préfet"
+        difficulte: moyenne
+        recours_si_refus: "Le tribunal administratif"
+        ancre_etape: 5
+        piege: "Ce n'est pas une seconde chance de faire annuler l'autorisation : la réclamation ne porte que sur l'insuffisance des prescriptions face aux nuisances ou aux dangers constatés."
+        liens: [ce-r181-50]
+        confiance: etabli
