@@ -30,12 +30,13 @@ let echecs = 0;
  * Le plancher, deux points sous la dernière mesure.
  *
  * Relevé à 62,0 % à la première mesure, à 64,5 % une fois l'échelon État
- * densifié, puis à 66,2 % avec les démarches du département et de la région.
+ * densifié, à 66,2 % avec les démarches du département et de la région, puis à
+ * 67,0 % quand la PMI, le CAUE, le SDIS et l'ARS ont rejoint le réseau.
  * On le garde deux points en dessous : une fiche nouvelle déplace le chiffre de
  * quelques dixièmes sans rien dégrader, et un seuil collé à la valeur ferait
  * échouer le premier ajout venu.
  */
-const PLANCHER_TROIS_CLICS = 64;
+const PLANCHER_TROIS_CLICS = 65;
 
 /**
  * Le diamètre du jour. Il était de 7, et la densification de l'État l'a fait

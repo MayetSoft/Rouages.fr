@@ -1,0 +1,64 @@
+# Devenir assistant maternel.
+# La PMI tenait au réseau par deux partages et n'agissait dans aucune démarche.
+# Celle-ci est la sienne : c'est elle qui instruit l'agrément, et dans une
+# commune rurale l'assistant maternel est souvent le seul mode de garde.
+processus:
+  - id: devenir-assistant-maternel
+    nom: "Devenir assistant maternel"
+    famille: quotidien
+    resume: "Accueillir des enfants chez soi demande un agrément du département, instruit par la PMI. Trois mois de silence valent agrément, et la formation obligatoire est à la charge du département."
+    declencheur: "Le projet d'accueillir à son domicile, contre rémunération, des enfants d'autres familles"
+    sortie: "Un agrément, ou un refus à contester"
+    decideur: president-departement
+    competences: [protection-maternelle]
+    liens: [casf-assistants-maternels, casf-l421-3, savoie-assistant-maternel]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Dépôt de la demande d'agrément"
+        note: "Auprès du président du conseil départemental du département où l'on réside."
+        liens: [casf-l421-3]
+        confiance: etabli
+      - ordre: 2
+        acteur: pmi
+        action: "Instruction par les professionnels de la PMI"
+        note: "L'agrément est délivré à l'issue d'une procédure conduite par les professionnels du service de protection maternelle et infantile."
+        liens: [savoie-assistant-maternel]
+        confiance: etabli
+      - ordre: 3
+        acteur: president-departement
+        action: "Décision du président du conseil départemental"
+        delai: { valeur: 3, unite: mois, nature: maximum_legal }
+        note: "Trois mois à compter du dossier complet. À défaut de décision notifiée dans ce délai, l'agrément est réputé acquis, et le département en délivre l'attestation."
+        liens: [casf-l421-6, casf-l421-3]
+        confiance: etabli
+      - ordre: 4
+        acteur: departement
+        action: "Formation obligatoire, organisée et financée par le département"
+        note: "Cent vingt heures, dont au moins quatre-vingts avant d'accueillir le premier enfant."
+        liens: [casf-assistants-maternels, savoie-assistant-maternel]
+        confiance: etabli
+
+    leviers:
+      - id: garder-la-date-agrement
+        quoi: "Garder la preuve de la date du dossier complet"
+        quand: "Au dépôt"
+        aupres_de: "Personne : c'est à conserver soi-même"
+        difficulte: faible
+        ancre_etape: 3
+        piege: "Trois mois après, sans réponse, l'agrément est acquis — mais il faut pouvoir montrer quand le dossier est devenu complet pour réclamer l'attestation."
+        liens: [casf-l421-6]
+        confiance: etabli
+      - id: formation-avant-accueil
+        quoi: "Suivre les quatre-vingts premières heures avant le premier accueil"
+        quand: "Entre l'agrément et le premier enfant accueilli"
+        aupres_de: "Le département, qui l'organise"
+        difficulte: moyenne
+        ancre_etape: 4
+        piege: "L'agrément ne suffit pas pour commencer : sans ces heures de formation, on ne peut pas accueillir. Elles ne coûtent rien à l'assistant, le département les finance."
+        liens: [casf-assistants-maternels, savoie-assistant-maternel]
+        confiance: etabli

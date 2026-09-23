@@ -1,0 +1,56 @@
+# Savoir ce que l'on boit.
+# L'ARS ne figurait dans aucune démarche. C'est elle qui contrôle l'eau du
+# robinet, commune par commune, et la loi l'oblige à rendre les résultats
+# lisibles à trois endroits que peu d'habitants connaissent.
+documents:
+  - id: note-qualite-eau
+    nom: "La note annuelle sur la qualité de l'eau"
+    resume: "Une synthèse établie à partir du contrôle sanitaire, jointe une fois par an à la facture d'eau."
+    ou_le_trouver: "Avec la facture d'eau ; les résultats détaillés sont affichés en mairie."
+    liens: [ars-bretagne-eau]
+
+processus:
+  - id: qualite-eau-robinet
+    nom: "Connaître la qualité de l'eau du robinet"
+    famille: quotidien
+    resume: "L'exploitant surveille, l'agence régionale de santé contrôle, et les résultats sont affichés en mairie, publiés en ligne et résumés chaque année avec la facture."
+    declencheur: "Une question sur l'eau que l'on boit, une odeur, une alerte de non-conformité"
+    sortie: "Les résultats du contrôle sanitaire, et le cas échéant des restrictions de consommation"
+    decideur: ars
+    competences: [eau-potable]
+    liens: [csp-controle-sanitaire, ars-bretagne-eau]
+    verifie_le: 2026-09-23
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: epci
+        action: "Surveillance permanente par la collectivité ou son exploitant"
+        note: "La collectivité qui distribue l'eau — commune, intercommunalité ou syndicat —, ou l'entreprise à qui elle l'a déléguée, surveille elle-même la qualité de l'eau qu'elle produit."
+        liens: [ars-bretagne-eau, csp-controle-sanitaire]
+        confiance: etabli
+      - ordre: 2
+        acteur: ars
+        action: "Contrôle sanitaire par l'agence régionale de santé"
+        note: "En complément, l'agence contrôle : prélèvements et analyses sont faits par elle ou par un laboratoire agréé, aux points qu'elle choisit. C'est elle qui interprète les résultats et gère les non-conformités."
+        liens: [csp-controle-sanitaire, ars-bretagne-eau]
+        confiance: etabli
+      - ordre: 3
+        acteur: commune
+        action: "Affichage des résultats en mairie"
+        produit: [note-qualite-eau]
+        note: "Les résultats sont affichés en mairie et publiés sur le site du ministère chargé de la santé ; une synthèse annuelle accompagne la facture d'eau."
+        liens: [ars-bretagne-eau]
+        confiance: etabli
+
+    leviers:
+      - id: lire-affichage-eau
+        quoi: "Lire les résultats affichés en mairie"
+        quand: "À tout moment"
+        aupres_de: "La mairie"
+        difficulte: faible
+        ancre_etape: 3
+        piege: "La note jointe à la facture ne donne qu'une synthèse de l'année. Le détail des analyses, prélèvement par prélèvement, est celui de l'affichage et du site du ministère."
+        liens: [ars-bretagne-eau]
+        confiance: etabli

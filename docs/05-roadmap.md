@@ -51,8 +51,8 @@ comme elle le mérite&nbsp;:
 - **sans impasse — un invariant.** Aucun nœud isolé, le graphe d'un seul tenant.
   Toute régression fait échouer le build. C'est acquis&nbsp;: 0 isolé,
   38 220 paires atteignables sur 38 220 ;
-- **trois clics — un cliquet.** 66,2 % des paires y sont, diamètre 6 — contre
-  62,0 % et 7 à la première mesure. À 207 nœuds, l'exiger de *toutes* les paires
+- **trois clics — un cliquet.** 67,0 % des paires y sont, diamètre 6 — contre
+  62,0 % et 7 à la première mesure. À 211 nœuds, l'exiger de *toutes* les paires
   reviendrait à demander un graphe presque complet&nbsp;; le contrôle retient
   donc le plancher atteint et refuse de redescendre, plutôt que de poursuivre un
   absolu.
@@ -1981,8 +1981,9 @@ Ce qui décide d'une issue&nbsp;:
   Les pages du ministère et des académies refusent les requêtes de cet
   environnement&nbsp;; l'étape est marquée `a_confirmer`, la fiche avec elle, et
   `npm run relire` la signale.
-- La PMI, le CAUE, le service d'incendie et l'agence régionale de santé
-  n'interviennent encore dans aucune démarche.
+- ~~La PMI, le CAUE, le service d'incendie et l'agence régionale de santé
+  n'interviennent encore dans aucune démarche.~~ Fait, voir la section
+  suivante.
 
 | | Avant | Après |
 |---|---|---|
@@ -1993,6 +1994,48 @@ Ce qui décide d'une issue&nbsp;:
 | Démarches où intervient un acteur régional | 1 — le budget communal, par la chambre régionale des comptes | **3** |
 
 Le cliquet suit&nbsp;: plancher relevé à 64 %.
+
+### La PMI, le CAUE, le SDIS et l'ARS rejoignent le réseau ✔
+
+Quatre services qui tenaient chacun par deux partages et n'agissaient dans
+aucune démarche. Pour chacun, la même question&nbsp;: *où un habitant le
+rencontre-t-il vraiment&nbsp;?*
+
+- **La PMI instruit l'agrément des assistants maternels** — un processus neuf,
+  « devenir assistant maternel ». Dans une commune rurale, c'est souvent le seul
+  mode de garde. Trois mois de silence du département valent agrément, et les
+  cent vingt heures de formation obligatoire, dont quatre-vingts avant le premier
+  enfant, sont organisées et financées par le département.
+- **Le CAUE conseille gratuitement avant un permis** — une étape ajoutée en tête
+  du permis de construire, conditionnelle, avec son levier. Au-delà de 150 m² de
+  surface de plancher, un particulier qui construit pour lui-même doit prendre
+  un architecte&nbsp;; en dessous, c'est le conseil du CAUE qui reste gratuit.
+  L'insertion a décalé les sept étapes et les ancres des leviers d'un cran, par
+  script et vérifié sur la page générée.
+- **L'ARS contrôle l'eau du robinet** — un processus neuf, « connaître la qualité
+  de l'eau du robinet », et un partage sur la compétence eau potable.
+  L'exploitant surveille, l'agence contrôle, et les résultats sont affichés en
+  mairie, publiés en ligne et résumés chaque année avec la facture.
+- **Le SDIS** n'a pas de démarche d'habitant qui soit la sienne, et on ne lui en a
+  pas inventé. Il gagne deux relations structurelles, toutes deux vérifiées&nbsp;:
+  la **défense extérieure contre l'incendie** — les poteaux et réserves d'eau
+  dont le maire répond, selon un règlement départemental que le SDIS élabore et
+  que le préfet arrête — et la **contribution communale**, dépense obligatoire du
+  budget de la commune dont le flux manquait, seul celui du département y
+  figurant.
+
+Au passage, une page de référence en double a été fusionnée&nbsp;: l'article
+L421-3 du code de l'action sociale et des familles existait déjà, pointé sur la
+section entière&nbsp;; il pointe désormais l'article.
+
+| | PMI | CAUE | SDIS | ARS |
+|---|---|---|---|---|
+| Arêtes avant | 2 | 2 | 2 | 2 |
+| Arêtes après | **3** | **3** | **4** | **4** |
+| Démarches | 1 | 1 | — | 1 |
+
+Réseau&nbsp;: 207 → 211 nœuds, 628 → 650 arêtes, 66,2 % → **67,0 %** à trois
+clics. Plancher du cliquet relevé à 65 %.
 
 ### Une ingestion qui ne se perd plus en route
 

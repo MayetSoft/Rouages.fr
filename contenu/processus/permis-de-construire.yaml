@@ -29,7 +29,7 @@ processus:
     competences: [delivrance-autorisation-urbanisme, redaction-plu]
     liens: [sp-permis, cu-l422-1, cu-l111-3, cu-l422-5, cu-r423-23, cu-r423-38, justice-affichage-urbanisme, od-sitadel, od-sitadel-communes, od-sudocuh]
     verifie_le: 2026-09-22
-    # Les six étapes et les cinq leviers sont vérifiés : c'est ce qui permet au
+    # Les sept étapes et les six leviers sont vérifiés : c'est ce qui permet au
     # processus de passer. Deux corrections y ont compté — la demande de pièces
     # manquantes ne « suspend » rien et ne décale plus le délai passé le premier
     # mois, et l'irrecevabilité du recours non notifié n'est pas opposable quand
@@ -37,8 +37,18 @@ processus:
     confiance: etabli
 
     etapes:
-      - { ordre: 1, acteur: petitionnaire, action: "Dépôt du dossier", produit: [dossier-demande], liens: [sp-permis], confiance: etabli }
-      - ordre: 2
+      - ordre: 1
+        # Le CAUE ne figurait dans aucune démarche. C'est pourtant avant le dépôt
+        # qu'il sert : un regard d'architecte gratuit, que la loi réserve à qui
+        # n'est pas tenu d'en payer un.
+        acteur: caue
+        action: "Conseil gratuit du CAUE, avant le dépôt"
+        conditionnelle: true
+        note: "Le conseil d'architecture, d'urbanisme et de l'environnement informe, oriente et conseille gratuitement ceux qui veulent construire, sans jamais prendre en charge la conception du projet. Au-delà de 150 m² de surface de plancher, un particulier qui construit pour lui-même doit recourir à un architecte ; en dessous, il n'y est pas tenu, et c'est le conseil du CAUE qui reste gratuit."
+        liens: [loi-architecture, caue87-seuil]
+        confiance: etabli
+      - { ordre: 2, acteur: petitionnaire, action: "Dépôt du dossier", produit: [dossier-demande], liens: [sp-permis], confiance: etabli }
+      - ordre: 3
         # Correction : la fiche parlait d'une demande de pièces qui « suspend
         # l'instruction et fait repartir le compte à rebours » — deux mécanismes
         # contradictoires. Le vrai est plus favorable au demandeur : le dossier est
@@ -51,14 +61,14 @@ processus:
         note: "Le dossier est réputé complet si la mairie n'a pas notifié la liste des pièces manquantes dans le mois du dépôt. Passé ce mois, une demande de pièces ne décale plus rien : le délai d'instruction court quand même."
         liens: [cu-r423-19, cu-r423-38]
         confiance: etabli
-      - ordre: 3
+      - ordre: 4
         acteur: service-instructeur
         action: "Instruction et consultation des services"
         delai: { valeur: 2, unite: mois, nature: maximum_legal }
         note: "Deux mois pour une maison individuelle, trois pour les autres constructions ; majoré en secteur protégé."
         liens: [cu-r423-19, cu-r423-23]
         confiance: etabli
-      - ordre: 4
+      - ordre: 5
         acteur: abf
         action: "Avis de l'architecte des Bâtiments de France"
         conditionnelle: true
@@ -66,14 +76,14 @@ processus:
         note: "Uniquement en périmètre de protection du patrimoine. L'avis est alors souvent conforme."
         liens: [code-patrimoine, cpat-l632-2]
         confiance: etabli
-      - ordre: 5
+      - ordre: 6
         acteur: maire
         action: "Signature de l'arrêté"
         produit: [arrete-permis]
         note: "L'absence de réponse dans le délai vaut en principe permis tacite."
         liens: [cu-l424-2]
         confiance: etabli
-      - ordre: 6
+      - ordre: 7
         acteur: petitionnaire
         action: "Affichage sur le terrain"
         produit: [panneau-affichage]
@@ -83,6 +93,16 @@ processus:
         confiance: etabli
 
     leviers:
+      - id: consulter-le-caue
+        acteur: citoyen
+        quoi: "Montrer son projet au CAUE avant de le déposer"
+        quand: "Avant le dépôt, quand le projet peut encore changer"
+        aupres_de: "Le CAUE du département"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Le conseil est gratuit, mais le CAUE ne dessine pas le projet à votre place : il éclaire des choix, il n'en prend aucun en charge."
+        liens: [loi-architecture]
+        confiance: etabli
       - id: lire-le-plu
         acteur: citoyen
         quoi: "Lire le PLU applicable à la parcelle"
@@ -99,7 +119,7 @@ processus:
         aupres_de: "Service urbanisme de la mairie"
         difficulte: faible
         recours_si_refus: "Saisir la CADA"
-        ancre_etape: 1
+        ancre_etape: 2
         piege: "Demander par écrit : le délai de saisine de la CADA court à compter du refus."
         liens: [cada, sp-permis, cada-saisine]
         confiance: etabli
@@ -109,7 +129,7 @@ processus:
         quand: "Dès que le panneau apparaît"
         aupres_de: "Personne — précaution à prendre soi-même"
         difficulte: faible
-        ancre_etape: 6
+        ancre_etape: 7
         piege: "Un affichage absent ou incomplet ne fait pas courir le délai. La preuve se constitue avant, pas après."
         liens: [cu-a424-15, cu-r600-2, justice-affichage-urbanisme]
         confiance: etabli
@@ -123,7 +143,7 @@ processus:
         aupres_de: "Le maire, en recommandé"
         difficulte: moyenne
         recours_si_refus: "Tribunal administratif, 2 mois après le rejet"
-        ancre_etape: 6
+        ancre_etape: 7
         piege: "Le recours doit être notifié au bénéficiaire du permis et à l'auteur de la décision dans les 15 jours, sous peine d'irrecevabilité — sauf si le panneau ne mentionnait pas cette obligation, auquel cas elle n'est pas opposable. Photographier le panneau sert aussi à cela."
         liens: [cu-r600-1, cu-r600-2, sp-recours-urbanisme, justice-affichage-urbanisme]
         confiance: etabli
@@ -133,7 +153,7 @@ processus:
         quand: "2 mois après l'affichage, ou après le rejet du recours gracieux"
         aupres_de: "Tribunal administratif du ressort"
         difficulte: elevee
-        ancre_etape: 6
+        ancre_etape: 7
         piege: "Il faut justifier d'un intérêt à agir : être voisin ne suffit pas toujours."
         liens: [cu-r600-1, cu-r600-2, sp-recours-urbanisme, wp-tribunal-administratif, justice-affichage-urbanisme]
         confiance: etabli
