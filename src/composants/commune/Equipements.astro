@@ -1,0 +1,59 @@
+---
+/**
+ * Ce qu'on trouve sur place, et ce pour quoi il faut partir.
+ *
+ * Le bloc des services nomme les établissements publics ; celui-ci compte tout
+ * ce qui est ouvert au public, commerces compris. L'absence est ici aussi
+ * informative que la présence, et c'est la seule liste du site où l'on affiche
+ * explicitement ce qui manque.
+ */
+import type { Fiche } from '../../modele/territoires.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  e: NonNullable<Fiche['equipements']>;
+}
+const { e } = Astro.props;
+/**
+ * « bureau de poste, relais poste, agence postale » devient « bureau de poste,
+ * relais poste ou agence postale » : dans une liste d'absences, la dernière
+ * virgule se lirait comme une séparation entre deux manques distincts.
+ */
+const ouPlutotQue = (nom: string) => {
+  const i = nom.lastIndexOf(', ');
+  return i === -1 ? nom : `${nom.slice(0, i)} ou ${nom.slice(i + 2)}`;
+};
+---
+<dl class="p-reperes">
+  <Repere
+    nom={`Équipements de proximité ${e.millesime}`}
+    montant={`${e.proximite} sur ${e.proximiteTotal}`}
+    compare={{ valeur: e.proximite, mediane: e.medianeProximite, reference: 'la médiane des communes' }}
+    mediane={`médiane des communes : ${e.medianeProximite} sur ${e.proximiteTotal}`}
+  />
+</dl>
+{e.presents.map((g) => (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">{g.ou}</span>
+    <ul>
+      {g.liste.map((x) => (
+        <li><span class="p-risque-nombre">{x.nombre.toLocaleString('fr-FR')}</span><span class="p-risque-nom">{x.nom}</span></li>
+      ))}
+    </ul>
+  </div>
+))}
+{e.absents.length > 0 && (
+  <div class="p-risque-groupe p-equipements-absents">
+    <span class="p-service-famille">Ce qui manque, dans la gamme de proximité</span>
+    <ul>
+      {e.absents.map((nom) => <li class="p-risque-nom">{ouPlutotQue(nom)}</li>)}
+    </ul>
+  </div>
+)}
+<p class="p-source-territoire">
+  {`D’après la base permanente des équipements de l’INSEE, millésime ${e.millesime} (${e.maj}). ` +
+    'La gamme de proximité est celle que l’INSEE publie, non une liste établie ici. Ce sont des ' +
+    'équipements ouverts au public, marchands compris — le bloc « Les services » nomme, lui, les ' +
+    'seuls établissements publics. Une commune sans équipement n’est pas une commune sans accès : ' +
+    'le bourg voisin est parfois à trois kilomètres, ce que ce fichier ne dit pas.'}
+</p>

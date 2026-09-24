@@ -1,0 +1,44 @@
+---
+/**
+ * Toutes les communes, par département.
+ *
+ * Le chemin qui ne demande rien : sans JavaScript, le champ de l'en-tête mène
+ * ici, et de là chaque commune a son lien. C'est aussi la seule façon, pour un
+ * moteur de recherche, d'atteindre une page de commune autrement que par le
+ * plan du site.
+ */
+import Base from '../../layouts/Base.astro';
+import { communes, metaTerritoires } from '../../modele/territoires.ts';
+
+const parDep = new Map<string, { nom: string; n: number }>();
+for (const c of communes()) {
+  const d = parDep.get(c.dep) ?? { nom: c.depNom, n: 0 };
+  d.n++;
+  parDep.set(c.dep, d);
+}
+const regions = metaTerritoires()?.regions ?? {};
+const deps = [...parDep].sort(([a], [b]) => a.localeCompare(b, 'fr', { numeric: true }));
+const total = deps.reduce((s, [, d]) => s + d.n, 0);
+---
+<Base
+  titre="Toutes les communes"
+  description="Les communes de France, département par département : pour chacune, qui exerce quoi, ses comptes, son élection et ses services."
+>
+  <div class="page page--etroite">
+    <p class="badge">Communes</p>
+    <h1>Toutes les communes</h1>
+    <p class="resume">
+      {`${total.toLocaleString('fr-FR')} communes, rangées par département. Le champ en haut de chaque page y conduit plus vite, par le nom ou le code postal.`}
+    </p>
+    <ul class="c-departements">
+      {deps.map(([code, d]) => (
+        <li>
+          <a href={`/communes/${code}`}>{`${code} · ${d.nom}`}</a>
+          <span class="c-departement-detail">
+            {`${d.n.toLocaleString('fr-FR')} commune${d.n > 1 ? 's' : ''}` + (regions[code] ? ` · ${regions[code]}` : '')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>

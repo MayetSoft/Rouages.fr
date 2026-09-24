@@ -1,0 +1,72 @@
+---
+/**
+ * Ce qui est prélevé ici, et par qui.
+ *
+ * La ligne « taxe foncière » d'un avis d'imposition n'est pas un taux : c'est
+ * une somme de taux votés par des assemblées différentes — la commune,
+ * l'intercommunalité, un syndicat, un établissement public foncier, la gestion
+ * des milieux aquatiques. Les séparer est exactement ce que ce site existe pour
+ * faire, et personne d'autre ne le fait sur l'avis lui-même.
+ */
+import type { Fiche } from '../../modele/territoires.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  f: NonNullable<Fiche['fiscalite']>;
+}
+const { f } = Astro.props;
+const pourCent = (v: number) =>
+  `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %`;
+const cfe = f.cfeGroupement > 0 ? f.cfeGroupement : f.cfeCommune;
+---
+<dl class="p-reperes">
+  <Repere
+    nom={`Taxe foncière ${f.millesime}`}
+    montant={pourCent(f.fbTotal)}
+    compare={{ valeur: f.fbTotal, mediane: f.medianeFb, reference: 'la médiane des communes' }}
+    mediane={`médiane des communes : ${pourCent(f.medianeFb)}`}
+  />
+</dl>
+{f.fb.length > 0 && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Ce que ce taux additionne</span>
+    <ul>
+      {f.fb.map((p) => (
+        <li><span class="p-risque-nombre">{pourCent(p.taux)}</span><span class="p-risque-nom">{p.nom}</span></li>
+      ))}
+    </ul>
+  </div>
+)}
+<p class="p-strate">
+  {f.omTaux > 0 && f.omQui
+    ? `Ordures ménagères : ${pourCent(f.omTaux)} sur la même base, perçus par ${f.omQui} ` +
+      `(médiane ${pourCent(f.medianeOm)} là où la taxe existe).`
+    : 'Aucune taxe d’enlèvement des ordures ménagères : le service est financé autrement — par ' +
+      'une redevance calculée sur le service rendu, ou sur le budget général.'}
+</p>
+{f.thTotal > 0 && (
+  <p class="p-strate">
+    {`Résidences secondaires : ${pourCent(f.thTotal)} de taxe d’habitation, dont ` +
+      `${pourCent(f.thCommune)} pour la commune` +
+      (f.majoration > 0
+        ? `, majorés de ${f.majoration.toLocaleString('fr-FR')} % par délibération du conseil municipal`
+        : '') +
+      '. La taxe d’habitation sur la résidence principale, elle, n’existe plus depuis 2023.'}
+  </p>
+)}
+{cfe > 0 && (
+  <p class="p-strate">
+    {`Entreprises : ${pourCent(cfe)} de cotisation foncière, ` +
+      (f.cfeGroupement > 0
+        ? 'votés par l’intercommunalité — sous fiscalité professionnelle unique, la commune ne ' +
+          'vote plus ce taux et ne perçoit plus cet impôt.'
+        : 'votés par le conseil municipal.')}
+  </p>
+)}
+{f.fnbTotal > 0 && <p class="p-strate">{`Terres et terrains non bâtis : ${pourCent(f.fnbTotal)}.`}</p>}
+<p class="p-source-territoire">
+  {'D’après le recensement des éléments d’imposition à la fiscalité directe locale de la DGFiP, ' +
+    `millésime ${f.millesime} (${f.maj}). Le taux communal de taxe foncière a absorbé en 2021 ` +
+    'l’ancienne part départementale : le comparer à celui de 2020 n’aurait pas de sens. Le montant ' +
+    'dû dépend aussi de la valeur locative du bien, que ce site ne connaît pas.'}
+</p>

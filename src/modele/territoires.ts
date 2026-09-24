@@ -11,6 +11,7 @@
  * 345 communes, et relire son fichier pour chacune multiplierait par autant le
  * temps de génération.
  */
+import { dernierChangement } from './fiche-commune.ts';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { verdictDe, type StructureExercante, type Verdict } from './verdict.ts';
@@ -87,9 +88,6 @@ type ElectionsDep = {
   scrutin: string;
   c: Record<string, { cm: number; cc: number }>;
 };
-
-/** Les séries de population du département : [série, année du sommet, sommet]. */
-type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
 
 /** La composition des conseils du département, sans aucun nom. */
 type ConseilsDep = {
@@ -201,7 +199,6 @@ const cacheSru = new Map<string, SruDep | null>();
 const cacheRisques = new Map<string, RisquesDep | null>();
 const cacheJournal = new Map<string, JournalDep | null>();
 const cacheElections = new Map<string, ElectionsDep | null>();
-const cachePop = new Map<string, PopDep | null>();
 const cacheConseils = new Map<string, ConseilsDep | null>();
 const cacheUrbanisme = new Map<string, UrbanismeDep | null>();
 const cachePlu = new Map<string, PluDep | null>();
@@ -310,11 +307,25 @@ export interface Fiche {
   /** Compétence de Rouages -> ce qu'on peut en dire ici. */
   verdicts: Map<string, Verdict>;
   reserve: (competence: string) => string | null;
-  maire: { prenom: string; nom: string; depuis: string } | null;
-  services: { famille: string; nom: string; prive: boolean; ecole?: { classes: (number | null)[]; eleves: (number | null)[]; rentrees: number[] } }[];
+  maire: { prenom: string; nom: string; depuis: string; maj: string } | null;
+  services: {
+    famille: string;
+    nom: string;
+    prive: boolean;
+    /** Établissement de santé doté d'un service d'urgences. */
+    urgences: boolean;
+    ecole?: {
+      classes: (number | null)[];
+      eleves: (number | null)[];
+      rentrees: number[];
+      dernierChangement: { rentree: number; ecart: number } | null;
+    };
+  }[];
   /** Ce qui n'est pas dans la commune mais dans son intercommunalité. */
   voisines: Record<string, { n: number; l: string[] }>;
   sdis: string | null;
+  /** La date des annuaires dont viennent les services. */
+  servicesMaj: string | null;
   /**
    * À quoi l'endroit est exposé, et ce qui y est déjà arrivé.
    *
@@ -330,13 +341,6 @@ export interface Fiche {
     maj: string;
   } | null;
   soumiseSru: boolean;
-  /**
-   * Le sommet de population, et l'écart d'aujourd'hui à ce sommet.
-   *
-   * Un nombre d'habitants seul ne dit rien : c'est l'écart à ce que la commune
-   * a été qui porte l'information, et c'est le dénominateur de tout le reste.
-   */
-  sommet: { annee: number; valeur: number; ecart: number } | null;
   /**
    * Ce que pèse la commune dans les deux assemblées où elle siège.
    *
@@ -374,6 +378,8 @@ export interface Fiche {
      */
     designes: boolean;
     scrutin: string;
+    /** La date du répertoire des élus, quand il couvre la commune. */
+    maj: string | null;
   } | null;
   /**
    * Qui écrit la règle de ce qui peut se construire.
@@ -435,8 +441,8 @@ export interface Fiche {
     proximite: number;
     proximiteTotal: number;
     medianeProximite: number;
-    /** Les plus nombreux, tous domaines confondus. */
-    principaux: { nom: string; nombre: number }[];
+    /** Tout ce qui est présent, rangé par domaine, les plus fournis d'abord. */
+    presents: { ou: string; liste: { nom: string; nombre: number }[] }[];
     /** Ce qui manque, parmi la seule gamme de proximité. */
     absents: string[];
     maj: string;
@@ -444,6 +450,8 @@ export interface Fiche {
   /** Ce qui s'y construit réellement, une fois la règle écrite. */
   logements: {
     annees: number[];
+    /** Les logements autorisés chaque année de la fenêtre. */
+    parAnnee: number[];
     autorises: number;
     commences: number;
     individuels: number;
@@ -513,9 +521,22 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
       famille: familles[e[0]] ?? '',
       nom: e[1],
       prive: familles[e[0]] !== 'sante' && e[2] === 1,
-      ...(serie ? { ecole: { classes: serie[0], eleves: serie[1], rentrees: ecoles!.rentrees } } : {}),
+      urgences: familles[e[0]] === 'sante' && e[2] === 1,
+      ...(serie
+        ? {
+            ecole: {
+              classes: serie[0],
+              eleves: serie[1],
+              rentrees: ecoles!.rentrees,
+              dernierChangement: dernierChangement(serie[0], ecoles!.rentrees),
+            },
+          }
+        : {}),
     };
   });
+  // Les urgences en tête : c'est l'établissement qu'on cherche quand on
+  // cherche vite, et il ne doit pas dépendre de l'ordre alphabétique.
+  services.sort((a, b) => Number(b.urgences) - Number(a.urgences));
 
   const sru = enCache(cacheSru, c.dep, `dep/${c.dep}-sru.json`);
 
@@ -527,10 +548,13 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
     structures,
     verdicts,
     reserve: (comp) => m.reserves?.[comp] ?? null,
-    maire: brutMaire ? { prenom: brutMaire[0], nom: brutMaire[1], depuis: brutMaire[2] } : null,
+    maire: brutMaire
+      ? { prenom: brutMaire[0], nom: brutMaire[1], depuis: brutMaire[2], maj: elus!.maj }
+      : null,
     services,
     voisines: servs?.v?.[c.code] ?? {},
     sdis: servs?.sdis ?? m.services?.sdis?.[c.dep] ?? null,
+    servicesMaj: servs?.maj ?? null,
     risques:
       risq && fr
         ? {
@@ -560,7 +584,6 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
     logements: assemblerLogements(c),
     fiscalite: assemblerFiscalite(c),
     equipements: assemblerEquipements(c),
-    sommet: assemblerSommet(c),
     maj: dep.maj,
   };
 }
@@ -571,16 +594,6 @@ export function ficheCommune(c: CommuneIndex, competences: { id: string; banatic
  * sièges à son propos serait faux.
  */
 const FISCALITE_PROPRE = new Set(['CC', 'CA', 'CU', 'METRO', 'MET69', 'SAN', 'EPT']);
-
-function assemblerSommet(c: CommuneIndex): Fiche['sommet'] {
-  const d = enCache(cachePop, c.dep, `dep/${c.dep}-population.json`);
-  const f = d?.c[c.code];
-  if (!d || !f) return null;
-  const [serie, annee, valeur] = f;
-  const actuelle = [...serie].reverse().find((x) => x > 0);
-  if (!actuelle || valeur === 0) return null;
-  return { annee, valeur, ecart: Math.round(((actuelle - valeur) / valeur) * 100) };
-}
 
 /**
  * Le pendant, à la construction de la page, de ce que fait le panneau.
@@ -617,12 +630,11 @@ function assemblerUrbanisme(
 }
 
 /**
- * La page statique n'a pas la place d'une liste de cinquante entrées : elle
- * donne le compte, les plus nombreux, et surtout ce qui manque — l'absence
- * étant ici l'information qu'aucune liste de présences ne donne.
+ * Ce qu'on trouve sur place, rangé par domaine, et ce qui manque — l'absence
+ * étant ici l'information qu'aucune liste de présences ne donne. La page en
+ * donnait les huit plus nombreux quand le panneau donnait tout ; elle donne
+ * tout désormais, puisqu'elle est seule à le dire.
  */
-const PRINCIPAUX = 8;
-
 function assemblerEquipements(c: CommuneIndex): Fiche['equipements'] {
   const d = enCache(cacheEquipements, c.dep, `dep/${c.dep}-equipements.json`);
   const f = d?.c[c.code];
@@ -637,11 +649,20 @@ function assemblerEquipements(c: CommuneIndex): Fiche['equipements'] {
     ).length,
     proximiteTotal: d.nombreProximite,
     medianeProximite: d.medianeProximite,
-    principaux: f
-      .map(([i, n]) => ({ nom: d.types[i]?.[0] ?? '', nombre: n }))
-      .filter((x) => x.nom)
-      .sort((a, b) => b.nombre - a.nombre || a.nom.localeCompare(b.nom))
-      .slice(0, PRINCIPAUX),
+    presents: (() => {
+      const parDomaine = new Map<string, { nom: string; nombre: number }[]>();
+      for (const [i, n] of f) {
+        const t = d.types[i];
+        if (!t) continue;
+        const ou = t[2] || 'Autres';
+        if (!parDomaine.has(ou)) parDomaine.set(ou, []);
+        parDomaine.get(ou)!.push({ nom: t[0], nombre: n });
+      }
+      for (const liste of parDomaine.values()) liste.sort((a, b) => b.nombre - a.nombre);
+      return [...parDomaine]
+        .map(([ou, liste]) => ({ ou, liste }))
+        .sort((a, b) => b.liste.length - a.liste.length || a.ou.localeCompare(b.ou));
+    })(),
     absents: d.groupes
       .filter(([, gamme, membres]) => gamme === 0 && !membres.some((i) => presence.has(i)))
       .map(([nom]) => nom),
@@ -683,6 +704,7 @@ function assemblerLogements(c: CommuneIndex): Fiche['logements'] {
   const autorises = parAnnee.reduce((s, x) => s + x, 0);
   return {
     annees: d.annees,
+    parAnnee,
     autorises,
     commences,
     individuels,
@@ -723,5 +745,6 @@ function assemblerConseil(
     agePartout: k?.age ?? 0,
     designes: f.cc === 0 && cc > 0 && !!conseil,
     scrutin: e.scrutin,
+    maj: k?.maj ?? null,
   };
 }

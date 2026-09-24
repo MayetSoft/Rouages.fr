@@ -8,7 +8,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { classer, type CommuneBreve } from '../src/client/territoire.ts';
+import { classer, type CommuneBreve } from '../src/client/recherche-commune.ts';
 import { RACINE } from '../src/modele/graphe.ts';
 
 const brut = JSON.parse(

@@ -1,0 +1,68 @@
+---
+/**
+ * Ce qui se crée en associations.
+ *
+ * **Des créations, pas des associations vivantes**, et le bloc le dit : le
+ * répertoire national n'enregistre pas la dissolution qu'on ne lui déclare pas.
+ * Une date de création, elle, est un fait daté.
+ */
+import type { Associations } from '../../modele/fiche-commune.ts';
+import { moisAnnee } from '../../vues/graphiques.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  a: Associations;
+}
+const { a } = Astro.props;
+const debut = a.annees[0];
+const fin = a.annees[a.annees.length - 1];
+// La virgule, pas le point : tout le reste du site compte en français.
+const dixieme = (v: number) => v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+---
+<p class="p-strate">
+  {`Créations déclarées de ${debut} à ${fin}. Le répertoire ne dit pas si une association ` +
+    'fonctionne encore — une dissolution se déclare, elle ne se constate pas — et le site ne ' +
+    'compte donc que ce qui s’ouvre.'}
+</p>
+<dl class="p-reperes">
+  <Repere
+    nom={`Créations en ${a.annees.length} ans`}
+    montant={a.total.toLocaleString('fr-FR')}
+    compare={{ valeur: a.taux, mediane: a.medianeTaux, reference: 'la médiane des communes' }}
+    mediane={`${dixieme(a.taux)} pour 1 000 habitants — médiane ${dixieme(a.medianeTaux)}`}
+    serie={{ valeurs: a.parAnnee, annees: a.annees, formater: (v) => `${v} création${v > 1 ? 's' : ''}` }}
+  />
+</dl>
+{a.domaines.length > 0 && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Par domaine, tel qu’il a été déclaré</span>
+    <ul>
+      {a.domaines.slice(0, 6).map((d) => (
+        <li><span class="p-risque-nombre">{d.nombre}</span><span class="p-risque-nom">{d.nom}</span></li>
+      ))}
+    </ul>
+  </div>
+)}
+{a.recentes.length > 0 && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Les dernières déclarées</span>
+    <ul>
+      {a.recentes.map((r) => (
+        <li class="p-risque-plan">
+          <span class="p-risque-nom">{r.titre}</span>
+          <span class="p-risque-detail">
+            {[
+              moisAnnee(`${r.mois}-01`) ?? r.mois.slice(0, 4),
+              ...(r.domaine ? [r.domaine.charAt(0).toLowerCase() + r.domaine.slice(1)] : []),
+            ].join(' · ')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+<p class="p-source-territoire">
+  D’après le répertoire national des associations ({a.maj}). Le site en retient la commune du
+  siège, jamais l’adresse : celui d’une petite association est souvent un domicile. Une
+  association déclarée ici peut agir ailleurs, et réciproquement.
+</p>

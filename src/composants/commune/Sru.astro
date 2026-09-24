@@ -1,0 +1,45 @@
+---
+/**
+ * L'obligation de logements sociaux : un taux à atteindre, un écart constaté,
+ * et un prélèvement quand il n'est pas comblé. Rien n'est affiché pour les
+ * communes absentes de l'inventaire : elles ne sont pas soumises à l'article 55,
+ * et écrire « 0 » se lirait comme un manquement.
+ */
+import type { Sru } from '../../modele/fiche-commune.ts';
+
+interface Props {
+  s: Sru;
+  maj: string | null;
+}
+const { s, maj } = Astro.props;
+const lls = s.lls !== null ? s.lls.toLocaleString('fr-FR') : s.llsTexte;
+const tauxBrut = s.taux !== null ? `${s.taux.toLocaleString('fr-FR')} %` : s.tauxTexte;
+const taux = tauxBrut && s.cible !== null ? `${tauxBrut} — cible ${s.cible.toLocaleString('fr-FR')} %` : tauxBrut;
+// L'état en une phrase. La carence est la seule situation où l'État peut se
+// substituer au maire pour délivrer les permis.
+const etat = s.exemptee
+  ? { classe: 'p-sru-etat', texte: 'Commune exemptée de l’obligation pour la période en cours.' }
+  : s.carencee
+    ? {
+        classe: 'p-sru-etat p-sru-etat--carence',
+        texte: 'Commune déclarée carencée : le préfet peut se substituer au maire pour délivrer les permis et majorer le prélèvement.',
+      }
+    : s.deficitaire === true
+      ? { classe: 'p-sru-etat p-sru-etat--deficit', texte: 'Commune déficitaire : la cible n’est pas atteinte.' }
+      : s.deficitaire === false
+        ? { classe: 'p-sru-etat', texte: 'Obligation respectée.' }
+        : null;
+---
+<dl class="p-sru-liste">
+  {lls && <div><dt>Logements sociaux</dt><dd>{lls}</dd></div>}
+  {taux && <div><dt>Taux atteint</dt><dd>{taux}</dd></div>}
+</dl>
+{etat && <p class={etat.classe}>{etat.texte}</p>}
+{s.prelevement !== null && s.prelevement > 0 && (
+  <p class="p-sru-prelevement">{`Prélèvement de l’année : ${Math.round(s.prelevement).toLocaleString('fr-FR')} €.`}</p>
+)}
+<p class="p-source-territoire">
+  {`Inventaire annuel de l’article 55 de la loi SRU${maj ? ` (${maj})` : ''}. Les communes qui n’y ` +
+    'figurent pas ne sont pas soumises à l’obligation : elles n’atteignent pas les seuils de ' +
+    'population et d’agglomération.'}
+</p>

@@ -1,0 +1,67 @@
+---
+/**
+ * Comment le conseil municipal a été élu.
+ *
+ * Deux taux, chacun rapporté à sa médiane nationale — 57 % de participation
+ * n'est ni bon ni mauvais tant qu'on ignore que la médiane est à 63 %. Le
+ * nombre de listes dit s'il y avait un choix.
+ *
+ * **Aucune nuance politique, aucun nom de candidat.** Relier une personne à
+ * une opinion reste interdit.
+ */
+import type { Scrutin } from '../../modele/fiche-commune.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  sc: Scrutin;
+}
+const { sc } = Astro.props;
+const taux = (valeur: number, total: number) => (total > 0 ? (valeur / total) * 100 : 0);
+const pc = (v: number) => `${v.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %`;
+const tours = sc.tours.filter((t) => t.inscrits > 0).map((t) => ({
+  titre: sc.tours.length > 1 ? (t.numero === 1 ? 'Premier tour' : 'Second tour') : null,
+  listes: t.listes,
+  lignes: [
+    {
+      nom: 'Participation',
+      valeur: taux(t.votants, t.inscrits),
+      mediane: t.medianeParticipation,
+      detail: `${t.votants.toLocaleString('fr-FR')} votants sur ${t.inscrits.toLocaleString('fr-FR')} inscrits`,
+    },
+    {
+      nom: 'Bulletins blancs ou nuls',
+      valeur: taux(t.refus, t.votants),
+      mediane: t.medianeRefus,
+      detail: `${t.refus.toLocaleString('fr-FR')} sur ${t.votants.toLocaleString('fr-FR')} votants`,
+    },
+  ],
+}));
+---
+{tours.map((t) => (
+  <div class="p-scrutin-tour">
+    {t.titre && <span class="p-service-famille">{t.titre}</span>}
+    <dl class="p-reperes">
+      {t.lignes.map((l) => (
+        <Repere
+          nom={l.nom}
+          montant={pc(l.valeur)}
+          compare={l.mediane > 0 ? { valeur: l.valeur, mediane: l.mediane, reference: 'la médiane nationale' } : null}
+          mediane={l.mediane > 0 ? `médiane ${pc(l.mediane)}` : null}
+          detail={l.detail}
+        />
+      ))}
+    </dl>
+    {t.listes > 0 && (
+      <p class="p-scrutin-listes">
+        {t.listes === 1
+          ? `Une seule liste se présentait, comme dans ${sc.partListeUnique} % des communes.`
+          : `${t.listes} listes se présentaient. Dans ${sc.partListeUnique} % des communes, il n’y en avait qu’une.`}
+      </p>
+    )}
+  </div>
+))}
+<slot />
+<p class="p-source-territoire">
+  D’après les résultats publiés par le ministère de l’Intérieur ({sc.maj}). Les nuances politiques
+  ne sont pas reprises : le site nomme des fonctions et des chiffres, pas des opinions.
+</p>

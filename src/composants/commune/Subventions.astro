@@ -1,0 +1,66 @@
+---
+/**
+ * Ce qui est versé aux associations.
+ *
+ * **Aucun total, et la raison est dans le texte.** L'obligation de publier ne
+ * porte que sur les conventions au-dessus d'un seuil ; certaines collectivités
+ * publient tout, d'autres s'en tiennent au seuil, et sommer les deux donnerait
+ * un chiffre sous-estimé d'un facteur inconnu. Les lignes, elles, restent
+ * vraies une à une.
+ */
+import type { CollectiviteSubventionne } from '../../modele/fiche-commune.ts';
+import Glose from '../Glose.astro';
+import { montantCourt } from '../../vues/graphiques.ts';
+
+interface Props {
+  liste: CollectiviteSubventionne[];
+  seuil: number | null;
+}
+const { liste, seuil } = Astro.props;
+const entete = (c: CollectiviteSubventionne) => {
+  const [debut, fin] = c.exercices;
+  return (
+    `${c.total.toLocaleString('fr-FR')} subvention${c.total > 1 ? 's' : ''} publiée${c.total > 1 ? 's' : ''}` +
+    (debut && fin ? (debut === fin ? `, ${debut}` : `, ${debut}‑${fin}`) : '') +
+    (c.total > c.liste.length ? `, les ${c.liste.length} plus grosses` : '')
+  );
+};
+// L'objet ne répète pas toujours le nom du bénéficiaire : quand il le fait,
+// l'afficher deux fois ne dit rien de plus.
+const detail = (sv: CollectiviteSubventionne['liste'][number]) => {
+  const memeChose = sv.objet.toLowerCase().includes(sv.qui.toLowerCase().slice(0, 18));
+  return [...(sv.annee ? [sv.annee] : []), ...(sv.objet && !memeChose ? [sv.objet] : [])].join(' · ');
+};
+---
+{liste.map((c, rang) => {
+  const Groupe = rang > 0 ? 'details' : 'div';
+  const Titre = rang > 0 ? 'summary' : 'p';
+  return (
+    <Groupe class="p-marche-acheteur">
+      <Titre class="p-marche-qui">
+        <span class="p-marche-nom"><Glose texte={c.nom} /></span>
+        {c.natureLibelle && <span class="p-marche-nature">{c.natureLibelle}</span>}
+        <span class="p-marche-total">{entete(c)}</span>
+      </Titre>
+      <ul>
+        {c.liste.map((sv) => (
+          <li>
+            <span class="p-marche-montant">{montantCourt(sv.montant)}</span>
+            <span><span class="p-marche-objet">{sv.qui}</span><span class="p-marche-detail">{detail(sv)}</span></span>
+          </li>
+        ))}
+      </ul>
+    </Groupe>
+  );
+})}
+<p class="p-source-territoire">
+  {'D’après les données essentielles des subventions, versées au schéma national. Les montants ne ' +
+    'sont pas additionnés' +
+    (seuil
+      ? ` : l’obligation de publier ne porte que sur les conventions de plus de ${seuil.toLocaleString('fr-FR')} €, ` +
+        'et chaque collectivité choisit d’en publier davantage ou non. Un total serait sous-estimé ' +
+        'd’une part qu’on ne connaît pas'
+      : '') +
+    '. Une collectivité qui n’apparaît pas ici publie ses subventions sur son propre site, sans ' +
+    'les verser en données ouvertes. Les aides versées à une personne ne sont pas reprises.'}
+</p>

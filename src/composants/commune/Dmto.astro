@@ -1,0 +1,59 @@
+---
+/**
+ * Les droits de mutation : ce qu'une vente rapporte, et à qui.
+ *
+ * Ce qu'on appelle « frais de notaire » est pour l'essentiel un impôt, qui va
+ * au département et aux communes ; le notaire le collecte et le reverse. La
+ * page peut trancher sur la part communale parce qu'elle connaît la population.
+ */
+import type { Dmto } from '../../modele/fiche-commune.ts';
+import { debutSerie, variation } from '../../modele/fiche-commune.ts';
+import { evolutionDepuis, montantCourt } from '../../vues/graphiques.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  d: Dmto;
+  dernier: number;
+}
+const { d, dernier } = Astro.props;
+const rangs = [
+  {
+    nom: 'Au département',
+    aide: 'Taxe départementale de publicité foncière et droits départementaux d’enregistrement.',
+    serie: d.departement,
+  },
+  {
+    nom: 'Aux communes du département',
+    aide: 'Taxe communale additionnelle, encaissée pour l’ensemble des communes du département.',
+    serie: d.communes,
+  },
+].filter((r) => r.serie[dernier] !== null && r.serie[dernier] !== undefined);
+---
+<p class="p-strate">
+  {'Les droits de mutation — l’essentiel de ce qu’on appelle « frais de notaire » — sont un ' +
+    `impôt, et le notaire ne fait que le collecter. Recettes de ${d.annees[dernier]}.`}
+</p>
+<dl class="p-reperes">
+  {rangs.map((r) => (
+    <Repere
+      nom={r.nom}
+      aide={r.aide}
+      montant={montantCourt(r.serie[dernier]!)}
+      serie={{ valeurs: r.serie, annees: d.annees, formater: montantCourt }}
+      evolution={evolutionDepuis(variation(r.serie), debutSerie(r.serie, d.annees) ?? d.annees[0])}
+    />
+  ))}
+</dl>
+<p class="p-dmto-part">
+  {d.partDirecte
+    ? 'La commune dépassant 5 000 habitants, la part communale lui revient directement.'
+    : 'La commune comptant 5 000 habitants ou moins, cette part ne lui revient pas ' +
+      'directement : elle alimente un fonds de péréquation départemental, redistribué selon un ' +
+      'barème voté par le conseil départemental. Les stations de tourisme classées font ' +
+      'exception, et le site ne connaît pas ce classement.'}
+</p>
+<p class="p-source-territoire">
+  Recettes mensuelles publiées par la direction générale des finances publiques, totalisées par
+  exercice complet ({d.maj}). Le taux voté par chaque conseil départemental est publié à part : le
+  site n’en recopie pas la table.
+</p>

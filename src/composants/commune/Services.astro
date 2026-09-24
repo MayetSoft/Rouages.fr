@@ -1,0 +1,118 @@
+---
+/**
+ * Où sont les services publics.
+ *
+ * Le reste de la page dit qui décide ; ce bloc dit où l'on va. Deux nuances
+ * changent la démarche et sont donc signalées : une école privée ne relève
+ * pas de la carte scolaire, un hôpital sans urgences ne se présente pas de la
+ * même façon un dimanche soir.
+ */
+import type { Fiche } from '../../modele/territoires.ts';
+import { tendance } from '../../vues/graphiques.ts';
+
+interface Props {
+  services: Fiche['services'];
+  voisines: Fiche['voisines'];
+  sdis: string | null;
+  maj: string | null;
+}
+const { services, voisines, sdis, maj } = Astro.props;
+
+/** L'ordre d'affichage, et le pluriel : « Écoles (1) » est un aveu de gabarit. */
+const LIBELLE_FAMILLE: [string, (n: number) => string][] = [
+  ['ecole', (n) => (n > 1 ? `${n} écoles` : 'Une école')],
+  ['college', (n) => (n > 1 ? `${n} collèges` : 'Un collège')],
+  ['lycee', (n) => (n > 1 ? `${n} lycées` : 'Un lycée')],
+  ['france-services', (n) => (n > 1 ? `${n} France services` : 'Une France services')],
+  ['ccas', () => 'Action sociale'],
+  ['sante', (n) => (n > 1 ? `${n} établissements de santé` : 'Un établissement de santé')],
+  ['point-justice', (n) => (n > 1 ? `${n} points-justice` : 'Un point-justice')],
+];
+/** Ce qu'on signale aussi dans l'intercommunalité, avec l'article qui s'accorde. */
+const VOISINAGE: [string, string, 'un' | 'une'][] = [
+  ['france-services', 'France services', 'une'],
+  ['point-justice', 'Point-justice', 'un'],
+];
+/** Au-delà, la liste d'une famille se replie derrière son décompte : Le Mans compte 87 écoles. */
+const SEUIL_REPLI = 6;
+
+const parFamille = new Map<string, Fiche['services']>();
+for (const s of services) {
+  if (!parFamille.has(s.famille)) parFamille.set(s.famille, []);
+  parFamille.get(s.famille)!.push(s);
+}
+const groupes = LIBELLE_FAMILLE.filter(([f]) => (parFamille.get(f)?.length ?? 0) > 0).map(([f, libelle]) => {
+  const liste = parFamille.get(f)!;
+  return { libelle: libelle(liste.length), liste, replie: liste.length > SEUIL_REPLI };
+});
+const chiffres = (e: NonNullable<Fiche['services'][number]['ecole']>) => {
+  const i = e.classes.reduce<number>((d, v, k) => (v !== null ? k : d), -1);
+  if (i === -1) return null;
+  const classes = e.classes[i]!;
+  const eleves = e.eleves[i];
+  const c = e.dernierChangement;
+  const n = c ? Math.abs(c.ecart) : 0;
+  return {
+    texte:
+      `${classes} classe${classes > 1 ? 's' : ''}` +
+      (eleves !== null && eleves !== undefined ? ` · ${eleves} élèves` : '') +
+      ` en ${e.rentrees[i]}`,
+    changement: c ? `${c.ecart < 0 ? '−' : '+'}${n} classe${n > 1 ? 's' : ''} à la rentrée ${c.rentree}` : null,
+    classeChangement: c ? `p-ecole-changement p-ecole-changement--${c.ecart < 0 ? 'moins' : 'plus'}` : '',
+    courbe: tendance(e.eleves, e.rentrees),
+  };
+};
+// Le nom de commune après un deux-points plutôt qu'après une préposition :
+// « à Le Lude » n'existe pas en français.
+const voisins = VOISINAGE.flatMap(([famille, libelle, article]) => {
+  const v = voisines[famille];
+  if (!v || parFamille.has(famille) || v.n === 0) return [];
+  const ou = v.l.length > 0
+    ? `Dans son intercommunalité : ${v.l.join(', ')}.`
+    : `${v.n} communes de son intercommunalité en accueillent ${article}.`;
+  return [{ libelle, texte: `${article === 'une' ? 'aucune' : 'aucun'} dans la commune. ${ou}` }];
+});
+---
+{groupes.map((g) => {
+  const Groupe = g.replie ? 'details' : 'div';
+  const Titre = g.replie ? 'summary' : 'span';
+  return (
+    <Groupe class="p-service-groupe">
+      <Titre class="p-service-famille">{g.libelle}</Titre>
+      <ul>
+        {g.liste.map((e) => {
+          const ch = e.ecole ? chiffres(e.ecole) : null;
+          return (
+            <li>
+              <span class="p-service-nom">{e.nom}</span>
+              {e.prive && <span class="p-service-note">privé</span>}
+              {e.urgences && <span class="p-service-note p-service-note--fort">urgences</span>}
+              {ch && (
+                <span class="p-ecole">
+                  <span class="p-ecole-chiffres">{ch.texte}</span>
+                  {ch.changement && <span class={ch.classeChangement}>{ch.changement}</span>}
+                  {ch.courbe && <Fragment set:html={ch.courbe} />}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </Groupe>
+  );
+})}
+{voisins.map((v) => (
+  <p class="p-service-voisin"><span class="p-service-famille">{v.libelle}</span><span>{v.texte}</span></p>
+))}
+{sdis && (
+  <p class="p-source-territoire">
+    {`Secours : ${sdis}. Les centres de secours ne sont pas publiés en open data national — seuls ` +
+      'les états-majors départementaux le sont, le site ne situe donc pas la caserne la plus proche.'}
+  </p>
+)}
+<p class="p-source-territoire">
+  {'D’après l’Annuaire de l’administration, l’Annuaire de l’éducation et le répertoire FINESS' +
+    (maj ? ` (${maj})` : '') +
+    '. Les effectifs et le nombre de classes viennent du recensement annuel des écoles du ' +
+    'premier degré : les collèges et lycées n’y figurent pas.'}
+</p>

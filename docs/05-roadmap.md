@@ -2140,6 +2140,66 @@ place les fichiers de l'ingestion précédente, datés, plutôt que de tout
 emporter. Restent fatals les référentiels dont dépend la structure du réseau,
 BANATIC et le découpage : sans eux il n'y a rien à écrire.
 
+### Une seule fiche par commune, et la carte rendue à ce qu'elle sait faire ✔
+
+La page d'une commune renvoyait vers la carte pour « les comptes, les marchés
+publics, les droits de mutation et les courbes ». Deux programmes décrivaient
+donc la même commune — l'un au build, l'autre dans le navigateur — et ils
+avaient dérivé&nbsp;: la faute d'accord sur « une carte communale, approuvé »,
+corrigée sur la page, restait dans le panneau&nbsp;; le plan intercommunal
+approuvé en janvier, ajouté à la page, n'avait jamais atteint le panneau. Sur
+trois communes témoins, **59 %** seulement des faits chiffrés du panneau se
+retrouvaient sur la page.
+
+La page est maintenant **la seule source**. Les assemblages du panneau ont été
+repris tels quels dans `src/modele/fiche-commune.ts`, qui lit les mêmes
+fichiers depuis le disque&nbsp;; chaque bloc a son composant sous
+`src/composants/commune/`, avec les textes et les classes du panneau. Là où les
+deux versions différaient, la plus complète l'a emporté&nbsp;: la liste entière
+des équipements plutôt que les huit premiers, la médiane des ordures ménagères
+et le foncier non bâti, la série annuelle des logements autorisés, la mention
+des urgences — et **« −1 classe à la rentrée 2021 »** pour l'école Yves Duteil,
+que la page ne disait pas. Mesuré au navigateur sur Le Mayet-de-Montagne,
+Vichy et Quimper&nbsp;: **863 faits chiffrés du panneau sur
+863** sont sur la page. Un sommaire de pastilles y conduit bloc par bloc.
+
+La carte ne garde que ce qu'elle est seule à savoir faire&nbsp;: dire, sur
+chaque compétence, qui l'exerce ici — et le prix de l'eau sur l'eau potable.
+Le reste du panneau est un lien vers la page.
+
+| | Avant | Après |
+| --- | --- | --- |
+| Fichiers chargés par la carte pour une commune | 19 | 4 |
+| Poids d’une visite de la carte, Le Mayet-de-Montagne | 826 Ko (mesure précédente) | 431 Ko |
+| `explorateur.ts` / `territoire.ts` | 3 425 / 2 017 lignes | 1 274 / 260 lignes |
+| Page d'une commune, médiane | 19 Ko | 65 Ko (14 Ko compressée) |
+| `dist/` complet | 889 Mo (dernière mesure) | 2,4 Go, 77 406 fichiers |
+| Durée du build complet | 2 min 47 | 6 min |
+
+**Le coût est réel et il est là**&nbsp;: ce que la page gagne se multiplie par
+34 875. Deux économies sans perte ont été faites — la réglette dessinée en CSS
+plutôt qu'en SVG (−5 Ko par page), la suite des marchés laissée dans son
+fichier et chargée à la demande. L'assemblage des données coûte 0,2 ms par
+commune&nbsp;: la durée du build suit le volume de HTML écrit, pas le calcul.
+Si l'envoi FTPS s'en ressent, le premier gisement est connu — les comptes du
+département et de la région, 6,5 Ko identiques sur chaque page d'un même
+département, qui trouveraient leur place sur la page du département.
+
+**Une commune se trouve depuis n'importe quelle page.** Le champ de l'en-tête
+cherche par nom ou par code postal, avec le classement que
+`verifier-recherche` garantit, et mène à la page. L'index national n'est
+téléchargé qu'à la première frappe. Sans JavaScript, le champ est remplacé par
+un lien vers `/communes`, qui liste les départements, puis les communes de
+chacun — un chemin de liens que les moteurs suivent aussi, déclaré au plan du
+site.
+
+**Une année impossible, attrapée en relisant Quimper.** Quimper Bretagne
+Occidentale publie trois conventions de subvention dont la date se lit
+« 1735 » et dont l'objet dit 2025&nbsp;; le panneau affichait « 90 subventions
+publiées, 1735-2024 ». L'ingestion refuse désormais une année hors de
+2000 → l'an prochain (`src/modele/annees.ts`), et la page la tait dans les
+fichiers déjà produits.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

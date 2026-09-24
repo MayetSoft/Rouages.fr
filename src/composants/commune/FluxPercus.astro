@@ -1,0 +1,42 @@
+---
+/**
+ * Ce que perçoit l'intercommunalité.
+ *
+ * La taxe d'enlèvement des ordures ménagères et le versement mobilité ne sont
+ * presque jamais dans les comptes communaux : c'est le groupement qui les
+ * perçoit. La structure est nommée — « votre intercommunalité » ne dit pas à
+ * qui écrire.
+ */
+import type { FluxPercu } from '../../modele/fiche-commune.ts';
+import { debutSerie } from '../../modele/fiche-commune.ts';
+import Glose from '../Glose.astro';
+import { euros, evolutionDepuis } from '../../vues/graphiques.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  liste: FluxPercu[];
+  annees: number[];
+}
+const { liste, annees } = Astro.props;
+---
+<p class="p-strate">
+  Par habitant, et rapporté aux seules intercommunalités qui perçoivent : y compter les autres
+  pour zéro ferait passer un taux ordinaire pour une anomalie.
+</p>
+<dl class="p-reperes">
+  {liste.map((f) => (
+    <Repere
+      nom={f.nom}
+      aide={f.explication}
+      montant={euros(f.valeur)}
+      compare={f.mediane !== null ? { valeur: f.valeur, mediane: f.mediane, reference: 'la médiane de celles qui perçoivent' } : null}
+      mediane={f.mediane !== null && f.mediane > 0
+        ? `médiane ${euros(f.mediane)}, sur ${f.percepteurs.toLocaleString('fr-FR')} intercommunalités`
+        : null}
+      serie={{ valeurs: f.serie, annees }}
+      evolution={evolutionDepuis(f.evolution, debutSerie(f.serie, annees) ?? annees[0])}
+    >
+      <span class="p-percepteur" slot="sous-nom"><Glose texte={`${f.structure} — ${f.natureLibelle}`} /></span>
+    </Repere>
+  ))}
+</dl>

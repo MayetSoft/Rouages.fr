@@ -35,6 +35,7 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { nommeUnePersonne } from '../src/modele/civilites.ts';
 import { debutFenetre, GENRES, type Evenement } from '../src/modele/journal.ts';
+import { anneePlausible } from '../src/modele/annees.ts';
 import { lireCsvOuvert, ressourcesDuSchema } from './donnees-ouvertes.ts';
 
 /** Combien de subventions le fichier du département porte, par collectivité. */
@@ -167,8 +168,13 @@ export async function collecterSubventions(
       // L'année de la convention : le schéma ne porte pas d'exercice, et la
       // date est écrite tantôt en ISO, tantôt à la française.
       const date = champ(l, 'dateconvention');
-      const annee = /(\d{4})/.exec(date)?.[1] ?? '';
-      if (!annee) continue;
+      const lue = /(\d{4})/.exec(date)?.[1] ?? '';
+      if (!lue) continue;
+      // Une date illisible donne des années impossibles : Quimper Bretagne
+      // Occidentale publiait trois conventions « de 1735 » dont l'objet dit
+      // 2025. La ligne reste — la convention existe —, l'année non : on ne
+      // publie pas un chiffre qu'on sait faux.
+      const annee = anneePlausible(lue) ? lue : '';
 
       let m = brut.get(siren);
       if (!m) {
@@ -198,7 +204,9 @@ export async function collecterSubventions(
       }
       totaux.set(siren, (totaux.get(siren) ?? 0) + 1);
       const bornes = exercices.get(siren);
-      if (!bornes) exercices.set(siren, [annee, annee]);
+      if (!annee) {
+        // Rien à borner.
+      } else if (!bornes) exercices.set(siren, [annee, annee]);
       else {
         if (annee < bornes[0]) bornes[0] = annee;
         if (annee > bornes[1]) bornes[1] = annee;

@@ -8,10 +8,14 @@
 import type { APIRoute } from 'astro';
 import { construireReseau } from '../modele/reseau.ts';
 import { plan } from '../modele/sitemap.ts';
+import { communes } from '../modele/territoires.ts';
 
 export const GET: APIRoute = ({ site }) => {
   const base = site?.href.replace(/\/$/, '') ?? 'https://rouages.fr';
-  const fixes = ['/', '/etat', '/glossaire', '/methode', '/signaler'];
+  const fixes = ['/', '/etat', '/glossaire', '/methode', '/signaler', '/communes'];
+  // Une liste par département : c'est par elles qu'un moteur suit le chemin
+  // jusqu'aux communes, en plus de leurs propres plans.
+  const departements = [...new Set(communes().map((c) => c.dep))].map((d) => `/communes/${d}`);
   const noeuds = construireReseau().noeuds.map((n) => `/n/${n.id}`);
-  return plan(base, [...fixes, ...noeuds]);
+  return plan(base, [...fixes, ...departements, ...noeuds]);
 };

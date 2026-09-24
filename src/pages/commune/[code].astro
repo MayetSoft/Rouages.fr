@@ -2,21 +2,19 @@
 /**
  * La page d'une commune.
  *
- * Jusqu'ici, la partie la plus riche du site — qui exerce quoi chez vous, qui
- * est le maire, ce que sont devenues les écoles — n'existait que derrière
- * `?commune=03165`, en JavaScript. Elle n'avait donc pas d'adresse : on ne
- * pouvait ni la partager, ni l'indexer, ni la lire sans script. Pour un site
- * qui veut centraliser l'information sur le fonctionnement des institutions,
- * c'était le manque le plus coûteux.
+ * Tout ce que le site sait d'une commune est ici, et seulement ici. Le panneau
+ * de la carte en portait longtemps davantage — les comptes, l'élection, les
+ * marchés, les délibérations, les associations — pendant que la page renvoyait
+ * vers lui. Deux programmes décrivaient la même commune, et ils avaient dérivé :
+ * une faute d'accord corrigée ici restait là-bas, un document d'urbanisme
+ * ajouté ici n'y arrivait jamais. La carte montre maintenant qui exerce chaque
+ * compétence, là où la question se pose, et conduit ici pour le reste.
  *
- * Cette page est le socle : ce que le site peut affirmer d'une commune sans
- * rien exécuter. La carte reste l'endroit où l'on explore ; ici on arrive, on
- * lit, on repart avec un nom et un lien.
- *
- * Elle ne reprend pas tout — ni les marchés, ni les courbes de finances, ni les
- * droits de mutation : ce sont des lectures, pas des réponses, et la carte les
- * porte déjà. Multiplier leur poids par 34 875 pages coûterait cher pour ce
- * qu'un lecteur venu par un moteur cherche vraiment : qui décide ici.
+ * Le poids a été le seul argument contre, parce que ce qu'on ajoute se
+ * multiplie par 34 875 pages. Il se mesure plutôt qu'il ne s'estime : les
+ * courbes sont des SVG de quelques centaines d'octets, les listes sont bornées
+ * à ce que le panneau montrait déjà, et la suite des marchés reste dans son
+ * propre fichier, chargé à la demande.
  */
 import Base from '../../layouts/Base.astro';
 import { construireReseau } from '../../modele/reseau.ts';
@@ -25,6 +23,24 @@ import type { Verdict } from '../../modele/verdict.ts';
 import { urlSignaler } from '../../modele/signalement.ts';
 import Glose from '../../composants/Glose.astro';
 import { ARTICLE_DOCUMENT, enFrancais, NOM_DOCUMENT } from '../../modele/urbanisme.ts';
+import { complementsFiche } from '../../modele/fiche-commune.ts';
+import { moisAnnee } from '../../vues/graphiques.ts';
+import Habitants from '../../composants/commune/Habitants.astro';
+import Scrutin from '../../composants/commune/Scrutin.astro';
+import Conseil from '../../composants/commune/Conseil.astro';
+import Comptes from '../../composants/commune/Comptes.astro';
+import FluxPercus from '../../composants/commune/FluxPercus.astro';
+import Echelons from '../../composants/commune/Echelons.astro';
+import Dmto from '../../composants/commune/Dmto.astro';
+import Sru from '../../composants/commune/Sru.astro';
+import Marches from '../../composants/commune/Marches.astro';
+import Deliberations from '../../composants/commune/Deliberations.astro';
+import Subventions from '../../composants/commune/Subventions.astro';
+import Associations from '../../composants/commune/Associations.astro';
+import Fiscalite from '../../composants/commune/Fiscalite.astro';
+import Logements from '../../composants/commune/Logements.astro';
+import Equipements from '../../composants/commune/Equipements.astro';
+import Services from '../../composants/commune/Services.astro';
 
 export function getStaticPaths() {
   // `ROUAGES_DEPS` restreint la génération à quelques départements : engendrer
@@ -45,6 +61,7 @@ const resolubles = reseau.noeuds
   .filter((n) => n.banatic && n.banatic.length > 0)
   .map((n) => ({ id: n.id, banatic: n.banatic! }));
 const fiche = ficheCommune(commune, resolubles);
+const plus = complementsFiche(commune, commune.population, fiche?.structures ?? []);
 
 const nomDe = new Map(reseau.noeuds.map((n) => [n.id, n]));
 /**
@@ -92,38 +109,6 @@ const lignes = fiche
       .sort((a, b) => a.noeud.nom.localeCompare(b.noeud.nom, 'fr'))
   : [];
 
-const LIBELLE_FAMILLE: Record<string, string> = {
-  ecole: 'Écoles',
-  college: 'Collèges',
-  lycee: 'Lycées',
-  'france-services': 'France services',
-  ccas: 'Action sociale',
-  sante: 'Santé',
-  'point-justice': 'Points-justice',
-};
-/**
- * Le chiffre d'une école, calculé ici plutôt que dans le gabarit : la dernière
- * rentrée renseignée demande un parcours de la série, et une expression de ce
- * genre au milieu du balisage se relit mal.
- */
-function chiffresEcole(e?: { classes: (number | null)[]; eleves: (number | null)[]; rentrees: number[] }) {
-  if (!e) return null;
-  const i = e.classes.reduce<number>((k, v, j) => (v !== null ? j : k), -1);
-  if (i === -1) return null;
-  const classes = e.classes[i]!;
-  const eleves = e.eleves[i];
-  return (
-    `${classes} classe${classes > 1 ? 's' : ''}` +
-    (eleves !== null && eleves !== undefined ? ` · ${eleves} élèves` : '') +
-    ` en ${e.rentrees[i]}`
-  );
-}
-
-interface ServiceAffiche {
-  nom: string;
-  prive: boolean;
-  chiffres: string | null;
-}
 /**
  * Qui écrit la règle de ce qui peut se construire, en une phrase.
  *
@@ -165,40 +150,17 @@ const phraseUrbanisme = !urb
         );
       })();
 
-/**
- * Ce qu'on trouve sur place, et ce pour quoi il faut partir.
- *
- * Les absences sont bornées : une commune de deux cents habitants en compte
- * vingt-six, et une phrase de vingt-six éléments ne se lit pas. Le panneau,
- * lui, les donne toutes — il a la place d'une liste.
- */
-const ABSENTS_MONTRES = 10;
 const equ = fiche?.equipements ?? null;
-
-/** Ce qui est prélevé ici, et par qui. */
 const fisc = fiche?.fiscalite ?? null;
-const pourCent = (v: number) =>
-  `${v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %`;
-
-/** Ce qui sort du plan : autorisé, commencé, et la part des maisons. */
 const log = fiche?.logements ?? null;
-const dixieme = (v: number) =>
-  v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-
-const parFamille = new Map<string, ServiceAffiche[]>();
-for (const s of fiche?.services ?? []) {
-  if (!parFamille.has(s.famille)) parFamille.set(s.famille, []);
-  parFamille.get(s.famille)!.push({ nom: s.nom, prive: s.prive, chiffres: chiffresEcole(s.ecole) });
-}
 
 /**
  * Ce qui a bougé, en six lignes.
  *
- * Six et non douze, pour la raison qui écarte déjà les marchés et les courbes
- * de cette page : ce qu'on y ajoute se multiplie par 34 875. La section pèse
+ * Six et non douze : ce qu'on ajoute à cette page se multiplie par 34 875,
+ * et la suite est dans le flux. La section pèse
  * alors deux kilo-octets au lieu de quatre, soit soixante-dix méga-octets de
- * moins sur le site entier — et la suite est dans le flux, vers lequel elle
- * conduit.
+ * moins sur le site entier.
  */
 const journal = journalCommune(commune, 6);
 
@@ -206,16 +168,56 @@ const region = meta?.regions?.[commune.dep];
 const titre = `${commune.nom} — qui décide quoi`;
 const description = fiche
   ? `Qui exerce chaque compétence à ${commune.nom} (${commune.cp}) : intercommunalité, ` +
-    `syndicats, commune. Écoles, services publics et interlocuteurs, avec leurs sources.`
+    `syndicats, commune. Comptes, élection, marchés publics, écoles et services, avec leurs sources.`
   : `${commune.nom} (${commune.cp})`;
 
-/** « 2026-03-20 » devient « mars 2026 ». */
-function moisAnnee(iso: string): string | null {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime())
-    ? null
-    : d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-}
+/**
+ * Les droits de mutation : le dernier exercice que le département renseigne.
+ * Sans lui, le bloc n'a rien à dire.
+ */
+const dmtoDernier = plus.dmto
+  ? plus.dmto.departement.reduce<number>((k, v, i) => (v !== null ? i : k), -1)
+  : -1;
+
+/**
+ * En Alsace-Moselle, une association ne se déclare pas en préfecture : elle
+ * s'inscrit au registre tenu par le greffe du tribunal judiciaire. Le
+ * répertoire national n'y sait rien, et le dire vaut mieux qu'un bloc absent.
+ */
+const DROIT_LOCAL = new Set(['57', '67', '68']);
+const droitLocal = DROIT_LOCAL.has(commune.dep) && !(plus.associations && plus.associations.total > 0);
+
+/**
+ * Le sommaire : la page d'une grande commune dépasse les dix écrans, et rien
+ * ne disait ce qui restait à venir. L'étiquette n'est pas le titre du bloc :
+ * « Une vente immobilière » tient dans une pastille, « Ce que rapporte une
+ * vente immobilière » non.
+ */
+const echelonsMontres = plus.comptesEchelons.some((c) => c.reperes.some((r) => r.valeur !== null));
+const sommaire: [string, string, unknown][] = [
+  ['habitants', 'Les habitants', plus.histoire],
+  ['election', 'L’élection', plus.scrutin],
+  ['conseil', 'Le conseil', fiche?.conseil && fiche.conseil.elus > 0],
+  ['qui-exerce', 'Qui exerce quoi', lignes.length > 0],
+  ['comptes', 'Ses comptes', plus.finances],
+  ['preleve', 'Ce qui est prélevé ici', fiche?.fiscalite],
+  ['intercommunalite', 'L’intercommunalité', plus.fluxPercus.length > 0],
+  ['echelons', 'Les échelons', echelonsMontres],
+  ['vente', 'Une vente immobilière', dmtoDernier >= 0],
+  ['urbanisme', 'Ce qui peut s’y construire', fiche?.urbanisme],
+  ['construit', 'Ce qui s’y construit', fiche?.logements],
+  ['risques', 'Les risques', fiche?.risques && (fiche.risques.recenses.length > 0 || fiche.risques.catnat.length > 0)],
+  ['logement-social', 'Le logement social', plus.sru],
+  ['marches', 'Les marchés', plus.marches.length > 0],
+  ['deliberations', 'Les délibérations', plus.deliberations.length > 0],
+  ['subventions', 'Les subventions', plus.subventions.length > 0],
+  ['associations', 'Les associations', (plus.associations && plus.associations.total > 0) || droitLocal],
+  ['equipements', 'Ce qu’on trouve sur place', fiche?.equipements],
+  ['services', 'Les services', (fiche?.services.length ?? 0) > 0],
+  ['journal', 'Ce qui a bougé', journal.length > 0],
+];
+const entrees = sommaire.filter(([, , present]) => !!present);
+const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
 ---
 
 <Base
@@ -230,15 +232,6 @@ function moisAnnee(iso: string): string | null {
       {commune.population.toLocaleString('fr-FR')} habitants · code postal {commune.cp} ·
       code INSEE {commune.code}
     </p>
-    {fiche?.sommet && fiche.sommet.ecart < 0 && (
-      <p class="c-sommet">
-        La commune a compté jusqu’à <strong>{fiche.sommet.valeur.toLocaleString('fr-FR')} habitants
-        en {fiche.sommet.annee}</strong> — elle en a {Math.abs(fiche.sommet.ecart)} % de moins
-        aujourd’hui. Tous les montants de cette page étant rapportés à l’habitant, c’est ce
-        dénominateur-là qui bouge sous eux.
-      </p>
-    )}
-
     {!fiche && (
       <p class="c-vide">
         Les données territoriales de cette commune n’ont pas pu être assemblées.
@@ -256,46 +249,59 @@ function moisAnnee(iso: string): string | null {
       </p>
     )}
 
-    {fiche?.conseil && fiche.conseil.sieges > 0 && (
-      <p class="c-conseil">
-        <strong>{fiche.conseil.sieges} sièges</strong> au conseil municipal{fiche.conseil.siegesCc > 0 && (
-          <>{', et '}<strong>{fiche.conseil.siegesCc}</strong>{' au conseil '}{fiche.conseil.ou
-            ? <Glose texte={`de ${fiche.conseil.ou}`} />
-            : <>communautaire</>}</>
-        )}.{' '}
-        <span class="c-conseil-source">D’après les résultats des {fiche.conseil.scrutin}.</span>
-        {fiche.conseil.elus > 0 && (
-          <span class="c-conseil-compo">
-            {'Le conseil compte aujourd’hui '}<strong>{fiche.conseil.elus} élus</strong>{
-              fiche.conseil.elus < fiche.conseil.sieges
-                ? ` — ${fiche.conseil.sieges - fiche.conseil.elus} siège${fiche.conseil.sieges - fiche.conseil.elus > 1 ? 's' : ''} vacant${fiche.conseil.sieges - fiche.conseil.elus > 1 ? 's' : ''}`
-                : ''
-            }{', dont '}<strong>{Math.round((fiche.conseil.femmes / fiche.conseil.elus) * 100)} % de femmes</strong>{
-              ` (contre ${fiche.conseil.femmesPartout.toLocaleString('fr-FR')} % dans l’ensemble des conseils), d’un âge médian de `
-            }<strong>{fiche.conseil.ageMedian} ans</strong>{` (contre ${fiche.conseil.agePartout}).`}
-            {fiche.conseil.ageMax > fiche.conseil.ageMin && (
-              <>{` Du plus jeune, ${fiche.conseil.ageMin} ans, au plus âgé, ${fiche.conseil.ageMax} ans.`}</>
-            )}
-            {fiche.conseil.groupes.length > 0 && (
-              <>{' Par groupe socioprofessionnel : '}{fiche.conseil.groupes
-                .map((g) => `${g.nombre} ${g.nom.toLowerCase()}`)
-                .join(', ')}.</>
-            )}
-          </span>
-        )}
-        {fiche.conseil.designes && fiche.conseil.ou && (
-          <span class="c-conseil-designes">
-            Au conseil de <Glose texte={fiche.conseil.ou} />, la commune n’élit pas ses
-            représentants&nbsp;: sous mille habitants, ce sont les conseillers municipaux pris
-            dans l’ordre du tableau — le maire, puis les adjoints (article L273-11 du code
-            électoral). Le résultat du scrutin ne les nomme donc pas.
-          </span>
-        )}
+    {fiche?.maire && (
+      <p class="p-source-territoire c-maire-source">
+        Le maire vient du répertoire national des élus ({fiche.maire.maj}).
       </p>
     )}
 
+    {entrees.length > 1 && (
+      <nav class="p-sommaire c-sommaire" aria-label="Les blocs de cette commune">
+        {entrees.map(([id, etiquette]) => <a class="p-sommaire-lien" href={`#${id}`}>{etiquette}</a>)}
+      </nav>
+    )}
+
+    {plus.histoire && (
+      <section id="habitants" class="p-habitants">
+        <h2 class="badge">Combien d’habitants</h2>
+        <Habitants h={plus.histoire} />
+      </section>
+    )}
+
+    {plus.scrutin && (
+      <section id="election" class="p-scrutin">
+        <h2 class="badge">{`Comment le conseil a été élu — ${plus.scrutin.nom}`}</h2>
+        <Scrutin sc={plus.scrutin}>
+          {fiche?.conseil && fiche.conseil.sieges > 0 && (
+            <p class="p-scrutin-sieges">
+              {`${fiche.conseil.sieges} sièges au conseil municipal`}{fiche.conseil.siegesCc > 0 && (
+                <>{`, ${fiche.conseil.siegesCc} au conseil `}{fiche.conseil.ou
+                  ? <Glose texte={`de ${fiche.conseil.ou}`} />
+                  : <>communautaire</>}</>
+              )}.
+            </p>
+          )}
+          {fiche?.conseil?.designes && fiche.conseil.ou && (
+            <p class="p-scrutin-designes">
+              Au conseil de <Glose texte={fiche.conseil.ou} />, la commune n’élit pas ses
+              représentants&nbsp;: sous mille habitants, ce sont les conseillers municipaux pris
+              dans l’ordre du tableau — le maire, puis les adjoints (article L273-11 du code
+              électoral). Le résultat du scrutin ne les nomme donc pas.
+            </p>
+          )}
+        </Scrutin>
+      </section>
+    )}
+
+    {fiche?.conseil && fiche.conseil.elus > 0 && (
+      <section id="conseil" class="p-conseil">
+        <h2 class="badge">De quoi le conseil est fait</h2>
+        <Conseil k={fiche.conseil} />
+      </section>
+    )}
+
     {fiche && fiche.structures.length > 0 && (
-      <section>
+      <section id="qui-exerce">
         <h2 class="badge">Les structures dont elle dépend</h2>
         <ul class="c-structures">
           {fiche.structures.map((s) => (
@@ -319,6 +325,19 @@ function moisAnnee(iso: string): string | null {
                 <span class={`c-verdict c-verdict--${l.dit.etat}`}><Glose texte={l.dit.qui} /></span>
                 {l.dit.incise && <span class="c-incise">{l.dit.incise}</span>}
                 {l.reserve && <span class="c-reserve">{l.reserve}</span>}
+                {eau && eau.competence === l.noeud.id && (
+                  // Le prix de l'eau n'a de sens qu'attaché au service qui la
+                  // distribue : c'est le même mètre cube, mais ni le même
+                  // exploitant ni le même tarif d'une commune à l'autre.
+                  <span class="p-prix-eau">
+                    <span class="p-prix">{`${eau.prix!.toLocaleString('fr-FR')} € / m³`}</span>
+                    <span class="p-prix-detail">
+                      {`TTC en ${eau.annee}, pour 120 m³ · médiane nationale ${eau.median?.toLocaleString('fr-FR')} €` +
+                        (eau.gestion ? ` · ${eau.gestion.toLowerCase()}` : '') +
+                        (eau.operateur ? ` (${eau.operateur})` : '')}
+                    </span>
+                  </span>
+                )}
               </dd>
             </div>
           ))}
@@ -330,48 +349,43 @@ function moisAnnee(iso: string): string | null {
       </section>
     )}
 
+    {plus.finances && (
+      <section id="comptes" class="p-finances">
+        <h2 class="badge">{`Ses comptes, en ${plus.finances.annee}`}</h2>
+        <Comptes f={plus.finances} />
+      </section>
+    )}
+
     {fisc && (
-      <section>
+      <section id="preleve" class="p-fiscalite">
         <h2 class="badge">Ce qui est prélevé ici</h2>
-        <p class="c-fiscalite">
-          {`Taxe foncière sur le bâti ${fisc.millesime} : `}
-          <strong>{pourCent(fisc.fbTotal)}</strong>
-          {` — médiane des communes ${pourCent(fisc.medianeFb)}. Ce taux additionne ` +
-            fisc.fb.map((p) => `${pourCent(p.taux)} (${p.nom.toLowerCase()})`).join(', ') +
-            '.'}
-          <span class="c-fiscalite-suite">
-            {(fisc.omTaux > 0 && fisc.omQui
-              ? `Ordures ménagères : ${pourCent(fisc.omTaux)}, perçus par ${fisc.omQui}. `
-              : 'Aucune taxe d’enlèvement des ordures ménagères : le service est financé par une ' +
-                'redevance ou sur le budget général. ') +
-              (fisc.thTotal > 0
-                ? `Résidences secondaires : ${pourCent(fisc.thTotal)} de taxe d’habitation, dont ` +
-                  `${pourCent(fisc.thCommune)} pour la commune` +
-                  (fisc.majoration > 0
-                    ? `, majorés de ${fisc.majoration.toLocaleString('fr-FR')} %`
-                    : '') +
-                  '. '
-                : '') +
-              (fisc.cfeGroupement > 0
-                ? `Entreprises : ${pourCent(fisc.cfeGroupement)} de cotisation foncière, votés par ` +
-                  'l’intercommunalité.'
-                : fisc.cfeCommune > 0
-                  ? `Entreprises : ${pourCent(fisc.cfeCommune)} de cotisation foncière, votés par ` +
-                    'le conseil municipal.'
-                  : '')}
-          </span>
-          <span class="c-fiscalite-source">
-            {`D’après le recensement des éléments d’imposition de la DGFiP, millésime ` +
-              `${fisc.millesime} (${fisc.maj}). Le taux communal de taxe foncière a absorbé en ` +
-              '2021 l’ancienne part départementale. Le montant dû dépend aussi de la valeur ' +
-              'locative du bien, que ce site ne connaît pas.'}
-          </span>
-        </p>
+        <Fiscalite f={fisc} />
+      </section>
+    )}
+
+    {plus.fluxPercus.length > 0 && (
+      <section id="intercommunalite" class="p-finances p-flux-percus">
+        <h2 class="badge">Ce que perçoit l’intercommunalité</h2>
+        <FluxPercus liste={plus.fluxPercus} annees={plus.anneesFlux} />
+      </section>
+    )}
+
+    {echelonsMontres && (
+      <section id="echelons" class="p-finances p-echelons">
+        <h2 class="badge">Les comptes des échelons au-dessus</h2>
+        <Echelons comptes={plus.comptesEchelons} maj={plus.echelonsMaj} />
+      </section>
+    )}
+
+    {plus.dmto && dmtoDernier >= 0 && (
+      <section id="vente" class="p-finances p-dmto">
+        <h2 class="badge">Ce que rapporte une vente immobilière</h2>
+        <Dmto d={plus.dmto} dernier={dmtoDernier} />
       </section>
     )}
 
     {urb && (
-      <section>
+      <section id="urbanisme">
         <h2 class="badge">Ce qui peut s’y construire</h2>
         <p class="c-urbanisme">{phraseUrbanisme}</p>
         {urb.enCours && (
@@ -414,27 +428,6 @@ function moisAnnee(iso: string): string | null {
               `intercommunale (${Math.round((urb.intercommunalesPartout / urb.totalPartout) * 100)} %).`}
           </p>
         )}
-        {log && (
-          <p class="c-logements">
-            {`En ${log.annees.length} ans, de ${log.annees[0]} à ${log.annees[log.annees.length - 1]}, `}
-            <strong>{`${log.autorises.toLocaleString('fr-FR')} logement${log.autorises > 1 ? 's' : ''} autorisé${log.autorises > 1 ? 's' : ''}`}</strong>
-            {` — ${dixieme(log.taux)} pour 1 000 habitants, contre ${dixieme(log.medianeTaux)} à la ` +
-              'médiane des communes. ' +
-              (log.commences === 0
-                ? 'Aucun n’a été commencé.'
-                : `${log.commences.toLocaleString('fr-FR')} ${log.commences > 1 ? 'ont' : 'a'} ` +
-                  `été commencé${log.commences > 1 ? 's' : ''}.`) +
-              (log.autorises === 0 || log.individuels === 0
-                ? ''
-                : ` ${log.individuels.toLocaleString('fr-FR')} des autorisations ` +
-                  `${log.individuels > 1 ? 'portent' : 'porte'} sur une maison individuelle.`)}
-            <span class="c-logements-source">
-              {`D’après Sitadel (${log.maj}), arrêté à ${moisAnnee(log.arrete) ?? log.arrete}. Ce ` +
-                'sont des logements et non des permis, en date de prise en compte de ' +
-                'l’autorisation et non de signature.'}
-            </span>
-          </p>
-        )}
         <p class="p-source-territoire">
           {`D’après l’enquête annuelle SuDocUH du ministère chargé de l’urbanisme (${urb.maj})` +
             (urb.jusquau
@@ -451,74 +444,15 @@ function moisAnnee(iso: string): string | null {
       </section>
     )}
 
-    {equ && (
-      <section>
-        <h2 class="badge">Ce qu’on trouve sur place</h2>
-        <p class="c-equipements">
-          <strong>{`${equ.proximite} des ${equ.proximiteTotal} équipements de proximité`}</strong>
-          {` que recense l’INSEE en ${equ.millesime} — médiane des communes : ` +
-            `${equ.medianeProximite}. Les plus nombreux : ` +
-            equ.principaux
-              .map((x) => `${x.nom} (${x.nombre.toLocaleString('fr-FR')})`)
-              .join(', ') + '.'}
-          {equ.absents.length > 0 && (
-            <span class="c-equipements-absents">
-              {'Absents de la gamme de proximité : ' +
-                equ.absents
-                  .slice(0, ABSENTS_MONTRES)
-                  .map((n) => n.replace(/, ([^,]*)$/, ' ou $1'))
-                  .join(' ; ') +
-                (equ.absents.length > ABSENTS_MONTRES
-                  ? `, et ${equ.absents.length - ABSENTS_MONTRES} autres.`
-                  : '.')}
-            </span>
-          )}
-          <span class="c-equipements-source">
-            {`D’après la base permanente des équipements (${equ.maj}). La gamme de proximité est ` +
-              'celle que l’INSEE publie, non une liste établie ici ; ce sont des équipements ' +
-              'ouverts au public, marchands compris. Une commune sans équipement n’est pas une ' +
-              'commune sans accès : le bourg voisin est parfois à trois kilomètres.'}
-          </span>
-        </p>
-      </section>
-    )}
-
-    {parFamille.size > 0 && (
-      <section>
-        <h2 class="badge">Les services publics sur place</h2>
-        {[...parFamille].map(([famille, liste]) => (
-          <div class="c-famille">
-            <h3>{LIBELLE_FAMILLE[famille] ?? famille}</h3>
-            <ul>
-              {liste.map((s) => (
-                <li>
-                  {s.nom}
-                  {s.prive && <span class="p-service-note">privé</span>}
-                  {s.chiffres && <span class="p-ecole-chiffres">{s.chiffres}</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-        {Object.entries(fiche?.voisines ?? {}).map(([famille, v]) => (
-          !parFamille.has(famille) && (
-            <p class="p-service-voisin">
-              <span class="p-service-famille">{LIBELLE_FAMILLE[famille] ?? famille}</span>
-              <span>
-                aucun dans la commune.{' '}
-                {v.l.length > 0
-                  ? `Dans son intercommunalité : ${v.l.join(', ')}.`
-                  : `${v.n} communes de son intercommunalité en accueillent un.`}
-              </span>
-            </p>
-          )
-        ))}
-        {fiche?.sdis && <p class="p-source-territoire">Secours : {fiche.sdis}.</p>}
+    {log && (
+      <section id="construit" class="p-logements">
+        <h2 class="badge">Ce qui s’y construit</h2>
+        <Logements g={log} />
       </section>
     )}
 
     {fiche?.risques && (fiche.risques.recenses.length > 0 || fiche.risques.catnat.length > 0) && (
-      <section>
+      <section id="risques">
         <h2 class="badge">À quoi la commune est exposée</h2>
         {fiche.risques.recenses.length > 0 && (
           <p class="mesure">
@@ -560,8 +494,68 @@ function moisAnnee(iso: string): string | null {
       </section>
     )}
 
+    {plus.sru && (
+      <section id="logement-social" class="p-sru">
+        <h2 class="badge">Logement social : ce que la loi exige</h2>
+        <Sru s={plus.sru} maj={plus.sruMaj} />
+      </section>
+    )}
+
+    {plus.marches.length > 0 && (
+      <section id="marches" class="p-marches">
+        <h2 class="badge">Ce qui est commandé</h2>
+        <Marches liste={plus.marches} depuis={plus.marchesDepuis} procedures={plus.marchesProcedures} />
+      </section>
+    )}
+
+    {plus.deliberations.length > 0 && (
+      <section id="deliberations" class="p-marches p-delibs">
+        <h2 class="badge">Ce qui a été délibéré</h2>
+        <Deliberations liste={plus.deliberations} depuis={plus.delibDepuis} />
+      </section>
+    )}
+
+    {plus.subventions.length > 0 && (
+      <section id="subventions" class="p-marches p-subventions">
+        <h2 class="badge">Ce qui est versé aux associations</h2>
+        <Subventions liste={plus.subventions} seuil={plus.subventionsSeuil} />
+      </section>
+    )}
+
+    {plus.associations && plus.associations.total > 0 && (
+      <section id="associations" class="p-assos">
+        <h2 class="badge">Ce qui se crée en associations</h2>
+        <Associations a={plus.associations} />
+      </section>
+    )}
+    {droitLocal && (
+      <section id="associations" class="p-assos">
+        <h2 class="badge">Ce qui se crée en associations</h2>
+        <p class="p-strate">
+          Ici, le répertoire national ne sait rien. En Alsace-Moselle, une association ne se
+          déclare pas en préfecture : elle s’inscrit au registre des associations tenu par le
+          greffe du tribunal judiciaire, sous le code civil local. C’est là que se consulte ce
+          qui s’est créé — et non dans le fichier dont le reste du pays relève.
+        </p>
+      </section>
+    )}
+
+    {equ && (
+      <section id="equipements" class="p-equipements">
+        <h2 class="badge">Ce qu’on trouve sur place</h2>
+        <Equipements e={equ} />
+      </section>
+    )}
+
+    {fiche && fiche.services.length > 0 && (
+      <section id="services" class="p-services">
+        <h2 class="badge">Les services publics sur place</h2>
+        <Services services={fiche.services} voisines={fiche.voisines} sdis={fiche.sdis} maj={fiche.servicesMaj} />
+      </section>
+    )}
+
     {journal.length > 0 && (
-      <section class="releve">
+      <section id="journal" class="releve">
         <h2 class="badge">Ce qui a bougé récemment</h2>
         <p class="mesure">
           Les six derniers faits datés — ici et dans les structures dont la commune dépend,
@@ -594,8 +588,8 @@ function moisAnnee(iso: string): string | null {
     <h2 class="badge">Aller plus loin</h2>
     <ul>
       <li>
-        <a href={`/?commune=${commune.code}`}>Ouvrir cette commune dans la carte</a> — les
-        comptes, les marchés publics, les droits de mutation et les courbes s’y trouvent.
+        <a href={`/?commune=${commune.code}`}>Voir cette commune sur la carte</a> — chaque
+        compétence y montre qui l’exerce ici, parmi tous les acteurs qui la partagent.
       </li>
       {fiche?.soumiseSru && (
         <li><a href="/n/logement-social">L’obligation de logements sociaux</a> s’applique ici.</li>

@@ -1,0 +1,47 @@
+---
+/**
+ * Ce qui s'y construit, une fois la règle écrite.
+ *
+ * Autoriser n'est pas construire : le bloc montre les deux plutôt que de
+ * laisser croire qu'un permis est un chantier.
+ */
+import type { Fiche } from '../../modele/territoires.ts';
+import { moisAnnee } from '../../vues/graphiques.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  g: NonNullable<Fiche['logements']>;
+}
+const { g } = Astro.props;
+const dixieme = (v: number) => v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const nombre = (n: number) => n.toLocaleString('fr-FR');
+const phrase =
+  (g.commences === 0
+    ? 'Aucun n’a été commencé sur la même période.'
+    : `${nombre(g.commences)} ${g.commences > 1 ? 'ont' : 'a'} été commencé${g.commences > 1 ? 's' : ''} ` +
+      'sur la même période' +
+      (g.autorises > 0 ? `, soit ${Math.round((g.commences / g.autorises) * 100)} % des autorisations.` : '.')) +
+  (g.autorises === 0
+    ? ''
+    : g.individuels === 0
+      ? ' Aucune de ces autorisations ne porte sur une maison individuelle.'
+      : ` ${nombre(g.individuels)} des logements autorisés ` +
+        `${g.individuels > 1 ? 'sont des maisons individuelles' : 'est une maison individuelle'}` +
+        ` (${Math.round((g.individuels / g.autorises) * 100)} %).`);
+---
+<dl class="p-reperes">
+  <Repere
+    nom={`Logements autorisés en ${g.annees.length} ans`}
+    montant={nombre(g.autorises)}
+    compare={{ valeur: g.taux, mediane: g.medianeTaux, reference: 'la médiane des communes' }}
+    mediane={`${dixieme(g.taux)} pour 1 000 habitants — médiane ${dixieme(g.medianeTaux)}`}
+    serie={{ valeurs: g.parAnnee, annees: g.annees, formater: (v) => `${v} logement${v > 1 ? 's' : ''}` }}
+  />
+</dl>
+<p class="p-strate">{phrase}</p>
+<p class="p-source-territoire">
+  {'D’après Sitadel, le recensement des autorisations d’urbanisme du ministère chargé du logement ' +
+    `(${g.maj}), arrêté à ${moisAnnee(g.arrete) ?? g.arrete}. Ce sont des logements, non des ` +
+    'permis — un permis d’immeuble en porte plusieurs — et la date est celle de la prise en compte ' +
+    'de l’autorisation, non celle de la signature du maire.'}
+</p>

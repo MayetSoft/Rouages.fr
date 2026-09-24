@@ -1,0 +1,147 @@
+---
+/**
+ * Ce que la commune et ses groupements commandent.
+ *
+ * La commune est ouverte, ses groupements repliés : six acheteurs à cinq
+ * marchés font trente lignes, et le décompte reste visible sur chaque en-tête.
+ * Les cinq plus récents sont écrits dans la page ; la suite a son propre
+ * fichier, que le bouton va chercher — sans JavaScript, le bouton n'apparaît
+ * pas, et le décompte dit ce qu'il reste.
+ */
+import type { AcheteurMarches } from '../../modele/fiche-commune.ts';
+import Glose from '../Glose.astro';
+import { moisAnnee, montantCourt } from '../../vues/graphiques.ts';
+
+interface Props {
+  liste: AcheteurMarches[];
+  depuis: string | null;
+  procedures: string[];
+}
+const { liste, depuis, procedures } = Astro.props;
+const detail = (m: AcheteurMarches['liste'][number]) =>
+  [moisAnnee(m.date) ?? m.date, ...(m.procedure ? [m.procedure.toLowerCase()] : []), ...(m.lots > 1 ? [`${m.lots} lots`] : [])].join(' · ');
+---
+<p class="p-strate">
+  {`Marchés notifiés depuis ${(depuis ?? '').slice(0, 4)}, du plus récent au plus ancien. Les ` +
+    'montants ne s’additionnent pas : un accord-cadre déclare un plafond, et chacun de ses lots ' +
+    'le redéclare en entier. Un même marché peut aussi figurer deux fois, publié sous deux ' +
+    'libellés — le recensement n’est pas dédoublonné à la source.'}
+</p>
+{liste.map((a, rang) => {
+  const Groupe = rang > 0 ? 'details' : 'div';
+  const Titre = rang > 0 ? 'summary' : 'p';
+  return (
+    <Groupe class="p-marche-acheteur">
+      <Titre class="p-marche-qui">
+        <span class="p-marche-nom"><Glose texte={a.nom} /></span>
+        {a.natureLibelle && <span class="p-marche-nature">{a.natureLibelle}</span>}
+        <span class="p-marche-total">
+          {`${a.total.toLocaleString('fr-FR')} marché${a.total > 1 ? 's' : ''}` +
+            (a.total > a.liste.length ? `, les ${a.liste.length} plus récents` : '')}
+        </span>
+      </Titre>
+      <ul>
+        {a.liste.map((m) => (
+          <li>
+            <span class="p-marche-montant">{montantCourt(m.montant)}</span>
+            <span><span class="p-marche-objet">{m.objet}</span><span class="p-marche-detail">{detail(m)}</span></span>
+          </li>
+        ))}
+      </ul>
+      {a.total > a.liste.length && (
+        <button
+          type="button"
+          class="p-marche-suite"
+          hidden
+          data-siren={a.siren}
+          data-total={a.total}
+          data-affiches={a.liste.length}
+        >{`Voir les ${(a.total - a.liste.length).toLocaleString('fr-FR')} autres`}</button>
+      )}
+    </Groupe>
+  );
+})}
+<script is:inline type="application/json" id="marches-procedures" set:html={JSON.stringify(procedures).replace(/</g, "\\u003c")} />
+<script>
+  /**
+   * « Voir les 403 autres ». Le premier clic va chercher le fichier de
+   * l'acheteur, une fois ; les suivants n'ajoutent que vingt-cinq lignes, parce
+   * qu'une liste de cinq mille marchés dépliée d'un coup ne se lit pas et fige
+   * la page sur un téléphone.
+   */
+  const PAS = 25;
+  const procedures: string[] = JSON.parse(document.getElementById('marches-procedures')?.textContent ?? '[]');
+  const moisAnnee = (iso: string) => {
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  };
+  const montantCourt = (v: number | null) => {
+    if (v === null) return '—';
+    if (Math.abs(v) >= 1_000_000) return `${(v / 1_000_000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M€`;
+    if (Math.abs(v) >= 1_000) return `${Math.round(v / 1000).toLocaleString('fr-FR')} k€`;
+    return `${Math.round(v).toLocaleString('fr-FR')} €`;
+  };
+  type Brut = { objet: string; montant: number | null; date: string; procedure: number; lots: number };
+  const span = (classe: string, texte: string) => {
+    const s = document.createElement('span');
+    s.className = classe;
+    s.textContent = texte;
+    return s;
+  };
+  const ligne = (m: Brut) => {
+    const li = document.createElement('li');
+    const droite = document.createElement('span');
+    const sous = [moisAnnee(m.date) ?? m.date];
+    const proc = procedures[m.procedure];
+    if (proc) sous.push(proc.toLowerCase());
+    if (m.lots > 1) sous.push(`${m.lots} lots`);
+    droite.append(span('p-marche-objet', m.objet), span('p-marche-detail', sous.join(' · ')));
+    li.append(span('p-marche-montant', montantCourt(m.montant)), droite);
+    return li;
+  };
+
+  for (const bouton of document.querySelectorAll<HTMLButtonElement>('button.p-marche-suite[data-siren]')) {
+    const ul = bouton.previousElementSibling as HTMLUListElement;
+    const siren = bouton.dataset.siren!;
+    const total = Number(bouton.dataset.total);
+    let affiches = Number(bouton.dataset.affiches);
+    const deja = affiches;
+    let reste: Brut[] | null = null;
+    let echec: HTMLElement | null = null;
+    // Avant le chargement, le décompte du recensement ; après, le nombre exact
+    // de lignes — un accord-cadre publie une ligne par lot, que le site regroupe.
+    const direRestant = () => {
+      const fin = reste ? deja + reste.length : total;
+      bouton.textContent = `Voir les ${(fin - affiches).toLocaleString('fr-FR')} autres`;
+    };
+    bouton.hidden = false;
+    bouton.addEventListener('click', async () => {
+      if (!reste) {
+        bouton.disabled = true;
+        bouton.textContent = 'Chargement…';
+        const f = await fetch(`/territoires/marches/${siren}.json`)
+          .then((r) => (r.ok ? (r.json() as Promise<{ m: Brut[] }>) : null))
+          .catch(() => null);
+        bouton.disabled = false;
+        // Aucun fichier n'est écrit vide : une liste vide vient d'une requête
+        // qui a échoué, et le bouton reste pour le clic suivant.
+        if (!f || f.m.length === 0) {
+          if (!echec) {
+            echec = span('p-marche-detail', 'La suite ne s’est pas chargée. À réessayer.');
+            bouton.after(echec);
+          }
+          direRestant();
+          return;
+        }
+        echec?.remove();
+        echec = null;
+        reste = f.m;
+      }
+      const lot = reste.slice(affiches - deja, affiches - deja + PAS);
+      for (const m of lot) ul.append(ligne(m));
+      affiches += lot.length;
+      if (affiches >= deja + reste.length) bouton.remove();
+      else direRestant();
+    });
+  }
+</script>

@@ -1,0 +1,48 @@
+---
+/**
+ * Les communes d'un département, par ordre alphabétique.
+ *
+ * Le code postal et la population figurent à côté du nom : ce sont eux qui
+ * départagent les homonymes, et dans un même département il y en a — deux
+ * Saint-Martin, trois Sainte-Colombe.
+ */
+import Base from '../../layouts/Base.astro';
+import { communes, metaTerritoires, type CommuneIndex } from '../../modele/territoires.ts';
+
+export function getStaticPaths() {
+  const filtre = process.env.ROUAGES_DEPS?.split(',').map((d) => d.trim()).filter(Boolean);
+  const parDep = new Map<string, CommuneIndex[]>();
+  for (const c of communes()) {
+    if (filtre && !filtre.includes(c.dep)) continue;
+    if (!parDep.has(c.dep)) parDep.set(c.dep, []);
+    parDep.get(c.dep)!.push(c);
+  }
+  return [...parDep].map(([dep, liste]) => ({
+    params: { dep },
+    props: { liste: liste.sort((a, b) => a.nom.localeCompare(b.nom, 'fr')) },
+  }));
+}
+
+const { dep } = Astro.params;
+const { liste } = Astro.props as { liste: CommuneIndex[] };
+const nom = liste[0]?.depNom ?? dep;
+const region = metaTerritoires()?.regions?.[dep];
+---
+<Base
+  titre={`Les communes — ${nom}`}
+  description={`Les ${liste.length} communes du département ${nom} (${dep}) : pour chacune, qui exerce quoi, ses comptes, son élection et ses services.`}
+>
+  <div class="page page--etroite">
+    <p class="badge"><a href="/communes">Communes</a>{region ? ` · ${region}` : ''}</p>
+    <h1>{`${nom} (${dep})`}</h1>
+    <p class="resume">{`${liste.length.toLocaleString('fr-FR')} communes.`}</p>
+    <ul class="c-communes">
+      {liste.map((c) => (
+        <li>
+          <a href={`/commune/${c.code}`}>{c.nom}</a>
+          <span class="c-departement-detail">{`${c.cp} · ${c.population.toLocaleString('fr-FR')} hab.`}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>

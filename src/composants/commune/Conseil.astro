@@ -1,0 +1,59 @@
+---
+/**
+ * De quoi le conseil est fait.
+ *
+ * **Aucun nom.** Ce qui entre est ce qu'aucune liste de noms ne dirait : de
+ * quoi l'assemblée est faite, et en quoi elle diffère de toutes les autres.
+ */
+import type { Fiche } from '../../modele/territoires.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  k: NonNullable<Fiche['conseil']>;
+}
+const { k } = Astro.props;
+const part = Math.round((k.femmes / k.elus) * 100);
+const vacants = k.sieges - k.elus;
+---
+<p class="p-strate">
+  {`${k.elus} conseillers en fonction` +
+    // Le répertoire décrit le conseil tel qu'il est, pas tel qu'il a été élu :
+    // un siège vacant se voit ici, et nulle part ailleurs.
+    (k.sieges > 0 && vacants > 0
+      ? ` sur ${k.sieges} sièges — ${vacants} siège${vacants > 1 ? 's' : ''} vacant${vacants > 1 ? 's' : ''}`
+      : '') +
+    '.'}
+</p>
+<dl class="p-reperes">
+  <Repere
+    nom="Femmes"
+    montant={`${part} %`}
+    compare={{ valeur: part, mediane: k.femmesPartout, reference: 'l’ensemble des conseils' }}
+    mediane={`${k.femmesPartout.toLocaleString('fr-FR')} % dans l’ensemble des conseils`}
+  />
+  <Repere
+    nom="Âge médian"
+    montant={`${k.ageMedian} ans`}
+    compare={{ valeur: k.ageMedian, mediane: k.agePartout, reference: 'l’ensemble des conseils' }}
+    mediane={`${k.agePartout.toLocaleString('fr-FR')} ans dans l’ensemble des conseils`}
+  />
+</dl>
+{k.ageMax > k.ageMin && (
+  <p class="p-strate">{`Du plus jeune, ${k.ageMin} ans, au plus âgé, ${k.ageMax} ans.`}</p>
+)}
+{k.groupes.length > 0 && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Par groupe socioprofessionnel</span>
+    <ul>
+      {k.groupes.map((g) => (
+        <li><span class="p-risque-nombre">{g.nombre}</span><span class="p-risque-nom">{g.nom}</span></li>
+      ))}
+    </ul>
+  </div>
+)}
+<p class="p-source-territoire">
+  {`D’après le répertoire national des élus${k.maj ? ` (${k.maj})` : ''}, agrégé par le site : ` +
+    'aucun nom, aucune date de naissance, aucune profession individuelle n’en est reprise. Les ' +
+    'huit groupes sont ceux de la nomenclature PCS de l’INSEE. La liste nominative des conseillers ' +
+    'est affichée en mairie, qui la publie souvent aussi sur son site.'}
+</p>

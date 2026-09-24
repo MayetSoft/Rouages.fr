@@ -261,11 +261,10 @@ Trois référentiels nationaux, parce qu'aucun ne couvre l'ensemble : l'Annuaire
 de l'administration (France services, CCAS, SDIS), l'Annuaire de l'éducation
 (écoles, collèges, lycées) et le référentiel FINESS (établissements de santé,
 et ceux qui ont un service d'urgences). 83 719 implantations dans 22 958
-communes, écrites par département à côté des données d'eau et de finances : le
-client ne télécharge que la sienne — 29 ko compressés pour le département le
-plus dense.
+communes, écrites par département à côté des données d'eau et de finances, et
+lues au build pour écrire la page de chaque commune.
 
-Le reste du panneau dit **qui décide** ; ce bloc dit **où l'on va**. Ce sont
+Le reste de la page dit **qui décide** ; ce bloc dit **où l'on va**. Ce sont
 deux questions différentes, et la seconde est souvent la première qu'on se
 pose.
 
@@ -295,8 +294,8 @@ humaine : la Métropole du Grand Paris en compte 131 communes, et y énumérer
 quatre-vingts France services n'aidait personne. Au-delà de trois communes, on
 donne le nombre sans la liste.
 
-Enfin Le Mans compte 87 écoles : les nommer toutes dans un panneau latéral,
-c'est n'en montrer aucune. Au-delà d'une poignée, la liste se replie derrière
+Enfin Le Mans compte 87 écoles : les nommer toutes d'affilée, c'est n'en
+montrer aucune. Au-delà d'une poignée, la liste se replie derrière
 son décompte — un `details` natif, qui marche sans script et que les lecteurs
 d'écran annoncent déjà. Les urgences, elles, remontent toujours en tête de leur
 famille : c'est l'établissement qu'on cherche quand on cherche vite.

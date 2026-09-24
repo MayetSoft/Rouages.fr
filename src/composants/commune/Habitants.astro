@@ -1,0 +1,37 @@
+---
+/**
+ * Combien d'habitants, et depuis quand.
+ *
+ * Tous les autres chiffres de la page sont par habitant : sans cette série, une
+ * dotation qui baisse se lit comme une décision de l'État alors qu'elle suit
+ * souvent une population qui s'en va.
+ */
+import type { Population } from '../../modele/fiche-commune.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  h: Population;
+}
+const { h } = Astro.props;
+---
+<dl class="p-reperes">
+  <Repere
+    nom={`Population en ${h.anneeActuelle}`}
+    montant={h.actuelle.toLocaleString('fr-FR')}
+    mediane={`${h.ecart >= 0 ? '+' : '\u2212'}${Math.abs(h.ecart)} % par rapport à son maximum, ` +
+      `${h.sommet[1].toLocaleString('fr-FR')} en ${h.sommet[0]}`}
+    serie={{ valeurs: h.serie, annees: h.annees, formater: (v) => `${v.toLocaleString('fr-FR')} habitants` }}
+  />
+</dl>
+{h.ecart < 0 && (
+  <p class="p-strate">
+    Les montants de cette page étant rapportés à l’habitant, c’est ce dénominateur-là qui bouge
+    sous eux.
+  </p>
+)}
+<p class="p-source-territoire">
+  {`D’après les recensements de l’INSEE, de ${h.annees[0]} à ${h.annees[h.annees.length - 1]} ` +
+    `(${h.maj}). Trois définitions s’y succèdent — population totale jusqu’en 1954, sans doubles ` +
+    'comptes jusqu’en 1999, municipale depuis : l’INSEE les publie comme une seule série, et ' +
+    'comparer les deux extrémités reste une tendance, pas une soustraction exacte.'}
+</p>
