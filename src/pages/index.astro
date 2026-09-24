@@ -21,6 +21,10 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
   description="Qui décide quoi, avec quel argent, et avec qui — une carte navigable des acteurs publics et de leurs relations, reliée à Wikipédia, Légifrance et l'open data."
   plein
 >
+  {/* La carte n'a pas de titre visible — l'en-tête et la légende en tiennent
+      lieu —, mais un lecteur d'écran qui parcourt les titres doit en trouver
+      un. Le repli sans JavaScript passe donc au second niveau. */}
+  <h1 class="visuellement-cache">La carte des rouages</h1>
   <div class="outils">
     <div class="champ-recherche">
       <label class="visuellement-cache" for="recherche">Chercher un acteur, une compétence</label>
@@ -89,14 +93,14 @@ const parEchelon = reseau.carte.colonnes.map((c) => ({
 
   <noscript>
     <div class="page">
-      <h1>La carte des rouages</h1>
+      <h2>La carte des rouages, en liste</h2>
       <p class="resume">
         La carte interactive demande JavaScript. Voici la même matière, en liste :
         chaque acteur a sa page, avec ses relations et ses liens de référence.
       </p>
       {parEchelon.map((c) => (
         <section>
-          <h2 class="badge">{c.libelle}</h2>
+          <h3 class="badge">{c.libelle}</h3>
           <ul>
             {c.noeuds.map((n) => (
               <li>

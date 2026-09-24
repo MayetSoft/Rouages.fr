@@ -38,12 +38,13 @@ const { titre, description, plein = false, flux } = Astro.props;
     />
   </head>
   <body>
+    <a class="evitement" href="#contenu">Aller au contenu</a>
     <header class="bandeau">
       <div class="bandeau-int">
         <a class="marque" href="/">Rouages</a>
         <span class="baseline">qui fait quoi, et avec qui</span>
         <RechercheCommune />
-        <nav>
+        <nav aria-label="Le site">
           <a href="/">La carte</a>
           <a href="/etat">Les pouvoirs</a>
           <a href="/glossaire">Glossaire</a>
@@ -52,7 +53,9 @@ const { titre, description, plein = false, flux } = Astro.props;
       </div>
     </header>
 
-    <slot />
+    <main id="contenu">
+      <slot />
+    </main>
 
     {!plein && (
       <footer>

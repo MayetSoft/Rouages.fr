@@ -769,6 +769,10 @@ function demarrer(reseau: Reseau) {
 
   function ecrirePanneauAccueil() {
     vider(panneau);
+    // Le panneau d'un nœud s'ouvre sur son nom, en titre de second niveau ; celui
+    // d'accueil n'en avait pas, et ses sections sautaient du titre de la page à
+    // un troisième niveau. Le titre est masqué : l'écran le dit déjà.
+    panneau.append(ligne('h2', 'visuellement-cache', 'Le réseau en bref'));
     panneau.append(
       ligne(
         'p',

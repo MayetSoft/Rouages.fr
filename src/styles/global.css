@@ -16,7 +16,11 @@
   --fond-bande: #f6f4f0;
   --encre: #17171a;
   --encre-douce: #5f5c55;
-  --encre-tres-douce: #8c887f;
+  /* Le gris des sources, des médianes et des dates. #8c887f ne tenait que
+     3,4:1 sur le fond, sous les 4,5:1 qu'exige un petit texte ; celui-ci tient
+     au moins 4,6:1 sur chacun des fonds du thème, et reste plus clair que
+     l'encre douce. */
+  --encre-tres-douce: #6f6b64;
   --trait: #ddd8d0;
   --trait-fort: #b9b2a7;
   --accent: #1e5f74;
@@ -55,7 +59,7 @@
     --fond-bande: #191c1f;
     --encre: #eeedea;
     --encre-douce: #a5a199;
-    --encre-tres-douce: #7d7972;
+    --encre-tres-douce: #928e85;
     --trait: #343a40;
     --trait-fort: #4e555c;
     --accent: #7cc4d8;
@@ -84,6 +88,14 @@ body {
 
 a { color: var(--accent); text-underline-offset: 2px; }
 h1, h2, h3 { letter-spacing: -0.014em; }
+
+/* Le lien d'évitement : invisible jusqu'à ce que le clavier l'atteigne, il
+   saute l'en-tête et mène droit au contenu. */
+.evitement {
+  position: absolute; left: .5rem; top: -3rem; z-index: 50; padding: .4rem .8rem;
+  background: var(--accent); color: var(--sur-accent); border-radius: var(--rayon);
+}
+.evitement:focus { top: .5rem; }
 
 .visuellement-cache {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;

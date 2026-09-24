@@ -87,9 +87,14 @@ export function svg(
   contenu: string,
   largeur: number = LARGEUR,
 ): string {
+  // `img` fait du dessin une seule image, et cache ce qu'il contient : juste
+  // pour un schéma muet, faux pour un voisinage dont chaque nœud est un lien —
+  // les lecteurs d'écran ne les voyaient plus. `group` garde le nom et la
+  // description, et laisse les liens à leur place.
+  const role = contenu.includes('<a ') ? 'group' : 'img';
   return [
     `<svg class="v-schema" viewBox="0 0 ${largeur} ${Math.ceil(hauteur)}"`,
-    ` role="img" aria-labelledby="${id}-t ${id}-d"`,
+    ` role="${role}" aria-labelledby="${id}-t ${id}-d"`,
     ` xmlns="http://www.w3.org/2000/svg">`,
     `<title id="${id}-t">${echapper(titre)}</title>`,
     `<desc id="${id}-d">${echapper(description)}</desc>`,

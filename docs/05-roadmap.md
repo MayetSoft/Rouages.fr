@@ -2200,6 +2200,48 @@ publiées, 1735-2024 ». L'ingestion refuse désormais une année hors de
 2000 → l'an prochain (`src/modele/annees.ts`), et la page la tait dans les
 fichiers déjà produits.
 
+### Un déploiement qui n'envoie plus que ce qui a changé ✔
+
+Les deux déploiements précédents avaient échoué après quatre heures chacun :
+`lftp mirror` compare taille et date, et sur une machine d'intégration neuve
+tout est daté du jour. Les 77 000 fichiers repartaient donc à chaque
+publication, y compris les 33 000 flux par commune identiques à l'octet près.
+
+Trois changements, et aucun ne retire rien au site :
+
+- **un manifeste d'empreintes** déposé sur le serveur au dernier envoi réussi.
+  Le suivant n'envoie que la différence. Essayé contre un serveur FTP local :
+  un fichier modifié, un supprimé, un ajouté donnent deux envois et un
+  effacement, les 8 628 autres ne bougent pas, et le serveur est ensuite
+  identique à `dist/` ;
+- **des noms sans empreinte dans `_astro/`.** Une retouche de CSS seule ne
+  change plus qu'un fichier sur 8 630 — elle changeait toutes les pages ;
+- **1 741 fichiers de données retirés de `dist/`**, que le navigateur ne lit
+  plus depuis que la page de commune est la seule source.
+
+Les flux par commune restent : c'est ce que le site offre de plus utile à un
+habitant, et une fois le manifeste en place ils ne coûtent plus rien tant que
+rien ne bouge chez eux.
+
+### Le HTML, contrôlé plutôt que supposé ✔
+
+Onze pages représentatives passées à html-validate et à axe-core, en clair
+comme en sombre. Le balisage était valide et la hiérarchie des titres sans
+saut ; il manquait l'essentiel des repères. Corrigé :
+
+- aucune page n'avait de `<main>`, ni de lien d'évitement ;
+- le gris des sources, des médianes et des dates tenait 3,4:1 en clair et
+  4,1:1 en sombre, sous les 4,5:1 qu'exige un petit texte — 642 éléments, un
+  seul jeton, qui tient désormais au moins 4,6:1 sur chacun des fonds ;
+- le schéma de voisinage était déclaré image alors qu'il contient des liens,
+  que les lecteurs d'écran ne voyaient donc plus ;
+- la carte n'avait pas de titre de premier niveau, et la navigation de
+  l'en-tête pas de nom.
+
+axe ne signale plus rien. html-validate garde une remarque, qu'on laisse :
+il préférerait un `<select>` pour la recherche de commune, où 34 875 options
+ne se parcourent pas.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

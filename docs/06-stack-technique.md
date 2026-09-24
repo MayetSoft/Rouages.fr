@@ -209,9 +209,47 @@ publication. Le certificat est vérifié : un FTPS qui accepte n'importe quel
 certificat ne protège de rien.
 
 **Le cache Cloudflare survit au dépôt.** Sans purge, la mise en ligne reste
-invisible pendant des heures. Les fichiers de `_astro/` portent une empreinte
-dans leur nom et n'ont, eux, jamais besoin d'être purgés — d'où leur
-`immutable` d'un an.
+invisible pendant des heures. La purge vaut aussi pour `_astro/`, dont les
+fichiers n'ont plus d'empreinte dans leur nom (ci-dessous).
+
+### N'envoyer que ce qui a changé
+
+`lftp mirror` compare la taille et la date. Sur une machine d'intégration
+neuve, chaque fichier du build est daté du jour : les 77 000 fichiers
+repartaient à chaque publication, un par un, y compris les 33 000 flux
+identiques à l'octet près. Quatre heures d'envoi, et deux échecs de suite en
+septembre 2026.
+
+Le déploiement dépose donc à la racine un **manifeste** — l'empreinte SHA-256
+de chaque fichier du dernier envoi réussi, sous `.manifeste`, que le
+`.htaccess` refuse de servir comme tout fichier caché. L'envoi suivant le
+récupère, compare, n'envoie que les fichiers nouveaux ou modifiés, efface ceux
+qui ont disparu, et ne dépose le nouveau manifeste qu'en dernier : un envoi
+interrompu laisse l'ancien en place, et le suivant renverra ce qui manque. Le
+détail est dans `scripts/manifeste.ts`.
+
+Deux conditions pour que la comparaison serve à quelque chose :
+
+- **un build déterministe.** Deux builds du même contenu donnent les mêmes
+  octets — vérifié sur 8 630 fichiers ;
+- **des noms de fichiers sans empreinte dans `_astro/`**
+  (`integrations/noms-fixes.mjs`). Avec elle, retoucher une règle de CSS
+  changeait le nom de la feuille, donc la balise qui la cite dans les 35 000
+  pages. Désormais, un changement de CSS seul modifie un fichier, et un seul.
+  Ces fichiers ne sont plus mis en cache un an : le navigateur les revalide à
+  chaque visite, pour un 304 de quelques octets.
+
+`dist/` ne contient plus non plus les données que seul le build lit
+(`integrations/elaguer.mjs`) : le navigateur ne lit, par département, que les
+groupements et le prix de l'eau. 1 741 fichiers de moins à chaque envoi
+complet.
+
+Sans manifeste sur le serveur — au premier envoi de ce mode —, la comparaison
+se fait par la taille seule : un fichier de même taille est tenu pour
+identique. C'est vrai des flux et des données, que rien ne modifie entre deux
+ingestions, et le manifeste déposé à la fin rend le pari inutile ensuite.
+L'entrée **complet** de `workflow_dispatch` revient à la comparaison taille et
+date, c'est-à-dire à tout renvoyer.
 
 ### Le garde-fou
 
@@ -247,8 +285,8 @@ Il a été vérifié sous Apache 2.4, page par page : URL sans extension servie
 directement, `.html` et barre finale redirigés en 301 vers l'adresse
 canonique, `/index.html` renvoyé vers `/`, adresse inconnue sur le 404 du
 site, fichiers cachés refusés. Les en-têtes de cache suivent la nature du
-fichier — un an et `immutable` pour `_astro/`, revalidation systématique pour
-le HTML, une heure pour les données territoriales — et la compression ramène
+fichier — revalidation systématique pour le HTML et pour `_astro/`, une heure
+pour les données territoriales — et la compression ramène
 un département de 24,8 ko à 8,1 ko.
 
 Il ne force **ni HTTPS ni le domaine canonique** : Cloudflare est devant et
