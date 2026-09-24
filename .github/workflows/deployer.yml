@@ -10,8 +10,9 @@ name: Déploiement
 # 2. FTPS explicite, jamais FTP simple : autrement le mot de passe du compte
 #    d'hébergement traverse le réseau en clair à chaque publication.
 # 3. Cloudflare met le HTML en cache. Sans purge, la mise en ligne est
-#    invisible pendant des heures. Les fichiers de `_astro/` portent une
-#    empreinte dans leur nom et n'ont, eux, jamais besoin d'être purgés.
+#    invisible pendant des heures. Les fichiers de `_astro/` n'ont plus
+#    d'empreinte dans leur nom (voir `integrations/noms-fixes.mjs`) : la purge
+#    vaut donc pour eux aussi.
 
 on:
   push:
@@ -20,6 +21,10 @@ on:
     inputs:
       simulation:
         description: "Simuler sans rien écrire sur le serveur"
+        type: boolean
+        default: false
+      complet:
+        description: "Tout renvoyer, sans se fier au manifeste du serveur"
         type: boolean
         default: false
 
@@ -72,6 +77,7 @@ jobs:
           MOTDEPASSE: ${{ secrets.FTP_MOTDEPASSE }}
           RACINE: ${{ secrets.FTP_RACINE }}
           SIMULATION: ${{ inputs.simulation }}
+          COMPLET: ${{ inputs.complet }}
         run: |
           set -euo pipefail
           : "${RACINE:=public_html}"
@@ -104,28 +110,70 @@ jobs:
             simuler=""
           fi
 
-          # Le site est passé de 975 à 36 000 fichiers le jour où chaque commune
-          # a eu sa page, puis à près de 43 000 quand la liste complète des
-          # marchés de chaque acheteur a eu la sienne, et à 76 552 quand chaque
-          # commune a eu son flux. C'est le nombre de fichiers qui domine
-          # désormais la durée, plus que le volume : en FTP, chacun coûte une
-          # connexion de données. D'où le parallélisme relevé à 8, qui reste
-          # sous ce qu'un hébergement mutualisé accepte — au-delà, le compte se
-          # fait limiter, et l'envoi échoue au lieu d'aller plus vite.
-          #
-          # Les flux sont nommés `03165-flux.xml` et non `03165/flux.xml` pour
-          # cette raison : un dossier par commune, ce serait trente-trois mille
-          # créations de répertoire en plus. `dist/` en compte sept en tout.
-          #
-          # Compter une heure environ pour un envoi complet, quelques minutes
-          # ensuite : `mirror` ne transfère que ce qui a changé, et un flux dont
-          # la commune n'a rien vu bouger reste identique à l'octet près — son
-          # `<updated>` porte la date du dernier fait, pas celle du build.
-          lftp -c "$reglages
-                   open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
-                   mirror --reverse --verbose=1 --parallel=8 \
-                          $effacer $simuler \
-                          dist/ \"$RACINE\""
+          # Ce qui est parti la dernière fois, et ce qui partirait maintenant.
+          # `mirror` seul comparait taille et date ; sur une machine neuve, tout
+          # est daté du jour, et les 77 000 fichiers repartaient à chaque
+          # publication — quatre heures, et deux échecs de suite. Le manifeste
+          # du dernier envoi réussi dit ce qui a réellement changé. Voir
+          # `scripts/manifeste.ts`.
+          travail="$GITHUB_WORKSPACE/.deploiement"
+          rm -rf "$travail" && mkdir -p "$travail"
+          npx tsx scripts/manifeste.ts ecrire dist "$travail/nouveau"
+
+          if [ "${COMPLET:-false}" != "true" ] && lftp -c "$reglages open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                      get \"$RACINE/.manifeste\" -o \"$travail/ancien\"" >/dev/null 2>&1 \
+             && [ -s "$travail/ancien" ]; then
+            echo "::notice::manifeste trouvé sur le serveur — seuls les fichiers modifiés partent."
+            npx tsx scripts/manifeste.ts comparer "$travail/ancien" "$travail/nouveau" dist \
+              "$travail/envoi" "$travail/effacer"
+            if [ -d "$travail/envoi" ]; then
+              lftp -c "$reglages
+                       open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                       mirror --reverse --verbose=1 --parallel=8 $simuler \
+                              \"$travail/envoi/\" \"$RACINE\""
+            fi
+            # Effacer suppose le marqueur, comme `--delete` plus bas : la liste
+            # vient du manifeste, mais c'est RACINE qui décide où elle s'applique.
+            if [ -s "$travail/effacer" ] && [ -n "$effacer" ] && [ -z "$simuler" ]; then
+              lftp -c "$reglages
+                       open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                       cd \"$RACINE\"; source \"$travail/effacer\""
+            fi
+          else
+            # Pas de manifeste sur le serveur — premier envoi de ce mode, ou
+            # envoi complet demandé. On compare alors par la taille seule
+            # (`--ignore-time`) : un fichier de même taille est tenu pour
+            # identique. C'est vrai des flux et des données, que rien ne
+            # modifie entre deux ingestions ; une page dont le contenu change
+            # change presque toujours de taille, et le manifeste déposé à la fin
+            # rend ce pari inutile dès l'envoi suivant. L'option « complet »
+            # revient à la comparaison d'avant, taille et date : sur une machine
+            # d'intégration neuve, où tout est daté du jour, c'est tout renvoyer.
+            if [ "${COMPLET:-false}" = "true" ]; then comparer=""; else comparer="--ignore-time"; fi
+            echo "::notice::pas de manifeste utilisable — envoi par comparaison${comparer:+ de taille}."
+
+            #
+            # Le parallélisme reste à 8 : c'est le nombre de fichiers qui domine
+            # la durée en FTP, chacun coûtant une connexion de données, et
+            # au-delà un hébergement mutualisé limite le compte. Les flux sont
+            # nommés `03165-flux.xml` et non `03165/flux.xml` pour la même
+            # raison : trente-trois mille créations de répertoire de moins.
+            lftp -c "$reglages
+                     open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                     mirror --reverse --verbose=1 --parallel=8 $comparer \
+                            --exclude '^\\.manifeste$' \
+                            $effacer $simuler \
+                            dist/ \"$RACINE\""
+          fi
+
+          # En dernier, et seulement si tout ce qui précède a réussi — `set -e`
+          # arrête l'étape à la première erreur : un envoi interrompu laisse
+          # l'ancien manifeste en place, et le suivant renverra ce qui manque.
+          if [ -z "$simuler" ]; then
+            lftp -c "$reglages
+                     open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                     put \"$travail/nouveau\" -o \"$RACINE/.manifeste\""
+          fi
 
       # Sans purge, Cloudflare continue de servir l'ancien HTML. Les secrets
       # sont facultatifs : sans eux, on le dit plutôt que d'échouer.

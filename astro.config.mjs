@@ -1,4 +1,6 @@
 import { defineConfig } from 'astro/config';
+import { elaguer } from './integrations/elaguer.mjs';
+import { nomsFixes } from './integrations/noms-fixes.mjs';
 
 export default defineConfig({
   site: 'https://rouages.fr',
@@ -8,4 +10,5 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   markdown: { shikiConfig: { theme: 'github-light' } },
+  integrations: [nomsFixes(), elaguer()],
 });
