@@ -158,10 +158,19 @@ jobs:
             # au-delà un hébergement mutualisé limite le compte. Les flux sont
             # nommés `03165-flux.xml` et non `03165/flux.xml` pour la même
             # raison : trente-trois mille créations de répertoire de moins.
+            #
+            # Les exclusions protègent ce qui appartient à l'hébergement et non
+            # au site. `.ftpquota` est tenu par le serveur FTP, qui refuse qu'on
+            # l'efface : `--delete` s'y cassait les dents en toute fin d'envoi,
+            # après que chaque page était partie — c'est ce qui a fait échouer
+            # trois déploiements de suite, sans rien dire avant la dernière
+            # ligne. `.well-known/` sert au renouvellement du certificat,
+            # `cgi-bin/` est créé par cPanel.
             lftp -c "$reglages
                      open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
                      mirror --reverse --verbose=1 --parallel=8 $comparer \
-                            --exclude '^\\.manifeste$' \
+                            --exclude '^\\.manifeste$' --exclude '^\\.ftpquota$' \
+                            --exclude '^\\.well-known/' --exclude '^cgi-bin/' \
                             $effacer $simuler \
                             dist/ \"$RACINE\""
           fi

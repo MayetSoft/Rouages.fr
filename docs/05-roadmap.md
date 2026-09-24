@@ -2219,6 +2219,15 @@ Trois changements, et aucun ne retire rien au site :
 - **1 741 fichiers de données retirés de `dist/`**, que le navigateur ne lit
   plus depuis que la page de commune est la seule source.
 
+**La vraie cause des échecs, trouvée au premier envoi du nouveau mode.** Il a
+fini ses 35 000 pages en deux heures, puis a échoué sur la dernière ligne :
+`Removing old file '.ftpquota'`. Ce fichier appartient au serveur FTP, qui
+refuse qu'on l'efface, et `mirror --delete` s'y arrêtait en erreur — après
+que tout était parti, donc sans manifeste déposé ni cache purgé. C'était déjà,
+selon toute vraisemblance, la fin silencieuse des deux déploiements
+précédents. Il est exclu du miroir, avec `.well-known/` et `cgi-bin/`, qui
+appartiennent eux aussi à l'hébergement.
+
 Les flux par commune restent : c'est ce que le site offre de plus utile à un
 habitant, et une fois le manifeste en place ils ne coûtent plus rien tant que
 rien ne bouge chez eux.

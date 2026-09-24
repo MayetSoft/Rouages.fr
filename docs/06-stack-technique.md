@@ -258,6 +258,12 @@ retirée du réseau resterait en ligne indéfiniment. C'est aussi une commande
 destructrice si la racine désigne le mauvais dossier — le répertoire personnel
 d'un compte cPanel contient le courrier et la configuration.
 
+Ce qui appartient à l'hébergement est exclu du miroir, et donc de la
+suppression : `.ftpquota`, que le serveur FTP tient lui-même et refuse qu'on
+efface — `--delete` s'y cassait en toute fin d'envoi, et c'est ce qui a fait
+échouer trois déploiements de suite en septembre 2026 —, `.well-known/`, qui
+sert au renouvellement du certificat, et `cgi-bin/`, que cPanel crée.
+
 Le déploiement ne supprime donc rien tant qu'il n'a pas trouvé le marqueur
 `.rouages` à la racine visée. Le premier envoi le dépose ; les suivants le
 trouvent et s'autorisent alors la suppression. Un chemin erroné ne peut ainsi
