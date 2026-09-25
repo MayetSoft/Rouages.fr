@@ -2275,6 +2275,36 @@ clics. Les comptes des CCAS sont publiés par l'OFGL depuis 2018 — au
 Mayet-de-Montagne, 12 504 € de recettes en 2024, dont 7 500 € de la commune ;
 ils entreront sur la page de chaque commune.
 
+### Ce que publient les entreprises ✔
+
+Le BODACC publie chaque jour ce qui s'ouvre, change de mains et ferme :
+créations, arrivées par transfert, modifications, ventes de fonds, radiations,
+procédures collectives. La page de chaque commune en donne le décompte par
+année depuis 2016, et les huit dernières annonces des sociétés, chacune liée à
+sa page sur bodacc.fr ; le flux de la commune annonce les créations, arrivées,
+cessions et radiations.
+
+Trois règles, qui tiennent à celle des personnes physiques :
+
+- **les entrepreneurs individuels sont comptés, jamais nommés** — ils exercent
+  sous leur nom. Le nom affiché vient de la liste des personnes de l'annonce,
+  et une annonce qui en cite une physique n'est pas nommée du tout : le champ
+  « commerçant » mêlait, pour une vente, la société et l'ancien exploitant ;
+- **les procédures collectives sont comptées, avec un lien** vers la
+  recherche du BODACC lui-même, jamais listées ;
+- **les dépôts de comptes ne sont pas repris.**
+
+Le BODACC ne donne pas de code commune. Le rattachement passe par le code
+postal, puis par le nom — débarrassé de « Cedex » et de l'arrondissement —
+dans le département, communes déléguées et associées comprises : Lomme et
+Hellemmes sont Lille. 10,5 % des annonces depuis 2016 restent sans commune,
+dont dix points sans aucune adresse ; la page le dit. Au
+Mayet-de-Montagne, 10 créations en 2024 et 8 annonces de procédure collective
+en 2019, recoupées une à une avec le BODACC.
+
+Les naissances et les décès (INSEE, depuis 2008) et le CCAS (comptes de
+l'OFGL, établissements FINESS) sont entrés sur la même page juste avant.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

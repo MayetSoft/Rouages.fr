@@ -29,6 +29,7 @@ import { FENETRE_MOIS, GENRES, retenir, type Evenement } from '../src/modele/jou
 import type { Marches } from './marches-emettre.ts';
 import type { Risques } from './risques-emettre.ts';
 import { PROCEDURES } from './marches-emettre.ts';
+import { ANNONCE, FAMILLES } from './entreprises-emettre.ts';
 
 interface Sources {
   marches: Marches | null;
@@ -38,6 +39,7 @@ interface Sources {
   subventions: { evenements: Evenement[] } | null;
   associations: { evenements: Evenement[] } | null;
   etatCivil?: import('./etat-civil-emettre.ts').EtatCivil | null;
+  entreprises?: import('./entreprises-emettre.ts').Entreprises | null;
 }
 
 /**
@@ -96,6 +98,22 @@ export function rassembler(s: Sources, aujourdhui = new Date()): Evenement[] {
         detail: `${n} naissance${n > 1 ? 's' : ''}, ${d} décès`,
         commune: code,
       });
+    }
+  }
+
+  // Les dernières annonces des sociétés, déjà retenues par commune pour la page.
+  if (s.entreprises) {
+    const GENRE_DE: Record<string, (typeof GENRES)[number]> = {
+      creation: 'Société créée',
+      immatriculation: 'Société arrivée',
+      vente: 'Fonds de commerce cédé',
+      radiation: 'Société radiée',
+    };
+    for (const [code, liste] of s.entreprises.recentes) {
+      for (const [date, f, nom, id] of liste) {
+        const g = GENRE_DE[FAMILLES[f]];
+        if (g) tout.push({ genre: GENRES.indexOf(g), date, quoi: nom, url: ANNONCE + id, commune: code });
+      }
     }
   }
 

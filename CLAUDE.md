@@ -30,8 +30,8 @@ npm run veille               l'état des sources surveillées
 npm run territoires -- --cache   réingère tout en réutilisant les gros fichiers
 ```
 
-`npm run territoires` dure une trentaine de minutes et touche une quinzaine de
-sources — dont dix-neuf collectes facultatives, isolées : celle qui échoue laisse en
+`npm run territoires` dure une trentaine de minutes et touche plus de vingt
+sources — dont vingt collectes facultatives, isolées : celle qui échoue laisse en
 place les fichiers de l'ingestion précédente plutôt que de tout emporter. Ce qui
 reste fatal, ce sont les référentiels dont dépend la structure du réseau,
 BANATIC et le découpage.

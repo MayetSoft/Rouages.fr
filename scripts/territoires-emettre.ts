@@ -121,6 +121,7 @@ export function emettre(o: {
   deliberations: Deliberations | null;
   subventions: Subventions | null;
   etatCivil?: import('./etat-civil-emettre.ts').EtatCivil | null;
+  entreprises?: import('./entreprises-emettre.ts').Entreprises | null;
   sortie: string;
   dire: (m: string) => void;
   VERT: string;
@@ -328,6 +329,7 @@ export function emettre(o: {
     subventions: o.subventions,
     associations: o.associations,
     etatCivil: o.etatCivil ?? null,
+    entreprises: o.entreprises ?? null,
   });
   const majJournal = new Date().toISOString().slice(0, 10);
 

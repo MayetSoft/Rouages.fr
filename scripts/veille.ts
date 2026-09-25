@@ -400,6 +400,30 @@ const controles: Record<
     return { gravite: 'ok', message: `à jour jusqu'à ${fin}, catalogue modifié le ${maj}`, millesime: String(fin), empreinte: maj };
   },
 
+  /**
+   * La date de la dernière parution d'un jeu quotidien. Son total grossit de
+   * quinze mille lignes par jour : un écart au total attendu alerterait sans
+   * cesse, et ne dirait rien de ce qui compte — que la publication s'arrête.
+   * `ressource` nomme le champ de date.
+   */
+  async 'opendatasoft-fraicheur'(s) {
+    const champ = s.ressource ?? 'dateparution';
+    const r = (await (
+      await obstine(`${s.url}/records?select=${encodeURIComponent(`max(${champ}) as d`)}&limit=1`)
+    ).json()) as { results?: { d?: string }[] };
+    const d = r.results?.[0]?.d;
+    if (!d) return { gravite: 'alerte', message: `le champ « ${champ} » ne renvoie plus de date` };
+    const lisible = d.slice(0, 10);
+    const jours = Math.round((Date.now() - new Date(d).getTime()) / 86_400_000);
+    // Le BODACC paraît du mardi au samedi : un long week-end ou une semaine
+    // de fêtes font quatre ou cinq jours sans parution, pas quinze.
+    return {
+      gravite: jours > 14 ? 'alerte' : jours > 7 ? 'a-regarder' : 'ok',
+      message: `dernière parution le ${lisible}, il y a ${jours} jour${jours > 1 ? 's' : ''}`,
+      empreinte: lisible,
+    };
+  },
+
   async 'paquet-npm'(s) {
     const r = (await (await obstine(`https://registry.npmjs.org/${s.url}/latest`)).json()) as {
       version: string;

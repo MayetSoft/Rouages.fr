@@ -227,6 +227,18 @@ sigles:
     definition: "Tient les comptes des collectivités et recouvre l'impôt local."
     liens: [od-actes-budgetaires, od-ofgl]
 
+  - id: sigle-bodacc
+    sigle: BODACC
+    developpe: "Bulletin officiel des annonces civiles et commerciales"
+    definition: "L'annexe du Journal officiel où paraissent les immatriculations, modifications, ventes de fonds et radiations des entreprises inscrites au registre du commerce, et leurs procédures collectives."
+    liens: [od-bodacc, dila-api-bodacc, wp-bodacc]
+
+  - id: sigle-dila
+    sigle: DILA
+    developpe: "Direction de l'information légale et administrative"
+    definition: "L'administration qui publie le Journal officiel et le BODACC."
+    liens: [dila-api-bodacc]
+
   - id: sigle-sru
     sigle: SRU
     developpe: "Solidarité et renouvellement urbains"

@@ -313,6 +313,26 @@ export interface CentresSociaux {
   maj: string;
 }
 
+/**
+ * Les annonces légales des entreprises de la commune, d'après le BODACC.
+ *
+ * Des annonces, pas des entreprises : une société qui déménage publie une
+ * modification, puis une radiation d'établissement ; une procédure collective
+ * en publie une par jugement. Les décomptes comptent tout, entrepreneurs
+ * individuels compris ; seules les sociétés sont nommées.
+ */
+export interface Entreprises {
+  annees: number[];
+  familles: string[];
+  /** Par famille, dans l'ordre de `familles`, le nombre d'annonces par année ; null si aucune. */
+  comptes: number[][] | null;
+  /** Les dernières annonces des sociétés : date, rang de la famille, nom, identifiant de l'annonce au BODACC. */
+  recentes: [string, number, string, string][];
+  /** La part des annonces nationales qu'aucune commune ne reçoit. */
+  sansCommune: number;
+  maj: string;
+}
+
 /** La population dans le temps. */
 export interface Population {
   annees: number[];
@@ -388,6 +408,13 @@ type CcasDep = {
   agregats: string[];
   s: Record<string, [string, 'CCAS' | 'CIAS', (number | null)[][], [string, number][], [string, string, number | null][], number]>;
   c: Record<string, string[]>;
+};
+type EntreprisesDep = {
+  maj: string;
+  annees: number[];
+  familles: string[];
+  sansCommune: number;
+  c: Record<string, [number[][] | null, [string, number, string, string][]]>;
 };
 type EtatCivilDep = { maj: string; annees: number[]; c: Record<string, [(number | null)[], (number | null)[]]> };
 type ElectionsDep = {
@@ -477,6 +504,7 @@ const assoDep = parDepartement<AssoDep>('associations');
 const popDep = parDepartement<PopDep>('population');
 const etatCivilDep = parDepartement<EtatCivilDep>('etat-civil');
 const ccasDep = parDepartement<CcasDep>('ccas');
+const entreprisesDep = parDepartement<EntreprisesDep>('entreprises');
 const electionsDep = parDepartement<ElectionsDep>('elections');
 const delibDep = parDepartement<DelibDep>('deliberations');
 const subvDep = parDepartement<SubvDep>('subventions');
@@ -612,6 +640,15 @@ function assemblerCentres(commune: CommuneFiche): CentresSociaux | null {
     // Le CCAS de la commune d'abord : c'est d'elle qu'on part.
     .sort((a, b) => (a.type === b.type ? 0 : a.type === 'CCAS' ? -1 : 1));
   return centres.length > 0 ? { annees: d.annees, agregats: d.agregats, centres, maj: d.maj } : null;
+}
+
+function assemblerEntreprises(commune: CommuneFiche): Entreprises | null {
+  const d = entreprisesDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const [comptes, recentes] = f;
+  if (!comptes && recentes.length === 0) return null;
+  return { annees: d.annees, familles: d.familles, comptes, recentes, sansCommune: d.sansCommune, maj: d.maj };
 }
 
 /** « La région — Centre-Val de Loire » : `meta.json` la nomme par département. */
@@ -861,6 +898,7 @@ export interface ComplementsFiche {
   histoire: Population | null;
   etatCivil: EtatCivil | null;
   centres: CentresSociaux | null;
+  entreprises: Entreprises | null;
   scrutin: Scrutin | null;
   finances: Finances | null;
   fluxPercus: FluxPercu[];
@@ -891,6 +929,7 @@ export function complementsFiche(
     histoire: assemblerPopulation(commune),
     etatCivil: assemblerEtatCivil(commune),
     centres: assemblerCentres(commune),
+    entreprises: assemblerEntreprises(commune),
     scrutin: assemblerScrutin(commune, structures),
     finances: assemblerFinances(commune, population),
     fluxPercus: assemblerFluxPercus(structures),

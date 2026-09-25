@@ -1,0 +1,129 @@
+---
+/**
+ * Ce que les entreprises de la commune publient au BODACC.
+ *
+ * **Des annonces, pas des entreprises**, et le bloc le dit : une société qui
+ * déménage publie une modification puis une radiation d'établissement, une
+ * procédure collective publie une annonce par jugement. Les décomptes
+ * comptent tout le monde, entrepreneurs individuels compris ; la liste ne
+ * nomme que des sociétés, parce qu'un entrepreneur individuel exerce sous son
+ * propre nom.
+ *
+ * Les procédures collectives ne sont que comptées : nommer ici une société en
+ * redressement, c'est en faire la nouvelle du village. Le lien conduit au
+ * BODACC lui-même, qui les publie pour qu'on puisse les y chercher.
+ */
+import type { Entreprises } from '../../modele/fiche-commune.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  e: Entreprises;
+  nom: string;
+  /** Les codes postaux de la commune, séparés par une espace. */
+  cp: string;
+}
+const { e, nom, cp } = Astro.props;
+
+const LIBELLES: Record<string, [string, string]> = {
+  creation: ['Créations', 'création'],
+  immatriculation: ['Arrivées par transfert', 'arrivée par transfert'],
+  modification: ['Modifications', 'modification'],
+  vente: ['Ventes et cessions', 'vente ou cession'],
+  radiation: ['Radiations', 'radiation'],
+  collective: ['Procédures collectives', 'procédure collective'],
+};
+const AIDES: Record<string, string> = {
+  creation: 'Une entreprise qui s’immatricule en commençant son activité ici, ou un établissement qui s’y ouvre.',
+  immatriculation: 'Une entreprise qui existait déjà et transfère ici son siège ou son établissement principal, depuis le ressort d’un autre tribunal.',
+  modification: 'Un changement de dirigeant, de capital, d’activité ou d’adresse.',
+  vente: 'Un fonds de commerce vendu ou cédé.',
+  radiation: 'Une entreprise ou un établissement rayé du registre : fermeture, départ ou fusion.',
+  collective: 'Sauvegarde, redressement ou liquidation judiciaire : une annonce par jugement.',
+};
+
+// L'année en cours n'est pas finie : la courbe s'arrête à la dernière année
+// pleine, et l'année en cours se lit à part, sans se comparer.
+const courante = new Date(e.maj).getFullYear();
+const iCourante = e.annees.indexOf(courante);
+const pleines = iCourante === -1 ? e.annees : e.annees.slice(0, iCourante);
+const derniere = pleines[pleines.length - 1];
+const annonces = (v: number) => `${v.toLocaleString('fr-FR')} annonce${v > 1 ? 's' : ''}`;
+const moisEnCours = new Date(e.maj).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+
+const reperes = (e.comptes ?? [])
+  .map((serie, f) => {
+    const famille = e.familles[f];
+    const valeurs = serie.slice(0, pleines.length);
+    return {
+      famille,
+      total: serie.reduce((a, b) => a + b, 0),
+      dernier: valeurs[valeurs.length - 1] ?? 0,
+      valeurs,
+      enCours: iCourante === -1 ? null : serie[iCourante],
+    };
+  })
+  .filter((r) => r.total > 0 && LIBELLES[r.famille]);
+const collective = reperes.find((r) => r.famille === 'collective');
+const autres = reperes.filter((r) => r.famille !== 'collective');
+
+// La recherche du BODACC lui-même : le nom de la ville, et ses codes postaux
+// pour ne pas prendre Saint-Martin-d'Hères pour Saint-Martin.
+const cps = cp.split(' ').filter(Boolean);
+const requete = `ville:"${nom}" AND ${cps.length > 1 ? `(${cps.map((c) => `cp:${c}`).join(' OR ')})` : `cp:${cps[0]}`}`;
+const lienCollectives =
+  'https://www.bodacc.fr/pages/annonces-commerciales-recherche/?refine.familleavis=collective&q=' +
+  encodeURIComponent(requete);
+
+/** Le BODACC donne à chaque annonce une page, que son identifiant suffit à retrouver. */
+const ANNONCE = 'https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:';
+const jour = (iso: string) =>
+  new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<p class="p-strate">
+  {`Les annonces légales publiées au BODACC pour une adresse de la commune, depuis ${e.annees[0]}. ` +
+    'Des annonces, pas des entreprises : une même société peut en publier plusieurs la même année.'}
+</p>
+{autres.length > 0 && (
+  <dl class="p-reperes">
+    {autres.map((r) => (
+      <Repere
+        nom={LIBELLES[r.famille][0]}
+        aide={AIDES[r.famille]}
+        montant={annonces(r.dernier)}
+        serie={{ valeurs: r.valeurs, annees: pleines, formater: annonces }}
+        detail={`en ${derniere}` + (r.enCours !== null ? ` · ${r.enCours.toLocaleString('fr-FR')} en ${courante}, au ${moisEnCours}` : '')}
+      />
+    ))}
+  </dl>
+)}
+{collective && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Les procédures collectives</span>
+    <p class="p-strate">
+      {`${annonces(collective.total)} de procédure collective depuis ${e.annees[0]}, dont ${collective.dernier.toLocaleString('fr-FR')} en ${derniere}` +
+        (collective.enCours !== null ? ` et ${collective.enCours.toLocaleString('fr-FR')} en ${courante}` : '') +
+        '. Une procédure en publie une à chaque jugement — ouverture, plan, clôture —, et le site ne les nomme pas. '}
+      <a href={lienCollectives} target="_blank" rel="noopener">Les annonces, sur le BODACC</a>
+    </p>
+  </div>
+)}
+{e.recentes.length > 0 && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Les dernières annonces des sociétés</span>
+    <ul>
+      {e.recentes.map(([date, f, societe, id]) => (
+        <li class="p-risque-plan">
+          <span class="p-risque-nom"><a href={ANNONCE + id} target="_blank" rel="noopener">{societe}</a></span>
+          <span class="p-risque-detail">{`${LIBELLES[e.familles[f]]?.[1] ?? e.familles[f]} · ${jour(date)}`}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+<p class="p-source-territoire">
+  {`D’après les annonces commerciales du BODACC, publiées par la DILA (${e.maj}). ` +
+    'Les décomptes incluent les entrepreneurs individuels ; la liste ne nomme que des sociétés, jamais une personne, ' +
+    'ni son adresse. Le BODACC ne donne pas de code commune : le site rattache chaque annonce par sa ville et son ' +
+    `code postal, et ${e.sansCommune.toLocaleString('fr-FR')} % des annonces, le plus souvent sans adresse, ` +
+    'ne sont comptées dans aucune commune. Les dépôts de comptes ne sont pas repris.'}
+</p>

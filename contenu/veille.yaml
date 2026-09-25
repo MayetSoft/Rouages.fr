@@ -286,6 +286,16 @@ surveillances:
     url: "https://data-pipeline-open.s3.sbg.io.cloud.ovh.net/rna/waldec.csv"
     lien: od-rna
 
+  - id: bodacc-annonces
+    nom: "BODACC — annonces commerciales"
+    alimente: "les créations, cessions, radiations et procédures collectives de chaque commune"
+    # Un jeu quotidien de cinquante millions de lignes : c'est la date de la
+    # dernière parution qu'on regarde, pas le total.
+    type: opendatasoft-fraicheur
+    url: "https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales"
+    ressource: "dateparution"
+    lien: od-bodacc
+
 decouverte:
   mots_cles:
     - "intercommunalité compétences"

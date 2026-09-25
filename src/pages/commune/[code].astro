@@ -38,6 +38,7 @@ import Deliberations from '../../composants/commune/Deliberations.astro';
 import Subventions from '../../composants/commune/Subventions.astro';
 import Associations from '../../composants/commune/Associations.astro';
 import CentresSociaux from '../../composants/commune/CentresSociaux.astro';
+import Entreprises from '../../composants/commune/Entreprises.astro';
 import Fiscalite from '../../composants/commune/Fiscalite.astro';
 import Logements from '../../composants/commune/Logements.astro';
 import Equipements from '../../composants/commune/Equipements.astro';
@@ -214,6 +215,7 @@ const sommaire: [string, string, unknown][] = [
   ['deliberations', 'Les délibérations', plus.deliberations.length > 0],
   ['subventions', 'Les subventions', plus.subventions.length > 0],
   ['associations', 'Les associations', (plus.associations && plus.associations.total > 0) || droitLocal],
+  ['entreprises', 'Les entreprises', plus.entreprises],
   ['equipements', 'Ce qu’on trouve sur place', fiche?.equipements],
   ['services', 'Les services', (fiche?.services.length ?? 0) > 0],
   ['journal', 'Ce qui a bougé', journal.length > 0],
@@ -546,6 +548,13 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
           greffe du tribunal judiciaire, sous le code civil local. C’est là que se consulte ce
           qui s’est créé — et non dans le fichier dont le reste du pays relève.
         </p>
+      </section>
+    )}
+
+    {plus.entreprises && (
+      <section id="entreprises" class="p-assos">
+        <h2 class="badge">Ce que publient ses entreprises</h2>
+        <Entreprises e={plus.entreprises} nom={commune.nom} cp={commune.cp} />
       </section>
     )}
 

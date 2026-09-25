@@ -374,6 +374,7 @@ export const Surveillance = z.object({
     'datagouv-ressource',
     'paquet-npm',
     'melodi-periode',
+    'opendatasoft-fraicheur',
   ]),
   url: z.string().min(3),
   /**

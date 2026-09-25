@@ -630,6 +630,20 @@ async function principal() {
   );
   if (etatCivil) dire(`${GRIS}${ecrireEtatCivil(SORTIE, etatCivil)} départements d’état civil écrits.${RAZ}`);
 
+  // Les annonces légales des entreprises : décomptes par commune, et les
+  // dernières annonces des sociétés, que le journal reprend. Avant l'émetteur
+  // principal, qui rassemble le journal ; le rattachement lit le découpage
+  // lui-même, pas l'index que l'émetteur va écrire.
+  const { collecterEntreprises, ecrireEntreprises, indexDuDecoupage } = await import('./entreprises-emettre.ts');
+  const entreprises = await tenter('Annonces du BODACC', () =>
+    collecterEntreprises(
+      async (url) => (await obstine(url)).text(),
+      indexDuDecoupage(),
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+  if (entreprises) dire(`${GRIS}${ecrireEntreprises(SORTIE, entreprises)} départements d’annonces d’entreprises écrits.${RAZ}`);
+
   const { collecterAssociations } = await import('./associations-emettre.ts');
   const associations = await tenter('Associations', () =>
     collecterAssociations(
@@ -676,6 +690,7 @@ async function principal() {
     fiscalite,
     equipements,
     etatCivil,
+    entreprises,
   );
 
   // Le centre d'action sociale : son budget, ses budgets annexes, ce qu'il
@@ -824,6 +839,7 @@ async function ecrire(
     ReturnType<typeof import('./equipements-emettre.ts')['collecterEquipements']>
   >,
   etatCivil: import('./etat-civil-emettre.ts').EtatCivil | null,
+  entreprises: import('./entreprises-emettre.ts').Entreprises | null,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -857,6 +873,7 @@ async function ecrire(
     fiscalite,
     equipements,
     etatCivil,
+    entreprises,
     sortie: SORTIE,
     dire,
     VERT,
