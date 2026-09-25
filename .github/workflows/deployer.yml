@@ -127,10 +127,25 @@ jobs:
             npx tsx scripts/manifeste.ts comparer "$travail/ancien" "$travail/nouveau" dist \
               "$travail/envoi" "$travail/effacer"
             if [ -d "$travail/envoi" ]; then
-              lftp -c "$reglages
-                       open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
-                       mirror --reverse --verbose=1 --parallel=8 $simuler \
-                              \"$travail/envoi/\" \"$RACINE\""
+              # Une seconde passe si la première échoue. Sur trente-cinq mille
+              # fichiers, le serveur en laisse tomber un ou deux — le #91 a
+              # perdu Paris et Noisy-le-Grand après trois heures d'envoi, sans
+              # manifeste déposé ni cache purgé. La reprise compare les seules
+              # tailles : ce qui est arrivé entier est sauté, ce qui manque ou
+              # a été tronqué repart. Seul angle mort : un fichier raté dont
+              # l'ancienne version avait la même taille à l'octet près — il
+              # repartira à sa prochaine modification. Un second échec, lui,
+              # arrête l'étape.
+              envoyer() {
+                lftp -c "$reglages
+                         open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                         mirror --reverse --verbose=1 --parallel=8 $1 $simuler \
+                                \"$travail/envoi/\" \"$RACINE\""
+              }
+              if ! envoyer ""; then
+                echo "::warning::des fichiers n'ont pas été reçus — seconde passe sur ceux-là."
+                envoyer "--ignore-time"
+              fi
             fi
             # Effacer suppose le marqueur, comme `--delete` plus bas : la liste
             # vient du manifeste, mais c'est RACINE qui décide où elle s'applique.
