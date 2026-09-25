@@ -281,6 +281,17 @@ export interface Associations {
   maj: string;
 }
 
+/**
+ * Les naissances et les décès, domiciliés : au domicile de la mère, à celui du
+ * défunt. Aucun nom — le fichier nominatif des décès n'est pas lu.
+ */
+export interface EtatCivil {
+  annees: number[];
+  naissances: (number | null)[];
+  deces: (number | null)[];
+  maj: string;
+}
+
 /** La population dans le temps. */
 export interface Population {
   annees: number[];
@@ -350,6 +361,7 @@ type AssoDep = {
   c: Record<string, { n: number; a: number[]; d: [number, number][]; r: [string, string, number][] }>;
 };
 type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
+type EtatCivilDep = { maj: string; annees: number[]; c: Record<string, [(number | null)[], (number | null)[]]> };
 type ElectionsDep = {
   scrutin: string;
   maj: string;
@@ -435,6 +447,7 @@ const eauDep = parDepartement<EauDep>('eau');
 const sruDep = parDepartement<SruDep>('sru');
 const assoDep = parDepartement<AssoDep>('associations');
 const popDep = parDepartement<PopDep>('population');
+const etatCivilDep = parDepartement<EtatCivilDep>('etat-civil');
 const electionsDep = parDepartement<ElectionsDep>('elections');
 const delibDep = parDepartement<DelibDep>('deliberations');
 const subvDep = parDepartement<SubvDep>('subventions');
@@ -548,6 +561,15 @@ function assemblerPopulation(commune: CommuneFiche): Population | null {
     ecart: Math.round(((actuelle - valeurSommet) / valeurSommet) * 100),
     maj: d.maj,
   };
+}
+
+function assemblerEtatCivil(commune: CommuneFiche): EtatCivil | null {
+  const d = etatCivilDep.get(commune.dep);
+  const f = d?.c[commune.code];
+  if (!d || !f) return null;
+  const [naissances, deces] = f;
+  if (![...naissances, ...deces].some((v) => v !== null)) return null;
+  return { annees: d.annees, naissances, deces, maj: d.maj };
 }
 
 /** « La région — Centre-Val de Loire » : `meta.json` la nomme par département. */
@@ -795,6 +817,7 @@ function assemblerFluxPercus(structures: StructureFiche[]): FluxPercu[] {
 
 export interface ComplementsFiche {
   histoire: Population | null;
+  etatCivil: EtatCivil | null;
   scrutin: Scrutin | null;
   finances: Finances | null;
   fluxPercus: FluxPercu[];
@@ -823,6 +846,7 @@ export function complementsFiche(
 ): ComplementsFiche {
   return {
     histoire: assemblerPopulation(commune),
+    etatCivil: assemblerEtatCivil(commune),
     scrutin: assemblerScrutin(commune, structures),
     finances: assemblerFinances(commune, population),
     fluxPercus: assemblerFluxPercus(structures),

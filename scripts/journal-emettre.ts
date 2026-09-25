@@ -37,6 +37,7 @@ interface Sources {
   deliberations: { evenements: Evenement[] } | null;
   subventions: { evenements: Evenement[] } | null;
   associations: { evenements: Evenement[] } | null;
+  etatCivil?: import('./etat-civil-emettre.ts').EtatCivil | null;
 }
 
 /**
@@ -76,6 +77,26 @@ export function rassembler(s: Sources, aujourdhui = new Date()): Evenement[] {
 
   for (const source of [s.deliberations, s.subventions, s.associations]) {
     if (source) tout.push(...source.evenements);
+  }
+
+  // Une entrée par commune, le jour où l'INSEE a publié l'année : ce qu'un
+  // habitant abonné au flux apprend sans avoir à revenir voir la page.
+  if (s.etatCivil?.publie) {
+    const genre = GENRES.indexOf('État civil publié');
+    const e = s.etatCivil;
+    const i = e.annees.length - 1;
+    for (const [code, [nais, dec]] of e.communes) {
+      const n = nais[i];
+      const d = dec[i];
+      if (n === null || d === null) continue;
+      tout.push({
+        genre,
+        date: e.publie!,
+        quoi: `Naissances et décès de ${e.annees[i]}`,
+        detail: `${n} naissance${n > 1 ? 's' : ''}, ${d} décès`,
+        commune: code,
+      });
+    }
   }
 
   if (s.risques) {

@@ -195,7 +195,7 @@ const droitLocal = DROIT_LOCAL.has(commune.dep) && !(plus.associations && plus.a
  */
 const echelonsMontres = plus.comptesEchelons.some((c) => c.reperes.some((r) => r.valeur !== null));
 const sommaire: [string, string, unknown][] = [
-  ['habitants', 'Les habitants', plus.histoire],
+  ['habitants', 'Les habitants', plus.histoire || plus.etatCivil],
   ['election', 'L’élection', plus.scrutin],
   ['conseil', 'Le conseil', fiche?.conseil && fiche.conseil.elus > 0],
   ['qui-exerce', 'Qui exerce quoi', lignes.length > 0],
@@ -261,10 +261,10 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       </nav>
     )}
 
-    {plus.histoire && (
+    {(plus.histoire || plus.etatCivil) && (
       <section id="habitants" class="p-habitants">
         <h2 class="badge">Combien d’habitants</h2>
-        <Habitants h={plus.histoire} />
+        <Habitants h={plus.histoire} ec={plus.etatCivil} />
       </section>
     )}
 

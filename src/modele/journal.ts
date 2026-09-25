@@ -48,6 +48,10 @@ export const GENRES = [
   'Compétence transférée',
   'Compétence reprise',
   'Rattachement modifié',
+  // Une publication, pas un fait daté de la commune : l'INSEE sort chaque
+  // juillet les naissances et les décès de l'année précédente. Le flux le dit,
+  // puisque la page n'annonce pas elle-même qu'elle a changé.
+  'État civil publié',
 ] as const;
 
 /** Sur combien de mois le journal regarde en arrière. */

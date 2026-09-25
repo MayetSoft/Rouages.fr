@@ -373,6 +373,33 @@ const controles: Record<
   },
 
   /** Le découpage administratif bouge à chaque fusion de communes. */
+  /**
+   * Un jeu du catalogue Melodi de l'INSEE : la dernière année publiée.
+   *
+   * L'adresse du fichier porte son millésime (`…_2025_CSV_FR`) et reste en
+   * place quand le suivant paraît : un « 200 » ne dirait rien. Le catalogue,
+   * lui, annonce la période couverte. `ressource` porte la dernière année que
+   * le collecteur sait lire ; au-delà, il faut changer son adresse.
+   */
+  async 'melodi-periode'(s) {
+    const r = (await (await obstine(`https://api.insee.fr/melodi/catalog/${s.url}`)).json()) as {
+      temporal?: { endPeriod?: string };
+      modified?: string;
+    };
+    const fin = Number((r.temporal?.endPeriod ?? '').slice(0, 4));
+    const lu = Number(s.ressource ?? 0);
+    const maj = (r.modified ?? '').slice(0, 10);
+    if (!fin) return { gravite: 'alerte', message: 'le catalogue ne dit plus quelle période il couvre' };
+    if (fin > lu) {
+      return {
+        gravite: 'a-regarder',
+        message: `l'INSEE publie désormais jusqu'à ${fin} (le collecteur lit ${lu}) : changer l'adresse du fichier`,
+        millesime: String(fin),
+      };
+    }
+    return { gravite: 'ok', message: `à jour jusqu'à ${fin}, catalogue modifié le ${maj}`, millesime: String(fin), empreinte: maj };
+  },
+
   async 'paquet-npm'(s) {
     const r = (await (await obstine(`https://registry.npmjs.org/${s.url}/latest`)).json()) as {
       version: string;

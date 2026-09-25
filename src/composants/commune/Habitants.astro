@@ -5,33 +5,92 @@
  * Tous les autres chiffres de la page sont par habitant : sans cette série, une
  * dotation qui baisse se lit comme une décision de l'État alors qu'elle suit
  * souvent une population qui s'en va.
+ *
+ * Les naissances et les décès en donnent la moitié de l'explication : le solde
+ * naturel. L'autre moitié, les arrivées et les départs, n'est publiée par
+ * personne commune par commune, et le site ne la reconstitue pas.
  */
-import type { Population } from '../../modele/fiche-commune.ts';
+import type { EtatCivil, Population } from '../../modele/fiche-commune.ts';
 import Repere from './Repere.astro';
 
 interface Props {
-  h: Population;
+  h: Population | null;
+  ec: EtatCivil | null;
 }
-const { h } = Astro.props;
+const { h, ec } = Astro.props;
+
+// La dernière année où les deux séries sont publiées, et le cumul sur les
+// seules années où elles le sont toutes les deux : additionner des naissances
+// d'une année aux décès d'une autre ne ferait pas un solde.
+const bilan = ec
+  ? (() => {
+      const communes = ec.annees
+        .map((a, i) => ({ a, n: ec.naissances[i], d: ec.deces[i] }))
+        .filter((x): x is { a: number; n: number; d: number } => x.n !== null && x.d !== null);
+      if (communes.length === 0) return null;
+      const dernier = communes[communes.length - 1];
+      const n = communes.reduce((s, x) => s + x.n, 0);
+      const d = communes.reduce((s, x) => s + x.d, 0);
+      return { dernier, debut: communes[0].a, n, d, solde: n - d, lacunes: communes.length < ec.annees.length };
+    })()
+  : null;
+const signe = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toLocaleString('fr-FR')}`;
+const nb = (v: number) => v.toLocaleString('fr-FR');
 ---
 <dl class="p-reperes">
-  <Repere
-    nom={`Population en ${h.anneeActuelle}`}
-    montant={h.actuelle.toLocaleString('fr-FR')}
-    mediane={`${h.ecart >= 0 ? '+' : '\u2212'}${Math.abs(h.ecart)} % par rapport à son maximum, ` +
-      `${h.sommet[1].toLocaleString('fr-FR')} en ${h.sommet[0]}`}
-    serie={{ valeurs: h.serie, annees: h.annees, formater: (v) => `${v.toLocaleString('fr-FR')} habitants` }}
-  />
+  {h && (
+    <Repere
+      nom={`Population en ${h.anneeActuelle}`}
+      montant={h.actuelle.toLocaleString('fr-FR')}
+      mediane={`${h.ecart >= 0 ? '+' : '−'}${Math.abs(h.ecart)} % par rapport à son maximum, ` +
+        `${h.sommet[1].toLocaleString('fr-FR')} en ${h.sommet[0]}`}
+      serie={{ valeurs: h.serie, annees: h.annees, formater: (v) => `${v.toLocaleString('fr-FR')} habitants` }}
+    />
+  )}
+  {ec && bilan && (
+    <>
+      <Repere
+        nom={`Naissances en ${bilan.dernier.a}`}
+        montant={nb(bilan.dernier.n)}
+        serie={{ valeurs: ec.naissances, annees: ec.annees, formater: (v) => `${v} naissance${v > 1 ? 's' : ''}` }}
+      />
+      <Repere
+        nom={`Décès en ${bilan.dernier.a}`}
+        montant={nb(bilan.dernier.d)}
+        serie={{ valeurs: ec.deces, annees: ec.annees, formater: (v) => `${v} décès` }}
+      />
+    </>
+  )}
 </dl>
-{h.ecart < 0 && (
+{bilan && (
+  <p class="p-strate">
+    {`De ${bilan.debut} à ${bilan.dernier.a}, ${nb(bilan.n)} naissance${bilan.n > 1 ? 's' : ''} et ` +
+      `${nb(bilan.d)} décès : un solde naturel de ${signe(bilan.solde)} habitant${Math.abs(bilan.solde) > 1 ? 's' : ''}` +
+      (bilan.lacunes ? ', sur les seules années où l’INSEE publie les deux chiffres' : '') +
+      '. Les arrivées et les départs, l’autre moitié de l’évolution, ne sont pas publiés commune par commune.'}
+  </p>
+)}
+{h && h.ecart < 0 && (
   <p class="p-strate">
     Les montants de cette page étant rapportés à l’habitant, c’est ce dénominateur-là qui bouge
     sous eux.
   </p>
 )}
-<p class="p-source-territoire">
-  {`D’après les recensements de l’INSEE, de ${h.annees[0]} à ${h.annees[h.annees.length - 1]} ` +
-    `(${h.maj}). Trois définitions s’y succèdent — population totale jusqu’en 1954, sans doubles ` +
-    'comptes jusqu’en 1999, municipale depuis : l’INSEE les publie comme une seule série, et ' +
-    'comparer les deux extrémités reste une tendance, pas une soustraction exacte.'}
-</p>
+{h && (
+  <p class="p-source-territoire">
+    {`D’après les recensements de l’INSEE, de ${h.annees[0]} à ${h.annees[h.annees.length - 1]} ` +
+      `(${h.maj}). Trois définitions s’y succèdent — population totale jusqu’en 1954, sans doubles ` +
+      'comptes jusqu’en 1999, municipale depuis : l’INSEE les publie comme une seule série, et ' +
+      'comparer les deux extrémités reste une tendance, pas une soustraction exacte.'}
+  </p>
+)}
+{ec && (
+  <p class="p-source-territoire">
+    {`Naissances et décès d’après l’état civil de l’INSEE (${ec.maj}), comptés au domicile : celui de ` +
+      'la mère pour une naissance, celui du défunt pour un décès. Une commune sans maternité a donc ses ' +
+      'naissances, et une commune qui abrite un hôpital ne compte pas les décès des alentours. Aucun nom ' +
+      'n’est repris ici ; '}
+    <a href="https://www.data.gouv.fr/datasets/fichier-des-personnes-decedees" target="_blank" rel="noopener">le fichier nominatif des personnes décédées</a>
+    {' est publié par l’INSEE, mis à jour chaque mois.'}
+  </p>
+)}

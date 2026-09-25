@@ -617,6 +617,19 @@ async function principal() {
     ),
   );
 
+  // Les naissances et les décès : le solde naturel explique la moitié de ce
+  // que la courbe des habitants montre. Écrits à part, par département, sans
+  // passer par l'émetteur principal — le jeu ne dépend de rien d'autre.
+  const { collecterEtatCivil, ecrireEtatCivil } = await import('./etat-civil-emettre.ts');
+  const etatCivil = await tenter('Naissances et décès', () =>
+    collecterEtatCivil(
+      (url, vers) => telechargerEnCache(url, vers, reutiliser, 'État civil INSEE (environ 6 Mo)'),
+      CACHE,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+  if (etatCivil) dire(`${GRIS}${ecrireEtatCivil(SORTIE, etatCivil)} départements d’état civil écrits.${RAZ}`);
+
   const { collecterAssociations } = await import('./associations-emettre.ts');
   const associations = await tenter('Associations', () =>
     collecterAssociations(
@@ -662,6 +675,7 @@ async function principal() {
     logements,
     fiscalite,
     equipements,
+    etatCivil,
   );
 }
 
@@ -796,6 +810,7 @@ async function ecrire(
   equipements: Awaited<
     ReturnType<typeof import('./equipements-emettre.ts')['collecterEquipements']>
   >,
+  etatCivil: import('./etat-civil-emettre.ts').EtatCivil | null,
 ) {
   const { emettre } = await import('./territoires-emettre.ts');
   emettre({
@@ -828,6 +843,7 @@ async function ecrire(
     logements,
     fiscalite,
     equipements,
+    etatCivil,
     sortie: SORTIE,
     dire,
     VERT,

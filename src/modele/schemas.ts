@@ -373,6 +373,7 @@ export const Surveillance = z.object({
     'datagouv-tabulaire',
     'datagouv-ressource',
     'paquet-npm',
+    'melodi-periode',
   ]),
   url: z.string().min(3),
   /**

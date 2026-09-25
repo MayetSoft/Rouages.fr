@@ -260,6 +260,22 @@ surveillances:
     url: "https://www.insee.fr/fr/statistiques/fichier/3698339/base-pop-historiques-1876-2023.xlsx"
     lien: od-insee-populations
 
+  - id: insee-naissances
+    nom: "INSEE — naissances domiciliées, par commune et par an"
+    alimente: "les naissances de chaque commune, au domicile de la mère, depuis 2008"
+    type: melodi-periode
+    url: "DS_ETAT_CIVIL_NAIS_COMMUNES"
+    ressource: "2025"
+    lien: od-insee-naissances
+
+  - id: insee-deces
+    nom: "INSEE — décès domiciliés, par commune et par an"
+    alimente: "les décès de chaque commune, au domicile du défunt, depuis 2008"
+    type: melodi-periode
+    url: "DS_ETAT_CIVIL_DECES_COMMUNES"
+    ressource: "2025"
+    lien: od-insee-deces
+
   - id: rna-waldec
     nom: "Répertoire national des associations — fichier Waldec"
     alimente: "les créations d'associations, commune par commune"
