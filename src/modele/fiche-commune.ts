@@ -353,6 +353,22 @@ export interface Entreprises {
   maj: string;
 }
 
+/**
+ * Les établissements actifs de la commune au répertoire SIRENE, par secteur,
+ * et parmi eux les employeurs.
+ */
+export interface Presentes {
+  total: number;
+  employeurs: number;
+  /** Établissements employeurs pour 1 000 habitants, et la médiane nationale. */
+  parMille: number | null;
+  mediane: number;
+  secteurs: { nom: string; total: number; employeurs: number }[];
+  /** La date de la copie de SIRENE lue. */
+  source: string | null;
+  maj: string;
+}
+
 /** La population dans le temps. */
 export interface Population {
   annees: number[];
@@ -435,6 +451,13 @@ type EntreprisesDep = {
   familles: string[];
   sansCommune: number;
   c: Record<string, [number[][] | null, [string, number, string, string][]]>;
+};
+type SireneDep = {
+  maj: string;
+  source: string | null;
+  sections: string[];
+  mediane: number;
+  c: Record<string, [number, number, number][]>;
 };
 type AgesDep = {
   maj: string;
@@ -533,6 +556,7 @@ const assoDep = parDepartement<AssoDep>('associations');
 const popDep = parDepartement<PopDep>('population');
 const etatCivilDep = parDepartement<EtatCivilDep>('etat-civil');
 const agesDep = parDepartement<AgesDep>('ages');
+const sireneDep = parDepartement<SireneDep>('sirene');
 const ccasDep = parDepartement<CcasDep>('ccas');
 const entreprisesDep = parDepartement<EntreprisesDep>('entreprises');
 const electionsDep = parDepartement<ElectionsDep>('elections');
@@ -646,6 +670,26 @@ function assemblerPopulation(commune: CommuneFiche): Population | null {
     anneeActuelle: d.annees[dernier],
     sommet: [anneeSommet, valeurSommet],
     ecart: Math.round(((actuelle - valeurSommet) / valeurSommet) * 100),
+    maj: d.maj,
+  };
+}
+
+function assemblerPresentes(commune: CommuneFiche, population: number): Presentes | null {
+  const d = sireneDep.get(commune.dep);
+  const c = d?.c[commune.code];
+  if (!d || !c || c.length === 0) return null;
+  const total = c.reduce((s, x) => s + x[1], 0);
+  const employeurs = c.reduce((s, x) => s + x[2], 0);
+  return {
+    total,
+    employeurs,
+    parMille: population > 0 ? (employeurs / population) * 1000 : null,
+    mediane: d.mediane,
+    secteurs: c
+      .filter(([i]) => i < d.sections.length - 1)
+      .map(([i, n, e]) => ({ nom: d.sections[i], total: n, employeurs: e }))
+      .sort((a, b) => b.employeurs - a.employeurs || b.total - a.total),
+    source: d.source,
     maj: d.maj,
   };
 }
@@ -956,6 +1000,7 @@ export interface ComplementsFiche {
   ages: Ages | null;
   centres: CentresSociaux | null;
   entreprises: Entreprises | null;
+  presentes: Presentes | null;
   scrutin: Scrutin | null;
   finances: Finances | null;
   fluxPercus: FluxPercu[];
@@ -988,6 +1033,7 @@ export function complementsFiche(
     ages: assemblerAges(commune),
     centres: assemblerCentres(commune),
     entreprises: assemblerEntreprises(commune),
+    presentes: assemblerPresentes(commune, population),
     scrutin: assemblerScrutin(commune, structures),
     finances: assemblerFinances(commune, population),
     fluxPercus: assemblerFluxPercus(structures),

@@ -286,6 +286,18 @@ surveillances:
     ressource: "2023"
     lien: od-insee-ages
 
+  - id: sirene-etablissements
+    nom: "SIRENE — établissements, copie Opendatasoft"
+    alimente: "les établissements actifs et employeurs de chaque commune, par secteur"
+    # Une copie refaite de loin en loin : au 25 septembre 2026, le dernier
+    # établissement traité datait du 1er août. C'est cette date qu'on regarde,
+    # et deux mois et demi sans nouvelle copie, c'est qu'elle n'est plus tenue.
+    type: opendatasoft-fraicheur
+    url: "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/economicref-france-sirene-v3"
+    ressource: "datederniertraitementetablissement"
+    attendu: 75
+    lien: od-sirene-ods
+
   - id: rna-waldec
     nom: "Répertoire national des associations — fichier Waldec"
     alimente: "les créations d'associations, commune par commune"
