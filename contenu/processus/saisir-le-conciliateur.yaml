@@ -1,0 +1,79 @@
+# Régler un litige par le conciliateur de justice.
+# Le conciliateur était décrit sans jamais agir, alors que c'est une étape
+# obligatoire avant le juge pour les litiges du quotidien — un impayé de moins
+# de 5 000 €, une haie, un bruit. L'obligation a été annulée en 2022 et
+# rétablie en 2023 : la fiche cite la version en vigueur, et le décret.
+processus:
+  - id: saisir-le-conciliateur
+    nom: "Régler un litige par le conciliateur de justice"
+    famille: quotidien
+    resume: "Un voisin, un artisan, un impayé de moins de 5 000 € : pourquoi le passage par le conciliateur est obligatoire avant le juge, ce qu'il coûte — rien —, et comment un accord signé devient exécutoire."
+    declencheur: "Un litige civil du quotidien : une somme de 5 000 € au plus, ou un trouble de voisinage"
+    sortie: "Un constat d'accord, homologué ou non, ou le droit de saisir le juge"
+    decideur: conciliateur-justice
+    competences: [reglement-amiable, juger-litiges-prives, execution-decisions]
+    liens: [sp-conciliateur, cpc-750-1, cpc-conciliateur]
+    verifie_le: 2026-09-25
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Prendre contact avec un conciliateur"
+        note: "Directement — par téléphone, courrier ou en ligne —, ou par le greffe du tribunal judiciaire. Le recours au conciliateur est gratuit, et l'avocat n'est pas nécessaire."
+        liens: [sp-conciliateur, conciliateurs-fr]
+        confiance: etabli
+      - ordre: 2
+        acteur: conciliateur-justice
+        action: "La tentative de conciliation"
+        note: "Pour une demande de 5 000 € au plus, ou un trouble anormal de voisinage, elle est obligatoire avant de saisir le tribunal judiciaire — à défaut de médiation ou de procédure participative. Sans elle, le juge peut déclarer la demande irrecevable. Elle est écartée si aucun conciliateur n'est disponible dans les trois mois suivant la prise de contact. La règle, annulée en 2022, a été rétablie pour les instances introduites depuis le 1er octobre 2023."
+        liens: [cpc-750-1, decret-2023-357]
+        confiance: etabli
+      - ordre: 3
+        acteur: conciliateur-justice
+        action: "Le constat d'accord"
+        note: "En cas d'accord, même partiel, un constat signé par les parties et le conciliateur peut être établi ; chacune en reçoit un exemplaire, et il les engage."
+        liens: [cpc-conciliateur, sp-conciliateur]
+        confiance: etabli
+      - ordre: 4
+        acteur: tribunal-judiciaire
+        action: "L'homologation par le juge"
+        note: "Demandée par toutes les parties, ou par l'une avec l'accord exprès des autres, elle donne au constat force exécutoire."
+        liens: [cpc-conciliateur, sp-conciliateur]
+        confiance: etabli
+      - ordre: 5
+        acteur: commissaire-justice
+        action: "L'exécution, si l'autre partie ne s'exécute pas"
+        note: "Un accord homologué s'exécute comme un jugement : seul un commissaire de justice peut procéder à l'exécution forcée."
+        liens: [cpce-l122-1]
+        confiance: etabli
+
+    leviers:
+      - id: concilier-avant-le-juge
+        quoi: "Passer par le conciliateur avant d'assigner"
+        quand: "Avant toute saisine du tribunal, pour 5 000 € au plus ou un trouble de voisinage"
+        aupres_de: "Un conciliateur de justice, par le site des conciliateurs ou le greffe"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Saisir directement le juge expose à l'irrecevabilité : on perd du temps, et il faut recommencer par la conciliation."
+        liens: [cpc-750-1]
+        confiance: etabli
+      - id: garder-la-date-du-contact
+        quoi: "Garder la preuve de la date de prise de contact"
+        quand: "Dès la demande au conciliateur"
+        aupres_de: "Soi-même : le courriel, le formulaire ou le courrier envoyé"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Si aucun conciliateur n'est disponible dans les trois mois, l'obligation tombe — encore faut-il pouvoir montrer quand on l'a demandé."
+        liens: [cpc-750-1, decret-2023-357]
+        confiance: etabli
+      - id: faire-homologuer
+        quoi: "Faire homologuer l'accord"
+        quand: "Après la signature du constat"
+        aupres_de: "Le juge du tribunal judiciaire"
+        difficulte: faible
+        ancre_etape: 4
+        piege: "Sans homologation, l'accord engage mais ne s'exécute pas de force. Et l'homologation suppose l'accord exprès de toutes les parties : autant le prévoir au moment de signer."
+        liens: [cpc-conciliateur]
+        confiance: etabli

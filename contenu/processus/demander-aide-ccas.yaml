@@ -1,0 +1,71 @@
+# Demander de l'aide au CCAS.
+# Le centre communal d'action sociale n'agissait dans aucune démarche. C'est
+# pourtant le guichet de l'aide sociale légale — la loi y fait déposer les
+# demandes —, celui des aides que la commune décide seule, et le seul endroit
+# où une personne sans domicile peut obtenir une adresse.
+processus:
+  - id: demander-aide-ccas
+    nom: "Demander de l'aide au CCAS"
+    famille: quotidien
+    resume: "Une aide sociale à demander, une facture qu'on ne peut plus payer, pas d'adresse où recevoir son courrier : ce que le CCAS doit faire, ce qu'il peut décider seul, et ce qu'il n'a pas le droit de refuser."
+    declencheur: "Une difficulté sociale ou financière, ou l'absence de domicile stable"
+    sortie: "Un dossier transmis, une aide de la commune, ou une adresse de domiciliation"
+    decideur: ccas
+    competences: [aide-sociale-communale, action-sociale]
+    liens: [casf-l123-5, casf-l131-1, casf-l264-1, code-action-sociale]
+    verifie_le: 2026-09-25
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: citoyen
+        action: "Déposer sa demande au CCAS, ou à la mairie"
+        note: "Les demandes d'aide sociale légale — hors aide sociale à l'enfance — se déposent au centre communal ou intercommunal d'action sociale, ou à défaut à la mairie de résidence."
+        liens: [casf-l131-1]
+        confiance: etabli
+      - ordre: 2
+        acteur: ccas
+        action: "Le dossier, et sa transmission"
+        delai: { valeur: 1, unite: mois, nature: maximum_legal }
+        note: "Le CCAS établit le dossier et le transmet dans le mois de son dépôt à l'autorité qui décide — le président du conseil départemental ou le préfet —, avec son avis. Il le transmet quelle que soit son appréciation du bien-fondé : la transmission est une obligation."
+        liens: [casf-l131-1, casf-l123-5]
+        confiance: etabli
+      - ordre: 3
+        acteur: president-departement
+        action: "La décision sur l'aide sociale légale"
+        note: "Le département instruit la demande, avec l'avis du CCAS ou, à défaut, du maire."
+        liens: [casf-l131-1]
+        confiance: etabli
+      - ordre: 4
+        acteur: ccas
+        action: "Les aides que le CCAS décide lui-même"
+        note: "Au-delà de l'aide légale, le CCAS mène une action générale de prévention et de développement social dans la commune, et peut accorder des prestations remboursables ou non. Leur nature et leurs conditions sont propres à chaque CCAS."
+        liens: [casf-l123-5]
+        confiance: etabli
+      - ordre: 5
+        acteur: ccas
+        action: "L'élection de domicile"
+        note: "Une personne sans domicile stable élit domicile auprès d'un centre communal ou intercommunal d'action sociale, ou d'un organisme agréé, pour recevoir son courrier et accéder à ses droits — prestations sociales, papiers d'identité, inscription sur les listes électorales, aide juridictionnelle. Le CCAS ne peut refuser que si la personne n'a aucun lien avec la commune, et par une décision spécialement motivée."
+        liens: [casf-l264-1, casf-domiciliation, guide-domiciliation]
+        confiance: etabli
+
+    leviers:
+      - id: exiger-la-transmission
+        quoi: "Exiger que le dossier soit transmis"
+        quand: "Au dépôt de la demande"
+        aupres_de: "Le CCAS, ou la mairie"
+        difficulte: faible
+        ancre_etape: 2
+        piege: "Un CCAS qui estime la demande vouée à l'échec n'a pas le droit de la garder : il doit la transmettre dans le mois, avec son avis. Noter la date du dépôt."
+        liens: [casf-l123-5, casf-l131-1]
+        confiance: etabli
+      - id: demander-le-refus-motive
+        quoi: "Demander le refus de domiciliation par écrit"
+        quand: "Si le CCAS refuse l'élection de domicile"
+        aupres_de: "Le CCAS"
+        difficulte: moyenne
+        ancre_etape: 5
+        piege: "Le seul motif possible est l'absence de lien avec la commune, et le refus doit être spécialement motivé. Un refus oral, ou sans motif, ne vaut pas."
+        liens: [casf-domiciliation, guide-domiciliation]
+        confiance: etabli

@@ -664,7 +664,7 @@ acteurs:
     type: service_administratif
     echelon: commune
     resume: "Établissement public distinct de la commune, obligatoire au-dessus de 1 500 habitants : il mène l’aide sociale de proximité et participe à l’instruction des demandes d’aide légale, que le département décide."
-    liens: [wp-ccas, code-action-sociale, unccas, casf-l123-4]
+    liens: [wp-ccas, code-action-sociale, unccas, casf-l123-4, casf-l123-5, od-ofgl-ccas]
     verifie_le: 2026-09-22
     confiance: etabli
 
@@ -896,6 +896,19 @@ acteurs:
     resume: "Médiateur de la consommation pour les litiges d'eau et d'assainissement, gratuit pour l'abonné, saisi après une réclamation écrite restée sans réponse satisfaisante."
     liens: [mediation-eau-fr, sp-mediateur-eau, wp-mediation-consommation, sispea-mediation]
     verifie_le: 2026-09-22
+    confiance: etabli
+
+  # La seule commission où des habitants, pris hors du conseil municipal,
+  # participent à l'établissement de leur propre impôt. Elle ne se réunit qu'à
+  # la demande de l'administration, et presque personne ne sait qu'elle existe.
+  - id: ccid
+    nom: "La commission communale des impôts directs"
+    nom_court: "Commission des impôts"
+    type: organe_collegial
+    echelon: commune
+    resume: "Le maire et six contribuables de la commune, huit au-delà de 2 000 habitants : avec le service des impôts, elle évalue les propriétés bâties et signale les changements qui les affectent."
+    liens: [cgi-1650, bofip-ccid]
+    verifie_le: 2026-09-25
     confiance: etabli
 
   - id: commission-controle-listes

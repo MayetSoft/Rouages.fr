@@ -2251,6 +2251,30 @@ axe ne signale plus rien. html-validate garde une remarque, qu'on laisse :
 il préférerait un `<select>` pour la recherche de commune, où 34 875 options
 ne se parcourent pas.
 
+### Trois acteurs qu'un habitant rencontre, enfin mis en action ✔
+
+Le CCAS, les finances publiques et le conciliateur de justice étaient décrits
+sans agir dans aucune démarche. Trois processus, chacun sur ses textes :
+
+- **contester sa taxe foncière** — la réclamation jusqu'au 31 décembre de
+  l'année suivante, six mois pour répondre, le silence qui vaut rejet et
+  n'enferme dans aucun délai ; et la commission communale des impôts directs,
+  nouvel acteur, où six contribuables de la commune évaluent avec
+  l'administration les propriétés bâties ;
+- **régler un litige par le conciliateur** — gratuit, obligatoire avant le juge
+  jusqu'à 5 000 € et pour un trouble de voisinage depuis le 1ᵉʳ octobre 2023,
+  après une annulation en 2022 : la fiche cite la version en vigueur de
+  l'article 750-1 et le décret qui l'a rétabli, pas l'identifiant de 2019 ;
+- **demander de l'aide au CCAS** — le dépôt de l'aide sociale légale, la
+  transmission obligatoire dans le mois quel que soit l'avis du centre, les
+  aides qu'il décide seul, et la domiciliation qu'il ne peut refuser qu'à qui
+  n'a aucun lien avec la commune.
+
+Réseau : 215 → 220 nœuds, 672 → 701 arêtes, 67,5 % → 68,1 % des paires à trois
+clics. Les comptes des CCAS sont publiés par l'OFGL depuis 2018 — au
+Mayet-de-Montagne, 12 504 € de recettes en 2024, dont 7 500 € de la commune ;
+ils entreront sur la page de chaque commune.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

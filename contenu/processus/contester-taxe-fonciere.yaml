@@ -1,0 +1,81 @@
+# Contester sa taxe foncière.
+# Les finances publiques tenaient au réseau par deux fils et n'agissaient dans
+# aucune démarche, alors que c'est l'administration que tout propriétaire
+# rencontre chaque automne. L'avis additionne des taux votés ailleurs ; ce qui
+# se conteste le plus utilement est la base, et presque personne ne sait
+# qu'une commission de contribuables de la commune participe à l'établir.
+processus:
+  - id: contester-taxe-fonciere
+    nom: "Contester sa taxe foncière"
+    famille: quotidien
+    resume: "Un avis qui paraît trop élevé : ce qui se discute et ce qui ne se discute pas, jusqu'à quand réclamer, ce que vaut le silence de l'administration, et la commission communale où siègent des contribuables de la commune."
+    declencheur: "Un avis de taxe foncière dont le montant, ou la surface et la catégorie retenues, paraissent faux"
+    sortie: "Un dégrèvement, ou un rejet à porter devant le tribunal administratif"
+    decideur: dgfip
+    competences: [evaluation-fonciere, comptable-public]
+    liens: [sp-taxe-fonciere, lpf-r196-2, lpf-r198-10, ce-reclamations-fiscales]
+    verifie_le: 2026-09-25
+    perime_apres_mois: 12
+    confiance: etabli
+
+    etapes:
+      - ordre: 1
+        acteur: ccid
+        action: "L'évaluation des locaux, avec la commission communale"
+        note: "Le service des impôts évalue les propriétés bâties avec la commission communale des impôts directs, qui lui signale aussi les changements affectant les propriétés. Elle réunit le maire et six contribuables de la commune, huit au-delà de 2 000 habitants, désignés par la direction départementale des finances publiques sur une liste double dressée par le conseil municipal. Elle ne se réunit qu'à la demande de l'administration."
+        liens: [cgi-1650, bofip-ccid]
+        confiance: etabli
+      - ordre: 2
+        acteur: dgfip
+        action: "L'avis d'imposition"
+        note: "Le montant applique à la valeur locative du bien les taux votés par plusieurs assemblées — la commune, l'intercommunalité, parfois un syndicat. Un taux se conteste par le recours contre la délibération qui l'a fixé ; la base, par une réclamation contre son propre avis."
+        liens: [sp-taxe-fonciere]
+        confiance: etabli
+      - ordre: 3
+        acteur: citoyen
+        action: "La réclamation"
+        note: "Elle est recevable jusqu'au 31 décembre de l'année qui suit la mise en recouvrement du rôle, auprès du service des impôts dont relève l'avis. Chaque avis a son propre délai : réclamer contre celui de cette année ne rouvre pas celui des années précédentes."
+        liens: [lpf-r196-2]
+        confiance: etabli
+      - ordre: 4
+        acteur: dgfip
+        action: "La réponse de l'administration"
+        delai: { valeur: 6, unite: mois, nature: maximum_legal }
+        note: "Six mois à compter de la réclamation. L'administration peut prolonger de trois mois au plus, à condition de le dire avant l'échéance. Un rejet, même partiel, doit être motivé. Le silence gardé six mois vaut rejet."
+        liens: [lpf-r198-10, ce-reclamations-fiscales]
+        confiance: etabli
+      - ordre: 5
+        acteur: tribunal-administratif
+        action: "Le recours devant le tribunal administratif"
+        note: "Après un rejet exprès, motivé et indiquant les voies et délais de recours, le tribunal se saisit dans les deux mois. Après un rejet implicite, par silence, ce délai ne court pas : le contribuable peut saisir le tribunal dès les six mois écoulés, sans attendre de réponse."
+        liens: [ce-reclamations-fiscales]
+        confiance: etabli
+
+    leviers:
+      - id: reclamer-avant-le-31-decembre
+        quoi: "Réclamer avant le 31 décembre de l'année suivante"
+        quand: "Jusqu'au 31 décembre de l'année qui suit la mise en recouvrement"
+        aupres_de: "Le service des impôts dont relève l'avis"
+        difficulte: faible
+        ancre_etape: 3
+        piege: "Le délai se compte avis par avis. Une erreur de surface présente depuis dix ans ne se rattrape que pour les années encore dans leur délai."
+        liens: [lpf-r196-2]
+        confiance: etabli
+      - id: saisir-le-tribunal-sans-attendre
+        quoi: "Saisir le tribunal après six mois de silence"
+        quand: "Six mois après la réclamation, sans réponse"
+        aupres_de: "Le tribunal administratif"
+        difficulte: moyenne
+        ancre_etape: 5
+        piege: "Le délai de deux mois ne court qu'à partir d'un rejet exprès qui indique les voies de recours. Un courrier de rejet qui ne les mentionne pas ne le fait pas courir."
+        liens: [ce-reclamations-fiscales, lpf-r198-10]
+        confiance: etabli
+      - id: sieger-a-la-ccid
+        quoi: "Figurer sur la liste de la commission communale"
+        quand: "Quand le conseil municipal dresse la liste des contribuables proposés"
+        aupres_de: "La mairie"
+        difficulte: faible
+        ancre_etape: 1
+        piege: "Il faut être inscrit aux rôles des impôts directs locaux de la commune. Le conseil propose deux fois plus de noms qu'il n'y a de sièges : c'est l'administration qui choisit."
+        liens: [cgi-1650]
+        confiance: etabli

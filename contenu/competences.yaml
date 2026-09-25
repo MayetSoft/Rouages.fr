@@ -715,6 +715,19 @@ competences:
     verifie_le: 2026-09-22
     confiance: etabli
 
+  # Le taux est voté par les assemblées ; la base, elle, ne l'est par personne.
+  # C'est la valeur locative, établie par l'administration avec la commission
+  # communale — et c'est elle qu'une réclamation corrige le plus souvent.
+  - id: evaluation-fonciere
+    nom: "Évaluation des propriétés et assiette des impôts locaux"
+    nom_court: "Évaluation foncière"
+    acteur: dgfip
+    resume: "La valeur locative de chaque local, sur laquelle s'appliquent les taux votés : établie par le service des impôts, avec la commission communale des impôts directs."
+    partagee_avec: [ccid, citoyen]
+    liens: [cgi-1650, bofip-ccid, sp-taxe-fonciere]
+    verifie_le: 2026-09-25
+    confiance: etabli
+
   - id: comptable-public
     nom: "Recouvrement de l'impôt et tenue des comptes"
     nom_court: "Comptable public"
