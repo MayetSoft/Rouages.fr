@@ -84,10 +84,22 @@ jobs:
 
           # Le chiffrement n'est pas négociable, et le certificat est vérifié :
           # un FTPS qui accepte n'importe quel certificat ne protège de rien.
+          #
+          # Chaque fichier part sous un nom temporaire, renommé une fois reçu
+          # en entier. Sans cela, lftp efface la page en ligne avant d'envoyer
+          # la nouvelle, et une connexion coupée en route laisse une page
+          # tronquée : Paris et Lyon ont été servies coupées net, à 560 et
+          # 192 Kio — des multiples exacts de 16 Kio, la taille d'un
+          # enregistrement TLS —, après deux déploiements qui avaient échoué
+          # sur elles. Les nouvelles tentatives sont espacées : les trois
+          # d'avant tombaient en huit secondes, contre le même incident.
           reglages="set ftp:ssl-force true;
                     set ftp:ssl-protect-data true;
                     set ssl:verify-certificate true;
-                    set net:max-retries 3;
+                    set xfer:use-temp-file true;
+                    set net:max-retries 8;
+                    set net:reconnect-interval-base 5;
+                    set net:reconnect-interval-multiplier 2;
                     set net:timeout 30;"
 
           # `--delete` est ce qui garde le serveur propre : sans lui, une page
@@ -139,12 +151,12 @@ jobs:
               envoyer() {
                 lftp -c "$reglages
                          open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
-                         mirror --reverse --verbose=1 --parallel=8 $1 $simuler \
+                         mirror --reverse --verbose=1 $1 $simuler \
                                 \"$travail/envoi/\" \"$RACINE\""
               }
-              if ! envoyer ""; then
+              if ! envoyer "--parallel=8"; then
                 echo "::warning::des fichiers n'ont pas été reçus — seconde passe sur ceux-là."
-                envoyer "--ignore-time"
+                envoyer "--parallel=2 --ignore-time"
               fi
             fi
             # Effacer suppose le marqueur, comme `--delete` plus bas : la liste
