@@ -10,14 +10,16 @@
  * naturel. L'autre moitié, les arrivées et les départs, n'est publiée par
  * personne commune par commune, et le site ne la reconstitue pas.
  */
-import type { EtatCivil, Population } from '../../modele/fiche-commune.ts';
+import type { Ages, EtatCivil, Population } from '../../modele/fiche-commune.ts';
+import Pyramide from './Pyramide.astro';
 import Repere from './Repere.astro';
 
 interface Props {
   h: Population | null;
   ec: EtatCivil | null;
+  ag: Ages | null;
 }
-const { h, ec } = Astro.props;
+const { h, ec, ag } = Astro.props;
 
 // La dernière année où les deux séries sont publiées, et le cumul sur les
 // seules années où elles le sont toutes les deux : additionner des naissances
@@ -94,3 +96,4 @@ const nb = (v: number) => v.toLocaleString('fr-FR');
     {' est publié par l’INSEE, mis à jour chaque mois.'}
   </p>
 )}
+{ag && <Pyramide a={ag} />}

@@ -630,6 +630,18 @@ async function principal() {
   );
   if (etatCivil) dire(`${GRIS}${ecrireEtatCivil(SORTIE, etatCivil)} départements d’état civil écrits.${RAZ}`);
 
+  // La pyramide des âges du recensement : 650 Mo décompressés, lus en flux.
+  // Écrite à part, par département, comme l'état civil.
+  const { collecterAges, ecrireAges } = await import('./ages-emettre.ts');
+  const ages = await tenter('Pyramide des âges', () =>
+    collecterAges(
+      (url, vers) => telechargerEnCache(url, vers, reutiliser, 'Population par sexe et âge INSEE (73 Mo)'),
+      CACHE,
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+  if (ages) dire(`${GRIS}${ecrireAges(SORTIE, ages)} départements de pyramides des âges écrits.${RAZ}`);
+
   // Les annonces légales des entreprises : décomptes par commune, et les
   // dernières annonces des sociétés, que le journal reprend. Avant l'émetteur
   // principal, qui rassemble le journal ; le rattachement lit le découpage

@@ -913,3 +913,23 @@ a.p-sommaire-lien { text-decoration: none; }
 .c-communes { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
 .c-departements li, .c-communes li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .5rem; }
 .c-departement-detail { font-size: .76rem; color: var(--encre-tres-douce); font-variant-numeric: tabular-nums; }
+
+/* La pyramide des âges : une teinte pour la commune, un trait pour le département. */
+.pyr { margin: .8rem 0 .3rem; max-width: 26rem; }
+.pyr-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pyr-barre { fill: var(--accent); fill: color-mix(in srgb, var(--accent) 70%, var(--fond-carte)); }
+.pyr-dep { fill: none; stroke: var(--encre); stroke-width: 1.5; stroke-linejoin: round; }
+.pyr-grille { fill: none; stroke: var(--trait); stroke-width: 1; }
+.pyr-svg text { font-size: 9px; fill: var(--encre-douce); text-anchor: middle; font-variant-numeric: tabular-nums; }
+.pyr-svg .pyr-f, .pyr-svg .pyr-h { font-size: 10px; font-weight: 600; fill: var(--encre); text-anchor: end; }
+.pyr-svg .pyr-h { text-anchor: start; }
+.pyr-legende { font-size: .82rem; color: var(--encre-douce); margin-top: .35rem; }
+.pyr-cle { display: inline-block; width: .9rem; height: .55rem; margin: 0 .3rem 0 .6rem; vertical-align: baseline; }
+.pyr-cle:first-child { margin-left: 0; }
+.pyr-cle-barre { background: var(--accent); background: color-mix(in srgb, var(--accent) 70%, var(--fond-carte)); border-radius: 2px; }
+.pyr-cle-dep { border-top: 1.5px solid var(--encre); height: 0; vertical-align: middle; }
+.pyr-tableau table { border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; margin-top: .3rem; }
+.pyr-tableau th, .pyr-tableau td { padding: .15rem .6rem .15rem 0; text-align: right; }
+.pyr-tableau th[scope="row"], .pyr-tableau thead th:first-child { text-align: left; font-weight: 400; }
+.pyr-tableau thead th { font-weight: 600; color: var(--encre-douce); border-bottom: 1px solid var(--trait); }
+.pyr-tableau > summary { display: list-item; cursor: pointer; }

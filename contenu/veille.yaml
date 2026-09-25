@@ -276,6 +276,16 @@ surveillances:
     ressource: "2025"
     lien: od-insee-deces
 
+  - id: insee-ages
+    nom: "INSEE — population par sexe et âge (recensement, table POP1)"
+    alimente: "la pyramide des âges de chaque commune"
+    # Un millésime par an, en juin : le collecteur pointe le fichier d'une
+    # année, et c'est au changement de période qu'il faut changer d'adresse.
+    type: melodi-periode
+    url: "DS_RP_TD_POPULATION_AGESEX_PRINC"
+    ressource: "2023"
+    lien: od-insee-ages
+
   - id: rna-waldec
     nom: "Répertoire national des associations — fichier Waldec"
     alimente: "les créations d'associations, commune par commune"

@@ -2305,6 +2305,29 @@ en 2019, recoupées une à une avec le BODACC.
 Les naissances et les décès (INSEE, depuis 2008) et le CCAS (comptes de
 l'OFGL, établissements FINESS) sont entrés sur la même page juste avant.
 
+### Qui sont les habitants : la pyramide des âges ✔
+
+La courbe dit combien ils sont, les naissances et les décès pourquoi leur
+nombre bouge ; la pyramide dit qui ils sont. Elle vient de la table POP1 du
+recensement de l'INSEE, millésime 2023 — les enquêtes de 2021 à 2025, que
+l'INSEE combine —, par sexe et par âge pour chaque commune et chaque
+département.
+
+- **En part des habitants, et le département en trait** à la même échelle :
+  c'est ce qui permet de poser un village sur un département et de voir
+  quelle tranche est plus fournie ou plus creuse qu'alentour.
+- **Tranches de cinq ans**, de quinze sous 500 habitants, rien sous 100 ; aucun
+  âge détaillé n'est publié. Les valeurs sont des estimations pondérées,
+  arrondies à l'unité dans le tableau replié sous le dessin.
+- **Le dessin pèse 2,8 Ko** : une chaîne SVG, un seul tracé par côté pour
+  toutes les barres. La première version, un élément et une infobulle par
+  barre, en pesait 10 — 350 Mo sur l'ensemble du site.
+
+Au Mayet-de-Montagne : 1 383 habitants, le total même de la population
+municipale ; 43 % ont 60 ans ou plus, contre 36 % dans l'Allier, et 19 % moins
+de 20 ans, contre 20 %. Mayotte, hors du recensement annuel, n'a pas de
+pyramide.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

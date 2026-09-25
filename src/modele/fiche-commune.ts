@@ -293,6 +293,21 @@ export interface EtatCivil {
 }
 
 /**
+ * La pyramide des âges du recensement : femmes et hommes par tranche de cinq
+ * ans, et celle du département, à laquelle la page la compare. Des
+ * estimations pondérées, au dixième.
+ */
+export interface Ages {
+  millesime: number;
+  /** Le premier âge de chaque tranche ; la dernière reçoit aussi les centenaires. */
+  tranches: number[];
+  femmes: number[];
+  hommes: number[];
+  departement: { femmes: number[]; hommes: number[] } | null;
+  maj: string;
+}
+
+/**
  * Le centre d'action sociale d'une commune, ou celui de son intercommunalité :
  * son budget principal, ses budgets annexes, les établissements qu'il gère.
  */
@@ -416,6 +431,13 @@ type EntreprisesDep = {
   sansCommune: number;
   c: Record<string, [number[][] | null, [string, number, string, string][]]>;
 };
+type AgesDep = {
+  maj: string;
+  millesime: number;
+  tranches: number[];
+  dep: [number[], number[]] | null;
+  c: Record<string, [number[], number[]]>;
+};
 type EtatCivilDep = { maj: string; annees: number[]; c: Record<string, [(number | null)[], (number | null)[]]> };
 type ElectionsDep = {
   scrutin: string;
@@ -503,6 +525,7 @@ const sruDep = parDepartement<SruDep>('sru');
 const assoDep = parDepartement<AssoDep>('associations');
 const popDep = parDepartement<PopDep>('population');
 const etatCivilDep = parDepartement<EtatCivilDep>('etat-civil');
+const agesDep = parDepartement<AgesDep>('ages');
 const ccasDep = parDepartement<CcasDep>('ccas');
 const entreprisesDep = parDepartement<EntreprisesDep>('entreprises');
 const electionsDep = parDepartement<ElectionsDep>('elections');
@@ -616,6 +639,20 @@ function assemblerPopulation(commune: CommuneFiche): Population | null {
     anneeActuelle: d.annees[dernier],
     sommet: [anneeSommet, valeurSommet],
     ecart: Math.round(((actuelle - valeurSommet) / valeurSommet) * 100),
+    maj: d.maj,
+  };
+}
+
+function assemblerAges(commune: CommuneFiche): Ages | null {
+  const d = agesDep.get(commune.dep);
+  const p = d?.c[commune.code];
+  if (!d || !p) return null;
+  return {
+    millesime: d.millesime,
+    tranches: d.tranches,
+    femmes: p[0],
+    hommes: p[1],
+    departement: d.dep ? { femmes: d.dep[0], hommes: d.dep[1] } : null,
     maj: d.maj,
   };
 }
@@ -897,6 +934,7 @@ function assemblerFluxPercus(structures: StructureFiche[]): FluxPercu[] {
 export interface ComplementsFiche {
   histoire: Population | null;
   etatCivil: EtatCivil | null;
+  ages: Ages | null;
   centres: CentresSociaux | null;
   entreprises: Entreprises | null;
   scrutin: Scrutin | null;
@@ -928,6 +966,7 @@ export function complementsFiche(
   return {
     histoire: assemblerPopulation(commune),
     etatCivil: assemblerEtatCivil(commune),
+    ages: assemblerAges(commune),
     centres: assemblerCentres(commune),
     entreprises: assemblerEntreprises(commune),
     scrutin: assemblerScrutin(commune, structures),

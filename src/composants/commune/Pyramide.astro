@@ -1,0 +1,176 @@
+---
+/**
+ * La pyramide des âges : les femmes à gauche, les hommes à droite, les plus
+ * âgés en haut — et, en trait, celle du département à la même échelle.
+ *
+ * Les deux sont en **part des habitants**, pas en nombre : c'est ce qui permet
+ * de poser un village de 1 400 habitants sur un département de 330 000 et de
+ * voir d'un coup d'œil quelle tranche est plus fournie ou plus creuse
+ * qu'alentour. Les nombres, arrondis, sont dans le tableau replié dessous.
+ *
+ * Une seule teinte : femmes et hommes se distinguent par le côté et
+ * l'intitulé, et la couleur reste libre pour ce qui compare — la commune en
+ * aplat, le département en trait.
+ *
+ * Sous 500 habitants, les tranches passent à quinze ans : une tranche de cinq
+ * ans y tient à une poignée de personnes, et la forme ne dirait plus rien.
+ * Sous 100, pas de pyramide du tout, seulement les deux parts.
+ */
+import type { Ages } from '../../modele/fiche-commune.ts';
+
+interface Props {
+  a: Ages;
+}
+const { a } = Astro.props;
+
+const somme = (v: number[]) => v.reduce((s, x) => s + x, 0);
+const total = somme(a.femmes) + somme(a.hommes);
+
+// Les tranches affichées : par cinq ans, ou par quinze sous 500 habitants.
+const pas = total < 500 ? 3 : 1;
+const groupes: number[][] = [];
+for (let i = 0; i < a.tranches.length; i += pas) {
+  groupes.push(a.tranches.slice(i, i + pas).map((_, k) => i + k));
+}
+const libelle = (g: number[]) => {
+  const debut = a.tranches[g[0]];
+  const dernier = g[g.length - 1] === a.tranches.length - 1;
+  return dernier ? `${debut} ans et plus` : `${debut}-${a.tranches[g[g.length - 1]] + 4} ans`;
+};
+const court = (g: number[]) => {
+  const debut = a.tranches[g[0]];
+  return g[g.length - 1] === a.tranches.length - 1 ? `${debut}+` : `${debut}-${a.tranches[g[g.length - 1]] + 4}`;
+};
+const cumul = (v: number[], g: number[]) => g.reduce((s, i) => s + (v[i] ?? 0), 0);
+
+const dep = a.departement;
+const totalDep = dep ? somme(dep.femmes) + somme(dep.hommes) : 0;
+const rangs = groupes.map((g) => ({
+  libelle: libelle(g),
+  court: court(g),
+  f: cumul(a.femmes, g),
+  h: cumul(a.hommes, g),
+  pf: cumul(a.femmes, g) / total,
+  ph: cumul(a.hommes, g) / total,
+  df: dep && totalDep > 0 ? cumul(dep.femmes, g) / totalDep : null,
+  dh: dep && totalDep > 0 ? cumul(dep.hommes, g) / totalDep : null,
+}));
+
+// Les deux parts qu'on écrit en toutes lettres : moins de 20 ans, 60 ans et plus.
+const part = (v: { femmes: number[]; hommes: number[] }, de: number, a2: number, t: number) =>
+  (somme(v.femmes.slice(de, a2)) + somme(v.hommes.slice(de, a2))) / t;
+const i20 = a.tranches.indexOf(20);
+const i60 = a.tranches.indexOf(60);
+const jeunes = part(a, 0, i20, total);
+const ages = part(a, i60, a.tranches.length, total);
+const jeunesDep = dep ? part(dep, 0, i20, totalDep) : null;
+const agesDep = dep ? part(dep, i60, a.tranches.length, totalDep) : null;
+const pc = (v: number) => `${Math.round(v * 100).toLocaleString('fr-FR')} %`;
+const pc1 = (v: number) => `${(v * 100).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %`;
+const entier = (v: number) => Math.round(v).toLocaleString('fr-FR');
+
+// La géométrie. Le repère est celui du viewBox ; le SVG se met à la largeur du
+// bloc. Écrit en une chaîne, sans une classe par élément : chaque octet de ce
+// dessin se multiplie par 34 875 pages. Toutes les barres d'un côté tiennent
+// dans un seul tracé, et les nombres sont dans le tableau, pas en infobulle.
+const L = 320;
+const MILIEU = 34; // la colonne des âges
+const G = (L - MILIEU) / 2; // le bord intérieur des barres de gauche
+const D = G + MILIEU; // celui des barres de droite
+const LARGEUR = G - 6;
+const HAUT = 16;
+const rangee = rangs.length > 10 ? 11 : 16;
+const barre = rangee - 2;
+const bas = HAUT + rangs.length * rangee;
+const H = bas + 14;
+const plusGrand = Math.max(...rangs.flatMap((r) => [r.pf, r.ph, r.df ?? 0, r.dh ?? 0]));
+const echelle = (v: number) => (v / plusGrand) * LARGEUR;
+const n1 = (v: number) => +v.toFixed(1);
+// Une graduation ronde : 1, 2, 5 ou 10 %, deux au plus de chaque côté.
+const graduation = [0.01, 0.02, 0.05, 0.1, 0.2].find((p) => plusGrand / p <= 2.5) ?? 0.25;
+const graduations = [1, 2].map((k) => k * graduation).filter((v) => v <= plusGrand);
+// Du plus âgé, en haut, au plus jeune.
+const y = (i: number) => HAUT + (rangs.length - 1 - i) * rangee;
+const barres = (cote: 'g' | 'd') =>
+  rangs
+    .map((r, i) => {
+      const w = n1(echelle(cote === 'g' ? r.pf : r.ph));
+      return cote === 'g' ? `M${G} ${y(i) + 1}h-${w}v${barre}h${w}z` : `M${D} ${y(i) + 1}h${w}v${barre}h-${w}z`;
+    })
+    .join('');
+// Le profil du département, en escalier : une marche par tranche, du haut vers le bas.
+const escalier = (cote: 'g' | 'd') => {
+  const valeurs = [...rangs].reverse().map((r) => (cote === 'g' ? r.df : r.dh));
+  if (valeurs.some((v) => v === null)) return '';
+  const x = (v: number) => n1(cote === 'g' ? G - echelle(v) : D + echelle(v));
+  return `<path class="pyr-dep" d="${valeurs
+    .map((v, j) => `${j === 0 ? `M${x(v!)} ${HAUT}` : `H${x(v!)}`}V${HAUT + (j + 1) * rangee}`)
+    .join('')}"/>`;
+};
+const svg =
+  `<svg class="pyr-svg" viewBox="0 0 ${L} ${H}" role="img" aria-label="Pyramide des âges, en part des habitants` +
+  `${dep ? ', comparée au département' : ''} ; les chiffres sont dans le tableau qui suit">` +
+  `<text class="pyr-f" x="${G}" y="10">Femmes</text><text class="pyr-h" x="${D}" y="10">Hommes</text>` +
+  graduations
+    .map((v) => {
+      const xg = n1(G - echelle(v));
+      const xd = n1(D + echelle(v));
+      return `<path class="pyr-grille" d="M${xg} ${HAUT}V${bas}M${xd} ${HAUT}V${bas}"/>` +
+        `<text x="${xg}" y="${H - 2}">${pc(v)}</text><text x="${xd}" y="${H - 2}">${pc(v)}</text>`;
+    })
+    .join('') +
+  `<path class="pyr-barre" d="${barres('g')}${barres('d')}"/>` +
+  rangs.map((r, i) => `<text x="${L / 2}" y="${y(i) + rangee / 2 + 3}">${r.court}</text>`).join('') +
+  escalier('g') +
+  escalier('d') +
+  '</svg>';
+---
+<h3 class="p-titre-echelon">{`Leurs âges, au recensement de ${a.millesime}`}</h3>
+<p class="p-strate">
+  {`${pc(jeunes)} des habitants ont moins de 20 ans` +
+    (jeunesDep !== null ? `, contre ${pc(jeunesDep)} dans le département` : '') +
+    `, et ${pc(ages)} ont 60 ans ou plus` +
+    (agesDep !== null ? `, contre ${pc(agesDep)}` : '') +
+    '.'}
+</p>
+{total >= 100 && (
+  <figure class="pyr">
+    <Fragment set:html={svg} />
+    <figcaption class="pyr-legende">
+      <span class="pyr-cle pyr-cle-barre" aria-hidden="true"></span>la commune
+      {dep && (
+        <>
+          <span class="pyr-cle pyr-cle-dep" aria-hidden="true"></span>le département
+        </>
+      )}
+      {` — en part de tous les habitants${pas > 1 ? ', par tranches de quinze ans' : ''}`}
+    </figcaption>
+  </figure>
+)}
+{total >= 100 && (
+  <details class="p-service-groupe pyr-tableau">
+    <summary class="p-service-famille">Les chiffres, tranche par tranche</summary>
+    <table>
+      <thead>
+        <tr><th scope="col">Âge</th><th scope="col">Femmes</th><th scope="col">Hommes</th><th scope="col">Part</th>{dep && <th scope="col">Département</th>}</tr>
+      </thead>
+      <tbody>
+        {[...rangs].reverse().map((r) => (
+          <tr>
+            <th scope="row">{r.libelle}</th>
+            <td>{entier(r.f)}</td>
+            <td>{entier(r.h)}</td>
+            <td>{pc1(r.pf + r.ph)}</td>
+            {dep && <td>{r.df !== null && r.dh !== null ? pc1(r.df + r.dh) : '—'}</td>}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </details>
+)}
+<p class="p-source-territoire">
+  {`D’après le recensement de l’INSEE, table « population par sexe et âge » (${a.maj}). Le millésime ` +
+    `${a.millesime} combine les enquêtes de ${a.millesime - 2} à ${a.millesime + 2} : une commune de moins de ` +
+    '10 000 habitants est recensée en entier une année sur cinq, et les chiffres sont des estimations, arrondies ici ' +
+    'à l’unité. Le site ne publie aucun âge détaillé.'}
+</p>
