@@ -292,6 +292,27 @@ export interface EtatCivil {
   maj: string;
 }
 
+/**
+ * Le centre d'action sociale d'une commune, ou celui de son intercommunalité :
+ * son budget principal, ses budgets annexes, les établissements qu'il gère.
+ */
+export interface CentreSocial {
+  nom: string;
+  type: 'CCAS' | 'CIAS';
+  /** Par agrégat, dans l'ordre de `agregats`, la série du budget principal. */
+  principal: (number | null)[][];
+  annexes: [string, number][];
+  etablissements: [string, string, number | null][];
+  dernier: number;
+}
+
+export interface CentresSociaux {
+  annees: number[];
+  agregats: string[];
+  centres: CentreSocial[];
+  maj: string;
+}
+
 /** La population dans le temps. */
 export interface Population {
   annees: number[];
@@ -361,6 +382,13 @@ type AssoDep = {
   c: Record<string, { n: number; a: number[]; d: [number, number][]; r: [string, string, number][] }>;
 };
 type PopDep = { maj: string; annees: number[]; c: Record<string, [number[], number, number]> };
+type CcasDep = {
+  maj: string;
+  annees: number[];
+  agregats: string[];
+  s: Record<string, [string, 'CCAS' | 'CIAS', (number | null)[][], [string, number][], [string, string, number | null][], number]>;
+  c: Record<string, string[]>;
+};
 type EtatCivilDep = { maj: string; annees: number[]; c: Record<string, [(number | null)[], (number | null)[]]> };
 type ElectionsDep = {
   scrutin: string;
@@ -448,6 +476,7 @@ const sruDep = parDepartement<SruDep>('sru');
 const assoDep = parDepartement<AssoDep>('associations');
 const popDep = parDepartement<PopDep>('population');
 const etatCivilDep = parDepartement<EtatCivilDep>('etat-civil');
+const ccasDep = parDepartement<CcasDep>('ccas');
 const electionsDep = parDepartement<ElectionsDep>('elections');
 const delibDep = parDepartement<DelibDep>('deliberations');
 const subvDep = parDepartement<SubvDep>('subventions');
@@ -570,6 +599,19 @@ function assemblerEtatCivil(commune: CommuneFiche): EtatCivil | null {
   const [naissances, deces] = f;
   if (![...naissances, ...deces].some((v) => v !== null)) return null;
   return { annees: d.annees, naissances, deces, maj: d.maj };
+}
+
+function assemblerCentres(commune: CommuneFiche): CentresSociaux | null {
+  const d = ccasDep.get(commune.dep);
+  const sirens = d?.c[commune.code];
+  if (!d || !sirens) return null;
+  const centres = sirens
+    .map((s) => d.s[s])
+    .filter(Boolean)
+    .map(([nom, type, principal, annexes, etablissements, dernier]) => ({ nom, type, principal, annexes, etablissements, dernier }))
+    // Le CCAS de la commune d'abord : c'est d'elle qu'on part.
+    .sort((a, b) => (a.type === b.type ? 0 : a.type === 'CCAS' ? -1 : 1));
+  return centres.length > 0 ? { annees: d.annees, agregats: d.agregats, centres, maj: d.maj } : null;
 }
 
 /** « La région — Centre-Val de Loire » : `meta.json` la nomme par département. */
@@ -818,6 +860,7 @@ function assemblerFluxPercus(structures: StructureFiche[]): FluxPercu[] {
 export interface ComplementsFiche {
   histoire: Population | null;
   etatCivil: EtatCivil | null;
+  centres: CentresSociaux | null;
   scrutin: Scrutin | null;
   finances: Finances | null;
   fluxPercus: FluxPercu[];
@@ -847,6 +890,7 @@ export function complementsFiche(
   return {
     histoire: assemblerPopulation(commune),
     etatCivil: assemblerEtatCivil(commune),
+    centres: assemblerCentres(commune),
     scrutin: assemblerScrutin(commune, structures),
     finances: assemblerFinances(commune, population),
     fluxPercus: assemblerFluxPercus(structures),

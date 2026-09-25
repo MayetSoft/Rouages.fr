@@ -1,0 +1,109 @@
+---
+/**
+ * Le centre communal d'action sociale, et celui de l'intercommunalité.
+ *
+ * Un établissement public distinct de la commune, avec son propre budget : les
+ * comptes de la commune ne montrent de lui que la subvention qu'elle lui
+ * verse. On dit ici d'où vient son argent, où il va, et ce qu'il gère — le nom
+ * d'un budget annexe est souvent celui d'une activité, une résidence ou un
+ * service d'aide à domicile.
+ */
+import type { CentresSociaux } from '../../modele/fiche-commune.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  cs: CentresSociaux;
+}
+const { cs } = Astro.props;
+/** L'euro près en dessous de cent mille, qui est la taille de la plupart des CCAS ; au-delà, en k€ et M€. */
+const montant = (v: number) =>
+  Math.abs(v) < 100_000
+    ? `${v.toLocaleString('fr-FR')} €`
+    : Math.abs(v) < 1_000_000
+      ? `${Math.round(v / 1000).toLocaleString('fr-FR')} k€`
+      : `${(v / 1_000_000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M€`;
+const rang = (nom: string) => cs.agregats.indexOf(nom);
+const vues = cs.centres.map((c) => {
+  const i = cs.annees.indexOf(c.dernier);
+  const v = (nom: string) => {
+    const k = rang(nom);
+    return k === -1 || i === -1 ? null : (c.principal[k]?.[i] ?? null);
+  };
+  const recoit = [
+    [v('Participations des communes'), c.type === 'CCAS' ? 'versés par la commune' : 'versés par les communes'],
+    [v("Concours de l'Etat"), 'de l’État'],
+    [v('Autres dotations et subventions'), 'd’autres dotations et subventions'],
+    [v('Ventes de biens et services'), 'de ventes et de prestations aux usagers'],
+  ].filter((x): x is [number, string] => typeof x[0] === 'number' && x[0] > 0);
+  const depense = [
+    [v('Frais de personnel'), 'de personnel'],
+    [v("Dépenses d'intervention"), 'd’aides et de subventions qu’il verse'],
+  ].filter((x): x is [number, string] => typeof x[0] === 'number' && x[0] > 0);
+  return {
+    c,
+    annee: c.dernier,
+    recettes: v('Recettes de fonctionnement'),
+    depenses: v('Dépenses de fonctionnement'),
+    serieRecettes: c.principal[rang('Recettes de fonctionnement')] ?? [],
+    serieDepenses: c.principal[rang('Dépenses de fonctionnement')] ?? [],
+    recoit,
+    depense,
+  };
+});
+---
+{vues.map((x) => (
+  <div class="c-centre">
+    <h3 class="p-titre-echelon">
+      {x.c.nom}
+      <span class="p-marche-nature">{x.c.type === 'CCAS' ? 'centre communal d’action sociale' : 'centre intercommunal d’action sociale'}</span>
+    </h3>
+    <p class="p-strate">{`Budget principal, en ${x.annee}.`}</p>
+    <dl class="p-reperes">
+      {x.recettes !== null && (
+        <Repere
+          nom="Recettes de fonctionnement"
+          montant={montant(x.recettes)}
+          serie={{ valeurs: x.serieRecettes, annees: cs.annees, formater: montant }}
+        />
+      )}
+      {x.depenses !== null && (
+        <Repere
+          nom="Dépenses de fonctionnement"
+          montant={montant(x.depenses)}
+          serie={{ valeurs: x.serieDepenses, annees: cs.annees, formater: montant }}
+        />
+      )}
+    </dl>
+    {x.recoit.length > 0 && (
+      <p class="p-strate">{'Ce qu’il reçoit : ' + x.recoit.map(([m, l]) => `${montant(m)} ${l}`).join(', ') + '.'}</p>
+    )}
+    {x.depense.length > 0 && (
+      <p class="p-strate">{'Ce qu’il dépense, entre autres : ' + x.depense.map(([m, l]) => `${montant(m)} ${l}`).join(', ') + '.'}</p>
+    )}
+    {x.c.annexes.length > 0 && (
+      <div class="p-risque-groupe">
+        <span class="p-service-famille">Ses budgets annexes — souvent une activité chacun</span>
+        <ul>
+          {x.c.annexes.map(([nom, m]) => (
+            <li class="p-risque-plan"><span class="p-risque-nom">{nom}</span><span class="p-risque-detail">{`${montant(m)} de dépenses de fonctionnement`}</span></li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {x.c.etablissements.length > 0 && (
+      <div class="p-risque-groupe">
+        <span class="p-service-famille">Les établissements qu’il gère</span>
+        <ul>
+          {x.c.etablissements.map(([categ, nom, places]) => (
+            <li class="p-risque-plan"><span class="p-risque-nom">{nom}</span><span class="p-risque-detail">{categ + (places ? ` · ${places.toLocaleString('fr-FR')} places` : '')}</span></li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+))}
+<p class="p-source-territoire">
+  {`D’après les comptes des centres d’action sociale publiés par l’OFGL (${cs.maj}), budget principal et ` +
+    'budgets annexes ; les établissements, d’après le répertoire FINESS. Le nom d’un budget annexe est celui ' +
+    'que le centre lui donne. Aucune aide individuelle n’est publiée, et le site n’en reprend aucune.'}
+</p>
