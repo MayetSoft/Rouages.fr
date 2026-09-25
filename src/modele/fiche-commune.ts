@@ -260,6 +260,11 @@ export interface Scrutin {
     medianeParticipation: number;
     medianeRefus: number;
   }[];
+  /**
+   * La liste arrivée en tête au tour qui a attribué les sièges : ses voix, en
+   * part des inscrits, et la médiane nationale de cette part.
+   */
+  tete: { voix: number; inscrits: number; part: number; mediane: number; seule: boolean } | null;
   sieges: number;
   siegesCc: number;
   conseilCc: string | null;
@@ -444,11 +449,13 @@ type ElectionsDep = {
   maj: string;
   medianes: { participation: number; refus: number }[];
   listeUnique: number;
+  medianeTete?: number;
   c: Record<
     string,
     {
-      t1: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number };
-      t2?: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number };
+      t1: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number; tete?: number };
+      t2?: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number; tete?: number };
+      decisif?: 1 | 2;
       cm: number;
       cc: number;
     }
@@ -811,9 +818,21 @@ function assemblerScrutin(commune: CommuneFiche, structures: StructureFiche[]): 
   };
   const tours = [tour(1, f.t1), tour(2, f.t2)].filter((t): t is NonNullable<typeof t> => !!t);
   if (tours.length === 0) return null;
+  const decisif = f.decisif === 2 && f.t2 ? f.t2 : f.t1;
+  const tete =
+    decisif.tete && decisif.inscrits > 0 && d.medianeTete
+      ? {
+          voix: decisif.tete,
+          inscrits: decisif.inscrits,
+          part: (decisif.tete / decisif.inscrits) * 100,
+          mediane: d.medianeTete,
+          seule: decisif.listes === 1,
+        }
+      : null;
   return {
     nom: d.scrutin,
     tours,
+    tete,
     sieges: f.cm,
     siegesCc: f.cc,
     conseilCc: conseil?.nom ?? null,

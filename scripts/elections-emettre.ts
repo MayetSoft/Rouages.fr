@@ -53,12 +53,21 @@ export interface TourCommune {
   refus: number;
   /** Combien de listes se présentaient. Une seule dans deux communes sur trois. */
   listes: number;
+  /**
+   * Les voix de la liste arrivée en tête. Rapportées aux inscrits, elles
+   * disent quelle part du corps électoral a choisi la liste qui tient le
+   * conseil — la prime majoritaire lui donne la moitié des sièges, qu'elle ait
+   * réuni 30 % des inscrits ou 80 %.
+   */
+  tete: number;
 }
 
 export interface ElectionCommune {
   t1: TourCommune;
   /** Le second tour, dans les 1 526 communes qui en ont eu un. */
   t2?: TourCommune;
+  /** Le tour qui a attribué les sièges : le premier, ou le second là où il a eu lieu. */
+  decisif: 1 | 2;
   /** Sièges au conseil municipal. */
   cm: number;
   /** Sièges de la commune au conseil communautaire : son poids dans l'intercommunalité. */
@@ -72,6 +81,8 @@ export interface Elections {
   medianes: { participation: number; refus: number }[];
   /** Part des communes où une seule liste se présentait au premier tour. */
   partListeUnique: number;
+  /** La médiane nationale des voix de la liste en tête, en part des inscrits, au tour décisif. */
+  medianeTete: number;
   communes: Map<string, ElectionCommune>;
 }
 
@@ -133,18 +144,27 @@ function mediane(valeurs: number[]): number {
  * absente plutôt que de fixer un maximum, parce que le ministère en ajoute
  * autant que nécessaire — treize dans la commune la plus disputée.
  */
-function listesDe(r: Record<string, string>): { listes: number; cm: number; cc: number } {
+function listesDe(r: Record<string, string>): { listes: number; cm: number; cc: number; tete: number; teteIns: number | null } {
   let listes = 0;
   let cm = 0;
   let cc = 0;
+  let tete = 0;
+  let teteIns: number | null = null;
   for (let i = 1; ; i++) {
     if (r[`Voix ${i}`] === undefined) break;
     if ((r[`Voix ${i}`] ?? '').trim() === '') continue;
     listes++;
     cm += entier(r[`Sièges au CM ${i}`]);
     cc += entier(r[`Sièges au CC ${i}`]);
+    const voix = entier(r[`Voix ${i}`]);
+    if (voix > tete) {
+      tete = voix;
+      // Le pourcentage que publie le ministère, pour recouper le nôtre.
+      const p = Number.parseFloat((r[`% Voix/inscrits ${i}`] ?? '').replace('%', '').replace(',', '.'));
+      teteIns = Number.isFinite(p) ? p : null;
+    }
   }
-  return { listes, cm, cc };
+  return { listes, cm, cc, tete, teteIns };
 }
 
 export async function collecterElections(
@@ -154,6 +174,8 @@ export async function collecterElections(
   const communes = new Map<string, ElectionCommune>();
   const medianes: { participation: number; refus: number }[] = [];
   let listeUnique = 0;
+  let ecarts = 0;
+  let recoupees = 0;
 
   for (const { tour, url } of TOURS) {
     let lignes: Record<string, string>[];
@@ -184,22 +206,31 @@ export async function collecterElections(
         exprimes: entier(l['Exprimés']),
         refus: entier(l['Blancs']) + entier(l['Nuls']),
         listes: 0,
+        tete: 0,
       };
-      const { listes, cm, cc } = listesDe(l);
+      const { listes, cm, cc, tete, teteIns } = listesDe(l);
       t.listes = listes;
+      t.tete = tete;
+      if (teteIns !== null && inscrits > 0) {
+        recoupees++;
+        if (Math.abs((tete / inscrits) * 100 - teteIns) > 0.01) ecarts++;
+      }
       if (inscrits > 0) participations.push((votants / inscrits) * 100);
       if (votants > 0) refus.push((t.refus / votants) * 100);
 
       if (tour === 1) {
         if (listes === 1) listeUnique++;
-        communes.set(code, { t1: t, cm, cc });
+        communes.set(code, { t1: t, decisif: 1, cm, cc });
       } else {
         const deja = communes.get(code);
         if (!deja) continue;
         deja.t2 = t;
         // Les sièges ne sont attribués qu'au tour qui élit le conseil : dans
         // ces 1 526 communes, le premier tour en a attribué zéro.
-        if (cm > 0) deja.cm = cm;
+        if (cm > 0) {
+          deja.cm = cm;
+          deja.decisif = 2;
+        }
         if (cc > 0) deja.cc = cc;
       }
     }
@@ -215,6 +246,19 @@ export async function collecterElections(
   }
 
   const partListeUnique = communes.size > 0 ? Math.round((listeUnique / communes.size) * 100) : 0;
+  // Au tour qui a attribué les sièges : c'est la liste arrivée en tête de
+  // celui-là qui tient le conseil.
+  const parts: number[] = [];
+  for (const c of communes.values()) {
+    const t = c.decisif === 2 && c.t2 ? c.t2 : c.t1;
+    if (t.inscrits > 0 && t.tete > 0) parts.push((t.tete / t.inscrits) * 100);
+  }
+  const medianeTete = mediane(parts);
+  if (ecarts > 0) dire(`Élections : ${ecarts} communes où nos voix sur inscrits s'écartent de celles du ministère.`);
+  dire(
+    `  liste en tête : médiane ${medianeTete} % des inscrits au tour décisif ; ` +
+      `${recoupees.toLocaleString('fr-FR')} pourcentages recoupés avec ceux du ministère.`,
+  );
   dire(
     `Élections (${SCRUTIN}) : ${communes.size.toLocaleString('fr-FR')} communes, ` +
       `${listeUnique.toLocaleString('fr-FR')} avec une seule liste au premier tour (${partListeUnique} %).`,
@@ -224,6 +268,7 @@ export async function collecterElections(
     maj: new Date().toISOString().slice(0, 10),
     medianes,
     partListeUnique,
+    medianeTete,
     communes,
   };
 }
@@ -254,6 +299,7 @@ export function ecrireElections(
       maj: e.maj,
       medianes: e.medianes,
       listeUnique: e.partListeUnique,
+      medianeTete: e.medianeTete,
       c,
     }),
   );

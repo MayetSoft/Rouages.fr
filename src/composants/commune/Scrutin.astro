@@ -4,7 +4,11 @@
  *
  * Deux taux, chacun rapporté à sa médiane nationale — 57 % de participation
  * n'est ni bon ni mauvais tant qu'on ignore que la médiane est à 63 %. Le
- * nombre de listes dit s'il y avait un choix.
+ * nombre de listes dit s'il y avait un choix. Et les voix de la liste arrivée
+ * en tête, rapportées aux inscrits : la prime majoritaire lui donne le conseil
+ * à 30 % des inscrits comme à 80 %, et c'est ce chiffre-là qui les distingue.
+ * Le ministère le publie lui-même (« % Voix/inscrits ») ; le collecteur le
+ * recoupe commune par commune.
  *
  * **Aucune nuance politique, aucun nom de candidat.** Relier une personne à
  * une opinion reste interdit.
@@ -60,6 +64,29 @@ const tours = sc.tours.filter((t) => t.inscrits > 0).map((t) => ({
     )}
   </div>
 ))}
+{sc.tete && (
+  <div class="p-scrutin-tour">
+    <dl class="p-reperes">
+      <Repere
+        nom="Voix de la liste arrivée en tête"
+        aide="Rapportées aux inscrits, et non aux suffrages exprimés : l’abstention, les blancs et les nuls y comptent."
+        montant={`${pc(sc.tete.part)} des inscrits`}
+        compare={{ valeur: sc.tete.part, mediane: sc.tete.mediane, reference: 'la médiane nationale' }}
+        mediane={`médiane ${pc(sc.tete.mediane)}`}
+        detail={`${sc.tete.voix.toLocaleString('fr-FR')} voix sur ${sc.tete.inscrits.toLocaleString('fr-FR')} inscrits`}
+      />
+    </dl>
+    <p class="p-scrutin-listes">
+      {(sc.tete.seule
+        ? 'Seule en lice, la liste était élue quel que soit son nombre de voix. '
+        : '') +
+        'La liste arrivée en tête reçoit d’office la moitié des sièges, puis sa part des autres à la proportionnelle : ' +
+        'elle détient la majorité du conseil, qu’elle ait réuni un quart des inscrits ou les trois quarts. '}
+      <a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006353609" target="_blank" rel="noopener">Code électoral, art. L262</a>
+      {'. Les inscrits ne sont pas tous les habitants : ni les mineurs, ni les étrangers hors Union européenne, ni ceux qui ne se sont pas inscrits n’y figurent.'}
+    </p>
+  </div>
+)}
 <slot />
 <p class="p-source-territoire">
   D’après les résultats publiés par le ministère de l’Intérieur ({sc.maj}). Les nuances politiques

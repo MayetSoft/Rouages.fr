@@ -2328,6 +2328,25 @@ municipale ; 43 % ont 60 ans ou plus, contre 36 % dans l'Allier, et 19 % moins
 de 20 ans, contre 20 %. Mayotte, hors du recensement annuel, n'a pas de
 pyramide.
 
+### Les voix de la liste arrivée en tête, en part des inscrits ✔
+
+La prime majoritaire (code électoral, art. L262) donne d'office la moitié des
+sièges à la liste arrivée en tête : elle tient le conseil, qu'elle ait réuni
+30 % des inscrits ou 80 %. La participation et les bulletins blancs ou nuls ne
+le disaient qu'à moitié ; le bloc de l'élection donne désormais ses voix
+rapportées aux inscrits, au tour qui a attribué les sièges, contre la médiane
+nationale — 48,1 %.
+
+Le chiffre n'est pas une construction du site : le ministère le publie liste
+par liste (« % Voix/inscrits »), et le collecteur recoupe le sien avec — 36 362
+pourcentages, aucun écart. Il vaut pour toutes les communes depuis que la loi
+du 21 mai 2025 a étendu le scrutin de liste à celles de moins de 1 000
+habitants. La page dit « des inscrits », jamais « de la population » : les
+mineurs, les étrangers hors Union européenne et les non-inscrits n'y sont pas.
+
+Au Mayet-de-Montagne : une seule liste, 420 voix sur 1 030 inscrits, 40,8 % ;
+165 bulletins blancs ou nuls sur 585 votants, 28 % contre une médiane de 9 %.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,
