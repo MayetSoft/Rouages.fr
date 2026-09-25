@@ -2347,6 +2347,26 @@ mineurs, les étrangers hors Union européenne et les non-inscrits n'y sont pas.
 Au Mayet-de-Montagne : une seule liste, 420 voix sur 1 030 inscrits, 40,8 % ;
 165 bulletins blancs ou nuls sur 585 votants, 28 % contre une médiane de 9 %.
 
+### Déployer par archives ✔ *(à activer : secret `DEPLOI_JETON`)*
+
+Chaque nouveauté de la page de commune coûtait trois heures et demie de
+déploiement — trente-cinq mille fichiers, une connexion FTP chacun — et deux
+envois ont échoué sur un seul fichier coupé en route, laissant Paris et Lyon
+tronquées en ligne. Deux correctifs d'abord : l'envoi sous nom temporaire, qui
+ne laisse plus jamais une page à moitié écrite, et une seconde passe qui
+rattrape les fichiers perdus.
+
+Puis le changement de fond : au-delà de trois cents fichiers, ils partent par
+archives de deux mille, et un script PHP déposé le temps du déploiement les
+ouvre sur le serveur. Vingt fichiers au lieu de trente-cinq mille. Le script
+est protégé par un jeton dont il ne connaît que l'empreinte, refuse tout
+chemin ou fichier qui n'est pas du site, et disparaît à la fin. Sans jeton, ou
+au moindre échec, rien ne change : le miroir fichier par fichier reprend.
+
+Essayé contre un serveur FTP et un PHP locaux : 4 100 fichiers en trois
+archives, déballées en plusieurs appels ; les chemins piégés refusés ; le repli
+quand PHP ne répond pas, sans rien laisser derrière.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,
