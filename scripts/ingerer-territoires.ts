@@ -645,7 +645,7 @@ async function principal() {
     ),
   );
 
-  ecrire(
+  await ecrire(
     graphe,
     groupements,
     codesSuivis,
@@ -677,6 +677,19 @@ async function principal() {
     equipements,
     etatCivil,
   );
+
+  // Le centre d'action sociale : son budget, ses budgets annexes, ce qu'il
+  // gère. Après l'écriture des structures, dont il lit l'appartenance de chaque
+  // commune à son intercommunalité — c'est par elle qu'un CIAS se rattache.
+  const { collecterCcas, ecrireCcas } = await import('./ccas-emettre.ts');
+  const ccas = await tenter('Centres d’action sociale', () =>
+    collecterCcas(
+      async (url) => (await obstine(url)).text(),
+      join(CACHE, 't-finess.csv'),
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+  if (ccas) dire(`${GRIS}${ecrireCcas(SORTIE, ccas)} départements de centres d’action sociale écrits.${RAZ}`);
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */
