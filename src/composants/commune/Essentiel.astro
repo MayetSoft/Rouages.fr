@@ -1,0 +1,108 @@
+---
+/**
+ * L'essentiel, en haut de la page : cinq ou six chiffres, chacun renvoyant au
+ * bloc qui l'explique.
+ *
+ * La page d'une commune dépasse dix écrans, et la plupart des lecteurs ne
+ * descendront pas jusqu'au bout. Ce qui est ici n'est pas un résumé de plus :
+ * c'est un sommaire chiffré. Aucun nombre n'y apparaît qui ne soit pas, plus
+ * bas, rapporté à sa médiane et à sa source — la carte ne fait que les
+ * remonter, et elle ne montre que ceux que la page porte vraiment.
+ */
+import type { ComplementsFiche } from '../../modele/fiche-commune.ts';
+
+interface Props {
+  plus: ComplementsFiche;
+  population: number;
+  /** Les faits datés du journal, sur sa fenêtre de six mois. */
+  faits: number;
+  /** Le plafond au-delà duquel le journal ne compte plus. */
+  plafond: number;
+}
+const { plus, population, faits, plafond } = Astro.props;
+const nb = (v: number) => v.toLocaleString('fr-FR');
+const pc = (v: number) => `${v.toLocaleString('fr-FR', { maximumFractionDigits: 0 })} %`;
+const euros = (v: number) => `${Math.round(v).toLocaleString('fr-FR')} €`;
+
+type Carte = { id: string; nom: string; valeur: string; detail: string | null };
+const cartes: Carte[] = [];
+
+// Les habitants : le nombre, et la part des 60 ans ou plus quand la pyramide
+// est là — c'est ce qui dit le plus vite à quelle commune on a affaire.
+if (population > 0) {
+  let detail: string | null = null;
+  const a = plus.ages;
+  if (a) {
+    const i60 = a.tranches.indexOf(60);
+    const tot = [...a.femmes, ...a.hommes].reduce((s, x) => s + x, 0);
+    const ages = [...a.femmes.slice(i60), ...a.hommes.slice(i60)].reduce((s, x) => s + x, 0);
+    if (tot > 0 && i60 >= 0) detail = `${pc((ages / tot) * 100)} ont 60 ans ou plus`;
+  }
+  cartes.push({ id: 'habitants', nom: 'Habitants', valeur: nb(population), detail });
+}
+
+if (plus.scrutin?.tete) {
+  const t = plus.scrutin.tete;
+  cartes.push({
+    id: 'election',
+    nom: 'La liste arrivée en tête',
+    valeur: `${pc(t.part)} des inscrits`,
+    detail: `médiane ${pc(t.mediane)}`,
+  });
+}
+
+const fonctionnement = plus.finances?.reperes.find((r) => r.id === 'repere-fonctionnement');
+if (fonctionnement && fonctionnement.valeur !== null) {
+  cartes.push({
+    id: 'comptes',
+    nom: 'Dépenses de fonctionnement',
+    valeur: `${euros(fonctionnement.valeur)} par habitant`,
+    detail: fonctionnement.mediane !== null ? `médiane de la strate ${euros(fonctionnement.mediane)}` : null,
+  });
+}
+
+if (plus.presentes) {
+  const p = plus.presentes;
+  cartes.push({
+    id: 'entreprises',
+    nom: 'Établissements employeurs',
+    valeur: nb(p.employeurs),
+    detail: `sur ${nb(p.total)} établissements actifs`,
+  });
+}
+
+const ccas = plus.centres?.centres.find((c) => c.type === 'CCAS');
+if (ccas && plus.centres) {
+  const i = plus.centres.annees.indexOf(ccas.dernier);
+  const k = plus.centres.agregats.indexOf('Dépenses de fonctionnement');
+  const v = i >= 0 && k >= 0 ? ccas.principal[k]?.[i] : null;
+  if (typeof v === 'number') {
+    cartes.push({ id: 'ccas', nom: 'Le CCAS', valeur: euros(v), detail: `de dépenses en ${ccas.dernier}` });
+  }
+}
+
+if (faits > 0) {
+  cartes.push({
+    id: 'journal',
+    nom: 'Ce qui a bougé',
+    valeur: faits >= plafond ? `plus de ${nb(plafond)} faits` : `${nb(faits)} fait${faits > 1 ? 's' : ''}`,
+    detail: 'datés, en six mois',
+  });
+}
+---
+{cartes.length >= 3 && (
+  <section class="c-essentiel" aria-labelledby="essentiel-titre">
+    <h2 id="essentiel-titre" class="badge">L’essentiel</h2>
+    <ul class="c-essentiel-liste">
+      {cartes.map((c) => (
+        <li>
+          <a class="c-essentiel-carte" href={`#${c.id}`}>
+            <span class="c-essentiel-nom">{c.nom}</span>
+            <span class="c-essentiel-valeur">{c.valeur}</span>
+            {c.detail && <span class="c-essentiel-detail">{c.detail}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

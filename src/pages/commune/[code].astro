@@ -40,6 +40,8 @@ import Associations from '../../composants/commune/Associations.astro';
 import CentresSociaux from '../../composants/commune/CentresSociaux.astro';
 import Entreprises from '../../composants/commune/Entreprises.astro';
 import EntreprisesPresentes from '../../composants/commune/EntreprisesPresentes.astro';
+import Essentiel from '../../composants/commune/Essentiel.astro';
+import Demarches from '../../composants/commune/Demarches.astro';
 import Fiscalite from '../../composants/commune/Fiscalite.astro';
 import Logements from '../../composants/commune/Logements.astro';
 import Equipements from '../../composants/commune/Equipements.astro';
@@ -166,6 +168,9 @@ const log = fiche?.logements ?? null;
  * moins sur le site entier.
  */
 const journal = journalCommune(commune, 6);
+// Tout le journal de la fenêtre, pour le compter dans l'essentiel : la page n'en montre que six.
+const PLAFOND_JOURNAL = 40;
+const faits = journalCommune(commune, PLAFOND_JOURNAL).length;
 
 const region = meta?.regions?.[commune.dep];
 const titre = `${commune.nom} — qui décide quoi`;
@@ -260,6 +265,8 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       </p>
     )}
 
+    <Essentiel plus={plus} population={commune.population} faits={faits} plafond={PLAFOND_JOURNAL} />
+
     {entrees.length > 1 && (
       <nav class="p-sommaire c-sommaire" aria-label="Les blocs de cette commune">
         {entrees.map(([id, etiquette]) => <a class="p-sommaire-lien" href={`#${id}`}>{etiquette}</a>)}
@@ -270,6 +277,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="habitants" class="p-habitants">
         <h2 class="badge">Combien d’habitants</h2>
         <Habitants h={plus.histoire} ec={plus.etatCivil} ag={plus.ages} />
+        <Demarches ids={["demander-apa"]} />
       </section>
     )}
 
@@ -295,6 +303,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
             </p>
           )}
         </Scrutin>
+        <Demarches ids={["inscription-electorale"]} />
       </section>
     )}
 
@@ -358,6 +367,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="comptes" class="p-finances">
         <h2 class="badge">{`Ses comptes, en ${plus.finances.annee}`}</h2>
         <Comptes f={plus.finances} />
+        <Demarches ids={["budget-communal", "controle-chambre-comptes", "document-administratif"]} />
       </section>
     )}
 
@@ -365,6 +375,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="ccas" class="p-finances p-echelons p-assos">
         <h2 class="badge">L’action sociale : le CCAS</h2>
         <CentresSociaux cs={plus.centres} />
+        <Demarches ids={["demander-aide-ccas", "demande-rsa"]} />
       </section>
     )}
 
@@ -372,6 +383,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="preleve" class="p-fiscalite">
         <h2 class="badge">Ce qui est prélevé ici</h2>
         <Fiscalite f={fisc} />
+        <Demarches ids={["contester-taxe-fonciere"]} />
       </section>
     )}
 
@@ -453,6 +465,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
                 ' qui est alimenté au fil de l’eau par les collectivités.'
               : '')}
         </p>
+        <Demarches ids={["permis-de-construire", "modifier-le-plu", "enquete-publique"]} />
       </section>
     )}
 
@@ -510,6 +523,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="logement-social" class="p-sru">
         <h2 class="badge">Logement social : ce que la loi exige</h2>
         <Sru s={plus.sru} maj={plus.sruMaj} />
+        <Demarches ids={["demande-logement-social"]} />
       </section>
     )}
 
@@ -524,6 +538,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="deliberations" class="p-marches p-delibs">
         <h2 class="badge">Ce qui a été délibéré</h2>
         <Deliberations liste={plus.deliberations} depuis={plus.delibDepuis} />
+        <Demarches ids={["deliberation", "document-administratif"]} />
       </section>
     )}
 
@@ -569,6 +584,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="equipements" class="p-equipements">
         <h2 class="badge">Ce qu’on trouve sur place</h2>
         <Equipements e={equ} />
+        <Demarches ids={["inscription-ecole", "choisir-son-college", "inscrire-au-transport-scolaire"]} />
       </section>
     )}
 
@@ -588,9 +604,9 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
           {' '}<a href={`/commune/${commune.code}-flux.xml`}>S’abonner au flux</a>, pour le
           recevoir dans un agrégateur. Le site ne demande aucune adresse et n’en conserve aucune.
         </p>
-        <ul class="journal">
+        <ul class="journal" data-commune={commune.code}>
           {journal.map((e) => (
-            <li>
+            <li data-date={e.date}>
               <span class="journal-date">{e.date}</span>
               <span class="journal-fait">
                 <span class="journal-genre">{e.genre}</span>
@@ -609,6 +625,11 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
         </p>
       </section>
     )}
+
+    <script>
+      // Sans effet quand la commune n'a pas de journal : le script cherche la liste et s'arrête.
+      import '../../client/derniere-visite.ts';
+    </script>
 
     <h2 class="badge">Aller plus loin</h2>
     <ul>

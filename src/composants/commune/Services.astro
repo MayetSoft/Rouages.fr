@@ -35,6 +35,18 @@ const VOISINAGE: [string, string, 'un' | 'une'][] = [
 ];
 /** Au-delà, la liste d'une famille se replie derrière son décompte : Le Mans compte 87 écoles. */
 const SEUIL_REPLI = 6;
+/**
+ * Au-delà, elle s'arrête. Paris compte 833 écoles, et leur liste pesait
+ * 520 Ko sur les 610 de la page — repliée, elle restait dans le HTML. Les
+ * écoles qui ont gagné ou perdu une classe passent devant : c'est ce qui bouge.
+ */
+const PLAFOND = 40;
+/** Où trouver la liste complète, quand la page l'arrête. */
+const SOURCE_COMPLETE: Record<string, string> = {
+  ecole: 'https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/',
+  college: 'https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/',
+  lycee: 'https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/',
+};
 
 const parFamille = new Map<string, Fiche['services']>();
 for (const s of services) {
@@ -43,7 +55,15 @@ for (const s of services) {
 }
 const groupes = LIBELLE_FAMILLE.filter(([f]) => (parFamille.get(f)?.length ?? 0) > 0).map(([f, libelle]) => {
   const liste = parFamille.get(f)!;
-  return { libelle: libelle(liste.length), liste, replie: liste.length > SEUIL_REPLI };
+  const ordonnee =
+    liste.length > PLAFOND ? [...liste.filter((e) => e.ecole?.dernierChangement), ...liste.filter((e) => !e.ecole?.dernierChangement)] : liste;
+  return {
+    famille: f,
+    libelle: libelle(liste.length),
+    liste: ordonnee.slice(0, PLAFOND),
+    reste: Math.max(0, liste.length - PLAFOND),
+    replie: liste.length > SEUIL_REPLI,
+  };
 });
 const chiffres = (e: NonNullable<Fiche['services'][number]['ecole']>) => {
   const i = e.classes.reduce<number>((d, v, k) => (v !== null ? k : d), -1);
@@ -98,6 +118,16 @@ const voisins = VOISINAGE.flatMap(([famille, libelle, article]) => {
           );
         })}
       </ul>
+      {g.reste > 0 && (
+        <p class="p-service-reste">
+          {`Et ${g.reste.toLocaleString('fr-FR')} autres, que la page ne liste pas pour rester légère` +
+            (g.famille === 'ecole' ? ' — celles qui ont gagné ou perdu une classe sont en tête' : '') +
+            (SOURCE_COMPLETE[g.famille] ? '. ' : '.')}
+          {SOURCE_COMPLETE[g.famille] && (
+            <a href={SOURCE_COMPLETE[g.famille]} target="_blank" rel="noopener">La liste complète, dans l’Annuaire de l’éducation</a>
+          )}
+        </p>
+      )}
     </Groupe>
   );
 })}

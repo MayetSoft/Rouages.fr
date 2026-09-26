@@ -933,3 +933,21 @@ a.p-sommaire-lien { text-decoration: none; }
 .pyr-tableau th[scope="row"], .pyr-tableau thead th:first-child { text-align: left; font-weight: 400; }
 .pyr-tableau thead th { font-weight: 600; color: var(--encre-douce); border-bottom: 1px solid var(--trait); }
 .pyr-tableau > summary { display: list-item; cursor: pointer; }
+
+/* L'essentiel : un sommaire chiffré, chaque carte mène à son bloc. */
+.c-essentiel { margin: 1.2rem 0 .6rem; }
+.c-essentiel-liste { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); }
+.c-essentiel-carte { display: grid; gap: .1rem; padding: .6rem .75rem; border: 1px solid var(--trait); border-radius: var(--rayon); background: var(--fond-carte); color: var(--encre); text-decoration: none; height: 100%; box-sizing: border-box; transition: border-color var(--transition); }
+.c-essentiel-carte:hover, .c-essentiel-carte:focus-visible { border-color: var(--accent); }
+.c-essentiel-nom { font-size: .8rem; color: var(--encre-douce); }
+.c-essentiel-valeur { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.c-essentiel-detail { font-size: .8rem; color: var(--encre-tres-douce); }
+
+/* Les démarches qu'un bloc appelle : une ligne, sous le bloc. */
+.c-demarches { margin: .7rem 0 0; font-size: .9rem; }
+.c-demarches-titre { display: block; font-size: .8rem; font-weight: 600; color: var(--encre-douce); margin-bottom: .1rem; }
+
+/* Depuis la dernière visite : un mot, pas une alarme. */
+.journal-depuis { font-size: .9rem; color: var(--accent); margin: .4rem 0; }
+.journal-marque { display: inline-block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--sur-accent); background: var(--accent); border-radius: 4px; padding: 0 .3rem; margin-right: .35rem; }
+.p-service-reste { font-size: .85rem; color: var(--encre-douce); margin: .35rem 0 0; }
