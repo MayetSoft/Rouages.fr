@@ -7,15 +7,18 @@
  * dire quoi en faire. Une ligne sous le bloc, pas davantage : les démarches
  * vivent sur leur propre page, avec leurs textes.
  *
- * Un identifiant inconnu fait échouer le build plutôt que de laisser un lien
- * mort sur trente-cinq mille pages.
+ * La liste est dans `src/modele/demarches-des-blocs.ts`, que
+ * `verifier-reseau` contrôle en entier ; un identifiant inconnu fait de toute
+ * façon échouer le build plutôt que de laisser un lien mort.
  */
+import { DEMARCHES_DES_BLOCS, type BlocAvecDemarches } from '../../modele/demarches-des-blocs.ts';
 import { chargerGraphe } from '../../modele/graphe.ts';
 
 interface Props {
-  ids: string[];
+  bloc: BlocAvecDemarches;
 }
-const { ids } = Astro.props;
+const { bloc } = Astro.props;
+const ids = DEMARCHES_DES_BLOCS[bloc];
 const graphe = chargerGraphe();
 const liens = ids.map((id) => {
   const p = graphe.processus.get(id);

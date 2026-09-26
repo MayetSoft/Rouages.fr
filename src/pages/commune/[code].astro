@@ -277,7 +277,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="habitants" class="p-habitants">
         <h2 class="badge">Combien d’habitants</h2>
         <Habitants h={plus.histoire} ec={plus.etatCivil} ag={plus.ages} />
-        <Demarches ids={["demander-apa"]} />
+        <Demarches bloc="habitants" />
       </section>
     )}
 
@@ -303,7 +303,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
             </p>
           )}
         </Scrutin>
-        <Demarches ids={["inscription-electorale"]} />
+        <Demarches bloc="election" />
       </section>
     )}
 
@@ -367,7 +367,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="comptes" class="p-finances">
         <h2 class="badge">{`Ses comptes, en ${plus.finances.annee}`}</h2>
         <Comptes f={plus.finances} />
-        <Demarches ids={["budget-communal", "controle-chambre-comptes", "document-administratif"]} />
+        <Demarches bloc="comptes" />
       </section>
     )}
 
@@ -375,7 +375,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="ccas" class="p-finances p-echelons p-assos">
         <h2 class="badge">L’action sociale : le CCAS</h2>
         <CentresSociaux cs={plus.centres} />
-        <Demarches ids={["demander-aide-ccas", "demande-rsa"]} />
+        <Demarches bloc="ccas" />
       </section>
     )}
 
@@ -383,7 +383,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="preleve" class="p-fiscalite">
         <h2 class="badge">Ce qui est prélevé ici</h2>
         <Fiscalite f={fisc} />
-        <Demarches ids={["contester-taxe-fonciere"]} />
+        <Demarches bloc="preleve" />
       </section>
     )}
 
@@ -465,7 +465,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
                 ' qui est alimenté au fil de l’eau par les collectivités.'
               : '')}
         </p>
-        <Demarches ids={["permis-de-construire", "modifier-le-plu", "enquete-publique"]} />
+        <Demarches bloc="urbanisme" />
       </section>
     )}
 
@@ -523,7 +523,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="logement-social" class="p-sru">
         <h2 class="badge">Logement social : ce que la loi exige</h2>
         <Sru s={plus.sru} maj={plus.sruMaj} />
-        <Demarches ids={["demande-logement-social"]} />
+        <Demarches bloc="logement-social" />
       </section>
     )}
 
@@ -538,7 +538,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="deliberations" class="p-marches p-delibs">
         <h2 class="badge">Ce qui a été délibéré</h2>
         <Deliberations liste={plus.deliberations} depuis={plus.delibDepuis} />
-        <Demarches ids={["deliberation", "document-administratif"]} />
+        <Demarches bloc="deliberations" />
       </section>
     )}
 
@@ -584,7 +584,7 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       <section id="equipements" class="p-equipements">
         <h2 class="badge">Ce qu’on trouve sur place</h2>
         <Equipements e={equ} />
-        <Demarches ids={["inscription-ecole", "choisir-son-college", "inscrire-au-transport-scolaire"]} />
+        <Demarches bloc="equipements" />
       </section>
     )}
 

@@ -22,6 +22,8 @@ interface Props {
 const { plus, population, faits, plafond } = Astro.props;
 const nb = (v: number) => v.toLocaleString('fr-FR');
 const pc = (v: number) => `${v.toLocaleString('fr-FR', { maximumFractionDigits: 0 })} %`;
+// Au dixième là où le bloc l'écrit au dixième : la carte ne doit pas dire 41 % quand le bloc dit 40,8 %.
+const pc1 = (v: number) => `${v.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %`;
 const euros = (v: number) => `${Math.round(v).toLocaleString('fr-FR')} €`;
 
 type Carte = { id: string; nom: string; valeur: string; detail: string | null };
@@ -46,8 +48,8 @@ if (plus.scrutin?.tete) {
   cartes.push({
     id: 'election',
     nom: 'La liste arrivée en tête',
-    valeur: `${pc(t.part)} des inscrits`,
-    detail: `médiane ${pc(t.mediane)}`,
+    valeur: `${pc1(t.part)} des inscrits`,
+    detail: `médiane ${pc1(t.mediane)}`,
   });
 }
 
