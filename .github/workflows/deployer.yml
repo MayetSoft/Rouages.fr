@@ -78,6 +78,9 @@ jobs:
           RACINE: ${{ secrets.FTP_RACINE }}
           SIMULATION: ${{ inputs.simulation }}
           COMPLET: ${{ inputs.complet }}
+          # Facultatifs : sans jeton, l'envoi reste fichier par fichier.
+          DEPLOI_JETON: ${{ secrets.DEPLOI_JETON }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://rouages.fr' }}
         run: |
           set -euo pipefail
           : "${RACINE:=public_html}"
@@ -154,7 +157,14 @@ jobs:
                          mirror --reverse --verbose=1 $1 $simuler \
                                 \"$travail/envoi/\" \"$RACINE\""
               }
-              if ! envoyer "--parallel=8"; then
+              # Par archives d'abord : une vingtaine de fichiers au lieu de
+              # trente-cinq mille, déballés par un script PHP que l'envoi dépose
+              # et efface (voir scripts/deploiement/). Sans jeton, sous trois
+              # cents fichiers, ou au moindre échec, on retombe sur le miroir,
+              # qui renvoie ce qui manque : déballer deux fois ne fait rien.
+              if [ -z "$simuler" ] && REGLAGES="$reglages" npx tsx scripts/deploiement/envoyer-archives.ts "$travail/envoi"; then
+                echo "::notice::fichiers envoyés par archives et déballés sur le serveur."
+              elif ! envoyer "--parallel=8"; then
                 echo "::warning::des fichiers n'ont pas été reçus — seconde passe sur ceux-là."
                 envoyer "--parallel=2 --ignore-time"
               fi
