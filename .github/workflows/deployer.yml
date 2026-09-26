@@ -83,6 +83,7 @@ jobs:
           SITE_URL: ${{ vars.SITE_URL || 'https://rouages.fr' }}
         run: |
           set -euo pipefail
+          debut=$(date +%s)
           : "${RACINE:=public_html}"
 
           # Le chiffrement n'est pas négociable, et le certificat est vérifié :
@@ -155,7 +156,7 @@ jobs:
                 lftp -c "$reglages
                          open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
                          mirror --reverse --verbose=1 $1 $simuler \
-                                \"$travail/envoi/\" \"$RACINE\""
+                                \"$2/\" \"$RACINE\""
               }
               # Par archives d'abord : une vingtaine de fichiers au lieu de
               # trente-cinq mille, déballés par un script PHP que l'envoi dépose
@@ -164,10 +165,38 @@ jobs:
               # qui renvoie ce qui manque : déballer deux fois ne fait rien.
               if [ -z "$simuler" ] && REGLAGES="$reglages" npx tsx scripts/deploiement/envoyer-archives.ts "$travail/envoi"; then
                 echo "::notice::fichiers envoyés par archives et déballés sur le serveur."
-              elif ! envoyer "--parallel=8"; then
-                echo "::warning::des fichiers n'ont pas été reçus — seconde passe sur ceux-là."
-                envoyer "--parallel=2 --ignore-time"
+              else
+                # Par lots de quatre mille — un quart d'heure chacun —, et le
+                # manifeste de ce qui est en ligne déposé après chaque lot.
+                # GitHub arrête un job au bout de six heures : le #100, avec
+                # soixante-huit mille fichiers, y est arrivé sans avoir déposé
+                # de manifeste, et le suivant aurait tout renvoyé. Ici, passé
+                # cinq heures dix, on ne commence plus de lot : l'étape s'arrête
+                # proprement, et le déploiement suivant reprend au lot d'après.
+                npx tsx scripts/manifeste.ts lots "$travail/ancien" "$travail/nouveau" \
+                  "$travail/envoi" 4000 "$travail/lots"
+                for lot in "$travail"/lots/lot-*/; do
+                  lot="${lot%/}"
+                  if [ $(( $(date +%s) - debut )) -gt 18600 ]; then
+                    incomplet=oui
+                    break
+                  fi
+                  echo "Lot ${lot##*/} ($(find "$lot" -type f | wc -l) fichiers)."
+                  if ! envoyer "--parallel=8" "$lot"; then
+                    echo "::warning::des fichiers de ${lot##*/} n'ont pas été reçus — seconde passe sur ceux-là."
+                    envoyer "--parallel=2 --ignore-time" "$lot"
+                  fi
+                  if [ -z "$simuler" ]; then
+                    lftp -c "$reglages
+                             open -u \"$UTILISATEUR\",\"$MOTDEPASSE\" \"$HOTE\";
+                             put \"$lot.manifeste\" -o \"$RACINE/.manifeste\""
+                  fi
+                done
               fi
+            fi
+            if [ -n "${incomplet:-}" ]; then
+              echo "::error::envoi incomplet, arrêté avant la limite de six heures ; le manifeste déposé dit ce qui est en ligne. Relancer le déploiement : il reprendra là où celui-ci s'est arrêté."
+              exit 1
             fi
             # Effacer suppose le marqueur, comme `--delete` plus bas : la liste
             # vient du manifeste, mais c'est RACINE qui décide où elle s'applique.

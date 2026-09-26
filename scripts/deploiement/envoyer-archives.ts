@@ -28,7 +28,7 @@
  */
 import { spawn } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -239,7 +239,10 @@ export async function envoyerArchives(
   }
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+// Le chemin réel des deux côtés : lancé par un lien symbolique, le script ne
+// se reconnaîtrait pas, sortirait sans rien faire avec le code 0, et le
+// déploiement croirait les archives déballées.
+if (process.argv[1] && realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1])) {
   const dossier = process.argv[2];
   if (!dossier) {
     console.error('usage : envoyer-archives.ts <dossier d’envoi> | --sonde');

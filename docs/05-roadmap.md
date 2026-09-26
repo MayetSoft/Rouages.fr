@@ -2395,6 +2395,17 @@ le code, le `cf-ray` et le titre de la page, retente un 52x, et commence par
 une requête sans jeton qui doit rendre le 403 du script — ce qui sépare
 « PHP ne répond pas » de « le POST est arrêté en route ».
 
+Le même déploiement a buté sur une seconde limite : GitHub arrête un job au
+bout de six heures, et soixante-huit mille fichiers un par un n'y tiennent
+pas. Arrêté en route, il n'aurait déposé aucun manifeste, et le suivant
+aurait tout renvoyé — sur une machine neuve, la date d'un fichier ne dit plus
+s'il est parti. Le repli envoie désormais par lots de quatre mille et dépose
+après chacun le manifeste de ce qui est en ligne ; passé cinq heures dix, il
+ne commence plus de lot et s'arrête en le disant. Relancé, il reprend au lot
+suivant. Essayé contre un serveur FTP local : 9 000 fichiers, arrêt après le
+premier lot, reprise qui n'envoie que les 5 001 restants puis efface ce qui a
+disparu.
+
 ### Une page qu'on lit sans la parcourir en entier ✔
 
 La page de commune dépassait dix écrans. Quatre changements pour celui qui ne
