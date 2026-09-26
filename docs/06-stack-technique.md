@@ -273,6 +273,14 @@ Sans jeton, sous le seuil, ou au moindre échec — PHP absent, Cloudflare qui
 bloque l'appel —, l'envoi retombe sur le miroir fichier par fichier, qui
 renvoie ce qui manque : déballer deux fois le même fichier ne fait rien.
 
+Ce miroir-là part par lots de quatre mille fichiers (`manifeste.ts lots`), et
+le manifeste de ce qui est en ligne est déposé après chaque lot. GitHub arrête
+un job au bout de six heures : passé cinq heures dix, aucun lot n'est plus
+commencé, l'étape échoue en le disant, sans rien effacer ni déposer le
+manifeste final, et le déploiement suivant reprend où celui-ci s'est arrêté.
+Le workflow « Sonder le déballage » dépose le script seul, l'appelle et
+l'efface : une minute pour savoir si le déballage marche, sans déployer.
+
 ### Le garde-fou
 
 `mirror --delete` est ce qui garde le serveur propre : sans lui, une page

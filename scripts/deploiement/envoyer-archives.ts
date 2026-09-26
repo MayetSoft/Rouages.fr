@@ -28,7 +28,7 @@
  */
 import { spawn } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -90,6 +90,23 @@ async function lftp(commandes: string[]): Promise<void> {
   }
 }
 
+/**
+ * Ce qu'une réponse qui n'est pas du JSON dit d'elle-même. Les pages d'erreur
+ * de Cloudflare commencent toutes par le même gabarit : les premiers octets
+ * n'apprennent rien, le titre et l'identifiant de requête (`cf-ray`) disent
+ * qui a répondu et quoi.
+ */
+export function resumer(r: { status: number; headers: Headers }, texte: string): string {
+  const titre = /<title>([\s\S]*?)<\/title>/i.exec(texte)?.[1]?.replace(/\s+/g, ' ').trim();
+  const morceaux = [
+    String(r.status),
+    `serveur ${r.headers.get('server') ?? '?'}`,
+    r.headers.get('cf-ray') ? `cf-ray ${r.headers.get('cf-ray')}` : null,
+    titre ? `« ${titre} »` : JSON.stringify(texte.slice(0, 200)),
+  ];
+  return morceaux.filter(Boolean).join(', ');
+}
+
 async function appeler(url: string, jeton: string, corps: Record<string, string>): Promise<Record<string, unknown>> {
   let derniere: unknown;
   for (let essai = 0; essai < 4; essai++) {
@@ -105,28 +122,41 @@ async function appeler(url: string, jeton: string, corps: Record<string, string>
       try {
         json = JSON.parse(texte) as Record<string, unknown>;
       } catch {
-        // Du PHP qui ne s'exécute pas se renvoie tel quel : inutile d'insister.
-        throw Object.assign(new Error(`réponse non JSON (${r.status}) : ${texte.slice(0, 120)}`), { definitif: true });
+        // Du PHP qui ne s'exécute pas se renvoie tel quel, avec un 200 :
+        // inutile d'insister. Une page d'erreur de Cloudflare (52x) peut
+        // tenir à un instant — le fichier tout juste déposé et encore
+        // examiné par l'hébergeur : elle a droit aux essais suivants.
+        throw Object.assign(new Error(`réponse non JSON (${resumer(r, texte)})`), { definitif: r.status < 500 });
       }
       if (!r.ok) throw Object.assign(new Error(`${r.status} : ${JSON.stringify(json)}`), { definitif: r.status < 500 });
       return json;
     } catch (e) {
       derniere = e;
-      if ((e as { definitif?: boolean }).definitif) break;
-      await new Promise((ok) => setTimeout(ok, 3000 * (essai + 1)));
+      if ((e as { definitif?: boolean }).definitif || essai === 3) break;
+      console.log(`Essai ${essai + 1} sur ${corps.action} : ${(e as Error).message}`);
+      await new Promise((ok) => setTimeout(ok, 5000 * (essai + 1)));
     }
   }
   throw derniere;
 }
 
-export async function envoyerArchives(dossier: string, dire: (m: string) => void = console.log): Promise<0 | 1 | 2> {
+/**
+ * `sonde` : le script seul, appelé puis effacé, sans archive ni fichier du
+ * site. C'est ce que lance le workflow « Sonder le déballage » : une minute
+ * pour savoir si le serveur répond, au lieu d'un déploiement entier.
+ */
+export async function envoyerArchives(
+  dossier: string | null,
+  dire: (m: string) => void = console.log,
+  { sonde = false }: { sonde?: boolean } = {},
+): Promise<0 | 1 | 2> {
   const jeton = process.env.DEPLOI_JETON ?? '';
-  const fichiers = lister(dossier);
+  const fichiers = dossier === null ? [] : lister(dossier);
   if (!jeton) {
     dire('Pas de jeton de déploiement : envoi fichier par fichier.');
     return 2;
   }
-  if (fichiers.length < SEUIL) {
+  if (!sonde && fichiers.length < SEUIL) {
     dire(`${fichiers.length} fichiers à envoyer : le miroir fait aussi bien.`);
     return 2;
   }
@@ -145,18 +175,20 @@ export async function envoyerArchives(dossier: string, dire: (m: string) => void
         .replace('__EMPREINTE__', createHash('sha256').update(jeton).digest('hex'))
         .replace('__PREFIXE__', prefixe),
     );
-    for (let i = 0; i * PAR_ARCHIVE < fichiers.length; i++) {
+    for (let i = 0; !sonde && i * PAR_ARCHIVE < fichiers.length; i++) {
       const nom = `${i}.zip`;
       // -X sans attributs étendus, -D sans entrées de dossier : des chemins, rien d'autre.
       await executer('zip', ['-q', '-X', '-D', join(travail, prefixe + nom), '-@'], {
-        cwd: dossier,
+        cwd: dossier!,
         entree: fichiers.slice(i * PAR_ARCHIVE, (i + 1) * PAR_ARCHIVE).join('\n') + '\n',
       });
       archives.push(nom);
       distants.push(prefixe + nom);
     }
-    const poids = archives.reduce((s, a) => s + statSync(join(travail, prefixe + a)).size, 0);
-    dire(`${fichiers.length} fichiers en ${archives.length} archives, ${(poids / 1e6).toFixed(0)} Mo.`);
+    if (!sonde) {
+      const poids = archives.reduce((s, a) => s + statSync(join(travail, prefixe + a)).size, 0);
+      dire(`${fichiers.length} fichiers en ${archives.length} archives, ${(poids / 1e6).toFixed(0)} Mo.`);
+    }
 
     // Les archives d'abord, le script en dernier : il n'est appelable qu'une
     // fois tout arrivé.
@@ -166,9 +198,19 @@ export async function envoyerArchives(dossier: string, dire: (m: string) => void
     ]);
 
     const url = `${env('SITE_URL').replace(/\/$/, '')}/${script}`;
+    // Une requête GET sans jeton d'abord, qui doit rendre le 403 du script :
+    // si elle passe et que le POST échoue, c'est le POST qu'on arrête en
+    // route (pare-feu de l'hébergeur ou de Cloudflare), pas PHP.
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+      dire(`Sonde sans jeton : ${resumer(r, await r.text())}.`);
+    } catch (e) {
+      dire(`Sonde sans jeton : ${(e as Error).message}.`);
+    }
     const ping = await appeler(url, jeton, { action: 'ping' });
     if (ping.ok !== true || ping.zip !== true) throw new Error(`le serveur ne sait pas déballer : ${JSON.stringify(ping)}`);
     dire(`Serveur prêt (PHP ${String(ping.php)}).`);
+    if (sonde) return 0;
 
     for (const a of archives) {
       let debut = 0;
@@ -197,11 +239,14 @@ export async function envoyerArchives(dossier: string, dire: (m: string) => void
   }
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+// Le chemin réel des deux côtés : lancé par un lien symbolique, le script ne
+// se reconnaîtrait pas, sortirait sans rien faire avec le code 0, et le
+// déploiement croirait les archives déballées.
+if (process.argv[1] && realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1])) {
   const dossier = process.argv[2];
   if (!dossier) {
-    console.error('usage : envoyer-archives.ts <dossier d’envoi>');
+    console.error('usage : envoyer-archives.ts <dossier d’envoi> | --sonde');
     process.exit(1);
   }
-  process.exit(await envoyerArchives(dossier));
+  process.exit(dossier === '--sonde' ? await envoyerArchives(null, console.log, { sonde: true }) : await envoyerArchives(dossier));
 }

@@ -77,7 +77,42 @@ if (mode === 'ecrire') {
   const disparus = [...ancien.keys()].filter((f) => !nouveau.has(f));
   writeFileSync(effacerF, disparus.map((f) => `rm -f ${cite(f)}`).join('\n') + (disparus.length ? '\n' : ''));
   console.log(`${envoyes} fichiers à envoyer, ${disparus.length} à effacer, ${nouveau.size - envoyes} inchangés.`);
+} else if (mode === 'lots') {
+  // L'envoi fichier par fichier, découpé en lots, avec pour chacun le
+  // manifeste de ce qui sera en ligne une fois le lot arrivé : l'ancien, mis à
+  // jour des fichiers des lots déjà partis. Déposé après chaque lot, il fait
+  // qu'un envoi interrompu — GitHub arrête un job au bout de six heures, et le
+  // #100 y est arrivé — reprend là où il s'est arrêté, au lieu de tout
+  // renvoyer : sur une machine neuve, la date ne dit plus ce qui est parti.
+  const [ancienF, nouveauF, envoi, tailleS, sortie] = args;
+  const taille = Number(tailleS);
+  if (!Number.isInteger(taille) || taille <= 0) throw new Error(`taille de lot invalide : ${tailleS}`);
+  const courant = lire(ancienF);
+  const nouveau = lire(nouveauF);
+  const fichiers = lister(envoi).sort();
+  let k = 0;
+  for (; k * taille < fichiers.length; k++) {
+    const nom = `lot-${String(k).padStart(3, '0')}`;
+    for (const f of fichiers.slice(k * taille, (k + 1) * taille)) {
+      const h = nouveau.get(f);
+      if (!h) throw new Error(`${f} est à envoyer mais absent du nouveau manifeste`);
+      const cible = join(sortie, nom, f);
+      mkdirSync(dirname(cible), { recursive: true });
+      try {
+        linkSync(join(envoi, f), cible);
+      } catch {
+        copyFileSync(join(envoi, f), cible);
+      }
+      courant.set(f, h);
+    }
+    const lignes = [...courant.keys()].sort().map((f) => `${courant.get(f)}  ${f}`);
+    writeFileSync(join(sortie, `${nom}.manifeste`), lignes.join('\n') + '\n');
+  }
+  console.log(`${fichiers.length} fichiers en ${k} lots de ${taille} au plus.`);
 } else {
-  console.error('usage : manifeste.ts ecrire <dist> <manifeste> | comparer <ancien> <nouveau> <dist> <envoi> <effacer>');
+  console.error(
+    'usage : manifeste.ts ecrire <dist> <manifeste> | comparer <ancien> <nouveau> <dist> <envoi> <effacer> | ' +
+      'lots <ancien> <nouveau> <envoi> <taille> <sortie>',
+  );
   process.exit(2);
 }
