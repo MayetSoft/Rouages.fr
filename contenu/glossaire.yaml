@@ -239,6 +239,12 @@ sigles:
     definition: "L'administration qui publie le Journal officiel et le BODACC."
     liens: [dila-api-bodacc]
 
+  - id: sigle-sirene
+    sigle: SIRENE
+    developpe: "Système informatisé du répertoire national des entreprises et des établissements"
+    definition: "Le répertoire que tient l'INSEE : chaque entreprise y a un numéro, et chacun de ses établissements le sien."
+    liens: [insee-def-sirene, od-sirene-ods, insee-sirene-variables]
+
   - id: sigle-sru
     sigle: SRU
     developpe: "Solidarité et renouvellement urbains"

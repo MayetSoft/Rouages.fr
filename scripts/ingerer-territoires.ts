@@ -717,6 +717,23 @@ async function principal() {
     ),
   );
   if (ccas) dire(`${GRIS}${ecrireCcas(SORTIE, ccas)} départements de centres d’action sociale écrits.${RAZ}`);
+
+  // Ce qui est installé : les établissements actifs au répertoire SIRENE, par
+  // secteur. Après l'écriture, dont il lit l'index — les départements et les
+  // populations — pour rapporter les employeurs aux habitants.
+  const { collecterSirene, ecrireSirene } = await import('./sirene-emettre.ts');
+  const index = JSON.parse(readFileSync(join(SORTIE, 'index.json'), 'utf8')) as {
+    c: [string, string, string, string, number][];
+  };
+  const sirene = await tenter('Établissements SIRENE', () =>
+    collecterSirene(
+      async (url) => (await obstine(url)).text(),
+      [...new Set(index.c.map((c) => c[3]))].sort(),
+      new Map(index.c.map((c) => [c[0], c[4]] as const)),
+      (m) => dire(`${GRIS}${m}${RAZ}`),
+    ),
+  );
+  if (sirene) dire(`${GRIS}${ecrireSirene(SORTIE, sirene)} départements d’établissements écrits.${RAZ}`);
 }
 
 /** Lit l'export en flux : 1,4 Go de XML ne tiennent pas en mémoire. */

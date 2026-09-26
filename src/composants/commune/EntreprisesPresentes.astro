@@ -1,0 +1,75 @@
+---
+/**
+ * Ce qui est installé dans la commune : les établissements actifs au
+ * répertoire SIRENE, secteur par secteur, et parmi eux les employeurs.
+ *
+ * Les deux nombres vont ensemble, et le bloc dit pourquoi : un établissement
+ * actif au répertoire n'est pas forcément ouvert — une SCI, un toit équipé de
+ * panneaux solaires y restent tant qu'on ne les radie pas. L'employeur, lui, a
+ * déclaré un salarié à l'URSSAF. La réglette porte sur les employeurs, rapportés
+ * aux habitants : c'est le chiffre qui se compare d'une commune à l'autre.
+ *
+ * Aucun nom : des décomptes seulement.
+ */
+import type { Presentes } from '../../modele/fiche-commune.ts';
+import Repere from './Repere.astro';
+
+interface Props {
+  p: Presentes;
+}
+const { p } = Astro.props;
+const nb = (v: number) => v.toLocaleString('fr-FR');
+const dixieme = (v: number) => v.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+// Huit secteurs au plus : au-delà, la liste ne se lit plus, et ce sont des
+// secteurs sans employeur ou presque.
+const montres = p.secteurs.slice(0, 8);
+const reste = p.secteurs.slice(8);
+const resteTotal = reste.reduce((s, x) => s + x.total, 0);
+const resteEmployeurs = reste.reduce((s, x) => s + x.employeurs, 0);
+const detail = (total: number, employeurs: number) =>
+  `${nb(total)} établissement${total > 1 ? 's' : ''}` +
+  (employeurs > 0 ? `, dont ${nb(employeurs)} employeur${employeurs > 1 ? 's' : ''}` : ', aucun employeur');
+---
+<h3 class="p-titre-echelon">Ce qui est installé</h3>
+<dl class="p-reperes">
+  <Repere
+    nom="Établissements actifs"
+    aide="Inscrits au répertoire SIRENE et non fermés : y figurent aussi ceux qui n’exercent plus, tant qu’on ne les a pas radiés."
+    montant={nb(p.total)}
+    detail={`dont ${nb(p.employeurs)} employeur${p.employeurs > 1 ? 's' : ''}`}
+  />
+  {p.parMille !== null && p.mediane > 0 && (
+    <Repere
+      nom="Établissements employeurs"
+      aide="Ceux qui ont déclaré au moins un salarié à l’URSSAF, et pas encore le départ du dernier."
+      montant={`${dixieme(p.parMille)} pour 1 000 habitants`}
+      compare={{ valeur: p.parMille, mediane: p.mediane, reference: 'la médiane des communes' }}
+      mediane={`médiane ${dixieme(p.mediane)}`}
+    />
+  )}
+</dl>
+{montres.length > 0 && (
+  <div class="p-risque-groupe">
+    <span class="p-service-famille">Par secteur, les employeurs d’abord</span>
+    <ul>
+      {montres.map((s) => (
+        <li class="p-risque-plan">
+          <span class="p-risque-nom">{s.nom}</span>
+          <span class="p-risque-detail">{detail(s.total, s.employeurs)}</span>
+        </li>
+      ))}
+      {reste.length > 0 && (
+        <li class="p-risque-plan">
+          <span class="p-risque-nom">{`${reste.length} autre${reste.length > 1 ? 's' : ''} secteur${reste.length > 1 ? 's' : ''}`}</span>
+          <span class="p-risque-detail">{detail(resteTotal, resteEmployeurs)}</span>
+        </li>
+      )}
+    </ul>
+  </div>
+)}
+<p class="p-source-territoire">
+  {`D’après la base SIRENE de l’INSEE, dans la copie tenue par Opendatasoft (${p.source ?? p.maj}). ` +
+    'Un établissement actif au répertoire n’est pas forcément ouvert : une SCI qui détient un bien, un toit équipé ' +
+    'de panneaux solaires, un auto-entrepreneur qui ne facture plus y restent tant qu’on ne les a pas radiés. ' +
+    'Les entrepreneurs individuels sont comptés, jamais nommés.'}
+</p>
