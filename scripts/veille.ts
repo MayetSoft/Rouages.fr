@@ -415,10 +415,13 @@ const controles: Record<
     if (!d) return { gravite: 'alerte', message: `le champ « ${champ} » ne renvoie plus de date` };
     const lisible = d.slice(0, 10);
     const jours = Math.round((Date.now() - new Date(d).getTime()) / 86_400_000);
-    // Le BODACC paraît du mardi au samedi : un long week-end ou une semaine
-    // de fêtes font quatre ou cinq jours sans parution, pas quinze.
+    // Le seuil d'alerte, en jours, est `attendu`. Par défaut quatorze : le
+    // BODACC paraît du mardi au samedi, et une semaine de fêtes fait quatre
+    // ou cinq jours sans parution, pas quinze. Une copie mensuelle en déclare
+    // davantage. On regarde à la moitié du seuil.
+    const seuil = s.attendu ?? 14;
     return {
-      gravite: jours > 14 ? 'alerte' : jours > 7 ? 'a-regarder' : 'ok',
+      gravite: jours > seuil ? 'alerte' : jours > seuil / 2 ? 'a-regarder' : 'ok',
       message: `dernière parution le ${lisible}, il y a ${jours} jour${jours > 1 ? 's' : ''}`,
       empreinte: lisible,
     };

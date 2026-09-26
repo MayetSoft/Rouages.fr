@@ -2347,6 +2347,24 @@ mineurs, les étrangers hors Union européenne et les non-inscrits n'y sont pas.
 Au Mayet-de-Montagne : une seule liste, 420 voix sur 1 030 inscrits, 40,8 % ;
 165 bulletins blancs ou nuls sur 585 votants, 28 % contre une médiane de 9 %.
 
+### Ce qui est installé : les établissements par secteur ✔
+
+Le BODACC disait ce qui s'ouvre, change de mains et ferme ; la base SIRENE dit
+ce qui est là. Le bloc des entreprises donne désormais les établissements
+actifs de la commune, secteur par secteur, et parmi eux les employeurs — ceux
+qui ont déclaré un salarié à l'URSSAF.
+
+Les deux nombres vont ensemble : un établissement actif au répertoire n'est
+pas forcément ouvert. Au Mayet-de-Montagne, 379 établissements actifs dont 72
+employeurs ; 51 des 52 de l'immobilier et les 13 de l'énergie n'emploient
+personne — des SCI, des toits équipés de panneaux solaires. La réglette porte
+sur les employeurs rapportés aux habitants : 52,1 pour 1 000, contre une
+médiane de 22,2 — un bourg-centre qui sert les villages autour.
+
+La source est la copie de SIRENE que tient Opendatasoft, agrégeable côté
+serveur : un département répond en deux secondes, la France en moins de deux
+minutes. Rien n'est nommé.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

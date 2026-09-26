@@ -39,6 +39,7 @@ import Subventions from '../../composants/commune/Subventions.astro';
 import Associations from '../../composants/commune/Associations.astro';
 import CentresSociaux from '../../composants/commune/CentresSociaux.astro';
 import Entreprises from '../../composants/commune/Entreprises.astro';
+import EntreprisesPresentes from '../../composants/commune/EntreprisesPresentes.astro';
 import Fiscalite from '../../composants/commune/Fiscalite.astro';
 import Logements from '../../composants/commune/Logements.astro';
 import Equipements from '../../composants/commune/Equipements.astro';
@@ -215,7 +216,7 @@ const sommaire: [string, string, unknown][] = [
   ['deliberations', 'Les délibérations', plus.deliberations.length > 0],
   ['subventions', 'Les subventions', plus.subventions.length > 0],
   ['associations', 'Les associations', (plus.associations && plus.associations.total > 0) || droitLocal],
-  ['entreprises', 'Les entreprises', plus.entreprises],
+  ['entreprises', 'Les entreprises', plus.presentes || plus.entreprises],
   ['equipements', 'Ce qu’on trouve sur place', fiche?.equipements],
   ['services', 'Les services', (fiche?.services.length ?? 0) > 0],
   ['journal', 'Ce qui a bougé', journal.length > 0],
@@ -551,10 +552,16 @@ const eau = plus.eau && plus.eau.prix !== null ? plus.eau : null;
       </section>
     )}
 
-    {plus.entreprises && (
+    {(plus.presentes || plus.entreprises) && (
       <section id="entreprises" class="p-assos">
-        <h2 class="badge">Ce que publient ses entreprises</h2>
-        <Entreprises e={plus.entreprises} nom={commune.nom} cp={commune.cp} />
+        <h2 class="badge">Ses entreprises</h2>
+        {plus.presentes && <EntreprisesPresentes p={plus.presentes} />}
+        {plus.entreprises && (
+          <>
+            <h3 class="p-titre-echelon">Ce qu’elles publient au BODACC</h3>
+            <Entreprises e={plus.entreprises} nom={commune.nom} cp={commune.cp} />
+          </>
+        )}
       </section>
     )}
 
