@@ -256,6 +256,9 @@ export interface Scrutin {
     votants: number;
     /** Blancs et nuls confondus. */
     refus: number;
+    /** Séparés, quand le fichier les distingue. */
+    blancs: number | null;
+    nuls: number | null;
     listes: number;
     medianeParticipation: number;
     medianeRefus: number;
@@ -476,8 +479,8 @@ type ElectionsDep = {
   c: Record<
     string,
     {
-      t1: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number; tete?: number };
-      t2?: { inscrits: number; votants: number; exprimes: number; refus: number; listes: number; tete?: number };
+      t1: { inscrits: number; votants: number; exprimes: number; refus: number; blancs?: number; nuls?: number; listes: number; tete?: number };
+      t2?: { inscrits: number; votants: number; exprimes: number; refus: number; blancs?: number; nuls?: number; listes: number; tete?: number };
       decisif?: 1 | 2;
       cm: number;
       cc: number;
@@ -855,6 +858,8 @@ function assemblerScrutin(commune: CommuneFiche, structures: StructureFiche[]): 
       inscrits: t.inscrits,
       votants: t.votants,
       refus: t.refus,
+      blancs: t.blancs ?? null,
+      nuls: t.nuls ?? null,
       listes: t.listes,
       medianeParticipation: m?.participation ?? 0,
       medianeRefus: m?.refus ?? 0,
