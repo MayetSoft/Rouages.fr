@@ -2385,6 +2385,16 @@ Essayé contre un serveur FTP et un PHP locaux : 4 100 fichiers en trois
 archives, déballées en plusieurs appels ; les chemins piégés refusés ; le repli
 quand PHP ne répond pas, sans rien laisser derrière.
 
+**Premier essai réel, le 26 septembre : repli.** 68 088 fichiers en 35
+archives (708 Mo) sont partis en deux minutes, puis le premier appel au script
+a reçu de Cloudflare un 520 — l'origine a rendu une réponse vide ou coupée.
+Le repli a joué son rôle : le miroir a pris la suite, et le nettoyage n'a rien
+laissé sur le serveur. Le journal ne gardait que les premiers octets de la page
+d'erreur, le gabarit commun à toutes celles de Cloudflare ; il garde désormais
+le code, le `cf-ray` et le titre de la page, retente un 52x, et commence par
+une requête sans jeton qui doit rendre le 403 du script — ce qui sépare
+« PHP ne répond pas » de « le POST est arrêté en route ».
+
 ### Une page qu'on lit sans la parcourir en entier ✔
 
 La page de commune dépassait dix écrans. Quatre changements pour celui qui ne
