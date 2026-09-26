@@ -51,6 +51,13 @@ export interface TourCommune {
   exprimes: number;
   /** Blancs et nuls confondus : ils disent la même chose — être venu sans choisir. */
   refus: number;
+  /**
+   * Les deux, séparés. Le blanc est un choix déclaré — une enveloppe vide ou
+   * un bulletin blanc —, le nul souvent un bulletin raturé ou annoté : au
+   * Mayet-de-Montagne, en 2026, 41 blancs et 124 nuls.
+   */
+  blancs: number;
+  nuls: number;
   /** Combien de listes se présentaient. Une seule dans deux communes sur trois. */
   listes: number;
   /**
@@ -205,6 +212,8 @@ export async function collecterElections(
         votants,
         exprimes: entier(l['Exprimés']),
         refus: entier(l['Blancs']) + entier(l['Nuls']),
+        blancs: entier(l['Blancs']),
+        nuls: entier(l['Nuls']),
         listes: 0,
         tete: 0,
       };

@@ -36,7 +36,11 @@ const tours = sc.tours.filter((t) => t.inscrits > 0).map((t) => ({
       nom: 'Bulletins blancs ou nuls',
       valeur: taux(t.refus, t.votants),
       mediane: t.medianeRefus,
-      detail: `${t.refus.toLocaleString('fr-FR')} sur ${t.votants.toLocaleString('fr-FR')} votants`,
+      detail:
+        `${t.refus.toLocaleString('fr-FR')} sur ${t.votants.toLocaleString('fr-FR')} votants` +
+        (t.blancs !== null && t.nuls !== null
+          ? ` : ${t.blancs.toLocaleString('fr-FR')} blanc${t.blancs > 1 ? 's' : ''}, ${t.nuls.toLocaleString('fr-FR')} nul${t.nuls > 1 ? 's' : ''}`
+          : ''),
     },
   ],
 }));

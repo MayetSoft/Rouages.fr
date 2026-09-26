@@ -2385,6 +2385,31 @@ Essayé contre un serveur FTP et un PHP locaux : 4 100 fichiers en trois
 archives, déballées en plusieurs appels ; les chemins piégés refusés ; le repli
 quand PHP ne répond pas, sans rien laisser derrière.
 
+### Une page qu'on lit sans la parcourir en entier ✔
+
+La page de commune dépassait dix écrans. Quatre changements pour celui qui ne
+descendra pas jusqu'au bout :
+
+- **L'essentiel**, en haut : cinq ou six chiffres — habitants et part des 60
+  ans ou plus, voix de la liste en tête, dépenses de fonctionnement par
+  habitant, employeurs, CCAS, faits du journal —, chacun renvoyant au bloc qui
+  le rapporte à sa médiane et à sa source. Rien n'y figure qui ne soit pas
+  plus bas.
+- **Les démarches liées**, sous neuf blocs : le graphe les décrivait, la page
+  ne les montrait pas. Du CCAS à la demande d'aide, de la taxe foncière à sa
+  contestation, de l'élection à l'inscription.
+- **Depuis la dernière visite** : le navigateur retient, commune par commune,
+  la date du dernier fait vu, et marque ce qui est plus récent. Rien ne part au
+  serveur.
+- **Les services plafonnés à quarante par famille**, les écoles qui ont gagné
+  ou perdu une classe en tête. Paris passe de 612 à 136 Ko : ses 833 écoles en
+  pesaient 520, repliées mais présentes dans le HTML.
+
+Au passage, les bulletins blancs et nuls sont comptés à part — au
+Mayet-de-Montagne, 41 blancs et 124 nuls —, et le rattachement des annonces du
+BODACC a son script de vérification, `npm run verifier-rattachement`, lancé en
+intégration continue.
+
 ## Phase 3 — Élargir
 
 - **Rouages économiques** : métiers, filières, chaînes de valeur. Même modèle,

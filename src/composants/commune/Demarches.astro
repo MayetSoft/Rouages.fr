@@ -1,0 +1,39 @@
+---
+/**
+ * Les démarches qu'un bloc chiffré appelle : du budget du CCAS à la demande
+ * d'aide, de la taxe foncière à sa contestation.
+ *
+ * Le graphe les décrit toutes ; la page de commune donnait les chiffres sans
+ * dire quoi en faire. Une ligne sous le bloc, pas davantage : les démarches
+ * vivent sur leur propre page, avec leurs textes.
+ *
+ * La liste est dans `src/modele/demarches-des-blocs.ts`, que
+ * `verifier-reseau` contrôle en entier ; un identifiant inconnu fait de toute
+ * façon échouer le build plutôt que de laisser un lien mort.
+ */
+import { DEMARCHES_DES_BLOCS, type BlocAvecDemarches } from '../../modele/demarches-des-blocs.ts';
+import { chargerGraphe } from '../../modele/graphe.ts';
+
+interface Props {
+  bloc: BlocAvecDemarches;
+}
+const { bloc } = Astro.props;
+const ids = DEMARCHES_DES_BLOCS[bloc];
+const graphe = chargerGraphe();
+const liens = ids.map((id) => {
+  const p = graphe.processus.get(id);
+  if (!p) throw new Error(`Démarche inconnue dans la page de commune : ${id}`);
+  return { id, nom: p.nom };
+});
+---
+{liens.length > 0 && (
+  <p class="c-demarches">
+    <span class="c-demarches-titre">{liens.length > 1 ? 'Les démarches liées' : 'La démarche liée'}</span>
+    {liens.map((l, i) => (
+      <>
+        {i > 0 && ' · '}
+        <a href={`/n/${l.id}`}>{l.nom}</a>
+      </>
+    ))}
+  </p>
+)}

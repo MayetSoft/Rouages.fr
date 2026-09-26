@@ -21,6 +21,8 @@
  * (`src/modele/reseau.ts`), donc il est de degré 1 par construction et non par
  * négligence.
  */
+import { DEMARCHES_DES_BLOCS } from '../src/modele/demarches-des-blocs.ts';
+import { chargerGraphe } from '../src/modele/graphe.ts';
 import { construireReseau, type Reseau } from '../src/modele/reseau.ts';
 
 const ROUGE = '\x1b[31m', VERT = '\x1b[32m', JAUNE = '\x1b[33m', GRIS = '\x1b[90m', RAZ = '\x1b[0m';
@@ -125,6 +127,20 @@ attendre(
   `plancher ${PLANCHER_TROIS_CLICS} % — le critère de la phase 2, tenu comme un cliquet` +
     ' plutôt que comme un absolu',
 );
+
+// Les démarches que la page de commune cite sous ses blocs : toutes doivent
+// exister, même celles des blocs qu'un build partiel n'affiche pas.
+{
+  const processus = chargerGraphe().processus;
+  const inconnues = Object.entries(DEMARCHES_DES_BLOCS).flatMap(([bloc, ids]) =>
+    ids.filter((id) => !processus.has(id)).map((id) => `${bloc} → ${id}`),
+  );
+  attendre(
+    'démarches citées par la page de commune',
+    inconnues.length === 0,
+    inconnues.length === 0 ? 'toutes existent dans le graphe' : `inconnues : ${inconnues.join(', ')}`,
+  );
+}
 
 // Le tableau de ce qui est mince, documents mis à part.
 const minces = reseau.noeuds
